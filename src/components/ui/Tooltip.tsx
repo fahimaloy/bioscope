@@ -44,10 +44,10 @@ export function Tooltip({ content, children, position = 'top', delay = 200, clas
   }
 
   const arrowStyles = {
-    top: 'top-full left-1/2 -translate-x-1/2 border-t-primary',
-    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-primary',
-    left: 'left-full top-1/2 -translate-y-1/2 border-l-primary',
-    right: 'right-full top-1/2 -translate-y-1/2 border-r-primary',
+    top: 'top-full left-1/2 -translate-x-1/2 border-t-[var(--ink)]',
+    bottom: 'bottom-full left-1/2 -translate-x-1/2 border-b-[var(--ink)]',
+    left: 'left-full top-1/2 -translate-y-1/2 border-l-[var(--ink)]',
+    right: 'right-full top-1/2 -translate-y-1/2 border-r-[var(--ink)]',
   }
 
   return (
@@ -67,7 +67,7 @@ export function Tooltip({ content, children, position = 'top', delay = 200, clas
           ref={tooltipRef}
           role="tooltip"
           className={cn(
-            'absolute z-50 px-3 py-2 text-xs font-medium text-white bg-primary rounded-input',
+            'absolute z-50 px-3 py-2 text-xs font-medium text-white bg-[var(--ink)] rounded-input',
             'whitespace-nowrap animate-fade-in',
             positionStyles[position],
             className

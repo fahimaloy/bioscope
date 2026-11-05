@@ -89,7 +89,7 @@ export function Dropdown({
       {isOpen && (
         <div
           className={cn(
-            'absolute z-50 mt-1 w-full bg-white border-3 border-[var(--ink)] rounded-card shadow-[0_10px_40px_rgba(0,0,0,0.15)]',
+            'absolute z-50 mt-1 w-full bg-[var(--surface-card)] border-3 border-[var(--ink)] rounded-card shadow-xl',
             'overflow-hidden animate-scale-in',
             align === 'right' && 'right-0'
           )}
@@ -110,6 +110,7 @@ export function Dropdown({
               className={cn(
                 'w-full px-4 py-3 text-left text-body transition-colors',
                 'focus:outline-none focus:bg-[var(--light)]',
+                'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
                 'first:rounded-t-card last:rounded-b-card',
                 item.value === value ? 'bg-primary/10 text-primary' : 'text-[var(--ink)]',
                 item.disabled && 'opacity-50 cursor-not-allowed',
@@ -220,7 +221,7 @@ export function MultiSelectDropdown({
       {isOpen && (
         <div
           className={cn(
-            'absolute z-50 mt-1 w-full bg-white border-3 border-[var(--ink)] rounded-card shadow-[0_10px_40px_rgba(0,0,0,0.15)]',
+            'absolute z-50 mt-1 w-full bg-[var(--surface-card)] border-3 border-[var(--ink)] rounded-card shadow-xl',
             'overflow-hidden animate-scale-in',
             align === 'right' && 'right-0'
           )}
@@ -243,6 +244,7 @@ export function MultiSelectDropdown({
                 className={cn(
                   'w-full px-4 py-3 text-left text-body transition-colors',
                   'focus:outline-none focus:bg-[var(--light)]',
+                  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
                   'first:rounded-t-card last:rounded-b-card',
                   isSelected ? 'bg-primary/10 text-primary' : 'text-[var(--ink)]',
                   (item.disabled || (maxSelected && values.length >= maxSelected && !isSelected)) &&
@@ -255,7 +257,7 @@ export function MultiSelectDropdown({
                     type="checkbox"
                     checked={isSelected}
                     disabled={Boolean(item.disabled || (maxSelected && values.length >= maxSelected && !isSelected))}
-                    className="w-4 h-4 text-primary border-[var(--ink)] rounded focus:ring-primary"
+                    className="w-4 h-4 text-primary border-[var(--ink)] rounded focus:ring-primary focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]"
                     aria-hidden="true"
                   />
                   {item.icon && <span className="flex-shrink-0">{item.icon}</span>}

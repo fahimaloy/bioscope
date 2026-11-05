@@ -4,22 +4,23 @@ import { forwardRef, HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'outline' | 'info'
+  variant?: 'default' | 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'outline' | 'info' | 'doodle'
   size?: 'xs' | 'sm' | 'md' | 'lg'
   dot?: boolean
   dotColor?: string
 }
 
 const variantStyles = {
-  default: 'bg-dark text-white',
+  default: 'bg-[var(--ink)] text-white',
   primary: 'bg-[var(--primary)] text-white',
-  secondary: 'bg-secondary text-white',
-  accent: 'bg-accent text-[var(--ink)]',
-  success: 'bg-green-500 text-white',
-  warning: 'bg-yellow-500 text-[var(--ink)]',
-  error: 'bg-red-500 text-white',
-  outline: 'bg-transparent border-2 border-[var(--ink)] text-[var(--ink)]',
-  info: 'bg-[var(--primary)] text-white',
+  secondary: 'bg-[var(--secondary)] text-white',
+  accent: 'bg-[var(--accent)] text-[var(--ink)]',
+  success: 'bg-[var(--success)] text-white',
+  warning: 'bg-[var(--warning)] text-[var(--ink)]',
+  error: 'bg-[var(--error)] text-white',
+  info: 'bg-[var(--info)] text-white',
+  outline: 'bg-transparent border-2 border-[var(--border-primary)] text-[var(--text-primary)]',
+  doodle: 'bg-[var(--primary)] text-white border-2 border-[var(--ink)] shadow-btn',
 }
 
 const sizeStyles = {
@@ -39,6 +40,7 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
           'transition-colors duration-200',
           variantStyles[variant],
           sizeStyles[size],
+          'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
           className
         )}
         {...props}

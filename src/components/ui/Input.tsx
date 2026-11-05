@@ -12,7 +12,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, icon, iconPosition = 'left', id: providedId, ...props }, ref) => {
+  ({ className, label, error, hint, icon, iconPosition = 'left', id: providedId, type, ...props }, ref) => {
     const generatedId = useId()
     const id = providedId || generatedId
     const errorId = `${id}-error`
@@ -20,9 +20,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const hasValue = props.defaultValue || props.value || (props as any).value !== ''
 
+    const isPassword = type === 'password'
+
     return (
       <div className="w-full">
-        <div className="relative">
+        <div className="relative flex items-center">
           {icon && iconPosition === 'left' && (
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/50 pointer-events-none z-10">
               {icon}
@@ -31,6 +33,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={id}
+            type={type}
             className={cn(
               'w-full bg-transparent transition-all duration-300',
               'border-2 rounded-input',
@@ -38,21 +41,33 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               'focus:outline-none focus:border-primary focus:shadow-input',
               'disabled:opacity-60 disabled:cursor-not-allowed',
               'text-body text-[var(--ink)]',
-              iconPosition === 'left' && 'pl-10',
-              iconPosition === 'right' && 'pr-10',
+              'py-3 px-4',  // consistent padding
+              iconPosition === 'left' && 'pl-12',
+              iconPosition === 'right' && 'pr-12',
+              isPassword && 'pr-12',
               error
-                ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(231,76,60,0.2)]'
+                ? 'border-[var(--error)] focus:border-[var(--error)] focus:shadow-[0_0_0_3px_rgba(231,76,60,0.2)]'
                 : 'border-[var(--ink)]',
+              'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
               className
             )}
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? errorId : hint ? hintId : undefined}
             {...props}
           />
-          {icon && iconPosition === 'right' && (
+          {icon && iconPosition === 'right' && !isPassword && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/50 pointer-events-none z-10">
               {icon}
             </div>
+          )}
+          {isPassword && (
+            <button
+              type="button"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--ink)]/50 hover:text-primary transition-colors p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]"
+              aria-label={props['aria-label'] === 'Hide password' ? 'Show password' : 'Hide password'}
+            >
+              {icon}
+            </button>
           )}
           {label && (
             <label
@@ -62,16 +77,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 'pointer-events-none bg-white px-1',
                 'text-[var(--ink)]/50 font-medium',
                 (hasValue || props.placeholder) && '-translate-y-3 scale-75 text-primary',
-                error && 'text-red-500'
+                error && 'text-[var(--error)]',
+                isPassword && 'right-12'
               )}
             >
               {label}
-              {props.required && <span className="text-red-500 ml-1">*</span>}
+              {props.required && <span className="text-[var(--error)] ml-1">*</span>}
             </label>
           )}
         </div>
         {error && (
-          <p id={errorId} className="mt-1.5 text-sm text-red-500 flex items-center gap-1" role="alert">
+          <p id={errorId} className="mt-1.5 text-sm text-[var(--error)] flex items-center gap-1" role="alert">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
@@ -119,8 +135,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               'disabled:opacity-60 disabled:cursor-not-allowed',
               'text-body text-[var(--ink)]',
               error
-                ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(231,76,60,0.2)]'
+                ? 'border-[var(--error)] focus:border-[var(--error)] focus:shadow-[0_0_0_3px_rgba(231,76,60,0.2)]'
                 : 'border-[var(--ink)]',
+              'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
               className
             )}
             aria-invalid={error ? 'true' : 'false'}
@@ -135,16 +152,16 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
                 'pointer-events-none bg-white px-1',
                 'text-[var(--ink)]/50 font-medium',
                 (hasValue || props.placeholder) && '-translate-y-3 scale-75 text-primary',
-                error && 'text-red-500'
+                error && 'text-[var(--error)]'
               )}
             >
               {label}
-              {props.required && <span className="text-red-500 ml-1">*</span>}
+              {props.required && <span className="text-[var(--error)] ml-1">*</span>}
             </label>
           )}
         </div>
         {error && (
-          <p id={errorId} className="mt-1.5 text-sm text-red-500 flex items-center gap-1" role="alert">
+          <p id={errorId} className="mt-1.5 text-sm text-[var(--error)] flex items-center gap-1" role="alert">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
@@ -193,8 +210,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               'disabled:opacity-60 disabled:cursor-not-allowed',
               'text-body text-[var(--ink)]',
               error
-                ? 'border-red-500 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(231,76,60,0.2)]'
+                ? 'border-[var(--error)] focus:border-[var(--error)] focus:shadow-[0_0_0_3px_rgba(231,76,60,0.2)]'
                 : 'border-[var(--ink)]',
+              'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
               className
             )}
             aria-invalid={error ? 'true' : 'false'}
@@ -225,16 +243,16 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
                 'pointer-events-none bg-white px-1',
                 'text-[var(--ink)]/50 font-medium',
                 (hasValue || props.defaultValue) && '-translate-y-3 scale-75 text-primary',
-                error && 'text-red-500'
+                error && 'text-[var(--error)]'
               )}
             >
               {label}
-              {props.required && <span className="text-red-500 ml-1">*</span>}
+              {props.required && <span className="text-[var(--error)] ml-1">*</span>}
             </label>
           )}
         </div>
         {error && (
-          <p id={errorId} className="mt-1.5 text-sm text-red-500 flex items-center gap-1" role="alert">
+          <p id={errorId} className="mt-1.5 text-sm text-[var(--error)] flex items-center gap-1" role="alert">
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>

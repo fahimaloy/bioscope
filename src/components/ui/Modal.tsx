@@ -113,7 +113,7 @@ export function Modal({
       >
         <div
           className={cn(
-            'w-full bg-white rounded-card border-3 border-[var(--ink)] shadow-[0_25px_50px_rgba(0,0,0,0.25)]',
+            'w-full bg-[var(--surface-card)] rounded-card border-3 border-[var(--ink)] shadow-xl',
             'overflow-hidden',
             sizeStyles[size],
             className

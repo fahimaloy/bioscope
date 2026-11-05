@@ -100,7 +100,7 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
     const variantStyles = {
       default: cn(
         'px-4 py-2 rounded-[30px] text-body font-medium transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+        'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
         isActive
           ? 'bg-white text-primary shadow-btn'
           : 'text-[var(--ink)]/70 hover:text-[var(--ink)] hover:bg-white/50',
@@ -108,7 +108,7 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
       ),
       pills: cn(
         'px-6 py-3 rounded-card text-body font-medium transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+        'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
         isActive
           ? 'bg-primary text-white shadow-btn'
           : 'text-[var(--ink)]/70 bg-[var(--light)] hover:bg-dark/10',
@@ -116,7 +116,7 @@ export const TabsTrigger = forwardRef<HTMLButtonElement, TabsTriggerProps>(
       ),
       underline: cn(
         'px-4 py-3 border-b-3 -mb-px text-body font-medium transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+        'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
         isActive
           ? 'border-primary text-primary'
           : 'border-transparent text-[var(--ink)]/70 hover:text-[var(--ink)]',

@@ -2,9 +2,10 @@
 
 import { forwardRef, HTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
+import { StickerPeel } from '@/components/decorative/DoodleElements'
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'elevated' | 'outlined'
+  variant?: 'default' | 'elevated' | 'outlined' | 'doodle' | 'doodle-elevated'
   hover?: boolean
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl'
 }
@@ -18,13 +19,17 @@ const paddingStyles = {
 }
 
 const variantStyles = {
-  default: 'bg-[var(--paper-deep)] border-3 border-[var(--ink)] shadow-card hover:shadow-card-hover',
-  elevated: 'bg-[var(--paper-deep)] border-3 border-[var(--ink)] shadow-[0_10px_40px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.15)]',
-  outlined: 'bg-[var(--paper-deep)] border-3 border-[var(--ink)] shadow-none',
+  default: 'bg-[var(--surface-card)] border-3 border-[var(--border-primary)] shadow-card hover:shadow-card-hover',
+  elevated: 'bg-[var(--surface-elevated)] border-3 border-[var(--border-primary)] shadow-xl hover:shadow-xl',
+  outlined: 'bg-transparent border-3 border-[var(--border-primary)] hover:border-primary',
+  doodle: 'bg-[var(--surface-card)] border-3 border-[var(--ink)] shadow-card hover:shadow-card-hover relative',
+  'doodle-elevated': 'bg-[var(--surface-card)] border-3 border-[var(--ink)] shadow-xl hover:shadow-card-hover relative',
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = 'default', hover = true, padding = 'lg', children, ...props }, ref) => {
+    const isDoodleVariant = variant === 'doodle' || variant === 'doodle-elevated'
+
     return (
       <div
         ref={ref}
@@ -38,6 +43,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         )}
         {...props}
       >
+        {isDoodleVariant && <StickerPeel />}
         {children}
       </div>
     )

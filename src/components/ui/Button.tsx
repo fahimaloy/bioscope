@@ -2,9 +2,10 @@
 
 import { forwardRef, ButtonHTMLAttributes } from 'react'
 import { cn } from '@/lib/utils'
+import { StickerPeel } from '@/components/decorative/DoodleElements'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | string
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'doodle' | 'doodle-secondary' | 'doodle-outline' | string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   loading?: boolean
   icon?: React.ReactNode
@@ -24,7 +25,10 @@ const variantStyles = {
   secondary: 'bg-[var(--accent)] text-[var(--ink)] border-[var(--ink)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active',
   outline: 'bg-transparent border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--primary)] hover:text-white hover:border-primary',
   ghost: 'bg-transparent border-transparent text-[var(--ink)] hover:bg-[var(--light)]',
-  destructive: 'bg-red-500 text-white border-red-600 shadow-btn hover:shadow-btn-hover active:shadow-btn-active',
+  destructive: 'bg-[var(--error)] text-white border-[var(--error)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active',
+  doodle: 'bg-[var(--primary)] text-white border-[var(--ink)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active relative overflow-hidden',
+  'doodle-secondary': 'bg-[var(--accent)] text-[var(--ink)] border-[var(--ink)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active relative overflow-hidden',
+  'doodle-outline': 'bg-transparent border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--primary)] hover:text-white hover:border-primary relative overflow-hidden',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -44,6 +48,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const isDisabled = disabled || loading
+    const isDoodleVariant = variant === 'doodle' || variant === 'doodle-secondary' || variant === 'doodle-outline'
 
     return (
       <button
@@ -51,7 +56,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'inline-flex items-center justify-center gap-2 font-display transition-all duration-300',
           'rounded-pill border-3',
-          'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-accent focus-visible:ring-offset-2',
+          'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
           'disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none',
           'active:translate-x-[4px] active:translate-y-[4px]',
           sizeStyles[size],
@@ -88,6 +93,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {icon && iconPosition === 'left' && !loading && <span className="flex-shrink-0">{icon}</span>}
         <span>{children}</span>
         {icon && iconPosition === 'right' && !loading && <span className="flex-shrink-0">{icon}</span>}
+        {isDoodleVariant && <StickerPeel />}
       </button>
     )
   }

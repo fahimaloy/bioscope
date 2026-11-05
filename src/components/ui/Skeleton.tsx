@@ -17,7 +17,7 @@ export function Skeleton({
   height,
   animation = 'pulse',
 }: SkeletonProps) {
-  const baseStyles = 'bg-dark/10 rounded overflow-hidden'
+  const baseStyles = 'bg-[var(--light)] rounded overflow-hidden'
 
   const variantStyles = {
     text: 'h-4 rounded',
@@ -86,7 +86,7 @@ export function SkeletonCard({ className, ...props }: SkeletonProps) {
 
 export function SkeletonTable({ rows = 5, columns = 4, className, ...props }: { rows?: number; columns?: number } & SkeletonProps) {
   return (
-    <div className={cn('overflow-hidden border-3 border-[var(--ink)] rounded-card bg-white', className)}>
+    <div className={cn('overflow-hidden border-3 border-[var(--ink)] rounded-card bg-[var(--surface-card)]', className)}>
       <table className="w-full" role="grid">
         <thead className="bg-[var(--light)]">
           <tr>
@@ -97,7 +97,7 @@ export function SkeletonTable({ rows = 5, columns = 4, className, ...props }: { 
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-light">
+        <tbody className="divide-y divide-[var(--light)]">
           {Array.from({ length: rows }).map((_, rowIndex) => (
             <tr key={rowIndex}>
               {Array.from({ length: columns }).map((_, colIndex) => (
@@ -115,7 +115,7 @@ export function SkeletonTable({ rows = 5, columns = 4, className, ...props }: { 
 
 export function SkeletonProductCard({ className, ...props }: SkeletonProps) {
   return (
-    <div className={cn('bg-white border-3 border-[var(--ink)] rounded-card p-6 shadow-card space-y-4', className)}>
+    <div className={cn('bg-[var(--surface-card)] border-3 border-[var(--ink)] rounded-card p-6 shadow-card space-y-4', className)}>
       <Skeleton variant="rectangular" width="100%" height={200} {...props} />
       <div className="space-y-2">
         <Skeleton variant="text" width="80%" height={28} {...props} />
@@ -132,7 +132,7 @@ export function SkeletonProductCard({ className, ...props }: SkeletonProps) {
 
 export function SkeletonOrderCard({ className, ...props }: SkeletonProps) {
   return (
-    <div className={cn('bg-white border-3 border-[var(--ink)] rounded-card p-6 shadow-card space-y-4', className)}>
+    <div className={cn('bg-[var(--surface-card)] border-3 border-[var(--ink)] rounded-card p-6 shadow-card space-y-4', className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Skeleton variant="text" width="120px" height={20} {...props} />
@@ -166,7 +166,7 @@ export const skeletonWaveStyles = `
 }
 
 .animate-wave {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background: linear-gradient(90deg, var(--light) 25%, #f3f4f6 50%, var(--light) 75%);
   background-size: 200% 100%;
   animation: wave 1.5s ease-in-out infinite;
 }
