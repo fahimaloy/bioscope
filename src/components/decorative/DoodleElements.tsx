@@ -8,12 +8,14 @@ export function DoodleShape({
   size = 'md',
   color = 'primary',
   animation = 'float',
+  style,
   ...props
 }: {
   className?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   color?: 'primary' | 'secondary' | 'accent' | 'ink'
   animation?: 'float' | 'wobble' | 'pulse' | 'rotate' | 'none'
+  style?: React.CSSProperties
 }) {
   const sizes = { sm: 60, md: 120, lg: 200, xl: 300 }
   const animations = {
@@ -40,6 +42,7 @@ export function DoodleShape({
       viewBox={`0 0 ${pathSize} ${pathSize}`}
       className={cn('text-[var(--', color, ')]', animations[animation], className)}
       aria-hidden="true"
+      style={style}
       {...props}
     >
       <path d={pathData} fill="currentColor" fillOpacity={0.15} />
