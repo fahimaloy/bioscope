@@ -1,7 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
+import { motion } from 'framer-motion'
+import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { WashiTape, SketchUnderline, DoodleShape, DoodleStar } from '@/components/decorative/DoodleElements'
+import { motionVariants } from '@/lib/motion'
 
 // All icons as SVG paths
 const iconPaths = {
@@ -11,161 +14,424 @@ const iconPaths = {
   linkedin: 'M16 8a6 6 0 0 1 6 6v.03m8.94-4.2a6.98 6.98 0 0 1-3.43 1.84l-.38 1.2a4.94 4.94 0 0 1-2.78 1.53L21.5 7.5a2.93 2.93 0 0 1-2.04-.85 2.93 2.93 0 0 1-.82-2.04l1.2-.38a6.98 6.98 0 0 1 1.84-3.43M10 2a6 6 0 0 0-6 6v.03m4.93-4.2a4.94 4.94 0 0 1 1.23.38l.38 1.2a2.93 2.93 0 0 1 .85 2.04 2.93 2.93 0 0 1-.85.2 2.93 2.93 0 0 1-2.04-.85l-1.2-.38a4.94 4.94 0 0 1-.38-1.23M2 10a6 6 0 0 0 6 6m4.93 4.2a4.94 4.94 0 0 1-1.23.38l-.38 1.2a2.93 2.93 0 0 1-.85 2.04 2.93 2.93 0 0 1-.85.2 2.93 2.93 0 0 1-2.04-.85l-1.2-.38a4.94 4.94 0 0 1 1.23-.38',
   mail: 'M4 4h16c1.1 0 2 .9 2 2v1c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-1c0-1.1.9-2 2-2m16 4H6c-1 0-2 1-2 2v1c0 1 1 2 2 2h14c1 0 2-1 2-2v-1c0-1-1-2-2-2ZM6 10c0 7-9 6.5-9 6.5S6 17 6 10Z',
   phone: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4 8.24 2 2 0 0 1 2.18 3.02 19.73 19.73 0 0 1 8.25 2 19.86 19.86 0 0 1 12 3.5c5.52 0 10.47 1.84 14.36 5H22Z',
-  map_pin: 'M12 2v2m0 18l6-6m-6 6l6 6m7-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0m-3 4c0 4-4 8-4 8H1c0-4 4-8 4-8m0 0c0 4 4 8 4 8H1c0-4 4-8 4-8Z',
+  map_pin: 'M12 2v2m0 18l6-6m-6 6l6 6m7-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0m-3 4c0 4-4 8-4 8H1c0-4 4-8 4-8m0 0c0 4 4-8 4-8H1c0-4 4-8 4-8Z',
+  arrow_right: 'M5 12h14M12 5l7 7-7 7',
 }
 
 const footerLinks = {
-  company: [
-    { href: '/about', label: 'About Us' },
-    { href: '/shop', label: 'Our Products' },
-    { href: '/custom-sticker', label: 'Custom Stickers' },
-    { href: '/contact', label: 'Contact' },
+  shop: [
+    { href: '/shop', label: 'All Stickers' },
+    { href: '/shop?category=vinyl', label: 'Vinyl Stickers' },
+    { href: '/shop?category=holographic', label: 'Holographic' },
+    { href: '/shop?category=matte', label: 'Matte Finish' },
+    { href: '/custom-sticker', label: 'Custom Design' },
   ],
   support: [
     { href: '/faq', label: 'FAQ' },
     { href: '/shipping', label: 'Shipping Info' },
     { href: '/returns', label: 'Returns Policy' },
     { href: '/track-order', label: 'Track Order' },
+    { href: '/contact', label: 'Contact Us' },
   ],
   legal: [
     { href: '/privacy', label: 'Privacy Policy' },
     { href: '/terms', label: 'Terms of Service' },
     { href: '/cookies', label: 'Cookie Policy' },
+    { href: '/accessibility', label: 'Accessibility' },
+  ],
+  company: [
+    { href: '/about', label: 'About Us' },
+    { href: '/blog', label: 'Blog' },
+    { href: '/careers', label: 'Careers' },
+    { href: '/press', label: 'Press Kit' },
+    { href: '/affiliates', label: 'Affiliates' },
   ],
 }
 
 const socialLinks = [
-  { href: 'https://facebook.com', label: 'Facebook', icon: 'facebook' },
-  { href: 'https://instagram.com', label: 'Instagram', icon: 'instagram' },
-  { href: 'https://twitter.com', label: 'Twitter', icon: 'twitter' },
-  { href: 'https://linkedin.com', label: 'LinkedIn', icon: 'linkedin' },
+  { href: 'https://facebook.com/bioscope', label: 'Facebook', icon: 'facebook' },
+  { href: 'https://instagram.com/bioscope', label: 'Instagram', icon: 'instagram' },
+  { href: 'https://twitter.com/bioscope', label: 'Twitter', icon: 'twitter' },
+  { href: 'https://linkedin.com/company/bioscope', label: 'LinkedIn', icon: 'linkedin' },
 ]
 
 const contactInfo = [
-  { icon: 'mail', text: 'support@stickershop.com', href: 'mailto:support@stickershop.com' },
+  { icon: 'mail', text: 'hello@bioscope.shop', href: 'mailto:hello@bioscope.shop' },
   { icon: 'phone', text: '+880 1700 000000', href: 'tel:+8801700000000' },
-  { icon: 'map_pin', text: 'Dhaka, Bangladesh', href: '#' },
+  { icon: 'map_pin', text: 'Dhaka, Bangladesh', href: 'https://maps.google.com/?q=Dhaka,Bangladesh' },
 ]
 
 export function Footer() {
   return (
-    <footer className="bg-dark text-white pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
-          {/* Brand */}
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6" aria-label="Go to homepage">
-              <span className="text-4xl font-display text-accent">bioscope</span>
-              <span className="text-3xl">🚀</span>
-            </Link>
-            <p className="text-[var(--ink)]/60 text-body leading-relaxed mb-6 max-w-xs">
-              Making Awesome Fun Things Happen since today! We create custom stickers that bring your ideas to life.
-            </p>
-            <div className="flex gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="w-10 h-10 rounded-full bg-dark/30 flex items-center justify-center text-white transition-all duration-300 hover:bg-primary hover:scale-110"
-                  aria-label={social.label}
-                  target="_blank"
-                  rel="noopener noreferrer"
+    <footer className="relative bg-[var(--bg-color)] text-[var(--ink)] pt-20 pb-12 overflow-hidden">
+      {/* Doodle Background - replaces old bg-shapes system */}
+      <DoodleScatter count={8} />
+      
+      {/* Decorative corner doodles */}
+      <DoodleShape size="lg" color="primary" animation="float" className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 opacity-20" />
+      <DoodleShape size="md" color="accent" animation="wobble" className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 opacity-20" />
+      <DoodleShape size="md" color="secondary" animation="pulse" className="absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2 opacity-20" />
+      <DoodleShape size="sm" color="accent" animation="rotate" className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 opacity-20" />
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top decorative scatter line with washi tape */}
+        <div className="flex items-center justify-center gap-4 mb-12 relative">
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--ink)]/30 to-transparent" />
+          <WashiTape width={180} height={32} rotation={-3}>
+            <span className="font-display text-[var(--ink)] text-sm tracking-wider uppercase">bioscope</span>
+          </WashiTape>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[var(--ink)]/30 to-transparent" />
+        </div>
+
+        {/* Main grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-16">
+          {/* Brand Column */}
+          <div className="lg:col-span-2 space-y-8" style={{ animationDelay: '0ms' }}>
+            <motion.div variants={motionVariants.staggerContainer} initial="hidden" animate="visible">
+              {/* Logo with DoodleStar */}
+              <Link 
+                href="/" 
+                className="flex items-center gap-3 group"
+                aria-label="Go to bioscope homepage"
+              >
+                <motion.span 
+                  whileHover="hoverScale"
+                  className="relative"
                 >
-                  <svg className="w-5 h-5 text-white">
-                    <path d={iconPaths[social.icon as keyof typeof iconPaths]} className="fill-current" />
-                  </svg>
-                </a>
-              ))}
-            </div>
+                  <DoodleStar size="md" color="accent" animation="float" className="absolute -top-2 -right-2 -translate-x-1/2 -translate-y-1/2 opacity-50" />
+                  <span className="text-5xl font-display text-[var(--primary)] tracking-wider relative z-10">bioscope</span>
+                </motion.span>
+                <motion.span 
+                  whileHover="hoverScale"
+                  className="text-4xl"
+                  aria-hidden="true"
+                >🚀</motion.span>
+              </Link>
+
+              <motion.p 
+                className="text-[var(--ink)]/70 text-body leading-relaxed max-w-xs"
+                variants={motionVariants.staggerItem}
+              >
+                Making awesome fun things happen since today! We create custom stickers that bring your ideas to life with premium vinyl, holographic finishes, and endless creativity.
+              </motion.p>
+
+              {/* Social Icons with hover bounce */}
+              <motion.div 
+                className="flex gap-3"
+                variants={motionVariants.staggerContainer}
+              >
+                {socialLinks.map((social, index) => (
+                  <motion.a
+                    key={social.label}
+                    href={social.href}
+                    className="relative group"
+                    aria-label={social.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variants={motionVariants.staggerItem}
+                    style={{ transitionDelay: `${index * 50}ms` }}
+                    whileHover="hoverScale"
+                    whileTap="tapPress"
+                  >
+                    <div className="w-11 h-11 rounded-full bg-[var(--surface-card)] border-2 border-[var(--ink)]/20 flex items-center justify-center transition-all duration-300 group-hover:border-[var(--primary)] group-hover:bg-[var(--primary)] group-hover:shadow-[4px_4px_0px_var(--ink)]">
+                      <svg className="w-5 h-5 text-[var(--ink)] group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d={iconPaths[social.icon as keyof typeof iconPaths]} />
+                      </svg>
+                    </div>
+                    {/* Tooltip */}
+                    <motion.span
+                      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 text-xs font-body font-medium text-white bg-[var(--ink)] rounded-md whitespace-nowrap opacity-0 pointer-events-none"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      {social.label}
+                    </motion.span>
+                  </motion.a>
+                ))}
+              </motion.div>
+            </motion.div>
           </div>
 
-          {/* Company Links */}
-          <div>
-            <h3 className="text-lg font-display text-primary mb-4">Company</h3>
-            <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
-                <li key={link.href}>
+          {/* Shop Links */}
+          <div style={{ animationDelay: '100ms' }}>
+            <motion.h3 
+              className="mb-6"
+              variants={motionVariants.fadeInUp}
+            >
+              <SketchUnderline className="font-display text-xl text-[var(--ink)] uppercase tracking-wider">
+                Shop
+              </SketchUnderline>
+            </motion.h3>
+            <motion.ul 
+              className="space-y-4"
+              variants={motionVariants.staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {footerLinks.shop.map((link, index) => (
+                <motion.li key={link.href} variants={motionVariants.staggerItem} style={{ transitionDelay: `${index * 50}ms` }}>
                   <Link
                     href={link.href}
-                    className="text-[var(--ink)]/60 hover:text-white transition-colors"
+                    className="flex items-center gap-2 text-[var(--ink)]/70 hover:text-[var(--primary)] transition-colors group"
                   >
-                    {link.label}
+                    <span className="text-body">{link.label}</span>
+                    <motion.svg
+                      className="w-4 h-4 text-[var(--primary)] opacity-0 group-hover:opacity-100 transition-all duration-300"
+                      variants={motionVariants.slideInRight}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d={iconPaths.arrow_right} />
+                    </motion.svg>
                   </Link>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           </div>
 
           {/* Support Links */}
-          <div>
-            <h3 className="text-lg font-display text-primary mb-4">Support</h3>
-            <ul className="space-y-3">
-              {footerLinks.support.map((link) => (
-                <li key={link.href}>
+          <div style={{ animationDelay: '200ms' }}>
+            <motion.h3 
+              className="mb-6"
+              variants={motionVariants.fadeInUp}
+            >
+              <SketchUnderline className="font-display text-xl text-[var(--ink)] uppercase tracking-wider">
+                Support
+              </SketchUnderline>
+            </motion.h3>
+            <motion.ul 
+              className="space-y-4"
+              variants={motionVariants.staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {footerLinks.support.map((link, index) => (
+                <motion.li key={link.href} variants={motionVariants.staggerItem} style={{ transitionDelay: `${index * 50}ms` }}>
                   <Link
                     href={link.href}
-                    className="text-[var(--ink)]/60 hover:text-white transition-colors"
+                    className="flex items-center gap-2 text-[var(--ink)]/70 hover:text-[var(--primary)] transition-colors group"
                   >
-                    {link.label}
+                    <span className="text-body">{link.label}</span>
+                    <motion.svg
+                      className="w-4 h-4 text-[var(--primary)] opacity-0 group-hover:opacity-100 transition-all duration-300"
+                      variants={motionVariants.slideInRight}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d={iconPaths.arrow_right} />
+                    </motion.svg>
                   </Link>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           </div>
 
           {/* Legal Links */}
-          <div>
-            <h3 className="text-lg font-display text-primary mb-4">Legal</h3>
-            <ul className="space-y-3">
-              {footerLinks.legal.map((link) => (
-                <li key={link.href}>
+          <div style={{ animationDelay: '300ms' }}>
+            <motion.h3 
+              className="mb-6"
+              variants={motionVariants.fadeInUp}
+            >
+              <SketchUnderline className="font-display text-xl text-[var(--ink)] uppercase tracking-wider">
+                Legal
+              </SketchUnderline>
+            </motion.h3>
+            <motion.ul 
+              className="space-y-4"
+              variants={motionVariants.staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              {footerLinks.legal.map((link, index) => (
+                <motion.li key={link.href} variants={motionVariants.staggerItem} style={{ transitionDelay: `${index * 50}ms` }}>
                   <Link
                     href={link.href}
-                    className="text-[var(--ink)]/60 hover:text-white transition-colors"
+                    className="flex items-center gap-2 text-[var(--ink)]/70 hover:text-[var(--primary)] transition-colors group"
                   >
-                    {link.label}
+                    <span className="text-body">{link.label}</span>
+                    <motion.svg
+                      className="w-4 h-4 text-[var(--primary)] opacity-0 group-hover:opacity-100 transition-all duration-300"
+                      variants={motionVariants.slideInRight}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d={iconPaths.arrow_right} />
+                    </motion.svg>
                   </Link>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
+          </div>
+
+          {/* Newsletter Signup */}
+          <div className="relative" style={{ animationDelay: '400ms' }}>
+            <motion.h3 
+              className="mb-6"
+              variants={motionVariants.fadeInUp}
+            >
+              <SketchUnderline className="font-display text-xl text-[var(--ink)] uppercase tracking-wider">
+                Newsletter
+              </SketchUnderline>
+            </motion.h3>
+            
+            <motion.p 
+              className="text-[var(--ink)]/60 text-body mb-6"
+              variants={motionVariants.fadeInUp}
+              style={{ transitionDelay: '100ms' }}
+            >
+              Get 10% off your first order + exclusive designs & early access.
+            </motion.p>
+
+            {/* Newsletter Form with Floating Label */}
+            <motion.form 
+              className="space-y-4"
+              variants={motionVariants.staggerContainer}
+              initial="hidden"
+              animate="visible"
+              onSubmit={(e) => {
+                e.preventDefault()
+                // Handle newsletter signup
+                const formData = new FormData(e.currentTarget)
+                const email = formData.get('email')
+                console.log('Newsletter signup:', email)
+                // TODO: Integrate with newsletter service
+                e.currentTarget.reset()
+              }}
+            >
+              <div className="relative">
+                <input
+                  type="email"
+                  name="email"
+                  id="footer-email"
+                  placeholder=" "
+                  className="w-full px-4 py-4 bg-[var(--surface-card)] border-2 border-[var(--ink)]/20 rounded-[var(--radius-md)] text-[var(--ink)] placeholder:text-transparent focus:outline-none focus:border-[var(--primary)] focus:shadow-[4px_4px_0px_var(--primary)] transition-all duration-300"
+                  required
+                  autoComplete="email"
+                  aria-label="Email address for newsletter"
+                />
+                <label
+                  htmlFor="footer-email"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink)]/50 text-body pointer-events-none transition-all duration-300 origin-left"
+                >
+                  Enter your email
+                </label>
+              </div>
+              <motion.button
+                type="submit"
+                className="w-full py-4 px-6 bg-[var(--primary)] text-white font-display text-lg uppercase tracking-wider rounded-[var(--radius-md)] border-2 border-[var(--ink)] shadow-[4px_4px_0px_var(--ink)] hover:shadow-[6px_6px_0px_var(--ink)] hover:-translate-y-1 hover:bg-[var(--primary)]/90 active:translate-y-1 active:shadow-[2px_2px_0px_var(--ink)] transition-all duration-300 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+                whileHover="hoverLift"
+                whileTap="tapPress"
+                variants={motionVariants.staggerItem}
+                style={{ transitionDelay: '200ms' }}
+              >
+                Subscribe
+              </motion.button>
+            </motion.form>
+
+            {/* Decorative elements around newsletter */}
+            <DoodleShape size="sm" color="accent" animation="float" className="absolute -top-4 -right-4 opacity-30" />
+            <DoodleStar size="sm" color="primary" animation="wobble" className="absolute bottom-20 right-10 opacity-30" />
           </div>
         </div>
 
-        {/* Contact Info */}
-        <div className="border-t border-[var(--ink)]/30 pt-8 mb-8">
+        {/* Contact Info Section */}
+        <div className="relative py-10 border-y border-[var(--ink)]/10 mb-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {contactInfo.map((contact) => (
-              <a
+            {contactInfo.map((contact, index) => (
+              <motion.a
                 key={contact.text}
                 href={contact.href}
-                className="flex items-center gap-3 text-[var(--ink)]/60 hover:text-white transition-colors"
+                className="flex items-start gap-4 text-[var(--ink)]/70 hover:text-[var(--primary)] transition-colors group"
+                target={contact.href.startsWith('http') ? '_blank' : undefined}
+                rel={contact.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
               >
-                <svg className="w-5 h-5 text-primary flex-shrink-0">
-                  <path d={iconPaths[contact.icon as keyof typeof iconPaths]} className="fill-current" />
-                </svg>
-                <span className="text-body">{contact.text}</span>
-              </a>
+                <div className="w-11 h-11 rounded-xl bg-[var(--surface-card)] border-2 border-[var(--ink)]/20 flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:border-[var(--primary)] group-hover:bg-[var(--primary)] group-hover:shadow-[4px_4px_0px_var(--ink)]">
+                  <svg className="w-5 h-5 text-[var(--ink)] group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d={iconPaths[contact.icon as keyof typeof iconPaths]} />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-medium text-body">{contact.text}</p>
+                  <p className="text-sm text-[var(--ink)]/50 mt-0.5">
+                    {contact.icon === 'mail' && 'We reply within 24h'}
+                    {contact.icon === 'phone' && 'Mon-Fri 9am-6pm'}
+                    {contact.icon === 'map_pin' && 'Visit our studio'}
+                  </p>
+                </div>
+              </motion.a>
             ))}
           </div>
+          
+          {/* Washi tape decorative element in contact section */}
+          <WashiTape width={200} height={36} rotation={2} className="absolute bottom-[-18px] left-1/2 -translate-x-1/2 z-10">
+            <span className="font-display text-[var(--ink)] text-xs tracking-wider uppercase">stay sticky</span>
+          </WashiTape>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-[var(--ink)]/30 pt-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[var(--ink)]/50 text-sm">
-              © 2024 bioscope. All rights reserved.
-            </p>
-            <p className="text-[var(--ink)]/50 text-sm">
-              Made with ❤️ in Bangladesh
-            </p>
+        {/* Copyright & Bottom */}
+        <div className="pt-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <motion.p 
+              className="text-[var(--ink)]/50 text-sm text-center md:text-left"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8 }}
+            >
+              © {new Date().getFullYear()} bioscope. All rights reserved.
+            </motion.p>
+            
+            <motion.div 
+              className="flex items-center gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9 }}
+            >
+              <span className="text-[var(--ink)]/50 text-sm">Made with</span>
+              <motion.span 
+                className="text-[var(--primary)]"
+                animate={{ scale: [1, 1.3, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                aria-label="Love"
+              >
+                ❤️
+              </motion.span>
+              <span className="text-[var(--ink)]/50 text-sm">in Bangladesh</span>
+            </motion.div>
+
+            {/* Payment/Trust badges */}
+            <motion.div 
+              className="flex items-center gap-3 text-[var(--ink)]/40 text-xs"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.0 }}
+            >
+              <span className="font-medium uppercase tracking-wider">Secure payments:</span>
+              <span className="font-display text-lg">🔒</span>
+              <span className="font-display text-lg">💳</span>
+              <span className="font-display text-lg">📱</span>
+            </motion.div>
           </div>
         </div>
 
-        {/* Floating shapes */}
-        <div className="fixed bottom-0 left-0 right-0 h-64 bg-shapes pointer-events-none overflow-hidden" style={{ zIndex: -1 }}>
-          <div className="shape shape-1" style={{ width: '300px', height: '300px', background: 'var(--primary)', bottom: '-10%', left: '-10%', animationDelay: '0s' }} />
-          <div className="shape shape-2" style={{ width: '400px', height: '400px', background: 'var(--secondary)', bottom: '-10%', right: '-10%', animationDelay: '-5s' }} />
-          <div className="shape shape-3" style={{ width: '250px', height: '250px', background: 'var(--accent)', bottom: '40%', left: '50%', animationDelay: '-10s' }} />
+        {/* Bottom doodle scatter */}
+        <div className="flex justify-center gap-2 mt-8">
+          <DoodleStar size="sm" color="primary" animation="float" />
+          <DoodleStar size="sm" color="accent" animation="wobble" />
+          <DoodleStar size="sm" color="secondary" animation="pulse" />
+          <DoodleStar size="sm" color="primary" animation="float" />
         </div>
       </div>
     </footer>

@@ -4,6 +4,7 @@ import { Shantell_Sans, Caveat, Nunito } from 'next/font/google'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from 'sonner'
+import { Footer } from '@/components/layout/Footer'
 
 const shantell = Shantell_Sans({ subsets: ['latin'], variable: '--font-display', display: 'swap', weight: ['400','700','800'] })
 const caveat = Caveat({ subsets: ['latin'], variable: '--font-hand', display: 'swap', weight: ['400','600','700'] })
@@ -70,9 +71,10 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://utfs.io" />
       </head>
-      <body className="min-h-screen bg-[var(--bg-color)] font-body antialiased">
+      <body className="min-h-screen bg-[var(--bg-color)] font-body antialiased flex flex-col">
         <Providers>
-          {children}
+          <main className="flex-1">{children}</main>
+          <Footer />
           <Toaster
             position="bottom-right"
             theme="system"
