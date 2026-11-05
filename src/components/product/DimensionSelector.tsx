@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import type { DimensionConfig } from '@/types'
@@ -99,18 +100,18 @@ export function DimensionSelector({
         <label className="block font-medium text-body text-[var(--ink)]">{label}</label>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {dimensions.map((dim) => (
-            <button
+            <Button
               key={dim.id}
+              variant={selectedDimension?.id === dim.id ? 'doodle' : 'doodle-outline'}
+              size="md"
+              className={cn(
+                'p-4 rounded-input text-center transition-all min-w-[110px]',
+                selectedDimension?.id === dim.id && 'animate-pulse-soft'
+              )}
               onClick={() => !disabled && onChange(dim)}
               disabled={disabled}
-              className={cn(
-                'p-4 rounded-input border-3 text-center transition-all',
-                selectedDimension?.id === dim.id
-                  ? 'border-primary bg-primary/10 text-primary shadow-[0_0_0_3px_rgba(255,107,107,0.2)]'
-                  : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary hover:bg-[var(--light)]'
-              )}
             >
-              <div className="font-display text-lg mb-1">{dim.label}</div>
+              <span className="block font-display">{dim.label}</span>
               <div className="text-sm text-[var(--ink)]/60">
                 {dim.width} × {dim.height} cm
               </div>
@@ -119,14 +120,14 @@ export function DimensionSelector({
                   {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
                 </div>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
     )
   }
 
-  // Default: buttons
+  // Default: buttons - now using doodle variants
   return (
     <div className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between">
@@ -142,19 +143,21 @@ export function DimensionSelector({
           </Button>
         )}
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3" role="radiogroup" aria-label={label}>
         {visibleDimensions.map((dim) => (
-          <button
+          <Button
             key={dim.id}
+            variant={selectedDimension?.id === dim.id ? 'doodle' : 'doodle-outline'}
+            size="md"
+            className={cn(
+              'px-4 py-3 rounded-input font-medium transition-all min-w-[110px]',
+              'relative overflow-hidden',
+              selectedDimension?.id === dim.id && 'animate-pulse-soft'
+            )}
             onClick={() => !disabled && onChange(dim)}
             disabled={disabled}
-            className={cn(
-              'px-4 py-3 rounded-input border-3 font-medium transition-all min-w-[110px]',
-              'relative overflow-hidden',
-              selectedDimension?.id === dim.id
-                ? 'border-primary bg-primary/10 text-primary shadow-[0_0_0_3px_rgba(255,107,107,0.2)]'
-                : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary hover:bg-[var(--light)]'
-            )}
+            aria-pressed={selectedDimension?.id === dim.id}
+            role="radio"
           >
             <span className="block font-display">{dim.label}</span>
             {dim.priceMultiplier !== 1 && (
@@ -162,27 +165,26 @@ export function DimensionSelector({
                 {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
               </span>
             )}
-          </button>
+          </Button>
         ))}
         {!showAll && !expanded && dimensions.length > maxVisible && (
-          <button
-            onClick={() => setExpanded(true)}
-            disabled={disabled}
+          <Button
+            variant="ghost"
+            size="md"
             className={cn(
-              'px-4 py-3 rounded-input border-3 font-medium transition-all min-w-[110px]',
+              'px-4 py-3 rounded-input font-medium transition-all min-w-[110px]',
               'border-dashed border-[var(--ink)]/30 text-[var(--ink)]/50 hover:border-primary hover:bg-[var(--light)]'
             )}
+            onClick={() => setExpanded(true)}
+            disabled={disabled}
           >
             +{dimensions.length - maxVisible} more
-          </button>
+          </Button>
         )}
       </div>
     </div>
   )
 }
-
-// Need to import useState
-import { useState } from 'react'
 
 // Dimension display for product cards/list
 export function DimensionDisplay({

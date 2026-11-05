@@ -1,9 +1,12 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import type { QuantityConfig } from '@/types'
 import { Minus, Plus } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { motionVariants } from '@/lib/motion'
 
 interface QuantitySelectorProps {
   quantity: number
@@ -28,6 +31,8 @@ export function QuantitySelector({
   className,
   disabled = false,
 }: QuantitySelectorProps) {
+  const [shake, setShake] = useState(false)
+
   const handleDecrease = () => {
     if (quantity > min) onChange(quantity - 1)
   }
@@ -39,20 +44,44 @@ export function QuantitySelector({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value) || min
     const clamped = Math.max(min, Math.min(max, val))
-    onChange(clamped)
+    
+    // Check if the new value is valid against quantity configs
+    const validConfig = quantityConfigs.find(
+      (q) => clamped >= q.minQty && (q.maxQty === null || clamped <= q.maxQty)
+    )
+    
+    if (validConfig) {
+      onChange(clamped)
+    } else {
+      // Trigger shake animation
+      setShake(true)
+      setTimeout(() => setShake(false), 500)
+    }
   }
+
+  // Reset shake when quantity changes via buttons
+  useEffect(() => {
+    if (shake) {
+      const timer = setTimeout(() => setShake(false), 500)
+      return () => clearTimeout(timer)
+    }
+  }, [quantity, shake])
 
   return (
     <div className={cn('flex items-center gap-4 flex-wrap', className)}>
       {/* Input with buttons */}
-      <div className="flex items-center border-3 border-[var(--ink)]/30 rounded-input overflow-hidden">
+      <motion.div
+        className="flex items-center border-3 border-[var(--ink)]/30 rounded-input overflow-hidden"
+        animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
+        transition={{ duration: 0.4 }}
+      >
         <Button
-          variant="ghost"
+          variant="doodle-outline"
           size="sm"
           onClick={handleDecrease}
           disabled={disabled || quantity <= min}
           aria-label="Decrease quantity"
-          className="w-12 h-12 p-0"
+          className="w-12 h-12 p-0 hover:shadow-btn-hover active:shadow-btn-active"
         >
           <Minus className="w-5 h-5" />
         </Button>
@@ -60,41 +89,38 @@ export function QuantitySelector({
           type="number"
           value={quantity}
           onChange={handleInputChange}
-          className="w-20 h-12 text-center text-xl font-display text-[var(--ink)] border-none focus:outline-none"
+          className="w-auto min-w-[3rem] h-12 text-center text-xl font-display text-[var(--ink)] border-none focus:outline-none"
           min={min}
           max={max}
           disabled={disabled}
           aria-label="Quantity"
         />
         <Button
-          variant="ghost"
+          variant="doodle-outline"
           size="sm"
           onClick={handleIncrease}
           disabled={disabled || quantity >= max}
           aria-label="Increase quantity"
-          className="w-12 h-12 p-0"
+          className="w-12 h-12 p-0 hover:shadow-btn-hover active:shadow-btn-active"
         >
           <Plus className="w-5 h-5" />
         </Button>
-      </div>
+      </motion.div>
 
       {/* Tier badges */}
       {showTierBadges && quantityConfigs.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {quantityConfigs.map((config) => (
-            <button
+            <Button
               key={`${config.minQty}-${config.maxQty || 'max'}`}
+              variant={selectedConfig?.id === config.id ? 'doodle' : 'doodle-outline'}
+              size="sm"
               onClick={() => !disabled && onChange(config.minQty)}
               disabled={disabled}
-              className={cn(
-                'px-3 py-1.5 rounded-full text-sm font-medium transition-all',
-                selectedConfig?.id === config.id
-                  ? 'bg-primary text-white shadow-btn'
-                  : 'bg-[var(--light)] text-[var(--ink)]/70 hover:bg-dark/10 border border-[var(--ink)]/20'
-              )}
+              className="transition-all"
             >
               {config.label}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -129,7 +155,7 @@ export function CompactQuantitySelector({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <Button
-        variant="ghost"
+        variant="doodle-outline"
         size="sm"
         onClick={handleDecrease}
         disabled={disabled || quantity <= min}
@@ -140,7 +166,7 @@ export function CompactQuantitySelector({
       </Button>
       <span className="w-10 text-center text-lg font-medium text-[var(--ink)]">{quantity}</span>
       <Button
-        variant="ghost"
+        variant="doodle-outline"
         size="sm"
         onClick={handleIncrease}
         disabled={disabled || quantity >= max}

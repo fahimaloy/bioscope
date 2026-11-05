@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
-import { Slider } from '@/components/ui/Slider'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { Badge } from '@/components/ui/Badge'
 import type { Product, DimensionConfig, QuantityConfig } from '@/types'
@@ -80,18 +79,20 @@ export function ProductConfigurator({
             </Button>
           )}
         </legend>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="Size options">
           {visibleDimensions.map((dim) => (
-            <button
+            <Button
               key={`${dim.width}x${dim.height}`}
-              onClick={() => onDimensionChange(dim)}
+              variant={selectedDimension?.id === dim.id ? 'doodle' : 'doodle-outline'}
+              size="md"
               className={cn(
-                'px-4 py-3 rounded-input border-3 font-medium transition-all min-w-[110px]',
+                'px-4 py-3 rounded-input font-medium transition-all min-w-[110px]',
                 'relative overflow-hidden',
-                selectedDimension?.id === dim.id
-                  ? 'border-primary bg-primary/10 text-primary shadow-[0_0_0_3px_rgba(255,107,107,0.2)]'
-                  : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary hover:bg-[var(--light)]'
+                selectedDimension?.id === dim.id && 'animate-pulse-soft'
               )}
+              onClick={() => onDimensionChange(dim)}
+              aria-pressed={selectedDimension?.id === dim.id}
+              role="radio"
             >
               <span className="block font-display">{dim.label}</span>
               {dim.priceMultiplier !== 1 && (
@@ -99,7 +100,7 @@ export function ProductConfigurator({
                   {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
                 </span>
               )}
-            </button>
+            </Button>
           ))}
         </div>
       </fieldset>
@@ -111,14 +112,16 @@ export function ProductConfigurator({
         <div className="flex items-center gap-4 flex-wrap">
           {/* Visual quantity selector */}
           <div className="flex items-center border-3 border-[var(--ink)]/30 rounded-input overflow-hidden">
-            <button
+            <Button
+              variant="doodle-outline"
+              size="sm"
               onClick={() => onQuantityChange(Math.max(1, selectedQuantity - 1))}
               disabled={selectedQuantity <= 1}
-              className="w-12 h-12 flex items-center justify-center text-2xl text-[var(--ink)] hover:bg-[var(--light)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Decrease quantity"
+              className="w-12 h-12 p-0 hover:shadow-btn-hover active:shadow-btn-active"
             >
               <Minus className="w-5 h-5" />
-            </button>
+            </Button>
             <input
               type="number"
               value={selectedQuantity}
@@ -126,36 +129,36 @@ export function ProductConfigurator({
                 const val = parseInt(e.target.value) || 1
                 onQuantityChange(val)
               }}
-              className="w-20 h-12 text-center text-xl font-display text-[var(--ink)] border-none focus:outline-none"
+              className="w-auto min-w-[3rem] h-12 text-center text-xl font-display text-[var(--ink)] border-none focus:outline-none"
               min="1"
               max={qtyConfig?.maxQty || 999}
               aria-label="Quantity"
             />
-            <button
+            <Button
+              variant="doodle-outline"
+              size="sm"
               onClick={() => {
                 const max = qtyConfig?.maxQty || 999
                 onQuantityChange(Math.min(max, selectedQuantity + 1))
               }}
-              className="w-12 h-12 flex items-center justify-center text-2xl text-[var(--ink)] hover:bg-[var(--light)] transition-colors"
               aria-label="Increase quantity"
+              className="w-12 h-12 p-0 hover:shadow-btn-hover active:shadow-btn-active"
             >
               <Plus className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           {/* Quantity tier badges */}
           <div className="flex flex-wrap gap-2">
             {product.allowedQuantities.map((q) => (
-              <Badge
+              <Button
                 key={`${q.minQty}-${q.maxQty || 'max'}`}
-                variant={qtyConfig?.id === q.id ? 'primary' : 'outline'}
+                variant={qtyConfig?.id === q.id ? 'doodle' : 'doodle-outline'}
                 size="sm"
-                className="cursor-pointer"
                 onClick={() => onQuantityChange(q.minQty)}
               >
                 {q.label}
-                {q.minQty === selectedQuantity && <span className="ml-1">✓</span>}
-              </Badge>
+              </Button>
             ))}
           </div>
         </div>
@@ -251,25 +254,19 @@ function CustomizationGroup({
       <label className="block text-sm font-medium text-[var(--ink)] mb-2">{label}</label>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => (
-          <button
+          <Button
             key={option}
-            onClick={() => onChange?.(option)}
+            variant={value === option ? 'doodle' : 'doodle-outline'}
+            size="sm"
             className={cn(
-              'px-4 py-2 rounded-input border-2 text-sm transition-all',
-              isColor
-                ? 'w-10 h-10 rounded-full'
-                : '',
-              value === option
-                ? 'border-primary bg-primary/10 text-primary ring-2 ring-primary ring-offset-2'
-                : isColor
-                ? 'border-2 border-[var(--ink)]/30 hover:ring-2 ring-primary'
-                : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+              isColor ? 'w-10 h-10 rounded-full p-0' : '',
             )}
+            onClick={() => onChange?.(option)}
             style={isColor ? { backgroundColor: option } : undefined}
             aria-pressed={value === option}
           >
             {!isColor && renderOption(option)}
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -289,7 +286,7 @@ function CustomField({
     case 'text':
       return (
         <div>
-          <label className="block text-sm font-medium text-[var(--ink)] mb-1">{field.label} {field.required && <span className="text-red-500">*</span>}</label>
+          <label className="block text-sm font-medium text-[var(--ink)] mb-1">{field.label} {field.required && <span className="text-[var(--error)]">*</span>}</label>
           <input
             type="text"
             value={value || ''}
@@ -302,7 +299,7 @@ function CustomField({
     case 'select':
       return (
         <div>
-          <label className="block text-sm font-medium text-[var(--ink)] mb-1">{field.label} {field.required && <span className="text-red-500">*</span>}</label>
+          <label className="block text-sm font-medium text-[var(--ink)] mb-1">{field.label} {field.required && <span className="text-[var(--error)]">*</span>}</label>
           <Dropdown
             trigger={<Button variant="outline" className="w-full justify-between">{value || 'Select...'}</Button>}
             items={field.options?.map((opt) => ({ value: opt, label: opt })) || []}
@@ -318,15 +315,12 @@ function CustomField({
           <label className="block text-sm font-medium text-[var(--ink)] mb-1">{field.label}</label>
           <div className="flex flex-wrap gap-2">
             {field.options?.map((color) => (
-              <button
+              <Button
                 key={color}
+                variant={value === color ? 'doodle' : 'doodle-outline'}
+                size="sm"
+                className="w-10 h-10 rounded-full p-0"
                 onClick={() => onChange?.(color)}
-                className={cn(
-                  'w-10 h-10 rounded-full border-3 transition-all',
-                  value === color
-                    ? 'ring-2 ring-primary ring-offset-2 scale-110'
-                    : 'border-[var(--ink)]/30 hover:ring-2 ring-primary'
-                )}
                 style={{ backgroundColor: color }}
                 aria-pressed={value === color}
               />

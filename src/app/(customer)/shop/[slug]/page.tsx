@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getProductBySlug, getRelatedProducts } from '@/lib/actions/product'
 import { ProductDetail } from '@/components/product/ProductDetail'
-import { ProductCard, ProductGrid } from '@/components/product/ProductCard'
+import { ProductCard } from '@/components/product/ProductCard'
 import { ReviewList } from '@/components/product/ReviewList'
 import { Card } from '@/components/ui/Card'
 
@@ -24,7 +24,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const product = await getProductBySlug(params.slug)
   if (!product || !product.isActive) notFound()
 
-  const related = await getRelatedProducts(product.id, product.categoryId, 4)
+  const related = await getRelatedProducts(product.id, product.categoryId, 8)
 
   const reviews = (product.reviews ?? []).map((r: any) => ({
     ...r,
@@ -64,8 +64,23 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
         {related.length > 0 && (
           <section className="mt-16">
-            <h2 className="font-display text-2xl text-primary mb-6">Related Products</h2>
-            <ProductGrid products={related.map(serializeProduct) as any} />
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-2xl text-primary">Related Products</h2>
+              <Link
+                href={`/shop?category=${product.category?.slug}`}
+                className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+              >
+                View All
+                <span>→</span>
+              </Link>
+            </div>
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x" role="list">
+              {related.map((p) => (
+                <div key={p.id} className="flex-shrink-0 snap-center w-64" role="listitem">
+                  <ProductCard product={serializeProduct(p) as any} variant="compact" />
+                </div>
+              ))}
+            </div>
           </section>
         )}
       </div>

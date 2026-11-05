@@ -515,6 +515,16 @@ h1, h2, h3, .logo, .footer-logo {
   background: #e55a5a;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
 /* Focus visible */
 *:focus-visible {
   outline: 3px solid var(--accent);
