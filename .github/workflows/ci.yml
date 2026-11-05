@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      NEXTAUTH_SECRET: ci-secret
+      NEXTAUTH_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npx prisma generate
+      - run: pnpm type-check
+      - run: pnpm lint
+      - run: pnpm test:run
+      - run: pnpm build
+        env:
+          # build must not need a live DB; pages are dynamic
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          NEXTAUTH_SECRET: ci-secret
+          NEXTAUTH_URL: http://localhost:3000

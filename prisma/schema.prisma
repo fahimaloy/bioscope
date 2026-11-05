@@ -1,0 +1,396 @@
+// Prisma Schema for Sticker Ecommerce Platform
+// Run: npx prisma generate && npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  PRINTING
+  READY_TO_SHIP
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum CustomRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PRICED
+  ORDERED
+}
+
+enum DeliveryZone {
+  INSIDE_DHAKA
+  OUTSIDE_DHAKA
+}
+
+enum PaymentMethod {
+  COD
+  BANK_TRANSFER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String?
+  role          UserRole  @default(CUSTOMER)
+  phone         String?
+  avatar        String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  addresses     Address[]
+  orders        Order[]
+  customRequests CustomRequest[]
+  reviews       Review[]
+  cart          Cart?
+  notifications Notification[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model Address {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  phone          String
+  addressLine1   String
+  addressLine2   String?
+  city           String
+  district       String
+  division       String
+  postalCode     String?
+  country        String       @default("Bangladesh")
+  isDefault      Boolean      @default(false)
+  deliveryZone   DeliveryZone
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  orders         Order[]
+
+  @@index([userId])
+  @@map("addresses")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("categories")
+}
+
+model Product {
+  id                 String   @id @default(cuid())
+  name               String
+  slug               String   @unique
+  description        String?
+  basePrice          Decimal  @db.Decimal(10, 2)
+  compareAtPrice     Decimal? @db.Decimal(10, 2)
+  images             String[]
+  categoryId         String
+  category           Category @relation(fields: [categoryId], references: [id])
+
+  // Configuration options
+  allowedDimensions  DimensionConfig[]
+  allowedQuantities  QuantityConfig[]
+  customizationOptions Json?
+
+  // Tax & pricing
+  taxPercent         Decimal  @default(0) @db.Decimal(5, 2)
+  additionalCharge   Decimal  @default(0) @db.Decimal(10, 2)
+  isTaxInclusive     Boolean  @default(false)
+
+  // Inventory
+  trackInventory     Boolean  @default(false)
+  stock              Int      @default(0)
+  lowStockThreshold  Int      @default(10)
+
+  // SEO & display
+  isActive           Boolean  @default(true)
+  isFeatured         Boolean  @default(false)
+  sortOrder          Int      @default(0)
+  metaTitle          String?
+  metaDescription    String?
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  orderItems         OrderItem[]
+  cartItems          CartItem[]
+  reviews            Review[]
+
+  @@index([categoryId])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([slug])
+  @@map("products")
+}
+
+model DimensionConfig {
+  id              String   @id @default(cuid())
+  productId       String
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  width           Float    // in cm
+  height          Float    // in cm
+  label           String   // e.g., "Small (5x5cm)"
+  priceMultiplier Decimal  @default(1) @db.Decimal(5, 2)
+  isDefault       Boolean  @default(false)
+  sortOrder       Int      @default(0)
+
+  @@unique([productId, width, height])
+  @@index([productId])
+  @@map("dimension_configs")
+}
+
+model QuantityConfig {
+  id            String   @id @default(cuid())
+  productId     String
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  minQty        Int
+  maxQty        Int?
+  pricePerUnit  Decimal  @db.Decimal(10, 2)
+  label         String   // e.g., "1-10 pcs", "11-50 pcs"
+  sortOrder     Int      @default(0)
+
+  @@index([productId])
+  @@map("quantity_configs")
+}
+
+model CustomRequest {
+  id              String                @id @default(cuid())
+  userId          String
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  imageUrl        String                // Uploaded design
+  originalName    String
+  width           Float                 // cm
+  height          Float                 // cm
+  quantity        Int
+  material        String                // vinyl, paper, holographic, etc.
+  finish          String                // matte, glossy, transparent
+  cutType         String                // kiss-cut, die-cut, custom
+  notes           String?
+  status          CustomRequestStatus   @default(PENDING)
+  adminNotes      String?
+  quotedPrice     Decimal?              @db.Decimal(10, 2)
+  quotedAt        DateTime?
+  orderedAt       DateTime?
+  orderId         String?               @unique
+  order           Order?                @relation(fields: [orderId], references: [id])
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("custom_requests")
+}
+
+model Order {
+  id                String       @id @default(cuid())
+  orderNumber       String       @unique // ORD-2024-001
+  userId            String
+  user              User         @relation(fields: [userId], references: [id])
+  status            OrderStatus  @default(PENDING)
+  subtotal          Decimal      @db.Decimal(10, 2)
+  taxAmount         Decimal      @db.Decimal(10, 2)
+  deliveryCharge    Decimal      @db.Decimal(10, 2)
+  discountAmount    Decimal      @default(0) @db.Decimal(10, 2)
+  total             Decimal      @db.Decimal(10, 2)
+  currency          String       @default("BDT")
+
+  // Address snapshot
+  shippingName      String
+  shippingPhone     String
+  shippingAddress   String
+  shippingCity      String
+  shippingDistrict  String
+  shippingDivision  String
+  shippingPostalCode String?
+  deliveryZone      DeliveryZone
+
+  // Payment
+  paymentMethod     PaymentMethod @default(COD)
+  paymentStatus     PaymentStatus @default(PENDING)
+  transactionId     String?
+
+  // Tracking
+  trackingNumber    String?
+  shippedAt         DateTime?
+  deliveredAt       DateTime?
+
+  notes             String?
+  adminNotes        String?
+
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  items             OrderItem[]
+  address           Address?     @relation(fields: [addressId], references: [id])
+  addressId         String?
+  customRequest     CustomRequest?
+  customRequestId   String?      @unique
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderNumber])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id            String  @id @default(cuid())
+  orderId       String
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product @relation(fields: [productId], references: [id])
+  productName   String  // Snapshot
+  productSlug   String
+  productImage  String
+  width         Float
+  height        Float
+  quantity      Int
+  unitPrice     Decimal @db.Decimal(10, 2)
+  totalPrice    Decimal @db.Decimal(10, 2)
+  taxPercent    Decimal @db.Decimal(5, 2)
+  taxAmount     Decimal @db.Decimal(10, 2)
+  customization Json?   // Custom options selected
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  items     CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id            String  @id @default(cuid())
+  cartId        String
+  cart          Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  width         Float
+  height        Float
+  quantity      Int
+  customization Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([cartId, productId, width, height])
+  @@index([cartId])
+  @@map("cart_items")
+}
+
+model Review {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId             String
+  product               Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  rating                Int      // 1-5
+  title                 String?
+  comment               String?
+  images                String[] // Review photos
+  isVerifiedPurchase    Boolean  @default(false)
+  isApproved            Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([productId])
+  @@index([userId])
+  @@unique([userId, productId]) // One review per user per product
+  @@map("reviews")
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   // JSON string for complex values
+  type        String   // STRING, NUMBER, BOOLEAN, JSON
+  category    String   // TAX, DELIVERY, GENERAL, EMAIL
+  description String?
+  isPublic    Boolean  @default(false) // Exposed to frontend
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@map("settings")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique // sha256 of the raw token sent by email
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // NEW_ORDER, CUSTOM_REQUEST, LOW_STOCK, etc.
+  title     String
+  message   String
+  data      Json?    // Related entity IDs, URLs
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
