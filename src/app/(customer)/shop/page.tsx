@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ProductGrid } from '@/components/product'
 import { DoodleScatter } from '@/components/decorative/DoodleScatter'
@@ -9,6 +9,10 @@ import { Badge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { SkeletonProductCard } from '@/components/ui/Skeleton'
 import { Grid, List } from 'lucide-react'
+import { Select } from '@/components/ui/Select'
+import { DoodleShape } from '@/components/decorative/DoodleElements'
+import { motion, AnimatePresence } from 'framer-motion'
+import { motionVariants } from '@/lib/motion'
 
 const sortOptions = [
   { value: 'featured', label: 'Featured', sortBy: 'sortOrder', sortOrder: 'asc' },
@@ -30,6 +34,8 @@ function normalize(p: any) {
     additionalCharge: Number(p.additionalCharge ?? 0),
   }
 }
+
+const selectOptions = sortOptions.map(opt => ({ value: opt.value, label: opt.label }))
 
 export default function ShopPage() {
   const [categories, setCategories] = useState<Category[]>([])
@@ -74,6 +80,11 @@ export default function ShopPage() {
     load()
   }, [load])
 
+  const categoryPills = [
+    { id: 'all', name: 'All Products' },
+    ...categories,
+  ]
+
   return (
     <div className="min-h-screen bg-[var(--bg-color)]">
       {/* Hero Section */}
@@ -98,56 +109,52 @@ export default function ShopPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium text-[var(--ink)]/60">Categories:</span>
-              <button
-                onClick={() => { setSelectedCategory('all'); setPage(1) }}
-                className={`px-4 py-2 rounded-pill text-sm font-medium transition-all ${
-                  selectedCategory === 'all'
-                    ? 'bg-primary text-white shadow-btn'
-                    : 'bg-[var(--light)] text-[var(--ink)] hover:bg-dark/10 border border-[var(--ink)]/20'
-                }`}
-              >
-                All Products
-              </button>
-              {categories.map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
-                  className={`px-4 py-2 rounded-pill text-sm font-medium transition-all ${
-                    selectedCategory === cat.id
-                      ? 'bg-primary text-white shadow-btn'
-                      : 'bg-[var(--light)] text-[var(--ink)] hover:bg-dark/10 border border-[var(--ink)]/20'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              ))}
+              <AnimatePresence mode="popLayout">
+                <div key={selectedCategory} className="flex flex-wrap items-center gap-2">
+                  {categoryPills.map((cat) => (
+                    <Button
+                      key={cat.id}
+                      variant={selectedCategory === cat.id ? 'doodle' : 'doodle-outline'}
+                      size="sm"
+                      onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
+                    >
+                      {cat.name}
+                    </Button>
+                  ))}
+                </div>
+              </AnimatePresence>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-[var(--ink)]/60">Sort by:</label>
-                <select
+                <Select
+                  options={selectOptions}
                   value={sortBy}
                   onChange={(e) => { setSortBy(e.target.value as typeof sortBy); setPage(1) }}
-                  className="px-3 py-2 border-2 border-[var(--ink)] rounded-input focus:border-primary focus:shadow-input text-sm"
-                >
-                  {sortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+                  className="min-w-[200px]"
+                />
               </div>
 
               <div className="flex items-center gap-1 bg-[var(--light)] rounded-input p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-input transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}
+                  className={`p-2 rounded-input transition-all duration-200 ${
+                    viewMode === 'grid'
+                      ? 'bg-white shadow-sm text-primary'
+                      : 'text-[var(--ink)]/60 hover:text-primary'
+                  }`}
                   aria-label="Grid view"
                 >
                   <Grid className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-input transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}
+                  className={`p-2 rounded-input transition-all duration-200 ${
+                    viewMode === 'list'
+                      ? 'bg-white shadow-sm text-primary'
+                      : 'text-[var(--ink)]/60 hover:text-primary'
+                  }`}
                   aria-label="List view"
                 >
                   <List className="w-5 h-5" />
@@ -167,25 +174,41 @@ export default function ShopPage() {
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              variants={motionVariants.staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
               {[...Array(8)].map((_, i) => (
-                <SkeletonProductCard key={i} />
+                <motion.div key={i} variants={motionVariants.staggerItem}>
+                  <SkeletonProductCard />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : products.length > 0 ? (
-            <ProductGrid
-              products={products as any}
-              variant={viewMode === 'list' ? 'compact' : 'default'}
-            />
+            <AnimatePresence mode="popLayout">
+              <motion.div
+                key={selectedCategory + '-' + sortBy + '-' + viewMode}
+                variants={motionVariants.staggerContainer}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <ProductGrid
+                  products={products as any}
+                  variant={viewMode === 'list' ? 'compact' : 'default'}
+                />
+              </motion.div>
+            </AnimatePresence>
           ) : (
             <div className="text-center py-16">
-              <div className="w-20 h-20 mx-auto mb-4 bg-[var(--light)] rounded-full flex items-center justify-center">
-                <span className="text-3xl">🔍</span>
-              </div>
+              <DoodleShape size="lg" color="primary" animation="float" className="mx-auto mb-6 opacity-50" />
               <h3 className="font-display text-xl text-[var(--ink)] mb-2">No products found</h3>
-              <p className="text-[var(--ink)]/60 mb-4">Try adjusting your filters or browse all categories</p>
-              <Button variant="secondary" onClick={() => { setSelectedCategory('all'); setPage(1) }}>
-                View All Products
+              <p className="text-[var(--ink)]/60 mb-6">Try adjusting your filters or browse all categories</p>
+              <Button variant="doodle" size="lg" onClick={() => { setSelectedCategory('all'); setPage(1) }}>
+                <span className="mr-2">✨</span>
+                Clear Filters
               </Button>
             </div>
           )}

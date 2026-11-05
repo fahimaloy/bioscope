@@ -10,6 +10,8 @@ import type { Product } from '@/types'
 import { ShoppingCart, Tag, Heart } from 'lucide-react'
 import { useCartStore, useIsInCart, useGetItemQuantity } from '@/lib/stores/cartStore'
 import { useAuth } from '@/lib/hooks/useAuth'
+import { motion } from 'framer-motion'
+import { motionVariants } from '@/lib/motion'
 
 interface ProductCardProps {
   product: Product
@@ -35,6 +37,18 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
     ? Math.round(((product.compareAtPrice! - product.basePrice) / product.compareAtPrice!) * 100)
     : 0
 
+  const imageContainerClass = cn(
+    'relative overflow-hidden bg-[var(--light)]',
+    'rounded-card', // Card radius = 20px
+    variant === 'compact' ? 'w-16 h-16 flex-shrink-0' : 'aspect-square mb-4',
+    variant === 'featured' ? 'aspect-[4/5] mb-4' : ''
+  )
+
+  const imageClass = cn(
+    'object-cover transition-transform duration-500 group-hover:scale-105',
+    variant === 'compact' ? '' : 'w-full h-full'
+  )
+
   if (variant === 'compact') {
     return (
       <Link
@@ -44,15 +58,19 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
           className
         )}
       >
-        <div className="w-16 h-16 rounded-input overflow-hidden bg-[var(--light)] flex-shrink-0 relative">
-          {product.images[0] && (
+        <div className={imageContainerClass}>
+          {product.images[0] ? (
             <Image
               src={product.images[0]}
               alt={product.name}
               fill
-              className="object-cover"
+              className={imageClass}
               sizes="64px"
             />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">
+              <Tag className="w-12 h-12" />
+            </div>
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -69,157 +87,163 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
   }
 
   return (
-    <HoverCard className={cn('flex flex-col h-full', className)}>
-      {/* Image */}
-      <div className="relative aspect-square mb-4 overflow-hidden rounded-input bg-[var(--light)]">
-        {product.images[0] ? (
-          <Link href={`/shop/${product.slug}`}>
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            />
-          </Link>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">
-            <Tag className="w-12 h-12" />
-          </div>
-        )}
-
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
-          {hasDiscount && (
-            <Badge variant="error" size="sm">
-              -{discountPercent}%
-            </Badge>
-          )}
-          {product.isFeatured && (
-            <Badge variant="accent" size="sm">
-              Featured
-            </Badge>
-          )}
-          {product.trackInventory && product.stock < product.lowStockThreshold && product.stock > 0 && (
-            <Badge variant="warning" size="sm">
-              Low Stock
-            </Badge>
-          )}
-        </div>
-
-        {/* Wishlist */}
-        <button
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[var(--ink)]/60 hover:text-red-500 hover:bg-red-50 transition-colors"
-          aria-label="Add to wishlist"
-        >
-          <Heart className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 flex flex-col">
-        <Link href={`/shop/${product.slug}`}>
-          <h3 className="font-display text-xl text-primary mb-1 line-clamp-1">{product.name}</h3>
-        </Link>
-
-        {product.description && (
-          <p className="text-body text-[var(--ink)]/60 mb-3 line-clamp-2 flex-1">{product.description}</p>
-        )}
-
-        {/* Dimensions */}
-        {product.allowedDimensions.length > 1 && (
-          <div className="mb-3">
-            <p className="text-xs text-[var(--ink)]/50 mb-1">Available sizes:</p>
-            <div className="flex flex-wrap gap-1">
-              {product.allowedDimensions.slice(0, 4).map((dim) => (
-                <span
-                  key={`${dim.width}x${dim.height}`}
-                  className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/70 rounded-full"
-                >
-                  {dim.label}
-                </span>
-              ))}
-              {product.allowedDimensions.length > 4 && (
-                <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/50 rounded-full">
-                  +{product.allowedDimensions.length - 4} more
-                </span>
-              )}
+    <motion.div
+      variants={motionVariants.staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      <HoverCard className={cn('flex flex-col h-full', className)}>
+        {/* Image */}
+        <div className={imageContainerClass} role="group" aria-label={product.name}>
+          {product.images[0] ? (
+            <Link href={`/shop/${product.slug}`} className="block aspect-square overflow-hidden">
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                className={imageClass}
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              />
+            </Link>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">
+              <Tag className="w-12 h-12" />
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Price & Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-[var(--light)]">
-          <div>
-            <span className="text-2xl font-display text-primary">{basePrice.toLocaleString()} BDT</span>
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1">
             {hasDiscount && (
-              <span className="ml-2 text-sm text-[var(--ink)]/40 line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+              <Badge variant="error" size="sm">
+                -{discountPercent}%
+              </Badge>
+            )}
+            {product.isFeatured && (
+              <Badge variant="accent" size="sm">
+                Featured
+              </Badge>
+            )}
+            {product.trackInventory && product.stock < product.lowStockThreshold && product.stock > 0 && (
+              <Badge variant="warning" size="sm">
+                Low Stock
+              </Badge>
             )}
           </div>
 
-          {showActions && (
-            <div className="flex items-center gap-2">
-              {inCart ? (
-                <div className="flex items-center gap-2 bg-primary text-white rounded-pill px-4 py-2">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      if (quantity > 1 && defaultDimension) {
-                        // Would need updateQuantity action
-                      }
-                    }}
-                    className="p-1"
-                    aria-label="Decrease quantity"
+          {/* Wishlist */}
+          <button
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[var(--ink)]/60 hover:text-red-500 hover:bg-red-50 transition-colors"
+            aria-label="Add to wishlist"
+          >
+            <Heart className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <Link href={`/shop/${product.slug}`}>
+            <h3 className="font-display text-xl text-primary mb-1 line-clamp-1">{product.name}</h3>
+          </Link>
+
+          {product.description && (
+            <p className="text-body text-[var(--ink)]/60 mb-3 line-clamp-2 flex-1 min-h-0">{product.description}</p>
+          )}
+
+          {/* Dimensions */}
+          {product.allowedDimensions.length > 1 && (
+            <div className="mb-3">
+              <p className="text-xs text-[var(--ink)]/50 mb-1">Available sizes:</p>
+              <div className="flex flex-wrap gap-1">
+                {product.allowedDimensions.slice(0, 4).map((dim) => (
+                  <span
+                    key={`${dim.width}x${dim.height}`}
+                    className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/70 rounded-full"
                   >
-                    −
-                  </button>
-                  <span className="font-medium px-2">{quantity}</span>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      if (defaultDimension) {
-                        // Would need updateQuantity action
-                      }
-                    }}
-                    className="p-1"
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
-                </div>
-              ) : (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    if (defaultDimension && isAuthenticated) {
-                      addItem({
-                        productId: product.id,
-                        product,
-                        width: defaultDimension.width,
-                        height: defaultDimension.height,
-                        quantity: 1,
-                        customization: null,
-                      })
-                    } else if (!isAuthenticated) {
-                      // Redirect to login
-                      window.location.href = `/login?redirect=/shop/${product.slug}`
-                    }
-                  }}
-                  disabled={!isAuthenticated}
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                </Button>
-              )}
+                    {dim.label}
+                  </span>
+                ))}
+                {product.allowedDimensions.length > 4 && (
+                  <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/50 rounded-full">
+                    +{product.allowedDimensions.length - 4} more
+                  </span>
+                )}
+              </div>
             </div>
           )}
+
+          {/* Price & Actions */}
+          <div className="flex items-center justify-between pt-3 border-t border-[var(--light)]">
+            <div>
+              <span className="text-2xl font-display text-primary">{basePrice.toLocaleString()} BDT</span>
+              {hasDiscount && (
+                <span className="ml-2 text-sm text-[var(--ink)]/40 line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+              )}
+            </div>
+
+            {showActions && (
+              <div className="flex items-center gap-2">
+                {inCart ? (
+                  <div className="flex items-center gap-2 bg-primary text-white rounded-pill px-4 py-2">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        if (quantity > 1 && defaultDimension) {
+                          // Would need updateQuantity action
+                        }
+                      }}
+                      className="p-1"
+                      aria-label="Decrease quantity"
+                    >
+                      −
+                    </button>
+                    <span className="font-medium px-2">{quantity}</span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        if (defaultDimension) {
+                          // Would need updateQuantity action
+                        }
+                      }}
+                      className="p-1"
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      if (defaultDimension && isAuthenticated) {
+                        addItem({
+                          productId: product.id,
+                          product,
+                          width: defaultDimension.width,
+                          height: defaultDimension.height,
+                          quantity: 1,
+                          customization: null,
+                        })
+                      } else if (!isAuthenticated) {
+                        // Redirect to login
+                        window.location.href = `/login?redirect=/shop/${product.slug}`
+                      }
+                    }}
+                    disabled={!isAuthenticated}
+                  >
+                    <ShoppingCart className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </HoverCard>
+      </HoverCard>
+    </motion.div>
   )
 }
 
@@ -244,11 +268,18 @@ export function ProductGrid({ products, variant = 'default', className, emptyMes
   const gridColumns = variant === 'compact' ? 1 : '1 sm:2 lg:3 xl:4'
 
   return (
-    <div className={cn('grid gap-6', `grid-cols-${gridColumns}`, className)}>
+    <motion.div
+      className={cn('grid gap-6', `grid-cols-${gridColumns}`, className)}
+      variants={motionVariants.staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} variant={variant} />
+        <motion.div key={product.id} variants={motionVariants.staggerItem}>
+          <ProductCard product={product} variant={variant} />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   )
 }
 

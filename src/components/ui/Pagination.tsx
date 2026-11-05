@@ -61,11 +61,11 @@ export function Pagination({
   return (
     <nav
       aria-label={ariaLabel}
-      className={cn('flex items-center justify-center gap-1', className)}
+      className={cn('flex items-center justify-center gap-2', className)}
     >
       {showFirstLast && (
         <Button
-          variant="ghost"
+          variant="doodle-outline"
           size="sm"
           onClick={() => onPageChange(1)}
           disabled={currentPage === 1}
@@ -76,7 +76,7 @@ export function Pagination({
       )}
 
       <Button
-        variant="ghost"
+        variant="doodle-outline"
         size="sm"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -86,16 +86,16 @@ export function Pagination({
       </Button>
 
       {showPageNumbers && (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {pages.map((page, index) =>
             page === 'ellipsis' ? (
-              <span key={`ellipsis-${index}`} className="px-2 text-[var(--ink)]/50">
+              <span key={`ellipsis-${index}`} className="px-3 text-[var(--ink)]/50 select-none">
                 ...
               </span>
             ) : (
               <Button
                 key={page}
-                variant={currentPage === page ? 'primary' : 'ghost'}
+                variant={currentPage === page ? 'doodle' : 'doodle-outline'}
                 size="sm"
                 onClick={() => onPageChange(page)}
                 aria-label={`Page ${page}`}
@@ -109,7 +109,7 @@ export function Pagination({
       )}
 
       <Button
-        variant="ghost"
+        variant="doodle-outline"
         size="sm"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
@@ -120,7 +120,7 @@ export function Pagination({
 
       {showFirstLast && (
         <Button
-          variant="ghost"
+          variant="doodle-outline"
           size="sm"
           onClick={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
