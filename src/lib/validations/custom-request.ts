@@ -15,30 +15,32 @@ export const submitCustomRequestSchema = z.object({
   cutType: z.enum(['kiss_cut', 'die_cut', 'custom'], {
     message: 'Please select a valid cut type',
   }),
-  notes: z.string().max(2000).optional(),
+  notes: z.string().max(2000, { message: 'Notes must be at most 2000 characters' }).optional(),
 })
 
 export const priceCustomRequestSchema = z.object({
   quotedPrice: z.number().positive({ message: 'Quoted price must be positive' }),
-  adminNotes: z.string().max(2000).optional(),
+  adminNotes: z.string().max(2000, { message: 'Admin notes must be at most 2000 characters' }).optional(),
 })
 
 export const updateCustomRequestStatusSchema = z.object({
-  status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'PRICED', 'ORDERED']),
-  adminNotes: z.string().max(2000).optional(),
-  quotedPrice: z.number().positive().optional(),
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'PRICED', 'ORDERED'], {
+    message: 'Please select a valid status',
+  }),
+  adminNotes: z.string().max(2000, { message: 'Admin notes must be at most 2000 characters' }).optional(),
+  quotedPrice: z.number().positive({ message: 'Quoted price must be positive' }).optional(),
 })
 
 export const customRequestFilterSchema = z.object({
   status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'PRICED', 'ORDERED']).optional(),
   userId: z.string().optional(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
+  startDate: z.string().datetime({ message: 'Invalid date format' }).optional(),
+  endDate: z.string().datetime({ message: 'Invalid date format' }).optional(),
   search: z.string().optional(),
-  sortBy: z.enum(['createdAt', 'quantity', 'width', 'height']).default('createdAt'),
-  sortOrder: z.enum(['asc', 'desc']).default('desc'),
-  page: z.number().int().positive().default(1),
-  limit: z.number().int().positive().max(100).default(20),
+  sortBy: z.enum(['createdAt', 'quantity', 'width', 'height'], { message: 'Invalid sort field' }).default('createdAt'),
+  sortOrder: z.enum(['asc', 'desc'], { message: 'Invalid sort order' }).default('desc'),
+  page: z.number().int().positive({ message: 'Page must be positive' }).default(1),
+  limit: z.number().int().positive({ message: 'Limit must be positive' }).max(100, { message: 'Limit cannot exceed 100' }).default(20),
 })
 
 export type SubmitCustomRequestInput = z.infer<typeof submitCustomRequestSchema>

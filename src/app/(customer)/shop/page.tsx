@@ -110,7 +110,7 @@ export default function ShopPage() {
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium text-[var(--ink)]/60">Categories:</span>
               <AnimatePresence mode="popLayout">
-                <div key={selectedCategory} className="flex flex-wrap items-center gap-2">
+                <div key={selectedCategory} className="flex flex-wrap items-center gap-2" role="group" aria-label="Product categories">
                   {categoryPills.map((cat) => (
                     <Button
                       key={cat.id}

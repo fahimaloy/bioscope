@@ -36,7 +36,7 @@ export default function HomePage() {
   ]
 
   return (
-    <main className="min-h-screen bg-[var(--bg-color)] overflow-x-hidden relative">
+    <main id="main-content" className="min-h-screen bg-[var(--bg-color)] overflow-x-hidden relative">
       {/* Grain texture overlay */}
       <div className="grain" aria-hidden="true" />
 

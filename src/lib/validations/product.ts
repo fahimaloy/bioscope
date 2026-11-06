@@ -7,7 +7,7 @@ export const dimensionConfigSchema = z.object({
   label: z.string().min(1, { message: 'Label is required' }),
   priceMultiplier: z.number().positive({ message: 'Price multiplier must be positive' }).default(1),
   isDefault: z.boolean().default(false),
-  sortOrder: z.number().int().min(0).default(0),
+  sortOrder: z.number().int().min(0, { message: 'Sort order must be 0 or greater' }).default(0),
 })
 
 export const quantityConfigSchema = z.object({
@@ -16,7 +16,7 @@ export const quantityConfigSchema = z.object({
   maxQty: z.number().int().positive({ message: 'Maximum quantity must be positive' }).optional(),
   pricePerUnit: z.number().positive({ message: 'Price per unit must be positive' }),
   label: z.string().min(1, { message: 'Label is required' }),
-  sortOrder: z.number().int().min(0).default(0),
+  sortOrder: z.number().int().min(0, { message: 'Sort order must be 0 or greater' }).default(0),
 })
 
 export const customizationOptionsSchema = z.object({
@@ -27,16 +27,16 @@ export const customizationOptionsSchema = z.object({
   customFields: z.array(z.object({
     key: z.string(),
     label: z.string(),
-    type: z.enum(['text', 'select', 'color', 'boolean']),
+    type: z.enum(['text', 'select', 'color', 'boolean'], { message: 'Invalid field type' }),
     required: z.boolean().default(false),
     options: z.array(z.string()).optional(),
   })).optional(),
 })
 
 export const createProductSchema = z.object({
-  name: z.string().min(2, { message: 'Product name must be at least 2 characters' }).max(100),
-  slug: z.string().min(2, { message: 'Slug must be at least 2 characters' }).max(100).regex(/^[a-z0-9-]+$/, { message: 'Slug can only contain lowercase letters, numbers, and hyphens' }),
-  description: z.string().max(5000).optional(),
+  name: z.string().min(2, { message: 'Product name must be at least 2 characters' }).max(100, { message: 'Product name must be at most 100 characters' }),
+  slug: z.string().min(2, { message: 'Slug must be at least 2 characters' }).max(100, { message: 'Slug must be at most 100 characters' }).regex(/^[a-z0-9-]+$/, { message: 'Slug can only contain lowercase letters, numbers, and hyphens' }),
+  description: z.string().max(5000, { message: 'Description must be at most 5000 characters' }).optional(),
   basePrice: z.number().positive({ message: 'Base price must be positive' }),
   compareAtPrice: z.number().positive({ message: 'Compare at price must be positive' }).optional(),
   categoryId: z.string().min(1, { message: 'Category is required' }),
@@ -44,17 +44,17 @@ export const createProductSchema = z.object({
   allowedDimensions: z.array(dimensionConfigSchema).min(1, { message: 'At least one dimension configuration is required' }),
   allowedQuantities: z.array(quantityConfigSchema).min(1, { message: 'At least one quantity configuration is required' }),
   customizationOptions: customizationOptionsSchema.optional(),
-  taxPercent: z.number().min(0).max(100).default(0),
-  additionalCharge: z.number().min(0).default(0),
+  taxPercent: z.number().min(0, { message: 'Tax percent cannot be negative' }).max(100, { message: 'Tax percent cannot exceed 100' }).default(0),
+  additionalCharge: z.number().min(0, { message: 'Additional charge cannot be negative' }).default(0),
   isTaxInclusive: z.boolean().default(false),
   trackInventory: z.boolean().default(false),
-  stock: z.number().int().min(0).default(0),
-  lowStockThreshold: z.number().int().min(0).default(10),
+  stock: z.number().int().min(0, { message: 'Stock cannot be negative' }).default(0),
+  lowStockThreshold: z.number().int().min(0, { message: 'Low stock threshold cannot be negative' }).default(10),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
-  sortOrder: z.number().int().min(0).default(0),
-  metaTitle: z.string().max(60).optional(),
-  metaDescription: z.string().max(160).optional(),
+  sortOrder: z.number().int().min(0, { message: 'Sort order must be 0 or greater' }).default(0),
+  metaTitle: z.string().max(60, { message: 'Meta title must be at most 60 characters' }).optional(),
+  metaDescription: z.string().max(160, { message: 'Meta description must be at most 160 characters' }).optional(),
 })
 
 export const updateProductSchema = createProductSchema.partial()

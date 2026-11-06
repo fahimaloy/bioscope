@@ -600,7 +600,9 @@ export default function AdminOrdersPage() {
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/40" />
+              <label htmlFor="order-search" className="sr-only">Search orders</label>
               <input
+                id="order-search"
                 type="text"
                 placeholder="Search order #, customer..."
                 value={search}
