@@ -6,13 +6,15 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Badge } from '@/components/ui/Badge'
+import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, CUSTOMER_CANCELLABLE } from '@/lib/order-status'
-import { Eye, Package, Truck } from 'lucide-react'
+import { Eye, Package, Truck, ChevronDown, ChevronUp } from 'lucide-react'
 import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { motion, AnimatePresence } from 'framer-motion'
+import { motionVariants } from '@/lib/motion'
 
 interface OrderListItem {
   id: string
@@ -22,6 +24,7 @@ interface OrderListItem {
   createdAt: string
   items: {
     productName: string
+    productSlug: string
     productImage: string | null
     quantity: number
     unitPrice: number
@@ -32,6 +35,31 @@ interface OrderListItem {
 
 const TABS = ['all', ...Object.keys(ORDER_STATUS_LABELS)] as const
 
+// Status to doodle variant mapping for badges
+const STATUS_DOT_COLOR: Record<string, string> = {
+  PENDING: 'var(--warning)',
+  CONFIRMED: 'var(--info)',
+  PROCESSING: 'var(--primary)',
+  PRINTING: 'var(--primary)',
+  READY_TO_SHIP: 'var(--secondary)',
+  SHIPPED: 'var(--secondary)',
+  DELIVERED: 'var(--success)',
+  CANCELLED: 'var(--error)',
+  REFUNDED: 'var(--error)',
+}
+
+const STATUS_BADGE_VARIANT: Record<string, 'accent' | 'primary' | 'secondary' | 'success' | 'error'> = {
+  PENDING: 'accent',
+  CONFIRMED: 'primary',
+  PROCESSING: 'primary',
+  PRINTING: 'primary',
+  READY_TO_SHIP: 'secondary',
+  SHIPPED: 'secondary',
+  DELIVERED: 'success',
+  CANCELLED: 'error',
+  REFUNDED: 'error',
+}
+
 export default function OrdersPage() {
   const router = useRouter()
   const [orders, setOrders] = useState<OrderListItem[]>([])
@@ -39,6 +67,7 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1)
   const [pager, setPager] = useState({ total: 0, totalPages: 1, hasNext: false, hasPrev: false })
   const [loading, setLoading] = useState(true)
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -75,6 +104,10 @@ export default function OrdersPage() {
       const j = await res.json().catch(() => null)
       toast.error(j?.error || 'This order cannot be cancelled')
     }
+  }
+
+  const toggleExpand = (orderId: string) => {
+    setExpandedOrderId(prev => prev === orderId ? null : orderId)
   }
 
   return (
@@ -116,46 +149,154 @@ export default function OrdersPage() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {orders.map((order) => (
-              <Card key={order.id} className="p-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-3">
-                      <Link href={`/orders/${order.id}`} className="font-display text-lg text-[var(--ink)] hover:text-primary">
-                        {order.orderNumber}
-                      </Link>
-                      <Badge variant="info" size="sm">
-                        {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status}
-                      </Badge>
+            {orders.map((order) => {
+              const isExpanded = expandedOrderId === order.id
+              const badgeVariant = STATUS_BADGE_VARIANT[order.status] || 'default'
+              const dotColor = STATUS_DOT_COLOR[order.status] || 'var(--ink)'
+
+              return (
+                <motion.div
+                  key={order.id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card
+                    variant="doodle"
+                    hover={true}
+                    padding="md"
+                    className="cursor-pointer group relative overflow-visible"
+                    onClick={() => router.push(`/orders/${order.id}`)}
+                  >
+                    <div className="relative">
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 pb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span className="font-display text-lg text-[var(--ink)]">
+                              {order.orderNumber}
+                            </span>
+                            <Badge variant={badgeVariant} size="sm" dot dotColor={dotColor}>
+                              {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-[var(--ink)]/50 mt-1">{formatDate(order.createdAt)}</p>
+                          <div className="mt-2 space-y-1">
+                            {order.items.slice(0, 3).map((item, i) => (
+                              <p key={i} className="text-sm text-[var(--ink)]/70">
+                                {item.productName} — {item.width}×{item.height} cm × {item.quantity}
+                              </p>
+                            ))}
+                            {order.items.length > 3 && (
+                              <p className="text-sm text-[var(--ink)]/50">+{order.items.length - 3} more items</p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <p className="font-display text-xl text-primary whitespace-nowrap">
+                            {formatCurrency(Number(order.total))}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/orders/${order.id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center gap-1"
+                            >
+                              <Button variant="outline" size="sm" aria-label="View order">
+                                <Eye className="w-4 h-4 mr-1" /> View
+                              </Button>
+                            </Link>
+                            {CUSTOMER_CANCELLABLE.includes(order.status as any) && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={(e) => { e.stopPropagation(); cancel(order.id) }}
+                              >
+                                Cancel
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Expandable items preview */}
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0, y: -10 }}
+                            animate={{ opacity: 1, height: 'auto', y: 0 }}
+                            exit={{ opacity: 0, height: 0, y: -10 }}
+                            transition={{ duration: 0.3, ease: [0.175, 0.885, 0.32, 1.275] }}
+                            className="border-t border-[var(--border-primary)] pt-4 mt-4"
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <span className="font-medium text-[var(--ink)]">Items ({order.items.length})</span>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); toggleExpand(order.id) }}
+                                className="text-sm text-[var(--ink)]/60 hover:text-primary flex items-center gap-1"
+                              >
+                                <ChevronUp className="w-4 h-4" /> Collapse
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                              {order.items.map((item, index) => (
+                                <Link
+                                  key={index}
+                                  href={`/shop/${item.productSlug}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="flex items-center gap-3 p-3 bg-[var(--light)]/50 rounded-input border border-[var(--ink)]/10 hover:border-primary/30 hover:bg-[var(--light)] transition-all"
+                                >
+                                  <div className="w-12 h-12 rounded-input overflow-hidden flex-shrink-0 bg-white">
+                                    {item.productImage ? (
+                                      <img
+                                        src={item.productImage}
+                                        alt={item.productName}
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">
+                                        <Package className="w-6 h-6" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-medium text-sm text-[var(--ink)] truncate">{item.productName}</p>
+                                    <p className="text-xs text-[var(--ink)]/50">
+                                      {item.width}×{item.height} cm × {item.quantity}
+                                    </p>
+                                  </div>
+                                  <span className="font-display text-primary text-sm">
+                                    {formatCurrency(Number(item.unitPrice) * item.quantity)}
+                                  </span>
+                                </Link>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Expand/Collapse trigger at bottom */}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleExpand(order.id) }}
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-8 flex items-center justify-center text-[var(--ink)]/50 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+                        aria-expanded={isExpanded}
+                        aria-controls={`order-items-${order.id}`}
+                      >
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ChevronDown className="w-5 h-5" />
+                        </motion.div>
+                        <span className="ml-2 text-xs font-medium hidden sm:inline">
+                          {isExpanded ? 'Hide items' : 'Show items'}
+                        </span>
+                      </button>
                     </div>
-                    <p className="text-sm text-[var(--ink)]/50 mt-1">{formatDate(order.createdAt)}</p>
-                    <div className="mt-2 space-y-1">
-                      {order.items.slice(0, 3).map((item, i) => (
-                        <p key={i} className="text-sm text-[var(--ink)]/70">
-                          {item.productName} — {item.width}×{item.height} cm × {item.quantity}
-                        </p>
-                      ))}
-                      {order.items.length > 3 && (
-                        <p className="text-sm text-[var(--ink)]/50">+{order.items.length - 3} more items</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <p className="font-display text-xl text-primary">{formatCurrency(Number(order.total))}</p>
-                    <Link href={`/orders/${order.id}`}>
-                      <Button variant="outline" size="sm" aria-label="View order">
-                        <Eye className="w-4 h-4 mr-1" /> View
-                      </Button>
-                    </Link>
-                    {CUSTOMER_CANCELLABLE.includes(order.status as any) && (
-                      <Button variant="destructive" size="sm" onClick={() => cancel(order.id)}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            ))}
+                  </Card>
+                </motion.div>
+              )
+            })}
           </div>
         )}
 
