@@ -583,7 +583,7 @@ function ToolsPanel({
               <div className="w-10 h-10 rounded-input bg-primary/10 flex items-center justify-center">
                 <Upload className="w-5 h-5 text-primary" />
               </div>
-              <SketchUnderline children={<span className="font-display text-lg text-primary">Upload Design</span>} />
+              <SketchUnderline><span className="font-display text-lg text-primary">Upload Design</span></SketchUnderline>
             </AccordionTrigger>
             <AccordionContent className="pt-4">
               <UploadZone
@@ -605,7 +605,7 @@ function ToolsPanel({
               <div className="w-10 h-10 rounded-input bg-accent/10 flex items-center justify-center">
                 <Settings className="w-5 h-5 text-accent" />
               </div>
-              <SketchUnderline children={<span className="font-display text-lg text-primary">Materials & Options</span>} />
+              <SketchUnderline><span className="font-display text-lg text-primary">Materials & Options</span></SketchUnderline>
             </AccordionTrigger>
             <AccordionContent className="space-y-6 mt-4">
               {/* Material */}
@@ -705,7 +705,7 @@ function ToolsPanel({
               <div className="w-10 h-10 rounded-input bg-secondary/10 flex items-center justify-center">
                 <Palette className="w-5 h-5 text-secondary" />
               </div>
-              <SketchUnderline children={<span className="font-display text-lg text-primary">Editing</span>} />
+              <SketchUnderline><span className="font-display text-lg text-primary">Editing</span></SketchUnderline>
             </AccordionTrigger>
             <AccordionContent className="flex-1 mt-4">
               {selectedLayer ? (
@@ -732,7 +732,7 @@ function ToolsPanel({
               <div className="w-10 h-10 rounded-input bg-accent/10 flex items-center justify-center">
                 <Layers className="w-5 h-5 text-accent" />
               </div>
-              <SketchUnderline children={<span className="font-display text-lg text-primary">Layers</span>} />
+              <SketchUnderline><span className="font-display text-lg text-primary">Layers</span></SketchUnderline>
             </AccordionTrigger>
             <AccordionContent className="flex-1 mt-4">
               <LayerPanel
@@ -793,7 +793,7 @@ function ToolsPanel({
               <div className="w-10 h-10 rounded-input bg-primary/10 flex items-center justify-center">
                 <Ruler className="w-5 h-5 text-primary" />
               </div>
-              <SketchUnderline children={<span className="font-display text-lg text-primary">Settings</span>} />
+              <SketchUnderline><span className="font-display text-lg text-primary">Settings</span></SketchUnderline>
             </AccordionTrigger>
             <AccordionContent className="flex-1 mt-4 overflow-y-auto">
               <DimensionControls

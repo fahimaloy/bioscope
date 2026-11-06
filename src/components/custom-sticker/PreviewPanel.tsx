@@ -150,7 +150,7 @@ export function PreviewPanel({
           className="border-t border-[var(--light)] overflow-hidden"
         >
           <div className="p-4 space-y-4">
-            <SketchUnderline className="-mb-2" children={<span className="font-display text-lg text-primary">Specifications</span>} />
+            <SketchUnderline className="-mb-2"><span className="font-display text-lg text-primary">Specifications</span></SketchUnderline>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <SpecItem label="Size" value={`${design.canvas.width} × ${design.canvas.height} cm`} />

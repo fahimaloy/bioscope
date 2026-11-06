@@ -35,7 +35,7 @@ type ViewportName = keyof typeof VIEWPORTS
 const PAGES: Array<{ path: string; name: string }> = [
   { path: '/', name: 'home' },
   { path: '/shop', name: 'shop' },
-  { path: '/shop/sample-sticker', name: 'product-detail' },
+  { path: '/shop/custom-logo-vinyl-sticker', name: 'product-detail' },
   { path: '/login', name: 'login' },
   { path: '/register', name: 'register' },
   { path: '/cart', name: 'cart' },
@@ -66,15 +66,24 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS) as Array<
     for (const { path, name } of PAGES) {
       test(name, async ({ page }) => {
         const errors = await collectConsoleErrors(page)
-        const res = await page.goto(path, { waitUntil: 'networkidle' })
+        const res = await page.goto(path, { waitUntil: 'domcontentloaded', timeout: 30_000 })
+        // Best-effort wait for network to settle; don't block on long-lived connections (HMR/socket.io)
+        await page.waitForLoadState('networkidle', { timeout: 10_000 }).catch(() => {})
         expect(res?.status()).toBeLessThan(500)
-        // Wait for fonts/animation settle before capturing
-        await page.waitForTimeout(500)
+        // Wait for all images, fonts, and in-flight rendering to settle before capturing.
+        await page.waitForFunction(
+          () => Array.from(document.images).every((img) => img.complete),
+          undefined,
+          { timeout: 15_000 },
+        ).catch(() => {})
+        await page.evaluate(() => document.fonts?.ready.catch(() => undefined)).catch(() => {})
+        await page.waitForTimeout(1_000)
         await expect(page).toHaveScreenshot(`${name}-${viewportName}.png`, {
           fullPage: true,
           maxDiffPixelRatio: 0.02,
           animations: 'disabled',
           caret: 'hide',
+          timeout: 30_000,
         })
         expect(errors).toEqual([])
       })

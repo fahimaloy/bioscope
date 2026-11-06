@@ -499,10 +499,7 @@ h1, h2, h3, .logo, .footer-logo {
 /* Legacy animate classes (keep for backwards compatibility) */
 .animate-float { animation: float 20s infinite alternate ease-in-out; }
 .animate-slide-in { animation: slideIn 0.3s ease-out; }
-.animate-slide-out { animation: slideOut 0.2s ease-in; }
-.animate-fade-in-legacy { animation: fadeIn 0.2s ease-out; }
 .animate-fade-out { animation: fadeOut 0.2s ease-in; }
-.animate-scale-in-legacy { animation: scaleIn 0.2s ease-out; }
 .animate-scale-out { animation: scaleOut 0.2s ease-in; }
 
 /* Stagger delays for children */
@@ -607,7 +604,7 @@ h1, h2, h3, .logo, .footer-logo {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .animate-float-gentle, .animate-pulse-soft, .animate-rotate-slow, .animate-bounceIn, .animate-scale-in, .animate-scale-out, .animate-float, .animate-slide-in, .animate-slide-out, .animate-fade-in-legacy, .animate-fade-out, .animate-scale-in-legacy, .animate-wobble, .animate-shake, .animate-slide-out-right, .animate-shimmer, .animate-marquee, .animate-skeleton-loading, .animate-reveal-letter, .animate-bounce {
+  .animate-float-gentle, .animate-pulse-soft, .animate-rotate-slow, .animate-bounceIn, .animate-scale-in, .animate-scale-out, .animate-float, .animate-slide-in, .animate-fade-out, .animate-wobble, .animate-shake, .animate-slide-out-right, .animate-shimmer, .animate-marquee, .animate-skeleton-loading, .animate-reveal-letter, .animate-bounce {
     animation: none !important;
   }
 }

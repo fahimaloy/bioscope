@@ -23,6 +23,8 @@
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
+    "e2e:visual": "playwright test --project=chromium --workers=1 e2e/visual.spec.ts",
+    "e2e:visual:update": "PLAYWRIGHT_USE_PROD=1 playwright test --project=chromium --workers=1 e2e/visual.spec.ts --update-snapshots",
     "socket:dev": "tsx watch socket-server/index.ts",
     "socket:build": "tsc -p socket-server/tsconfig.json",
     "socket:start": "node socket-server/dist/index.js",
