@@ -130,8 +130,9 @@ export function CheckoutOrderSummary({
 
         {deliveryCharge > 0 && deliveryRemaining > 0 && (
           <motion.p
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            initial={{ opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            style={{ transformOrigin: 'top' }}
             className="text-xs text-[var(--ink)]/50 text-center bg-[var(--accent)]/50 rounded-input p-2 border border-[var(--accent)]/30"
           >
             Add {formatCurrency(deliveryRemaining)} more for free delivery!

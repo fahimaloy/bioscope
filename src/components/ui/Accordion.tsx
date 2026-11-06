@@ -148,10 +148,11 @@ export const AccordionContent = forwardRef<HTMLDivElement, AccordionContentProps
           <motion.div
             ref={ref}
             id={id}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={{ scaleY: 0, opacity: 0 }}
+            animate={{ scaleY: 1, opacity: 1 }}
+            exit={{ scaleY: 0, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30, duration: 0.3 }}
+            style={{ transformOrigin: 'top' }}
             className={cn('overflow-hidden bg-[var(--paper-deep)]', className)}
             {...props}
           >

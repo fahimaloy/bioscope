@@ -142,10 +142,11 @@ export function PreviewPanel({
       {/* Specs Panel */}
       {showSpecs && (
         <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
+          initial={{ scaleY: 0, opacity: 0 }}
+          animate={{ scaleY: 1, opacity: 1 }}
+          exit={{ scaleY: 0, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          style={{ transformOrigin: 'top' }}
           className="border-t border-[var(--light)] overflow-hidden"
         >
           <div className="p-4 space-y-4">

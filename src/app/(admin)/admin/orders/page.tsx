@@ -655,10 +655,11 @@ export default function AdminOrdersPage() {
             {expandedRow && orders.find((o) => o.id === expandedRow) && (
               <motion.div
                 key={expandedRow}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0, scaleY: 0 }}
+                animate={{ opacity: 1, scaleY: 1 }}
+                exit={{ opacity: 0, scaleY: 0 }}
                 transition={{ duration: 0.3 }}
+                style={{ transformOrigin: 'top' }}
                 className="absolute left-0 right-0 top-full z-10"
               >
                 <ExpandedRowContent order={orders.find((o) => o.id === expandedRow)!} />

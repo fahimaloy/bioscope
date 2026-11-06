@@ -242,9 +242,10 @@ export default function CustomersPage() {
             
             {showFilters && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0, scaleY: 0 }}
+                animate={{ opacity: 1, scaleY: 1 }}
+                exit={{ opacity: 0, scaleY: 0 }}
+                style={{ transformOrigin: 'top' }}
                 className="mt-4 pt-4 border-t border-[var(--light)]"
               >
                 <div className="flex flex-wrap gap-4">

@@ -27,6 +27,23 @@ export const motionVariants = {
   
   // Page transitions
   pageEnter: { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -20 }, transition: { duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] } },
+  
+  // Reduced motion variants (opacity only, instant transitions)
+  reducedMotion: {
+    fadeIn: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
+    fadeInUp: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
+    fadeInDown: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
+    scaleIn: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
+    slideInRight: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
+    slideInLeft: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
+    wobble: { animate: { rotate: 0 }, transition: { duration: 0 } },
+    float: { animate: { y: 0 }, transition: { duration: 0 } },
+    pulseSoft: { initial: { scale: 1 }, animate: { scale: 1 }, transition: { duration: 0 } },
+    bounceIn: { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0 } },
+    staggerContainer: { animate: { transition: { staggerChildren: 0, delayChildren: 0 } } },
+    staggerItem: { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0 } },
+    pageEnter: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
+  },
 } as const;
 
 export type MotionVariantKey = keyof typeof motionVariants;

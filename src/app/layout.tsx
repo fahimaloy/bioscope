@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { Shantell_Sans, Caveat, Nunito } from 'next/font/google'
+import { MotionConfig } from 'framer-motion'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from 'sonner'
@@ -72,17 +73,19 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://utfs.io" />
       </head>
       <body className="min-h-screen bg-[var(--bg-color)] font-body antialiased flex flex-col">
-        <Providers>
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <Toaster
-            position="bottom-right"
-            theme="system"
-            toastOptions={{
-              className: 'sonner-toast',
-            }}
-          />
-        </Providers>
+        <MotionConfig reducedMotion="user">
+          <Providers>
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <Toaster
+              position="bottom-right"
+              theme="system"
+              toastOptions={{
+                className: 'sonner-toast',
+              }}
+            />
+          </Providers>
+        </MotionConfig>
       </body>
     </html>
   )

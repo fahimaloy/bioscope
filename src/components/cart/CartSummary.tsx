@@ -96,8 +96,9 @@ export function CartSummary({
           {/* Free Delivery Progress Bar */}
           {deliveryCharge > 0 && deliveryRemaining > 0 && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              style={{ transformOrigin: 'top' }}
               className="space-y-2"
             >
               <p className="text-sm text-[var(--ink)]/50 text-center">
@@ -106,9 +107,10 @@ export function CartSummary({
               <div className="w-full h-3 bg-[var(--light)] rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${freeDeliveryProgress}%` }}
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: freeDeliveryProgress / 100 }}
                   transition={{ type: 'spring', stiffness: 100, damping: 15, delay: 0.2 }}
+                  style={{ transformOrigin: 'left' }}
                 />
               </div>
               <div className="flex justify-between text-xs text-[var(--ink)]/40">

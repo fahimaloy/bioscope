@@ -223,10 +223,11 @@ export default function OrdersPage() {
                       <AnimatePresence>
                         {isExpanded && (
                           <motion.div
-                            initial={{ opacity: 0, height: 0, y: -10 }}
-                            animate={{ opacity: 1, height: 'auto', y: 0 }}
-                            exit={{ opacity: 0, height: 0, y: -10 }}
+                            initial={{ opacity: 0, scaleY: 0, y: -10 }}
+                            animate={{ opacity: 1, scaleY: 1, y: 0 }}
+                            exit={{ opacity: 0, scaleY: 0, y: -10 }}
                             transition={{ duration: 0.3, ease: [0.175, 0.885, 0.32, 1.275] }}
+                            style={{ transformOrigin: 'top' }}
                             className="border-t border-[var(--border-primary)] pt-4 mt-4"
                           >
                             <div className="flex items-center justify-between mb-3">

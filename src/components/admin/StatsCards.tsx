@@ -429,10 +429,10 @@ export function OrderStatusDistribution({ distribution }: { distribution: Record
                   <div className="h-2 bg-[var(--light)] rounded-full overflow-hidden">
                     <motion.div
                       className="h-full rounded-full"
-                      style={{ backgroundColor: status.color }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${percentage}%` }}
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: percentage / 100 }}
                       transition={{ type: 'spring', stiffness: 100, damping: 15, delay: 0.2 }}
+                      style={{ backgroundColor: status.color, transformOrigin: 'left' }}
                     />
                   </div>
                 </div>

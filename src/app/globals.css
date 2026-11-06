@@ -606,7 +606,7 @@ h1, h2, h3, .logo, .footer-logo {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .animate-float-gentle, .animate-pulse-soft, .animate-rotate-slow, .animate-bounceIn, .animate-scale-in, .animate-scale-out {
+  .animate-float-gentle, .animate-pulse-soft, .animate-rotate-slow, .animate-bounceIn, .animate-scale-in, .animate-scale-out, .animate-float, .animate-slide-in, .animate-slide-out, .animate-fade-in-legacy, .animate-fade-out, .animate-scale-in-legacy, .animate-wobble, .animate-shake, .animate-slide-out-right, .animate-shimmer, .animate-marquee, .animate-skeleton-loading, .animate-reveal-letter, .animate-bounce {
     animation: none !important;
   }
 }

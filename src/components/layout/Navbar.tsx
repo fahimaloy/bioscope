@@ -87,10 +87,11 @@ export function Navbar() {
                       {link.label}
                     </motion.span>
                     <motion.span
-                      className="absolute bottom-[-4px] left-0 h-[3px] bg-[var(--primary)] transition-all duration-300"
-                      initial={{ width: 0 }}
-                      animate={pathname === link.href ? { width: '100%' } : { width: 0 }}
-                      whileHover={{ width: '100%' }}
+                      className="absolute bottom-[-4px] left-0 h-[3px] bg-[var(--primary)]"
+                      initial={{ scaleX: 0 }}
+                      animate={pathname === link.href ? { scaleX: 1 } : { scaleX: 0 }}
+                      whileHover={{ scaleX: 1 }}
+                      style={{ transformOrigin: 'left' }}
                     />
                   </Link>
                 ))}
@@ -196,10 +197,11 @@ export function Navbar() {
           <motion.div
             id="mobile-menu"
             key="mobile-menu"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            exit={{ opacity: 0, scaleY: 0 }}
             transition={{ duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] }}
+            style={{ transformOrigin: 'top' }}
             className="md:hidden relative"
           >
             <DoodleBackground shapeCount={6} className="inset-0 -z-10" />

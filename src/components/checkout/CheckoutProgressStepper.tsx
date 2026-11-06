@@ -28,9 +28,10 @@ export function CheckoutProgressStepper({
           <div className="absolute inset-0" style={{ backgroundImage: `repeating-linear-gradient(90deg, var(--ink) 0, var(--ink) 8px, transparent 8px, transparent 16px)`, opacity: 0.3 }} />
           {/* Active progress fill */}
           <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${(currentStep / (totalSteps - 1)) * 100}%` }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: currentStep / (totalSteps - 1) }}
             transition={{ duration: 0.5, ease: [0.175, 0.885, 0.32, 1.275] }}
+            style={{ transformOrigin: 'left' }}
             className="h-full bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)]"
           />
         </div>

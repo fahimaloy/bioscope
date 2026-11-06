@@ -217,12 +217,12 @@ function RegisterForm() {
                 </div>
                 <div className="h-2 bg-[var(--border-primary)] rounded-full overflow-hidden">
                   <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${(passwordStrength.score / 5) * 100}%` }}
-                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: passwordStrength.score / 5 }}
+                    className="h-full rounded-full"
                     style={{ 
                       backgroundColor: `var(--${passwordStrength.color})`,
-                      transition: 'width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                      transformOrigin: 'left',
                     }}
                   />
                 </div>
