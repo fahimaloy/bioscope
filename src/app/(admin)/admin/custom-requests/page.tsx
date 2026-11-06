@@ -14,7 +14,6 @@ import {
 } from '@/components/ui'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Search, Eye, DollarSign, CheckCircle, XCircle, Edit2 } from 'lucide-react'
-import { motion } from 'framer-motion'
 
 const statusColors: Record<string, 'warning' | 'success' | 'error' | 'accent' | 'primary' | 'default'> = {
   PENDING: 'warning',
@@ -133,7 +132,7 @@ export default function CustomRequestsPage() {
     }
   }
 
-  const setStatus = async (id: string, status: string) => {
+  const setStatus = useCallback(async (id: string, status: string) => {
     const res = await fetch(`/api/custom-requests/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -146,7 +145,7 @@ export default function CustomRequestsPage() {
       const j = await res.json().catch(() => null)
       toast.error(j?.error || 'Failed to update status')
     }
-  }
+  }, [load])
 
   const columns = useMemo((): import('@/components/ui/DataTable').Column<CustomRequest>[] => [
     {
@@ -277,7 +276,7 @@ export default function CustomRequestsPage() {
         </div>
       ),
     },
-  ], [])
+  ], [setStatus])
 
   return (
     <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
