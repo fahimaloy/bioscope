@@ -12,7 +12,7 @@ export const motionVariants = {
   // Doodle-specific
   wobble: { animate: { rotate: [-3, 3, -3, 0] }, transition: { duration: 0.5, ease: 'easeInOut' } },
   float: { animate: { y: [0, -8, 0] }, transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' } },
-  pulseSoft: { animate: { scale: [1, 1.02, 1] }, transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' } },
+  pulseSoft: { initial: { scale: 1 }, animate: { scale: [1, 1.02, 1] as [number, number, number] }, transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' } },
   bounceIn: { initial: { opacity: 0, scale: 0.3 }, animate: { opacity: 1, scale: 1 }, transition: { type: 'spring', stiffness: 260, damping: 20 } },
   
   // Interactive

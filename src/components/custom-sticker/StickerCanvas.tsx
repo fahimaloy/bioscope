@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { fabric } from 'fabric'
 import { cn } from '@/lib/utils'
 import type { StickerDesign, DesignLayer, MaterialType, FinishType, CutType } from '@/types'
 import { useStickerBuilderStore } from '@/lib/hooks/useStickerBuilder'
+import { StickerPeel } from '@/components/decorative/DoodleElements'
 
 interface StickerCanvasProps {
   ref?: any
@@ -13,6 +14,9 @@ interface StickerCanvasProps {
   backgroundColor?: string
   grid?: boolean
   rulers?: boolean
+  snapToGrid?: boolean
+  zoom?: number
+  onZoomChange?: (zoom: number) => void
   onSelectionChange?: (layer: DesignLayer | null) => void
   className?: string
 }
@@ -315,6 +319,91 @@ export function StickerCanvas({
     }
   }
 
+  // Rulers with cm marks
+  const drawRulers = useCallback(() => {
+    if (!fabricRef.current || !rulers) return
+    const canvas = fabricRef.current
+    const ctx = canvas.getContext()
+    if (!ctx) return
+
+    const cw = canvas.getWidth() ?? 0
+    const ch = canvas.getHeight() ?? 0
+    const rulerSize = 30
+
+    // Top ruler
+    const topRulerCanvas = document.querySelector('.ruler-top canvas') as HTMLCanvasElement
+    if (topRulerCanvas) {
+      const rctx = topRulerCanvas.getContext('2d')
+      if (rctx) {
+        rctx.clearRect(0, 0, topRulerCanvas.width, topRulerCanvas.height)
+        rctx.fillStyle = 'rgba(255,255,255,0.9)'
+        rctx.fillRect(0, 0, topRulerCanvas.width, topRulerCanvas.height)
+        rctx.strokeStyle = 'rgba(51,38,26,0.2)'
+        rctx.lineWidth = 1
+
+        // Draw cm marks
+        const pxPerCm = cw / (width * 2)
+        for (let cm = 0; cm <= width; cm += 1) {
+          const x = cm * pxPerCm
+          rctx.beginPath()
+          rctx.moveTo(x, rulerSize - 10)
+          rctx.lineTo(x, rulerSize)
+          rctx.stroke()
+          if (cm % 1 === 0) {
+            rctx.font = '10px Outfit'
+            rctx.fillStyle = 'rgba(51,38,26,0.6)'
+            rctx.textAlign = 'center'
+            rctx.fillText(`${cm}`, x, rulerSize - 12)
+          }
+        }
+      }
+    }
+
+    // Left ruler
+    const leftRulerCanvas = document.querySelector('.ruler-left canvas') as HTMLCanvasElement
+    if (leftRulerCanvas) {
+      const rctx = leftRulerCanvas.getContext('2d')
+      if (rctx) {
+        rctx.clearRect(0, 0, leftRulerCanvas.width, leftRulerCanvas.height)
+        rctx.fillStyle = 'rgba(255,255,255,0.9)'
+        rctx.fillRect(0, 0, leftRulerCanvas.width, leftRulerCanvas.height)
+        rctx.strokeStyle = 'rgba(51,38,26,0.2)'
+        rctx.lineWidth = 1
+
+        const pxPerCm = ch / (height * 2)
+        for (let cm = 0; cm <= height; cm += 1) {
+          const y = cm * pxPerCm
+          rctx.beginPath()
+          rctx.moveTo(rulerSize - 10, y)
+          rctx.lineTo(rulerSize, y)
+          rctx.stroke()
+          if (cm % 1 === 0) {
+            rctx.font = '10px Outfit'
+            rctx.fillStyle = 'rgba(51,38,26,0.6)'
+            rctx.textAlign = 'right'
+            rctx.fillText(`${cm}`, rulerSize - 12, y + 3)
+          }
+        }
+      }
+    }
+  }, [width, height, rulers])
+
+  // Draw rulers on render
+  useEffect(() => {
+    if (!rulers) return
+    const canvas = fabricRef.current
+    if (!canvas) return
+
+    const handleRender = () => {
+      drawRulers()
+    }
+    canvas.on('after:render', handleRender)
+    drawRulers()
+    return () => {
+      canvas.off('after:render', handleRender)
+    }
+  }, [drawRulers, rulers])
+
   // Zoom controls
   const zoomIn = useCallback(() => {
     if (!fabricRef.current) return
@@ -340,8 +429,22 @@ export function StickerCanvas({
 
   return (
     <div className={cn('relative overflow-hidden bg-[var(--light)] rounded-card', className)}>
-      {/* Canvas */}
-      <div className="relative aspect-square">
+      {/* Rulers */}
+      {rulers && (
+        <>
+          <div className="absolute top-0 left-8 w-full h-8 bg-white/90 backdrop-blur-sm border-b border-[var(--ink)]/20 overflow-hidden ruler-top z-10">
+            <canvas className="w-full h-full" width={width * 2} height={30} />
+          </div>
+          <div className="absolute top-8 left-0 w-8 h-full bg-white/90 backdrop-blur-sm border-r border-[var(--ink)]/20 overflow-hidden ruler-left z-10">
+            <canvas className="w-full h-full" width={30} height={height * 2} />
+          </div>
+          {/* Corner */}
+          <div className="absolute top-0 left-0 w-8 h-8 bg-white/90 backdrop-blur-sm border-b border-r border-[var(--ink)]/20 z-20" />
+        </>
+      )}
+
+      {/* Canvas with 3px ink border and StickerPeel corner */}
+      <div className="relative aspect-square border-3 border-[var(--ink)]">
         <canvas
           ref={(el) => {
             canvasRef.current = el
@@ -350,30 +453,20 @@ export function StickerCanvas({
           }}
           className="w-full h-full"
         />
+        {/* Sticker Peel Corner */}
+        <StickerPeel className="absolute top-[-5px] right-[-5px]" />
       </div>
 
       {/* Zoom Controls */}
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-input p-2 shadow-lg">
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-input p-2 shadow-lg z-10">
         <button onClick={zoomOut} className="p-2 text-[var(--ink)] hover:text-primary transition-colors" aria-label="Zoom out">−</button>
         <span className="px-3 text-sm font-medium text-[var(--ink)]">{Math.round(zoom * 100)}%</span>
         <button onClick={zoomIn} className="p-2 text-[var(--ink)] hover:text-primary transition-colors" aria-label="Zoom in">+</button>
         <button onClick={resetZoom} className="p-2 text-[var(--ink)] hover:text-primary transition-colors" aria-label="Reset zoom">⌂</button>
       </div>
 
-      {/* Rulers */}
-      {rulers && (
-        <>
-          <div className="absolute top-0 left-0 w-full h-8 bg-white/90 backdrop-blur-sm border-b border-[var(--ink)]/20 overflow-hidden">
-            <canvas className="w-full h-full" width={width * 2} height={80} />
-          </div>
-          <div className="absolute top-0 left-0 w-8 h-full bg-white/90 backdrop-blur-sm border-r border-[var(--ink)]/20 overflow-hidden">
-            <canvas className="w-full h-full" width={80} height={height * 2} />
-          </div>
-        </>
-      )}
-
       {/* Dimensions Display */}
-      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-input px-3 py-1 text-sm font-medium text-[var(--ink)]">
+      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-input px-3 py-1 text-sm font-medium text-[var(--ink)] z-10">
         {design.canvas.width} × {design.canvas.height} cm @ {design.canvas.dpi} DPI
       </div>
     </div>
