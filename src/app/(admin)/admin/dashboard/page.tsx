@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { DashboardSummary, OrderStatusDistribution, RevenueChartCard } from '@/components/admin/StatsCards'
+import { DashboardSummary, RevenueChartCard, OrderStatusDistribution, ActivityFeed, StatsCards } from '@/components/admin/StatsCards'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
-import { Package, ShoppingBag, DollarSign, Users, TrendingUp, Clock, AlertCircle, FileText, Plus, Settings, BarChart2 } from 'lucide-react'
+import { Package, ShoppingBag, TrendingUp, Clock, AlertCircle, FileText, Plus, Settings, BarChart2 } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { SketchUnderline } from '@/components/decorative/DoodleElements'
 
 const quickActions = [
   { name: 'Add Product', href: '/admin/products', icon: Plus, color: 'primary' },
@@ -59,20 +61,24 @@ export default function AdminDashboardPage() {
 
         const recent = [
           ...orders.slice(0, 4).map((o: any) => ({
-            icon: '📦',
+            id: `order-${o.id}`,
+            type: 'order' as const,
             title: `Order ${o.orderNumber} — ${o.status}`,
             desc: `${o.user?.name ?? o.shippingName} · ${formatCurrency(Number(o.total))}`,
             time: formatDate(o.createdAt),
             href: `/orders/${o.id}`,
+            icon: <ShoppingBag className="w-4 h-4" />,
           })),
           ...(recentCrRes?.data?.data ?? []).slice(0, 3).map((c: any) => ({
-            icon: '✨',
+            id: `cr-${c.id}`,
+            type: 'custom' as const,
             title: `Custom request ${c.status.toLowerCase()}`,
             desc: `${c.originalName} · ${c.width}×${c.height}cm × ${c.quantity}`,
             time: formatDate(c.createdAt),
             href: '/admin/custom-requests',
+            icon: <span className="text-xl">✨</span>,
           })),
-        ].slice(0, 6)
+        ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 6)
 
         setStats({
           totalOrders: ordersRes?.data?.pagination?.total ?? orders.length,
@@ -99,10 +105,16 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 100, damping: 15 }}
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+      >
         <div>
           <h1 className="font-display text-3xl text-primary">Dashboard</h1>
-          <p className="text-[var(--ink)]/60">Welcome back! Here's what's happening with your store.</p>
+          <p className="text-[var(--ink)]/60">Welcome back! Here&apos;s what&apos;s happening with your store.</p>
         </div>
         <div className="flex flex-wrap gap-3">
           {quickActions.map((action) => (
@@ -114,58 +126,90 @@ export default function AdminDashboardPage() {
             </Link>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      {stats ? <DashboardSummary stats={stats} /> : <div className="h-32 animate-pulse bg-[var(--light)] rounded-card" />}
+      {/* Main Stats Cards - 4 cards: Orders, Revenue, Products, Customers */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, type: 'spring', stiffness: 100, damping: 15 }}
+      >
+        {stats ? <StatsCards stats={stats} /> : <div className="h-32 animate-pulse bg-[var(--light)] rounded-card" />}
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Dashboard Summary Row */}
+      {stats && <DashboardSummary stats={stats} />}
+
+      {/* Revenue Chart + Secondary Stats */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, type: 'spring', stiffness: 100, damping: 15 }}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
         <div className="lg:col-span-2">
           <RevenueChartCard data={revenue} />
         </div>
 
         <div className="space-y-4">
-          <StatCard label="Pending Orders" value={stats?.pendingOrders ?? '—'} icon={Clock} color="var(--accent)" trend="Requires attention" trendUp={false} />
-          <StatCard label="Low Stock Products" value={stats?.lowStockProducts ?? '—'} icon={AlertCircle} color="var(--error)" trend="Needs restock" trendUp={false} />
-          <StatCard label="Custom Requests" value={stats?.pendingCustomRequests ?? '—'} icon={FileText} color="var(--info)" trend="Awaiting review" trendUp={false} />
-          <StatCard label="Avg. Order Value" value={stats ? formatCurrency(stats.averageOrderValue) : '—'} icon={TrendingUp} color="var(--warning)" trend="All time" trendUp={true} />
+          <SecondaryStatCard 
+            label="Pending Orders" 
+            value={stats?.pendingOrders ?? '—'} 
+            icon={Clock} 
+            color="var(--accent)" 
+            trend="Requires attention" 
+            trendUp={false} 
+          />
+          <SecondaryStatCard 
+            label="Low Stock Products" 
+            value={stats?.lowStockProducts ?? '—'} 
+            icon={AlertCircle} 
+            color="var(--error)" 
+            trend="Needs restock" 
+            trendUp={false} 
+          />
+          <SecondaryStatCard 
+            label="Custom Requests" 
+            value={stats?.pendingCustomRequests ?? '—'} 
+            icon={FileText} 
+            color="var(--info)" 
+            trend="Awaiting review" 
+            trendUp={false} 
+          />
+          <SecondaryStatCard 
+            label="Avg. Order Value" 
+            value={stats ? formatCurrency(stats.averageOrderValue) : '—'} 
+            icon={TrendingUp} 
+            color="var(--warning)" 
+            trend="All time" 
+            trendUp={true} 
+          />
         </div>
-      </div>
+      </motion.div>
 
+      {/* Order Status Distribution */}
       <OrderStatusDistribution distribution={distribution} />
 
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display text-xl text-primary">Recent Activity</h2>
-          <Link href="/admin/orders"><Button variant="ghost" size="sm">View All</Button></Link>
-        </div>
-        <div className="space-y-3">
-          {activity.length === 0 && <p className="text-[var(--ink)]/50 text-sm">No recent activity.</p>}
-          {activity.map((a, index) => (
-            <Link key={index} href={a.href} className="flex items-center gap-4 p-3 bg-[var(--light)] rounded-input border border-[var(--ink)]/20 hover:border-primary transition-colors">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10 text-primary">
-                <span>{a.icon}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-body text-[var(--ink)] truncate">{a.title}</p>
-                <p className="text-sm text-[var(--ink)]/60 truncate">{a.desc}</p>
-              </div>
-              <span className="text-xs text-[var(--ink)]/50 whitespace-nowrap">{a.time}</span>
-            </Link>
-          ))}
-        </div>
-      </Card>
+      {/* Activity Feed Timeline */}
+      <ActivityFeed activities={activity} limit={6} />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Quick Links */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, type: 'spring', stiffness: 100, damping: 15 }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+      >
         <QuickLinkCard title="Manage Products" desc="Add, edit, or remove products" icon={Package} href="/admin/products" color="primary" />
         <QuickLinkCard title="Process Orders" desc="View and update order status" icon={ShoppingBag} href="/admin/orders" color="secondary" />
         <QuickLinkCard title="Custom Requests" desc="Review and price custom requests" icon={FileText} href="/admin/custom-requests" color="accent" />
         <QuickLinkCard title="Analytics" desc="View detailed reports" icon={BarChart2} href="/admin/analytics" color="default" />
-      </div>
+      </motion.div>
     </div>
   )
 }
 
-function StatCard({ label, value, icon: Icon, color, trend, trendUp }: {
+function SecondaryStatCard({ label, value, icon: Icon, color, trend, trendUp }: {
   label: string
   value: string | number
   icon: any
@@ -174,16 +218,20 @@ function StatCard({ label, value, icon: Icon, color, trend, trendUp }: {
   trendUp?: boolean
 }) {
   return (
-    <div className="bg-white rounded-card border-3 border-[var(--ink)] p-4 shadow-card">
+    <Card variant="doodle" hover={true} padding="md" className="relative overflow-visible group">
       <div className="flex items-center justify-between mb-2">
-        <div className={cn('w-10 h-10 rounded-input flex items-center justify-center')} style={{ backgroundColor: color + '20', color }}>
+        <div className={cn('w-10 h-10 rounded-input flex items-center justify-center animate-float-gentle transition-all duration-300 group-hover:scale-110', `bg-[${color}]/10 text-[${color}]`)}>
           <Icon className="w-5 h-5" />
         </div>
+        <span className="text-xs font-medium" style={{ color: trendUp ? 'var(--success)' : 'var(--error)' }}>
+          {trendUp ? '↑' : '↓'} {trend}
+        </span>
       </div>
-      <div className="text-2xl font-display text-[var(--ink)] mb-1">{value}</div>
-      <p className="font-medium text-body text-[var(--ink)]/70">{label}</p>
-      <p className="text-xs text-[var(--ink)]/50 mt-1">{trend}</p>
-    </div>
+      <div className="text-xl font-display text-[var(--ink)] mb-1">{value}</div>
+      <SketchUnderline className="inline-block">
+        <p className="font-medium text-body text-[var(--ink)]/70 text-sm">{label}</p>
+      </SketchUnderline>
+    </Card>
   )
 }
 
@@ -195,17 +243,19 @@ function QuickLinkCard({ title, desc, icon: Icon, href, color }: {
   color: string
 }) {
   return (
-    <a href={href} className="bg-white rounded-card border-3 border-[var(--ink)] p-6 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all group">
-      <div className="flex items-center justify-between mb-4">
-        <div className={cn('w-12 h-12 rounded-input flex items-center justify-center')} style={{ backgroundColor: (color === 'default' ? 'var(--dark)' : color) + '20', color: color === 'default' ? 'var(--dark)' : color }}>
-          <Icon className="w-6 h-6" />
+    <a href={href} className="block">
+      <Card variant="doodle" hover={true} padding="lg" className="relative overflow-visible group h-full">
+        <div className="flex items-center justify-between mb-4">
+          <div className={cn('w-12 h-12 rounded-input flex items-center justify-center animate-float-gentle transition-all duration-300 group-hover:scale-110', `bg-[${color === 'default' ? 'var(--dark)' : color}]/10 text-[${color === 'default' ? 'var(--dark)' : color}]`)}>
+            <Icon className="w-6 h-6" />
+          </div>
         </div>
-      </div>
-      <h3 className="font-display text-lg text-[var(--ink)] mb-1">{title}</h3>
-      <p className="text-sm text-[var(--ink)]/60 mb-4">{desc}</p>
-      <span className="inline-flex items-center gap-1 text-sm font-medium text-primary group-hover:underline">
-        View →
-      </span>
+        <h3 className="font-display text-lg text-[var(--ink)] mb-1">{title}</h3>
+        <p className="text-sm text-[var(--ink)]/60 mb-4">{desc}</p>
+        <span className="inline-flex items-center gap-1 text-sm font-medium text-primary group-hover:underline transition-colors">
+          View →
+        </span>
+      </Card>
     </a>
   )
 }
