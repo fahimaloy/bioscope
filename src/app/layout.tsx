@@ -79,8 +79,7 @@ export default function RootLayout({
             position="bottom-right"
             theme="system"
             toastOptions={{
-              className: 'bg-white border-3 border-[var(--ink)] shadow-card',
-              style: { borderRadius: '20px' },
+              className: 'sonner-toast',
             }}
           />
         </Providers>
