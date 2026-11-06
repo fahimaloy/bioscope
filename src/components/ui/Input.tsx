@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes, useId } from 'react'
+import { forwardRef, InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes, useId, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -8,11 +8,12 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string
   hint?: string
   icon?: React.ReactNode
+  toggleIcon?: React.ReactNode | { show: React.ReactNode; hide: React.ReactNode }
   iconPosition?: 'left' | 'right'
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, label, error, hint, icon, iconPosition = 'left', id: providedId, type, ...props }, ref) => {
+  ({ className, label, error, hint, icon, toggleIcon, iconPosition = 'left', id: providedId, type, ...props }, ref) => {
     const generatedId = useId()
     const id = providedId || generatedId
     const errorId = `${id}-error`
@@ -20,7 +21,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     const hasValue = props.defaultValue || props.value || (props as any).value !== ''
 
-    const isPassword = type === 'password'
+    const isPasswordType = type === 'password'
+    const [showPassword, setShowPassword] = useState(false)
+    const currentType = isPasswordType && showPassword ? 'text' : type
+    
+    let toggleButtonIcon: React.ReactNode = icon
+    if (toggleIcon) {
+      if (typeof toggleIcon === 'object' && 'show' in toggleIcon && 'hide' in toggleIcon) {
+        toggleButtonIcon = showPassword ? toggleIcon.hide : toggleIcon.show
+      } else {
+        toggleButtonIcon = toggleIcon
+      }
+    }
 
     return (
       <div className="w-full">
@@ -33,7 +45,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             id={id}
-            type={type}
+            type={currentType}
             className={cn(
               'w-full bg-transparent transition-all duration-300',
               'border-2 rounded-input',
@@ -44,7 +56,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               'py-3 px-4',  // consistent padding
               iconPosition === 'left' && 'pl-12',
               iconPosition === 'right' && 'pr-12',
-              isPassword && 'pr-12',
+              isPasswordType && 'pr-12',
               error
                 ? 'border-[var(--error)] focus:border-[var(--error)] focus:shadow-[0_0_0_3px_rgba(231,76,60,0.2)]'
                 : 'border-[var(--ink)]',
@@ -55,18 +67,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-describedby={error ? errorId : hint ? hintId : undefined}
             {...props}
           />
-          {icon && iconPosition === 'right' && !isPassword && (
+          {icon && iconPosition === 'right' && !isPasswordType && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/50 pointer-events-none z-10">
               {icon}
             </div>
           )}
-          {isPassword && (
+          {isPasswordType && toggleButtonIcon && (
             <button
               type="button"
+              onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--ink)]/50 hover:text-primary transition-colors p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]"
-              aria-label={props['aria-label'] === 'Hide password' ? 'Show password' : 'Hide password'}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {icon}
+              {toggleButtonIcon}
             </button>
           )}
           {label && (
@@ -78,7 +91,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 'text-[var(--ink)]/50 font-medium',
                 (hasValue || props.placeholder) && '-translate-y-3 scale-75 text-primary',
                 error && 'text-[var(--error)]',
-                isPassword && 'right-12'
+                isPasswordType && 'right-12'
               )}
             >
               {label}

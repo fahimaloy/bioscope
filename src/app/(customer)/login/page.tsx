@@ -11,7 +11,7 @@ import { loginSchema, type LoginInput } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
-import { Mail, Lock, X } from 'lucide-react'
+import { Mail, Lock, X, Eye, EyeOff } from 'lucide-react'
 import { DoodleScatter } from '@/components/decorative/DoodleScatter'
 import { WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
 import { motion } from 'framer-motion'
@@ -141,6 +141,7 @@ function LoginForm() {
             error={errors.password?.message}
             disabled={isLoading}
             icon={<Lock className="w-5 h-5" />}
+            toggleIcon={{ show: <Eye className="w-5 h-5" />, hide: <EyeOff className="w-5 h-5" /> }}
             iconPosition="left"
           />
 

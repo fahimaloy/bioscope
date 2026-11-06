@@ -10,9 +10,9 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { DoodleScatter } from '@/components/decorative/DoodleScatter'
-import { WashiTape, SketchUnderline, StickerPeel } from '@/components/decorative/DoodleElements'
+import { WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
 import { motion } from 'framer-motion'
-import { Check, X, Loader2 } from 'lucide-react'
+import { Check, X, Eye, EyeOff } from 'lucide-react'
 
 function calculatePasswordStrength(password: string): { score: number; label: string; color: string } {
   if (!password) return { score: 0, label: '', color: '' }
@@ -40,8 +40,6 @@ function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [showError, setShowError] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     register,
@@ -197,12 +195,13 @@ function RegisterForm() {
           <div className="space-y-2">
             <Input
               label="Password"
-              type={showPassword ? 'text' : 'password'}
+              type="password"
               placeholder="At least 8 characters"
               {...register('password')}
               error={errors.password?.message}
               disabled={isLoading}
               icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
+              toggleIcon={{ show: <Eye className="w-5 h-5" />, hide: <EyeOff className="w-5 h-5" /> }}
               iconPosition="left"
             />
             
@@ -234,12 +233,13 @@ function RegisterForm() {
           <div className="relative space-y-2">
             <Input
               label="Confirm Password"
-              type={showConfirmPassword ? 'text' : 'password'}
+              type="password"
               placeholder="Confirm your password"
               {...register('confirmPassword')}
               error={passwordsMismatch ? 'Passwords do not match' : errors.confirmPassword?.message}
               disabled={isLoading}
               icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>}
+              toggleIcon={{ show: <Eye className="w-5 h-5" />, hide: <EyeOff className="w-5 h-5" /> }}
               iconPosition="left"
               className={passwordsMismatch ? 'animate-shake' : ''}
             />
