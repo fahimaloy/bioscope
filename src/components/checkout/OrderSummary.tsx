@@ -5,6 +5,9 @@ import { CartSummary } from '@/components/cart/CartSummary'
 import { CheckoutCartItem } from '@/components/cart/CartItem'
 import { formatCurrency } from '@/lib/utils'
 import type { CartItem } from '@/types'
+import { Card } from '@/components/ui/Card'
+import { TornEdge } from '@/components/decorative/DoodleElements'
+import { motion } from 'framer-motion'
 
 interface OrderSummaryProps {
   items: CartItem[]
@@ -30,11 +33,12 @@ export function OrderSummary({
   className,
 }: OrderSummaryProps) {
   return (
-    <div className={cn('bg-white rounded-card border-3 border-[var(--ink)] shadow-card p-6 space-y-6 sticky top-24', className)}>
-      <h3 className="font-display text-xl text-primary">Order Summary</h3>
+    <Card variant="doodle" padding="lg" className={cn('sticky top-24', className)}>
+      <TornEdge position="top" className="h-2 bg-[var(--accent)] -mx-8 -mt-8" />
+      <h3 className="font-display text-xl text-primary mb-6">Order Summary</h3>
 
       {/* Items */}
-      <div className="space-y-3 max-h-96 overflow-y-auto">
+      <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
         {items.map((item) => (
           <CheckoutCartItem key={`${item.productId}-${item.width}-${item.height}`} item={item} />
         ))}
@@ -52,7 +56,7 @@ export function OrderSummary({
         onPromoApply={() => {}}
         onCheckout={() => {}}
       />
-    </div>
+    </Card>
   )
 }
 
@@ -71,59 +75,74 @@ export function CheckoutOrderSummary({
   const deliveryRemaining = Math.max(0, freeDeliveryThreshold - subtotal)
 
   return (
-    <div className={cn('bg-white rounded-card border-3 border-[var(--ink)] shadow-card p-6 space-y-4', className)}>
+    <Card variant="doodle" padding="lg" className={cn('sticky top-24 space-y-4', className)}>
+      <TornEdge position="top" className="h-2 bg-gradient-to-r from-[var(--accent)] to-[var(--pink)] -mx-8 -mt-8" />
       <h3 className="font-display text-lg text-primary">Order Summary</h3>
 
       {/* Items List */}
-      <div className="space-y-2 max-h-64 overflow-y-auto">
+      <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
         {items.map((item) => (
-          <div key={`${item.productId}-${item.width}-${item.height}`} className="flex items-center gap-3 p-2 bg-[var(--light)] rounded-input">
-            <img src={item.productImage || '/images/sticker-placeholder.svg'} alt={item.productName} className="w-12 h-12 rounded-input object-cover" />
+          <motion.div
+            key={`${item.productId}-${item.width}-${item.height}`}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center gap-3 p-3 bg-[var(--light)]/50 rounded-input border-2 border-[var(--ink)]/20 hover:border-[var(--ink)]/40 transition-colors"
+          >
+            <img
+              src={item.productImage || '/images/sticker-placeholder.svg'}
+              alt={item.productName}
+              className="w-14 h-14 rounded-input object-cover flex-shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-[var(--ink)] truncate">{item.productName}</p>
               <p className="text-xs text-[var(--ink)]/50">{item.width} × {item.height} cm • Qty: {item.quantity}</p>
             </div>
-            <span className="font-medium text-primary">{formatCurrency(item.unitPrice * item.quantity)}</span>
-          </div>
+            <span className="font-display text-primary whitespace-nowrap">{formatCurrency(item.unitPrice * item.quantity)}</span>
+          </motion.div>
         ))}
       </div>
 
-      <div className="border-t border-[var(--light)] pt-3 space-y-2">
+      <div className="border-t border-[var(--light)] pt-3 space-y-3">
         <div className="flex justify-between text-sm">
           <span className="text-[var(--ink)]/70">Subtotal</span>
-          <span className="font-medium text-primary">{formatCurrency(subtotal)}</span>
+          <span className="font-display text-primary">{formatCurrency(subtotal)}</span>
         </div>
 
         {discountAmount > 0 && (
           <div className="flex justify-between text-sm text-green-600">
             <span>Discount</span>
-            <span className="font-medium">-{formatCurrency(discountAmount)}</span>
+            <span className="font-display">-{formatCurrency(discountAmount)}</span>
           </div>
         )}
 
         <div className="flex justify-between text-sm">
           <span className="text-[var(--ink)]/70">Tax</span>
-          <span className="font-medium text-primary">{formatCurrency(taxAmount)}</span>
+          <span className="font-display text-primary">{formatCurrency(taxAmount)}</span>
         </div>
 
         <div className="flex justify-between text-sm">
           <span className="text-[var(--ink)]/70">Delivery</span>
-          <span className="font-medium text-primary">
+          <span className="font-display text-primary">
             {deliveryCharge > 0 ? formatCurrency(deliveryCharge) : 'Free'}
           </span>
         </div>
 
         {deliveryCharge > 0 && deliveryRemaining > 0 && (
-          <p className="text-xs text-[var(--ink)]/50 text-center">
+          <motion.p
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="text-xs text-[var(--ink)]/50 text-center bg-[var(--accent)]/50 rounded-input p-2 border border-[var(--accent)]/30"
+          >
             Add {formatCurrency(deliveryRemaining)} more for free delivery!
-          </p>
+          </motion.p>
         )}
 
-        <div className="flex justify-between font-display border-t border-[var(--ink)] pt-2">
+        <div className="flex justify-between font-display border-t border-[var(--ink)] pt-3 mt-2">
           <span>Total</span>
           <span className="text-primary">{formatCurrency(total)}</span>
         </div>
       </div>
-    </div>
+    </Card>
   )
 }
