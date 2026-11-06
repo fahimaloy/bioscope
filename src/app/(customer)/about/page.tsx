@@ -1,24 +1,19 @@
+'use client'
+
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
+import { WashiTape, StickerPeel, DoodleShape, DoodleScribble } from '@/components/decorative/DoodleElements'
 import { StaggeredText } from '@/components/animations/StaggeredText'
 import { CounterAnimation } from '@/components/animations/CounterAnimation'
-import { Truck, Shield, RotateCcw, Award, Users, Heart, Sparkles, Palette, Zap, Leaf, Globe, MessageCircle } from 'lucide-react'
+import { Shield, RotateCcw, Heart, Sparkles, Palette, Leaf } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 const stats = [
   { value: 500, label: 'Happy Customers' },
   { value: 150, label: 'Projects Done' },
   { value: 50, label: 'Awards Won' },
-]
-
-const features = [
-  { icon: Sparkles, title: 'Custom Designs', description: 'Create unique stickers with our intuitive design tool' },
-  { icon: Leaf, title: 'Eco-Friendly Materials', description: 'Choose from vinyl, paper, kraft, and holographic options' },
-  { icon: Truck, title: 'Fast Delivery', description: '2-3 days inside Dhaka, 3-5 days outside Dhaka' },
-  { icon: Shield, title: 'Quality Guaranteed', description: 'Premium materials with vibrant, long-lasting prints' },
-  { icon: Palette, title: 'Endless Customization', description: 'Any shape, size, finish, and quantity you need' },
-  { icon: Zap, title: 'Easy Ordering', description: 'Simple checkout with COD and bank transfer options' },
 ]
 
 const team = [
@@ -28,156 +23,337 @@ const team = [
   { name: 'Karim Hassan', role: 'Lead Developer', bio: 'Builds the tech that powers our platform', avatar: 'KH' },
 ]
 
+const values = [
+  { title: 'Creativity First', desc: 'Every design is a chance to create something amazing', icon: Sparkles },
+  { title: 'Customer Obsessed', desc: 'Your satisfaction is our top priority', icon: Heart },
+  { title: 'Sustainable Practices', desc: 'Eco-friendly materials and responsible production', icon: Leaf },
+]
+
+const sectionContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+}
+
+const sectionItemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+      damping: 15,
+      duration: 0.6,
+    },
+  },
+}
+
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      {/* Floating Background */}
-      <DoodleScatter count={5} />
+    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4 relative overflow-hidden">
+      {/* Global Doodle Background */}
+      <DoodleBackground shapeCount={12} />
+      
+      {/* Floating decorative elements */}
+      <DoodleShape size="xl" color="primary" animation="float" className="absolute top-20 left-10 opacity-20" style={{ filter: 'blur(60px)' }} />
+      <DoodleShape size="lg" color="secondary" animation="float" className="absolute bottom-20 right-10 opacity-20" style={{ filter: 'blur(60px)', animationDelay: '2s' }} />
+      <DoodleShape size="md" color="accent" animation="wobble" className="absolute top-1/2 left-5 opacity-15" style={{ animationDelay: '1s' }} />
+      <DoodleShape size="md" color="primary" animation="wobble" className="absolute top-1/2 right-5 opacity-15" style={{ animationDelay: '3s' }} />
+      <DoodleScribble color="accent" width={120} height={60} className="absolute top-40 right-20 opacity-30" />
+      <div className="absolute bottom-40 left-20 opacity-30" style={{ transform: 'rotate(180deg)' }}>
+        <DoodleScribble color="secondary" width={100} height={50} />
+      </div>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Hero Section */}
         <section className="relative py-20 text-center">
+          {/* Washi tape accents */}
+          <WashiTape rotation={-3} width={180} height={32} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4" />
+          <WashiTape rotation={2} width={140} height={28} className="absolute top-20 right-10 opacity-60" />
+          <WashiTape rotation={-5} width={120} height={24} className="absolute top-32 left-10 opacity-60" />
+          
           <div className="relative z-10">
-            <StaggeredText as="h1" className="mb-6" style={{ fontSize: 'clamp(4rem, 10vw, 8rem)' }}>
-              ABOUT US
-            </StaggeredText>
-            <p className="subtitle text-2xl md:text-3xl mb-8 max-w-2xl mx-auto">
-              Making Awesome Fun Things Happen with Custom Stickers
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Badge variant="primary" size="lg">Since 2020</Badge>
-              <Badge variant="secondary" size="lg">500+ Clients</Badge>
-              <Badge variant="accent" size="lg">Bangladesh Made</Badge>
-            </div>
-          </div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.175, 0.885, 0.32, 1.275] }}
+            >
+              <StaggeredText as="h1" className="mb-6" style={{ fontSize: 'clamp(4rem, 10vw, 8rem)' }}>
+                ABOUT US
+              </StaggeredText>
+              <p className="subtitle text-2xl md:text-3xl mb-8 max-w-2xl mx-auto text-[var(--ink)]/70">
+                Making Awesome Fun Things Happen with Custom Stickers
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Badge variant="primary" size="lg">Since 2020</Badge>
+                <Badge variant="secondary" size="lg">500+ Clients</Badge>
+                <Badge variant="accent" size="lg">Bangladesh Made</Badge>
+              </div>
+            </motion.div>
 
-          {/* Floating Emojis */}
-        </section>
-
-        {/* Stats */}
-        <section className="py-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {stats.map((stat, index) => (
-              <CounterAnimation
-                key={stat.label}
-                target={stat.value}
-                duration={2000}
-                className="text-4xl font-display text-primary"
-              >
-                <p className="font-black text-uppercase text-sm mt-1 text-[var(--ink)]/60">{stat.label}</p>
-              </CounterAnimation>
-            ))}
+            {/* Floating decorative shapes around hero */}
+            <DoodleShape size="sm" color="primary" animation="float" className="absolute -top-10 -left-10 opacity-30" />
+            <DoodleShape size="sm" color="accent" animation="wobble" className="absolute -top-10 -right-10 opacity-30" style={{ animationDelay: '1s' }} />
+            <DoodleShape size="sm" color="secondary" animation="float" className="absolute bottom-20 -left-10 opacity-30" style={{ animationDelay: '2s' }} />
+            <DoodleShape size="sm" color="primary" animation="wobble" className="absolute bottom-20 -right-10 opacity-30" style={{ animationDelay: '3s' }} />
           </div>
         </section>
 
-        {/* Mission */}
-        <section className="py-16 bg-white rounded-card border-3 border-[var(--ink)] mx-4 shadow-card">
-          <div className="max-w-4xl mx-auto px-6 py-12 text-center">
-            <h2 className="font-display text-3xl text-primary mb-6">Our Mission</h2>
-            <p className="text-xl text-[var(--ink)]/70 leading-relaxed mb-6">
-              We believe that everyone deserves to express themselves through custom designs.
-              Whether you're a small business owner, an artist, or just someone who loves stickers,
-              we're here to make your vision stick.
-            </p>
-            <div className="grid md:grid-cols-3 gap-6 mt-12">
-              {[
-                { icon: Heart, title: 'Passion', desc: 'We love what we do and it shows in every sticker' },
-                { icon: Users, title: 'Community', desc: 'Building relationships with every customer' },
-                { icon: Award, title: 'Excellence', desc: 'Premium quality in every detail' },
-              ].map((item, index) => (
-                <div key={index} className="p-6 bg-[var(--light)] rounded-input">
-                  <div className="w-14 h-14 mx-auto mb-4 bg-primary/10 rounded-input flex items-center justify-center">
-                    <item.icon className="w-7 h-7 text-primary" />
-                  </div>
-                  <h3 className="font-display text-xl text-primary mb-2">{item.title}</h3>
-                  <p className="text-[var(--ink)]/70">{item.desc}</p>
-                </div>
+        {/* Stats Section */}
+        <section className="py-16 relative">
+          <WashiTape rotation={-2} width={200} height={32} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4" />
+          
+          <motion.div
+            variants={sectionContainerVariants}
+            initial="hidden"
+            animate="visible"
+            className="relative z-10"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {stats.map((stat) => (
+                <motion.div key={stat.label} variants={sectionItemVariants}>
+                  <Card variant="doodle" padding="lg" className="text-center relative">
+                    <StickerPeel />
+                    <CounterAnimation
+                      target={stat.value}
+                      duration={2000}
+                      className="text-4xl font-display text-primary mb-2"
+                    >
+                      <p className="font-black text-uppercase text-sm mt-1 text-[var(--ink)]/60">{stat.label}</p>
+                    </CounterAnimation>
+                  </Card>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </section>
 
-        {/* Features */}
-        <section className="py-16">
-          <div className="text-center mb-12">
-            <h2 className="section-title">Why Choose Us?</h2>
-            <p className="text-[var(--ink)]/60 mt-2">Everything you need for perfect custom stickers</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {features.map((feature, index) => (
-              <Card key={index} className="p-6 h-full hover:shadow-card-hover transition-shadow">
-                <div className="w-14 h-14 mx-auto mb-4 bg-primary/10 rounded-input flex items-center justify-center">
-                  <feature.icon className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="font-display text-xl text-primary mb-2 text-center">{feature.title}</h3>
-                <p className="text-[var(--ink)]/70 text-center">{feature.description}</p>
-              </Card>
-            ))}
-          </div>
+        {/* Our Story */}
+        <section className="py-16 relative" id="story">
+          <WashiTape rotation={3} width={180} height={32} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4" />
+          <WashiTape rotation={-4} width={140} height={28} className="absolute top-24 right-16 opacity-60" />
+          <div className="absolute top-1/2 left-0 opacity-20" style={{ transform: 'rotate(-90deg)' }}>
+        <DoodleScribble color="primary" width={160} height={80} />
+      </div>
+          
+          <motion.div
+            variants={sectionContainerVariants}
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            className="relative z-10"
+          >
+            <div className="max-w-4xl mx-auto px-6">
+              <motion.div
+                variants={sectionItemVariants}
+                className="text-center mb-12"
+              >
+                <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
+                  Our Story
+                </span>
+              </motion.div>
+              
+              <motion.div
+                variants={sectionItemVariants}
+                className="space-y-8 text-lg text-[var(--ink)]/70 leading-relaxed"
+              >
+                <p>
+                  BioScope started with a simple idea: everyone deserves to express themselves through custom designs. 
+                  What began as a small home-based sticker printing operation in Dhaka has grown into Bangladesh's 
+                  most trusted custom sticker platform, serving thousands of creators, businesses, and dreamers.
+                </p>
+                <p>
+                  We believe that stickers are more than just adhesive paper — they're tiny canvases for big ideas. 
+                  Whether you're a small business owner branding your packages, an artist sharing your illustrations, 
+                  or someone who just wants to decorate their laptop, we're here to make your vision stick.
+                </p>
+                <p className="font-semibold text-primary">
+                  Every sticker we print carries a piece of someone's story. That's a responsibility we take seriously.
+                </p>
+              </motion.div>
+            </div>
+          </motion.div>
         </section>
 
-        {/* Team */}
-        <section className="py-16">
-          <div className="text-center mb-12">
-            <h2 className="section-title">Meet Our Team</h2>
-            <p className="text-[var(--ink)]/60 mt-2">The people behind the stickers</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            {team.map((member, index) => (
-              <Card key={index} className="p-6 text-center">
-                <div className="w-24 h-24 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-display text-primary">{member.avatar}</span>
-                </div>
-                <h3 className="font-display text-lg text-[var(--ink)] mb-1">{member.name}</h3>
-                <p className="text-primary text-sm mb-2">{member.role}</p>
-                <p className="text-[var(--ink)]/60 text-sm">{member.bio}</p>
-              </Card>
-            ))}
-          </div>
-        </section>
+        {/* Materials Section */}
+        <section className="py-16 relative" id="materials">
+          <WashiTape rotation={-3} width={200} height={32} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4" />
+          <DoodleShape size="lg" color="secondary" animation="float" className="absolute top-1/2 right-0 opacity-15" />
+          
+          <motion.div
+            variants={sectionContainerVariants}
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            className="relative z-10"
+          >
+            <motion.div
+              variants={sectionItemVariants}
+              className="text-center mb-12"
+            >
+              <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
+                Our Materials
+              </span>
+            </motion.div>
 
-        {/* Values */}
-        <section className="py-16 bg-dark text-white">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="section-title text-white mb-8">Our Values</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <motion.div
+              variants={sectionItemVariants}
+              className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
+            >
               {[
-                { title: 'Creativity First', desc: 'Every design is a chance to create something amazing' },
-                { title: 'Customer Obsessed', desc: 'Your satisfaction is our top priority' },
-                { title: 'Sustainable Practices', desc: 'Eco-friendly materials and responsible production' },
-              ].map((value, index) => (
-                <div key={index} className="p-6">
-                  <div className="w-12 h-12 mx-auto mb-4 bg-accent/20 rounded-input flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-accent" />
+                { name: 'Vinyl', desc: 'Durable, weatherproof, perfect for outdoor use', icon: Shield },
+                { name: 'Paper', desc: 'Eco-friendly, matte finish, great for indoor', icon: Leaf },
+                { name: 'Kraft', desc: 'Natural brown texture, rustic & sustainable', icon: RotateCcw },
+                { name: 'Holographic', desc: 'Iridescent shine that changes with light', icon: Sparkles },
+              ].map((material, index) => (
+                <Card key={index} variant="doodle" padding="lg" className="text-center relative">
+                  <StickerPeel />
+                  <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-input flex items-center justify-center">
+                    <material.icon className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="font-display text-xl text-primary mb-2">{material.name}</h3>
+                  <p className="text-[var(--ink)]/70 text-sm">{material.desc}</p>
+                </Card>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* Team Section */}
+        <section className="py-16 relative" id="team">
+          <WashiTape rotation={2} width={180} height={32} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4" />
+          <WashiTape rotation={-3} width={120} height={24} className="absolute top-32 left-20 opacity-60" />
+          <div className="absolute top-1/2 right-0 opacity-20" style={{ transform: 'rotate(-90deg)' }}>
+        <DoodleScribble color="secondary" width={140} height={70} />
+      </div>
+          
+          <motion.div
+            variants={sectionContainerVariants}
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            className="relative z-10"
+          >
+            <motion.div
+              variants={sectionItemVariants}
+              className="text-center mb-12"
+            >
+              <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
+                Meet Our Team
+              </span>
+              <p className="text-[var(--ink)]/60 mt-2">The people behind the stickers</p>
+            </motion.div>
+
+            <motion.div
+              variants={sectionItemVariants}
+              className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto"
+            >
+              {team.map((member, index) => (
+                <motion.div key={index} variants={sectionItemVariants}>
+                  <Card variant="doodle" padding="lg" className="text-center relative group">
+                    <StickerPeel />
+                    <div className="relative mb-4">
+                      <div className="w-28 h-28 mx-auto bg-primary/10 rounded-full flex items-center justify-center border-3 border-[var(--primary)] relative overflow-hidden">
+                        <span className="text-3xl font-display text-primary relative z-10">{member.avatar}</span>
+                        {/* Peel effect on avatar */}
+                        <div className="absolute top-[-4px] right-[-4px] w-5 h-5 bg-[var(--accent)] border-2 border-[var(--ink)] rounded-tr-full shadow-[2px_2px_0_var(--ink)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </div>
+                    </div>
+                    <h3 className="font-display text-lg text-[var(--ink)] mb-1">{member.name}</h3>
+                    <p className="text-primary text-sm mb-2">{member.role}</p>
+                    <p className="text-[var(--ink)]/60 text-sm">{member.bio}</p>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* Values Section */}
+        <section className="py-16 relative bg-[var(--dark)] text-white" id="values">
+          <WashiTape rotation={-2} width={200} height={32} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4" />
+          <DoodleShape size="xl" color="accent" animation="float" className="absolute top-0 left-0 opacity-10" style={{ filter: 'blur(80px)' }} />
+          <DoodleShape size="lg" color="primary" animation="wobble" className="absolute bottom-0 right-0 opacity-10" style={{ filter: 'blur(80px)' }} />
+          <DoodleScribble color="accent" width={180} height={90} className="absolute top-20 right-20 opacity-20" />
+          
+          <motion.div
+            variants={sectionContainerVariants}
+            initial="hidden"
+            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            className="relative z-10 max-w-4xl mx-auto"
+          >
+            <motion.div
+              variants={sectionItemVariants}
+              className="text-center mb-12"
+            >
+              <span className="sketch-underline font-display text-3xl md:text-4xl text-white">
+                Our Values
+              </span>
+            </motion.div>
+
+            <motion.div
+              variants={sectionItemVariants}
+              className="grid md:grid-cols-3 gap-8"
+            >
+              {values.map((value, index) => (
+                <Card key={index} variant="doodle" padding="lg" className="text-center relative bg-[var(--dark)] border-primary">
+                  <StickerPeel />
+                  <div className="w-14 h-14 mx-auto mb-4 bg-primary/20 rounded-input flex items-center justify-center border-2 border-[var(--primary)]">
+                    <value.icon className="w-7 h-7 text-accent" />
                   </div>
                   <h3 className="font-display text-xl text-white mb-2">{value.title}</h3>
                   <p className="text-white/70">{value.desc}</p>
-                </div>
+                </Card>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
-        {/* CTA */}
-        <section className="py-16 text-center">
-          <h2 className="font-display text-3xl md:text-4xl text-primary mb-6">Ready to Create?</h2>
-          <p className="text-xl text-[var(--ink)]/60 mb-8 max-w-xl mx-auto">
-            Join thousands of happy customers who trust us for their custom sticker needs.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <a href="/shop">
-              <Button variant="primary" size="lg">
-                <Sparkles className="w-5 h-5 mr-2" />
-                Shop Now
-              </Button>
-            </a>
-            <a href="/custom-sticker">
-              <Button variant="secondary" size="lg">
-                <Palette className="w-5 h-5 mr-2" />
-                Design Custom
-              </Button>
-            </a>
-          </div>
+        {/* CTA Section */}
+        <section className="py-16 relative text-center">
+          <WashiTape rotation={3} width={180} height={32} className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4" />
+          <WashiTape rotation={-4} width={140} height={28} className="absolute bottom-10 right-10 opacity-60" />
+          <DoodleShape size="md" color="primary" animation="float" className="absolute top-20 left-10 opacity-20" />
+          <DoodleShape size="md" color="accent" animation="wobble" className="absolute bottom-20 right-10 opacity-20" />
+          
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative z-10"
+          >
+            <h2 className="font-display text-3xl md:text-4xl text-primary mb-6">Ready to Create?</h2>
+            <p className="text-xl text-[var(--ink)]/60 mb-8 max-w-xl mx-auto">
+              Join thousands of happy customers who trust us for their custom sticker needs.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <a href="/shop">
+                <Button variant="doodle" size="lg">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Shop Now
+                </Button>
+              </a>
+              <a href="/custom-sticker">
+                <Button variant="doodle-secondary" size="lg">
+                  <Palette className="w-5 h-5 mr-2" />
+                  Design Custom
+                </Button>
+              </a>
+            </div>
+          </motion.div>
         </section>
       </div>
     </div>
