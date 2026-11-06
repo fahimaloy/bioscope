@@ -5,6 +5,9 @@ import { cn } from '@/lib/utils'
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { Button } from './Button'
 import { Checkbox } from './Checkbox'
+import { DoodleShape, DoodleScribble, DoodleStar } from '@/components/decorative/DoodleElements'
+import { motion } from 'framer-motion'
+import { Pagination } from './Pagination'
 
 export interface Column<T> {
   key: string
@@ -102,7 +105,7 @@ export function DataTable<T>({
     <div className={cn('overflow-hidden border-3 border-[var(--ink)] rounded-card bg-white', className)}>
       <div className="overflow-x-auto">
         <table className="w-full" role="grid">
-          <thead className="bg-[var(--light)]">
+          <thead className="bg-[var(--tertiary)] border-b-2 border-[var(--primary)]">
             <tr>
               {selectable && (
                 <th className="px-4 py-3 text-left">
@@ -118,7 +121,7 @@ export function DataTable<T>({
                   key={column.key}
                   scope="col"
                   className={cn(
-                    'px-4 py-3 text-left font-medium text-[var(--ink)]/70',
+                    'px-4 py-3 text-left font-medium text-[var(--ink)]',
                     'uppercase tracking-wider text-sm',
                     column.align === 'center' && 'text-center',
                     column.align === 'right' && 'text-right',
@@ -142,19 +145,25 @@ export function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-light">
+          <tbody className="divide-y divide-[var(--light)]">
             {sortedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-4 py-12 text-center text-[var(--ink)]/50">
-                  {emptyMessage}
+                <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-4 py-16 text-center">
+                  <div className="flex flex-col items-center gap-4">
+                    <DoodleShape size="lg" color="primary" animation="float" className="opacity-30" />
+                    <p className="text-body text-[var(--ink)]/50">{emptyMessage}</p>
+                  </div>
                 </td>
               </tr>
             ) : (
-              sortedData.map((row) => (
-                <tr
+              sortedData.map((row, rowIndex) => (
+                <motion.tr
                   key={keyExtractor(row)}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: rowIndex * 0.05, duration: 0.3 }}
                   className={cn(
-                    'transition-colors hover:bg-[var(--light)]/50',
+                    'transition-colors hover:bg-[var(--surface-hover)]',
                     rowClassName?.(row)
                   )}
                 >
@@ -188,7 +197,7 @@ export function DataTable<T>({
                       {column.cell ? column.cell(row) : column.accessor ? column.accessor(row) : (row as any)[column.key]}
                     </td>
                   ))}
-                </tr>
+                </motion.tr>
               ))
             )}
           </tbody>
@@ -202,40 +211,12 @@ export function DataTable<T>({
             {Math.min(pagination.page * pagination.pageSize, pagination.total)} of{' '}
             {pagination.total} results
           </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={pagination.pageSize}
-              onChange={(e) => pagination.onPageSizeChange(parseInt(e.target.value))}
-              className="px-3 py-1 text-sm border-2 border-[var(--ink)] rounded-input focus:border-primary focus:shadow-input"
-            >
-              {[10, 20, 50, 100].map((size) => (
-                <option key={size} value={size}>
-                  {size} per page
-                </option>
-              ))}
-            </select>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => pagination.onPageChange(pagination.page - 1)}
-              disabled={pagination.page === 1}
-              aria-label="Previous page"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <span className="text-sm text-[var(--ink)]/70 px-2">
-              Page {pagination.page} of {Math.ceil(pagination.total / pagination.pageSize)}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => pagination.onPageChange(pagination.page + 1)}
-              disabled={pagination.page >= Math.ceil(pagination.total / pagination.pageSize)}
-              aria-label="Next page"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
+          <Pagination
+            currentPage={pagination.page}
+            totalPages={Math.ceil(pagination.total / pagination.pageSize)}
+            onPageChange={pagination.onPageChange}
+            className="flex-1 justify-end"
+          />
         </div>
       )}
     </div>

@@ -4,8 +4,10 @@ import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import type { Product } from '@/types'
-import { Tag, DollarSign, Settings, Eye, Edit3, Trash2, CheckCircle, XCircle } from 'lucide-react'
+import { Tag, DollarSign, Settings, Eye, Edit3, Trash2, CheckCircle, XCircle, Package, Layers, Image as ImageIcon, Globe, Hash, Palette } from 'lucide-react'
+import { DoodleShape, DoodleScribble, StickerPeel, WashiTape } from '@/components/decorative/DoodleElements'
 
 interface ProductPreviewProps {
   product: Partial<Product>
@@ -24,7 +26,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
     : 0
 
   return (
-    <div className="bg-white rounded-card border-3 border-[var(--ink)] p-6 shadow-card space-y-6">
+    <div className={cn('space-y-6', className)}>
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -40,11 +42,13 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
       </div>
 
       {/* Product Card Preview */}
-      <div className="bg-[var(--light)] rounded-input p-6 border-2 border-[var(--ink)]">
+      <Card className="p-6 space-y-6 border-3 border-[var(--ink)]">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Image */}
           <div className="relative w-full md:w-64 flex-shrink-0">
-            <div className="aspect-square rounded-input overflow-hidden bg-white border-2 border-[var(--ink)]/20">
+            <div className="aspect-square rounded-input overflow-hidden bg-white border-2 border-[var(--ink)]/20 relative">
+              <DoodleShape size="sm" color="primary" animation="float" className="absolute top-4 left-4 opacity-20 pointer-events-none" />
+              <DoodleShape size="sm" color="secondary" animation="wobble" className="absolute bottom-4 right-4 opacity-20 pointer-events-none" style={{ animationDelay: '1s' }} />
               {product.images?.[0] ? (
                 <Image
                   src={product.images[0]}
@@ -55,7 +59,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">
-                  <span className="text-6xl">🏷️</span>
+                  <ImageIcon className="w-20 h-20" />
                 </div>
               )}
             </div>
@@ -65,12 +69,14 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
               )}
               {(product as any).isFeatured && <Badge variant="accent" size="sm">Featured</Badge>}
             </div>
+            <StickerPeel className="absolute top-0 right-0" />
           </div>
 
           {/* Details */}
           <div className="flex-1 space-y-4">
             <div>
-              <span className="text-sm font-medium text-secondary uppercase tracking-wider">
+              <span className="text-sm font-medium text-secondary uppercase tracking-wider flex items-center gap-1">
+                <Tag className="w-3 h-3" />
                 {(product as any).category?.name || 'Category'}
               </span>
               <h3 className="font-display text-2xl text-[var(--ink)] mt-1">{product.name || 'Product Name'}</h3>
@@ -82,7 +88,10 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
 
             {/* Price */}
             <div className="flex items-baseline gap-4 flex-wrap">
-              <span className="text-3xl font-display text-primary">{((product.basePrice ?? 0) || 0).toLocaleString()} BDT</span>
+              <span className="text-3xl font-display text-primary flex items-center gap-1">
+                <DollarSign className="w-6 h-6" />
+                {((product.basePrice ?? 0) || 0).toLocaleString()} BDT
+              </span>
               {product.compareAtPrice && product.compareAtPrice > ((product.basePrice ?? 0) || 0) && (
                 <>
                   <span className="text-xl text-[var(--ink)]/40 line-through">{(product.compareAtPrice as number).toLocaleString()} BDT</span>
@@ -93,7 +102,8 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
 
             {/* Tax Info */}
             {(product.taxPercent || 0) > 0 && (
-              <p className="text-sm text-[var(--ink)]/60">
+              <p className="text-sm text-[var(--ink)]/60 flex items-center gap-1">
+                <Settings className="w-4 h-4" />
                 {(product as any).isTaxInclusive ? 'Price includes' : 'Plus'} {(product as any).taxPercent}% tax
               </p>
             )}
@@ -101,7 +111,10 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
             {/* Dimensions */}
             {product.allowedDimensions && product.allowedDimensions.length > 0 && (
               <div className="pt-4 border-t border-[var(--ink)]/20">
-                <h4 className="font-medium text-body text-[var(--ink)] mb-2">Available Sizes</h4>
+                <h4 className="font-medium text-body text-[var(--ink)] mb-2 flex items-center gap-2">
+                  <Package className="w-4 h-4" />
+                  Available Sizes
+                </h4>
                 <div className="flex flex-wrap gap-2">
                   {product.allowedDimensions.map((dim: any) => (
                     <Badge
@@ -119,7 +132,10 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
             {/* Quantity Tiers */}
             {product.allowedQuantities && product.allowedQuantities.length > 0 && (
               <div className="pt-4 border-t border-[var(--ink)]/20">
-                <h4 className="font-medium text-body text-[var(--ink)] mb-2">Quantity Tiers</h4>
+                <h4 className="font-medium text-body text-[var(--ink)] mb-2 flex items-center gap-2">
+                  <Layers className="w-4 h-4" />
+                  Quantity Tiers
+                </h4>
                 <div className="flex flex-wrap gap-2">
                   {product.allowedQuantities.map((qty: any) => (
                     <Badge key={`${qty.minQty}-${qty.maxQty}`} variant="outline" size="sm">
@@ -133,11 +149,14 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
             {/* Customization Options */}
             {product.customizationOptions && (
               <div className="pt-4 border-t border-[var(--ink)]/20">
-                <h4 className="font-medium text-body text-[var(--ink)] mb-2">Customization Options</h4>
+                <h4 className="font-medium text-body text-[var(--ink)] mb-2 flex items-center gap-2">
+                  <Palette className="w-4 h-4" />
+                  Customization Options
+                </h4>
                 <div className="space-y-2">
                   {product.customizationOptions.materials?.length && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--ink)]/60 w-24">Materials:</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-[var(--ink)]/60">Materials:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.materials.map((m: string) => (
                           <Badge key={m} variant="outline" size="sm">{m}</Badge>
@@ -146,8 +165,8 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                     </div>
                   )}
                   {product.customizationOptions.finishes?.length && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--ink)]/60 w-24">Finishes:</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-[var(--ink)]/60">Finishes:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.finishes.map((f: string) => (
                           <Badge key={f} variant="outline" size="sm">{f}</Badge>
@@ -156,8 +175,8 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                     </div>
                   )}
                   {product.customizationOptions.cutTypes?.length && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-[var(--ink)]/60 w-24">Cut Types:</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm text-[var(--ink)]/60">Cut Types:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.cutTypes.map((c: string) => (
                           <Badge key={c} variant="outline" size="sm">{c}</Badge>
@@ -185,7 +204,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
             )}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Quick Actions */}
       <div className="flex flex-wrap gap-3 pt-4 border-t border-[var(--light)]">

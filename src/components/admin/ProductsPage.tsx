@@ -10,11 +10,38 @@ import { Card } from '@/components/ui/Card'
 import { ProductForm } from '@/components/admin/ProductForm'
 import { ProductPreview } from '@/components/admin/ProductPreview'
 import { Select } from '@/components/ui/Select'
+import { Modal } from '@/components/ui/Modal'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
+import Image from 'next/image'
 
 const COLUMNS: Column<any>[] = [
-  { key: 'image', header: 'Image', cell: ({ row }: { row: any }) => <img src={row.images?.[0] || '/images/sticker-placeholder.svg'} alt={row.name} className="w-12 h-12 rounded-input object-cover" /> },
+  { 
+    key: 'image', 
+    header: 'Image', 
+    cell: ({ row }: { row: any }) => (
+      <div className="relative w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border-2 border-[var(--ink)]/20">
+        {row.images?.[0] ? (
+          <Image
+            src={row.images[0]}
+            alt={row.name}
+            fill
+            className="object-cover"
+            sizes="48px"
+          />
+        ) : (
+          <Image
+            src="/images/stickers/skull_sticker.png"
+            alt={row.name}
+            fill
+            className="object-cover opacity-50"
+            sizes="48px"
+          />
+        )}
+      </div>
+    ),
+    width: '60px'
+  },
   { key: 'name', header: 'Product', accessor: (row: any) => row.name, sortable: true },
   { key: 'category', header: 'Category', accessor: (row: any) => row.category?.name ?? '—' },
   { key: 'price', header: 'Price', accessor: (row: any) => formatCurrency(Number(row.basePrice)), sortable: true },
@@ -107,9 +134,9 @@ export default function ProductsPage() {
       header: 'Actions',
       cell: ({ row }: { row: any }) => (
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => setPreviewProduct(row)} aria-label="Preview"><Eye className="w-4 h-4" /></Button>
-          <Button variant="ghost" size="sm" onClick={() => { setEditingProduct(row); setShowForm(true) }} aria-label="Edit"><Edit className="w-4 h-4" /></Button>
-          <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50" onClick={() => handleDelete(row.id)} aria-label="Delete"><Trash2 className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => setPreviewProduct(row)} aria-label="Preview" className="hover:-translate-y-1 transition-transform"><Eye className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => { setEditingProduct(row); setShowForm(true) }} aria-label="Edit" className="hover:-translate-y-1 transition-transform"><Edit className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 hover:-translate-y-1 transition-transform" onClick={() => handleDelete(row.id)} aria-label="Delete"><Trash2 className="w-4 h-4" /></Button>
         </div>
       ),
     },
@@ -174,30 +201,36 @@ export default function ProductsPage() {
           />
         </Card>
 
-        {showForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <div className="bg-white rounded-card border-3 border-[var(--ink)] w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-              <ProductForm
-                initialData={editingProduct}
-                categories={categories}
-                onSubmit={handleSubmit}
-                onCancel={() => { setShowForm(false); setEditingProduct(null) }}
-                isEditing={!!editingProduct}
-              />
-            </div>
-          </div>
-        )}
+        <Modal
+          isOpen={showForm}
+          onClose={() => { setShowForm(false); setEditingProduct(null) }}
+          title={editingProduct ? 'Edit Product' : 'Add New Product'}
+          size="full"
+        >
+          <ProductForm
+            initialData={editingProduct}
+            categories={categories}
+            onSubmit={handleSubmit}
+            onCancel={() => { setShowForm(false); setEditingProduct(null) }}
+            isEditing={!!editingProduct}
+          />
+        </Modal>
 
-        {previewProduct && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-            <div className="bg-white rounded-card border-3 border-[var(--ink)] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <Modal
+          isOpen={!!previewProduct}
+          onClose={() => setPreviewProduct(null)}
+          title="Product Preview"
+          size="lg"
+        >
+          {previewProduct && (
+            <>
               <ProductPreview product={previewProduct} />
-              <div className="p-4 border-t border-[var(--light)]">
+              <div className="p-4 border-t border-[var(--light)] flex justify-end">
                 <Button variant="outline" onClick={() => setPreviewProduct(null)}>Close</Button>
               </div>
-            </div>
-          </div>
-        )}
+            </>
+          )}
+        </Modal>
       </div>
     </div>
   )
