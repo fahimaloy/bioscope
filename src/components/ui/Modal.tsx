@@ -1,9 +1,11 @@
 'use client'
 
-import { Fragment, ReactNode, useEffect, useRef } from 'react'
+import { Fragment, ReactNode, useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './Button'
+import { Card } from './Card'
+import { TornEdge } from '@/components/decorative/DoodleElements'
 
 interface ModalProps {
   isOpen: boolean
@@ -41,12 +43,14 @@ export function Modal({
   const overlayRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const previousActiveElement = useRef<HTMLElement | null>(null)
+  const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement
       document.body.style.overflow = 'hidden'
       contentRef.current?.focus()
+      setIsExiting(false)
     } else {
       document.body.style.overflow = ''
       previousActiveElement.current?.focus()
@@ -59,7 +63,7 @@ export function Modal({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return
+      if (!isOpen && !isExiting) return
 
       if (e.key === 'Escape' && closeOnEscape) {
         onClose()
@@ -87,23 +91,34 @@ export function Modal({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, closeOnEscape, onClose])
+  }, [isOpen, isExiting, closeOnEscape, onClose])
 
-  if (!isOpen) return null
+  const handleClose = () => {
+    setIsExiting(true)
+    // Allow exit animation to complete
+    setTimeout(() => {
+      onClose()
+    }, 200)
+  }
+
+  if (!isOpen && !isExiting) return null
 
   return (
     <Fragment>
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[199] animate-fade-in"
-        onClick={closeOnOverlayClick ? onClose : undefined}
+        className={cn(
+          'fixed inset-0 bg-[var(--overlay)] backdrop-blur-sm z-[199] animate-fade-in',
+          isExiting && 'animate-fade-out'
+        )}
+        onClick={closeOnOverlayClick ? handleClose : undefined}
         aria-hidden="true"
       />
       <div
         ref={contentRef}
         className={cn(
           'fixed inset-0 z-[200] flex items-center justify-center p-4',
-          'animate-scale-in'
+          isExiting ? 'animate-scale-out' : 'animate-scale-in'
         )}
         tabIndex={-1}
         role="dialog"
@@ -111,14 +126,8 @@ export function Modal({
         aria-labelledby={title ? 'modal-title' : undefined}
         aria-describedby={description ? 'modal-description' : undefined}
       >
-        <div
-          className={cn(
-            'w-full bg-[var(--surface-card)] rounded-card border-3 border-[var(--ink)] shadow-xl',
-            'overflow-hidden',
-            sizeStyles[size],
-            className
-          )}
-        >
+        <Card variant="doodle-elevated" className={cn(sizeStyles[size], className)} padding="none">
+          <TornEdge position="top" className="h-4 bg-[var(--surface-card)] border-3 border-[var(--ink)] border-b-0" />
           {(title || showCloseButton) && (
             <div className="flex items-start justify-between p-6 border-b border-[var(--light)]">
               <div>
@@ -137,9 +146,12 @@ export function Modal({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onClose}
+                  onClick={handleClose}
                   aria-label="Close modal"
-                  className="text-[var(--ink)]/50 hover:text-[var(--ink)] hover:bg-[var(--light)]"
+                  className={cn(
+                    'text-[var(--ink)]/50 hover:text-[var(--ink)] hover:bg-[var(--light)]',
+                    'animate-wobble hover:animate-wobble'
+                  )}
                 >
                   <X className="w-5 h-5" />
                 </Button>
@@ -147,7 +159,7 @@ export function Modal({
             </div>
           )}
           <div className="p-6">{children}</div>
-        </div>
+        </Card>
       </div>
     </Fragment>
   )
