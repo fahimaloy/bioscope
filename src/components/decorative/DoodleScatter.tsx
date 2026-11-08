@@ -14,15 +14,15 @@ import { DoodleStar, type DoodleAnimation, type DoodleColor } from './DoodleStar
  * section renders the same layout on the server and the client (no hydration
  * drift, no `Math.random()`).
  *
- * The component accepts a hard maximum of 8 elements; the design rule remains
- * **one accent per section, ≤ 6 elements** (docs/DESIGN_CONTRACT.md §3).
- * Pass `children` to scatter your own doodles instead of the built-in set.
+ * The component is hard-capped at 6 elements (docs/DESIGN_CONTRACT.md §3):
+ * one accent per section, ≤ 6 elements. Pass `children` to scatter your own
+ * doodles instead of the built-in set.
  *
  * Purely decorative: `aria-hidden`, no text of its own.
  */
 
-/** Hard ceiling on scattered elements, regardless of the `count` prop. */
-export const SCATTER_MAX = 8
+/** Hard ceiling on scattered elements, regardless of the `count` prop — 6, per contract §3. */
+export const SCATTER_MAX = 6
 
 interface ScatterSlot {
   left: string
@@ -78,7 +78,7 @@ const DEFAULT_SHAPES: ReadonlyArray<{
 ]
 
 export interface DoodleScatterProps {
-  /** Number of elements to scatter. Default 6, hard max 8. */
+  /** Number of elements to scatter. Defaults to 6; values above 6 are clamped. */
   count?: number
   /** Layout seed — the same seed always yields the same scatter. */
   seed?: string

@@ -5,7 +5,10 @@ import { motion } from 'framer-motion'
 import { DoodleShape } from './DoodleElements'
 import { cn } from '@/lib/utils'
 
-/** @deprecated Legacy full-screen floating background with no direct equivalent in the new decor set yet — see @/components/decorative. */ export function DoodleBackground({
+/**
+ * @deprecated Legacy full-screen floating background with no direct equivalent in the new decor set yet — see @/components/decorative.
+ */
+export function DoodleBackground({
   shapeCount = 8,
   className,
   interactive = false,

@@ -3,7 +3,10 @@
 import { cn } from '@/lib/utils'
 
 // DoodleShape - organic blob shapes
-/** @deprecated Legacy shim with no direct equivalent in the new decor set yet — see @/components/decorative. */ export function DoodleShape({
+/**
+ * @deprecated Legacy shim with no direct equivalent in the new decor set yet — see @/components/decorative.
+ */
+export function DoodleShape({
   className,
   size = 'md',
   color = 'primary',
@@ -51,7 +54,10 @@ import { cn } from '@/lib/utils'
 }
 
 // WashiTape - decorative tape strip
-/** @deprecated Use WashiTape from '@/components/decorative' instead. */ export function WashiTape({
+/**
+ * @deprecated Use WashiTape from '@/components/decorative' instead.
+ */
+export function WashiTape({
   children,
   rotation = -2,
   width = 140,
@@ -85,7 +91,10 @@ import { cn } from '@/lib/utils'
 }
 
 // StickerPeel - corner peel effect
-/** @deprecated Use StickerPeel from '@/components/decorative' instead. */ export function StickerPeel({ className }: { className?: string }) {
+/**
+ * @deprecated Use StickerPeel from '@/components/decorative' instead.
+ */
+export function StickerPeel({ className }: { className?: string }) {
   return (
     <div className={cn('relative', className)}>
       <div className="absolute top-[-4px] right-[-4px] w-4.5 h-4.5 bg-[var(--primary)] border-2 border-[var(--ink)] rounded-tr-full shadow-[2px_2px_0_var(--ink)]" />
@@ -94,7 +103,10 @@ import { cn } from '@/lib/utils'
 }
 
 // TornEdge - paper tear effect
-/** @deprecated Use TornEdge from '@/components/decorative' instead. */ export function TornEdge({ position = 'top', className }: { position?: 'top' | 'bottom'; className?: string }) {
+/**
+ * @deprecated Use TornEdge from '@/components/decorative' instead.
+ */
+export function TornEdge({ position = 'top', className }: { position?: 'top' | 'bottom'; className?: string }) {
   const clipPaths = {
     top: 'polygon(0 0, 100% 0, 100% 92%, 92% 100%, 8% 92%, 0 100%)',
     bottom: 'polygon(0 0, 100% 0, 100% 100%, 92% 100%, 8% 92%, 0 92%)',
@@ -105,7 +117,10 @@ import { cn } from '@/lib/utils'
 }
 
 // SketchUnderline - hand-drawn underline
-/** @deprecated Use SketchUnderline from '@/components/decorative' instead. */ export function SketchUnderline({ children, className }: { children: React.ReactNode; className?: string }) {
+/**
+ * @deprecated Use SketchUnderline from '@/components/decorative' instead.
+ */
+export function SketchUnderline({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <span className={cn('relative inline-block', className)}>
       {children}
@@ -115,7 +130,10 @@ import { cn } from '@/lib/utils'
 }
 
 // DoodleScribble - hand-drawn scribble decoration
-/** @deprecated Use DoodleSquiggle from '@/components/decorative' instead. */ export function DoodleScribble({
+/**
+ * @deprecated Use DoodleSquiggle from '@/components/decorative' instead.
+ */
+export function DoodleScribble({
   className,
   color = 'primary',
   width = 80,
@@ -144,7 +162,10 @@ import { cn } from '@/lib/utils'
 }
 
 // DoodleStar - decorative star shape
-/** @deprecated Use DoodleStar from '@/components/decorative' instead. */ export function DoodleStar({
+/**
+ * @deprecated Use DoodleStar from '@/components/decorative' instead.
+ */
+export function DoodleStar({
   className,
   size = 'md',
   color = 'accent',

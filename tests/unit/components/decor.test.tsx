@@ -6,7 +6,7 @@
 // every decor component renders an `aria-hidden` decorative element, the
 // doodles never carry text, `MarqueeRibbon` duplicates its items for a
 // seamless loop and pauses on hover, and `DoodleScatter` is deterministic
-// and hard-capped at 8 elements (the design rule is ≤ 6 per section).
+// and hard-capped at 6 elements per contract §3.
 
 import { describe, expect, it } from 'vitest'
 import type { ReactNode } from 'react'
@@ -79,13 +79,13 @@ describe('decor set', () => {
     expect(track!.className).toContain('animation-play-state:paused')
   })
 
-  it('DoodleScatter defaults to 6 elements and hard-caps the count at 8', () => {
+  it('DoodleScatter defaults to 6 elements and hard-caps the count at 6', () => {
     const { container, unmount } = render(<DoodleScatter />)
     expect(rootOf(container).childNodes, 'default count is 6').toHaveLength(6)
     unmount()
 
     const { container: capped } = render(<DoodleScatter count={99} />)
-    expect(rootOf(capped).childNodes, 'count is hard-capped at 8').toHaveLength(8)
+    expect(rootOf(capped).childNodes, 'count is hard-capped at 6').toHaveLength(6)
   })
 
   it('DoodleScatter positions elements from a deterministic seed', () => {
