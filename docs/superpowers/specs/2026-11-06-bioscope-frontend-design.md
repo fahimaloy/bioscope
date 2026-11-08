@@ -364,7 +364,7 @@ The footer already promises 11 destinations; 10 of them do not exist. All are bu
 
 ## 9. Agent-driven pre-setups
 
-- **`AGENTS.md`** gains a "Design system contract" section: token-only color usage, the motion rules, the decor rule (one accent per section), the do-not-touch logic list, and the gate commands.
+- **`docs/DESIGN_CONTRACT.md`** holds the design system contract (`AGENTS.md` is write-protected in this environment, so the contract lives here and every task brief references it): token-only color usage, the motion rules, the decor rule (one accent per section), the do-not-touch logic list, and the gate commands.
 - **`.cursor/rules/*.mdc`** for scoped conventions (optional, only if the team uses Cursor).
 - **`pnpm verify`** runs `type-check`, `lint`, `test:run`, `build`, and GitNexus `detect-changes --scope all`; a pre-commit hook runs the same on staged files.
 - **MCP:** keep GitNexus (impact before edit, detect-changes before commit); add Context7 so agents read current package docs instead of guessing Tailwind/Motion APIs; Playwright MCP for visual verification.

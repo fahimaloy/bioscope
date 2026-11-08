@@ -83,7 +83,7 @@ tests/unit/components/*.test.tsx
 **Files:**
 - Modify: `package.json` (scripts: `verify`, `tokens`)
 - Create: `scripts/gates.mjs`
-- Modify: `AGENTS.md` (add "Design system contract" section)
+- Create: `docs/DESIGN_CONTRACT.md` (the design-system contract — `AGENTS.md` is write-protected in this environment, so the contract lives here and every task brief references it)
 - Modify: `.gitignore` (add `.superpowers/`)
 
 **Interfaces:**
@@ -97,9 +97,9 @@ Create `scripts/gates.mjs` that runs, in order, `pnpm type-check`, `pnpm lint`, 
 
 In `package.json` add `"verify": "node scripts/gates.mjs"` and `"tokens": "style-dictionary build && node scripts/splice-tokens.mjs"`.
 
-- [ ] **Step 3: Write the design contract into AGENTS.md**
+- [ ] **Step 3: Write the design contract into `docs/DESIGN_CONTRACT.md`**
 
-Add a section stating: token-only color usage (no hex), the one-accent-per-section rule, the contrast rule, the motion rules (including "every page has at least one purposeful motion"), the brand-surface rules from spec §5.8, the frozen-logic list, and that `pnpm verify` must pass before any commit.
+`AGENTS.md` is write-protected in this environment (a hook denied the write and instructed that it not be retried), so the contract lives in `docs/DESIGN_CONTRACT.md`. Write a section stating: token-only color usage (no hex), the one-accent-per-section rule, the contrast rule (including the per-accent `--on-<accent>` pairs from spec §5.2), the motion rules (including "every page has at least one purposeful motion"), the brand-surface rules from spec §5.8, the frozen-logic list, and that `pnpm verify` must pass before any commit.
 
 - [ ] **Step 4: Add the MCP servers**
 
@@ -121,7 +121,7 @@ Expected: all five gates exit 0 (the codebase is green at the start of the rebui
 - [ ] **Step 8: Commit**
 
 ```bash
-git add package.json scripts/gates.mjs AGENTS.md .gitignore
+git add package.json scripts/gates.mjs docs/DESIGN_CONTRACT.md .gitignore
 git commit -m "chore: add design-system gates and agent contract"
 ```
 
