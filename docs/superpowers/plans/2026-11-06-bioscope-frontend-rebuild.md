@@ -269,7 +269,7 @@ Expected: FAIL — modules missing.
 
 - [ ] **Step 3: Implement the set**
 
-Build the components. `MarqueeRibbon` takes `items: string[]`, duplicates them for a seamless loop, pauses on hover, and is `aria-hidden`. `DoodleScatter` takes `count` (default 6, hard max 8) and positions children with inline `left/top/rotate` from a deterministic seed. `TornEdge`, `WashiTape`, `StickerPeel`, `SketchUnderline` are presentational. All colors come from `var(--…)`.
+Build the components. `MarqueeRibbon` takes `items: string[]`, duplicates them for a seamless loop, pauses on hover, and is `aria-hidden`. `DoodleScatter` takes `count` (default 6, hard max 6) and positions children with inline `left/top/rotate` from a deterministic seed. `TornEdge`, `WashiTape`, `StickerPeel`, `SketchUnderline` are presentational. All colors come from `var(--…)`.
 
 - [ ] **Step 4: Run to verify it passes**
 
