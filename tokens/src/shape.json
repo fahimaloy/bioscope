@@ -78,5 +78,47 @@
     "$type": "shadow",
     "$value": "0 0 0 3px var(--die-cut), var(--shadow-ink-2)",
     "$description": "Die-cut sticker outline plus offset ink shadow"
+  },
+  "z": {
+    "dropdown": {
+      "$type": "number",
+      "$value": 100,
+      "$description": "Dropdown menu stacking level"
+    },
+    "sticky": {
+      "$type": "number",
+      "$value": 200,
+      "$description": "Sticky header stacking level"
+    },
+    "fixed": {
+      "$type": "number",
+      "$value": 300,
+      "$description": "Fixed overlay stacking level"
+    },
+    "modal-backdrop": {
+      "$type": "number",
+      "$value": 400,
+      "$description": "Modal backdrop stacking level"
+    },
+    "modal": {
+      "$type": "number",
+      "$value": 500,
+      "$description": "Modal dialog stacking level"
+    },
+    "popover": {
+      "$type": "number",
+      "$value": 600,
+      "$description": "Popover stacking level"
+    },
+    "tooltip": {
+      "$type": "number",
+      "$value": 700,
+      "$description": "Tooltip stacking level"
+    },
+    "toast": {
+      "$type": "number",
+      "$value": 800,
+      "$description": "Toast notification stacking level"
+    }
   }
 }

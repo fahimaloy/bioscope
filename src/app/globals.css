@@ -78,6 +78,14 @@
   --shadow-ink-4: 10px 10px 0 var(--ink);
   --shadow-color: 8px 8px 0 var(--accent);
   --shadow-die-cut: 0 0 0 3px var(--die-cut), var(--shadow-ink-2);
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);

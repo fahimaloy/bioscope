@@ -32,11 +32,20 @@ function cssValue(token) {
   return String(raw).replace(/\{([^}]+)\}/g, (_, ref) => `var(--${ref})`)
 }
 
+/**
+ * Token name used for the emitted custom property / TS key. Style Dictionary's
+ * `token.name` is only the leaf key, so grouped tokens (the `z` group in
+ * shape.json) would lose their prefix; the full path keeps it (`--z-modal`).
+ */
+function tokenKey(token) {
+  return token.path.join('-')
+}
+
 /** Flat CSS custom property block, e.g. `:root { --paper: #FAF3E3; }`. */
 function cssTokensFormat({ dictionary }) {
   const lines = dictionary.allTokens
     .filter((token) => token.$type !== 'spring')
-    .map((token) => `  --${token.name}: ${cssValue(token)};`)
+    .map((token) => `  --${tokenKey(token)}: ${cssValue(token)};`)
 
   return `:root {\n${lines.join('\n')}\n}\n`
 }
@@ -45,7 +54,10 @@ function cssTokensFormat({ dictionary }) {
 function tsTokensFormat({ dictionary }) {
   const entries = dictionary.allTokens
     .filter((token) => token.$type !== 'spring')
-    .map((token) => `  ${JSON.stringify(token.name)}: 'var(--${token.name})',`)
+    .map((token) => {
+      const key = tokenKey(token)
+      return `  ${JSON.stringify(key)}: 'var(--${key})',`
+    })
 
   return (
     `export const designTokens = {\n${entries.join('\n')}\n} as const;\n\n` +

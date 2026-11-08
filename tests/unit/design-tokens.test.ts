@@ -188,7 +188,25 @@ const SHAPE: Record<string, string> = {
   'shadow-die-cut': '0 0 0 3px var(--die-cut), var(--shadow-ink-2)',
 }
 
-/** Every CSS custom property the brief's Interfaces list requires. */
+/**
+ * z-index scale restored from the pre-rebuild repo (globals.css at ab5f491).
+ * Authored as a `z` group in tokens/src/shape.json.
+ */
+const Z_INDEX: Record<string, number> = {
+  dropdown: 100,
+  sticky: 200,
+  fixed: 300,
+  'modal-backdrop': 400,
+  modal: 500,
+  popover: 600,
+  tooltip: 700,
+  toast: 800,
+}
+
+/**
+ * Every CSS custom property the brief's Interfaces list requires, plus the
+ * restored `--z-*` stacking scale.
+ */
 const REQUIRED_CSS_TOKENS = [
   '--paper',
   '--paper-deep',
@@ -252,6 +270,14 @@ const REQUIRED_CSS_TOKENS = [
   '--radius-wobble-md',
   '--radius-wobble-lg',
   '--border-ink',
+  '--z-dropdown',
+  '--z-sticky',
+  '--z-fixed',
+  '--z-modal-backdrop',
+  '--z-modal',
+  '--z-popover',
+  '--z-tooltip',
+  '--z-toast',
   '--ease-spring',
   '--ease-out',
   '--ease-in-out',
@@ -349,9 +375,12 @@ describe('design tokens', () => {
     }
   })
 
-  it('defines the shape tokens from spec §5.4', () => {
+  it('defines the shape tokens from spec §5.4 and the z-index scale', () => {
     for (const [name, expected] of Object.entries(SHAPE)) {
       expect(shape[name]?.$value, `shape.${name}`).toBe(expected)
+    }
+    for (const [name, expected] of Object.entries(Z_INDEX)) {
+      expect(shape.z?.[name]?.$value, `shape.z.${name}`).toBe(expected)
     }
   })
 
