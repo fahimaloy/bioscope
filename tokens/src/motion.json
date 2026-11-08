@@ -1,0 +1,52 @@
+{
+  "ease-spring": {
+    "$type": "cubicBezier",
+    "$value": [0.34, 1.56, 0.64, 1],
+    "$description": "Springy overshoot"
+  },
+  "ease-out": {
+    "$type": "cubicBezier",
+    "$value": [0.16, 1, 0.3, 1],
+    "$description": "Decisive exit"
+  },
+  "ease-in-out": {
+    "$type": "cubicBezier",
+    "$value": [0.65, 0, 0.35, 1],
+    "$description": "Neutral in-out"
+  },
+  "dur-micro": {
+    "$type": "duration",
+    "$value": "150ms",
+    "$description": "Micro-interaction"
+  },
+  "dur-fast": {
+    "$type": "duration",
+    "$value": "200ms",
+    "$description": "Fast transition"
+  },
+  "dur-base": {
+    "$type": "duration",
+    "$value": "300ms",
+    "$description": "Base transition"
+  },
+  "dur-slow": {
+    "$type": "duration",
+    "$value": "500ms",
+    "$description": "Slow transition"
+  },
+  "dur-scene": {
+    "$type": "duration",
+    "$value": "800ms",
+    "$description": "Entrance scene"
+  },
+  "spring-hover": {
+    "$type": "spring",
+    "$value": { "stiffness": 500, "damping": 30 },
+    "$description": "Motion spring preset, within 400–550 / 20–30"
+  },
+  "spring-press": {
+    "$type": "spring",
+    "$value": { "stiffness": 700, "damping": 30 },
+    "$description": "Motion press spring preset"
+  }
+}

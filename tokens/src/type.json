@@ -1,0 +1,52 @@
+{
+  "text-xs": {
+    "$type": "typography",
+    "$value": { "fontSize": "12px", "lineHeight": "1.5" },
+    "$description": "Caption / annotation"
+  },
+  "text-sm": {
+    "$type": "typography",
+    "$value": { "fontSize": "14px", "lineHeight": "1.5" },
+    "$description": "Dense UI"
+  },
+  "text-base": {
+    "$type": "typography",
+    "$value": { "fontSize": "16px", "lineHeight": "1.6" },
+    "$description": "Body"
+  },
+  "text-lg": {
+    "$type": "typography",
+    "$value": { "fontSize": "18px", "lineHeight": "1.6" },
+    "$description": "Large body"
+  },
+  "text-xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "20px", "lineHeight": "1.4" },
+    "$description": "Small heading"
+  },
+  "text-2xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "24px", "lineHeight": "1.3" },
+    "$description": "Heading"
+  },
+  "text-3xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "30px", "lineHeight": "1.2" },
+    "$description": "Heading"
+  },
+  "text-4xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "36px", "lineHeight": "1.15" },
+    "$description": "Display"
+  },
+  "text-5xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "48px", "lineHeight": "1.1" },
+    "$description": "Display"
+  },
+  "text-6xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "64px", "lineHeight": "1.05" },
+    "$description": "Hero display"
+  }
+}

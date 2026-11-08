@@ -1,0 +1,232 @@
+{
+  "paper": {
+    "$type": "color",
+    "$value": "#FAF3E3",
+    "$description": "App background"
+  },
+  "paper-deep": {
+    "$type": "color",
+    "$value": "#F3E7CE",
+    "$description": "Alt surface, sticky notes, table header"
+  },
+  "paper-raised": {
+    "$type": "color",
+    "$value": "#FFFDF7",
+    "$description": "Cards, sheets"
+  },
+  "ink": {
+    "$type": "color",
+    "$value": "#241B12",
+    "$description": "Text, borders, offset shadows"
+  },
+  "ink-soft": {
+    "$type": "color",
+    "$value": "#4A3B2C",
+    "$description": "Secondary text"
+  },
+  "ink-muted": {
+    "$type": "color",
+    "$value": "#7A6A57",
+    "$description": "Tertiary text, captions"
+  },
+  "die-cut": {
+    "$type": "color",
+    "$value": "#FFFFFF",
+    "$description": "Sticker white outline"
+  },
+  "pink": {
+    "$type": "color",
+    "$value": "#E91E63",
+    "$description": "Primary brand / primary action"
+  },
+  "pink-strong": {
+    "$type": "color",
+    "$value": "#C2185B",
+    "$description": "Text-bearing pink surface"
+  },
+  "violet": {
+    "$type": "color",
+    "$value": "#9C27B0",
+    "$description": "Accent, badges"
+  },
+  "orange": {
+    "$type": "color",
+    "$value": "#FF9800",
+    "$description": "Accent, warnings"
+  },
+  "lime": {
+    "$type": "color",
+    "$value": "#8BC34A",
+    "$description": "Accent, success-adjacent"
+  },
+  "teal": {
+    "$type": "color",
+    "$value": "#009688",
+    "$description": "Accent, links, secondary action"
+  },
+  "blue": {
+    "$type": "color",
+    "$value": "#2196F3",
+    "$description": "Info"
+  },
+  "gold": {
+    "$type": "color",
+    "$value": "#FBC02D",
+    "$description": "Highlights, washi tape, starbursts"
+  },
+  "red": {
+    "$type": "color",
+    "$value": "#D32F2F",
+    "$description": "Error / destructive"
+  },
+  "green": {
+    "$type": "color",
+    "$value": "#388E3C",
+    "$description": "Success"
+  },
+  "green-strong": {
+    "$type": "color",
+    "$value": "#2E7D32",
+    "$description": "Text-bearing green surface"
+  },
+  "brand": {
+    "$type": "color",
+    "$value": "{pink}",
+    "$description": "Primary brand alias"
+  },
+  "on-brand": {
+    "$type": "color",
+    "$value": "#FFFFFF",
+    "$description": "Text on --pink-strong only"
+  },
+  "accent": {
+    "$type": "color",
+    "$value": "{gold}",
+    "$description": "Accent alias"
+  },
+  "info": {
+    "$type": "color",
+    "$value": "{blue}",
+    "$description": "Info alias"
+  },
+  "success": {
+    "$type": "color",
+    "$value": "{green}",
+    "$description": "Success alias"
+  },
+  "warning": {
+    "$type": "color",
+    "$value": "{orange}",
+    "$description": "Warning alias"
+  },
+  "error": {
+    "$type": "color",
+    "$value": "{red}",
+    "$description": "Error alias"
+  },
+  "surface": {
+    "$type": "color",
+    "$value": "{paper}",
+    "$description": "Base surface"
+  },
+  "surface-raised": {
+    "$type": "color",
+    "$value": "{paper-raised}",
+    "$description": "Raised surface"
+  },
+  "surface-sunken": {
+    "$type": "color",
+    "$value": "{paper-deep}",
+    "$description": "Sunken surface"
+  },
+  "text": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Body text"
+  },
+  "text-muted": {
+    "$type": "color",
+    "$value": "{ink-soft}",
+    "$description": "Secondary text"
+  },
+  "text-subtle": {
+    "$type": "color",
+    "$value": "{ink-muted}",
+    "$description": "Tertiary text"
+  },
+  "text-inverse": {
+    "$type": "color",
+    "$value": "{paper-raised}",
+    "$description": "Text on dark/accent fills"
+  },
+  "border": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Border color"
+  },
+  "ring": {
+    "$type": "color",
+    "$value": "{gold}",
+    "$description": "Focus ring"
+  },
+  "overlay": {
+    "$type": "color",
+    "$value": "color-mix(in srgb, var(--ink) 55%, transparent)",
+    "$description": "Modal/scrim overlay"
+  },
+  "on-pink": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Display/decor only — 3.89:1, never body text"
+  },
+  "on-pink-strong": {
+    "$type": "color",
+    "$value": "#FFFFFF",
+    "$description": "Text on --pink-strong (5.87:1)"
+  },
+  "on-violet": {
+    "$type": "color",
+    "$value": "#FFFFFF",
+    "$description": "Text on --violet (6.31:1)"
+  },
+  "on-red": {
+    "$type": "color",
+    "$value": "#FFFFFF",
+    "$description": "Text on --red (4.59:1)"
+  },
+  "on-green": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Display/decor only — 4.11:1, never body text"
+  },
+  "on-green-strong": {
+    "$type": "color",
+    "$value": "#FFFFFF",
+    "$description": "Text on --green-strong (5.13:1)"
+  },
+  "on-teal": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Text on --teal (4.60:1)"
+  },
+  "on-orange": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Text on --orange (7.85:1)"
+  },
+  "on-gold": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Text on --gold (10.2:1)"
+  },
+  "on-blue": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Text on --blue (5.41:1)"
+  },
+  "on-lime": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Text on --lime (8.06:1)"
+  }
+}

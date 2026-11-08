@@ -1,0 +1,82 @@
+{
+  "radius-sm": {
+    "$type": "dimension",
+    "$value": "6px",
+    "$description": "Small radius"
+  },
+  "radius-md": {
+    "$type": "dimension",
+    "$value": "10px",
+    "$description": "Medium radius"
+  },
+  "radius-lg": {
+    "$type": "dimension",
+    "$value": "16px",
+    "$description": "Large radius"
+  },
+  "radius-xl": {
+    "$type": "dimension",
+    "$value": "24px",
+    "$description": "Extra-large radius"
+  },
+  "radius-pill": {
+    "$type": "dimension",
+    "$value": "999px",
+    "$description": "Pill radius"
+  },
+  "radius-wobble-sm": {
+    "$type": "dimension",
+    "$value": "255px 15px 225px 15px / 15px 225px 15px 255px",
+    "$description": "Hand-drawn wobble outline, small"
+  },
+  "radius-wobble-md": {
+    "$type": "dimension",
+    "$value": "18px 6px 20px 8px / 8px 20px 6px 18px",
+    "$description": "Hand-drawn wobble outline, medium"
+  },
+  "radius-wobble-lg": {
+    "$type": "dimension",
+    "$value": "30px 10px 34px 12px / 12px 34px 10px 30px",
+    "$description": "Hand-drawn wobble outline, large"
+  },
+  "border-ink": {
+    "$type": "border",
+    "$value": "2px solid var(--ink)",
+    "$description": "Dense/data surface border"
+  },
+  "border-strong": {
+    "$type": "border",
+    "$value": "3px solid var(--ink)",
+    "$description": "Card/button/badge border"
+  },
+  "shadow-ink-1": {
+    "$type": "shadow",
+    "$value": "2px 2px 0 var(--ink)",
+    "$description": "Hard offset shadow, step 1"
+  },
+  "shadow-ink-2": {
+    "$type": "shadow",
+    "$value": "4px 4px 0 var(--ink)",
+    "$description": "Hard offset shadow, step 2"
+  },
+  "shadow-ink-3": {
+    "$type": "shadow",
+    "$value": "6px 6px 0 var(--ink)",
+    "$description": "Hard offset shadow, step 3"
+  },
+  "shadow-ink-4": {
+    "$type": "shadow",
+    "$value": "10px 10px 0 var(--ink)",
+    "$description": "Hard offset shadow, step 4"
+  },
+  "shadow-color": {
+    "$type": "shadow",
+    "$value": "8px 8px 0 var(--accent)",
+    "$description": "Colored offset shadow"
+  },
+  "shadow-die-cut": {
+    "$type": "shadow",
+    "$value": "0 0 0 3px var(--die-cut), var(--shadow-ink-2)",
+    "$description": "Die-cut sticker outline plus offset ink shadow"
+  }
+}

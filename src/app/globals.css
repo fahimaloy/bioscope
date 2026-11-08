@@ -4,128 +4,90 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @tokens-start (generated) */
 :root {
-  /* MAFTS Design Tokens */
-  --primary: #FF6B6B;
-  --secondary: #4ECDC4;
-  --accent: #FFE66D;
-  --dark: #2C3E50;
-  --light: #ECF0F1;
-  --bg-color: #FAFAFA;
-  --ink: #000000;
-
-  /* Semantic status colors */
-  --error: #E74C3C;
-  --success: #2ECC71;
-  --warning: #F39C12;
-  --info: #3498DB;
-  --purple: #9B59B6;
-
-  /* Typography */
-  --font-display: 'Bangers', cursive;
-  --font-body: 'Outfit', sans-serif;
-
-  /* Shadows */
-  --shadow-btn: 4px 4px 0px var(--ink);
-  --shadow-btn-hover: 6px 8px 0px var(--ink);
-  --shadow-btn-active: 0px 0px 0px var(--ink);
-  --shadow-card: 8px 8px 0px var(--secondary);
-  --shadow-card-hover: 12px 12px 0px var(--primary);
-  --shadow-stat: 6px 6px 0px var(--primary);
-  --shadow-form: 10px 10px 0px var(--accent);
-  --shadow-input: 4px 4px 0px var(--primary);
-  --shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.05);
-
-  /* Semantic Backgrounds */
-  --bg-primary: var(--bg-color);
-  --bg-secondary: #FFFFFF;
-  --bg-tertiary: var(--light);
-  --bg-inverse: var(--dark);
-  --bg-brand: var(--primary);
-  --bg-brand-hover: #FF5252;
-  --bg-brand-subtle: rgba(255, 107, 107, 0.1);
-
-  /* Semantic Text */
-  --text-primary: var(--dark);
-  --text-secondary: #5D6D7E;
-  --text-tertiary: #85929E;
-  --text-inverse: #FFFFFF;
-  --text-link: var(--primary);
-  --text-link-hover: #FF5252;
-  --text-on-brand: #FFFFFF;
-
-  /* Semantic Borders */
-  --border-primary: var(--dark);
-  --border-secondary: var(--light);
-  --border-focus: var(--primary);
-  --border-error: var(--error);
-  --border-success: var(--success);
-  --border-warning: var(--warning);
-
-  /* Semantic Surfaces */
-  --surface: #FFFFFF;
-  --surface-hover: var(--light);
-  --surface-active: #E8ECEF;
-  --surface-elevated: #FFFFFF;
-  --surface-card: #FFFFFF;
-
-  /* Overlay */
-  --overlay: rgba(44, 62, 80, 0.5);
-  --overlay-backdrop: blur(10px);
-
-  /* Shadows - offset style (MAFTS) */
-  --shadow-xs: 2px 2px 0px var(--dark);
-  --shadow-sm: 4px 4px 0px var(--dark);
-  --shadow-md: 6px 6px 0px var(--secondary);
-  --shadow-lg: 8px 8px 0px var(--secondary);
-  --shadow-xl: 12px 12px 0px var(--primary);
-  --shadow-inner: inset 2px 2px 0px var(--dark);
-  --shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.05);
-
-  /* Border Radius */
+  --paper: #FAF3E3;
+  --paper-deep: #F3E7CE;
+  --paper-raised: #FFFDF7;
+  --ink: #241B12;
+  --ink-soft: #4A3B2C;
+  --ink-muted: #7A6A57;
+  --die-cut: #FFFFFF;
+  --pink: #E91E63;
+  --pink-strong: #C2185B;
+  --violet: #9C27B0;
+  --orange: #FF9800;
+  --lime: #8BC34A;
+  --teal: #009688;
+  --blue: #2196F3;
+  --gold: #FBC02D;
+  --red: #D32F2F;
+  --green: #388E3C;
+  --green-strong: #2E7D32;
+  --brand: var(--pink);
+  --on-brand: #FFFFFF;
+  --accent: var(--gold);
+  --info: var(--blue);
+  --success: var(--green);
+  --warning: var(--orange);
+  --error: var(--red);
+  --surface: var(--paper);
+  --surface-raised: var(--paper-raised);
+  --surface-sunken: var(--paper-deep);
+  --text: var(--ink);
+  --text-muted: var(--ink-soft);
+  --text-subtle: var(--ink-muted);
+  --text-inverse: var(--paper-raised);
+  --border: var(--ink);
+  --ring: var(--gold);
+  --overlay: color-mix(in srgb, var(--ink) 55%, transparent);
+  --on-pink: var(--ink);
+  --on-pink-strong: #FFFFFF;
+  --on-violet: #FFFFFF;
+  --on-red: #FFFFFF;
+  --on-green: var(--ink);
+  --on-green-strong: #FFFFFF;
+  --on-teal: var(--ink);
+  --on-orange: var(--ink);
+  --on-gold: var(--ink);
+  --on-blue: var(--ink);
+  --on-lime: var(--ink);
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+  --text-6xl: 64px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-pill: 50px;
-  --radius-full: 9999px;
-
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --transition-base: 300ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --transition-slow: 500ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --transition-colors: 200ms ease;
-
-  /* Typography Scale */
-  --font-size-xs: 0.75rem;    /* 12px */
-  --font-size-sm: 0.875rem;   /* 14px */
-  --font-size-base: 1rem;     /* 16px */
-  --font-size-lg: 1.125rem;   /* 18px */
-  --font-size-xl: 1.25rem;    /* 20px */
-  --font-size-2xl: 1.5rem;    /* 24px */
-  --font-size-3xl: 1.875rem;  /* 30px */
-  --font-size-4xl: 2.25rem;   /* 36px */
-  --font-size-5xl: 3rem;      /* 48px */
-  --font-size-6xl: 3.5rem;    /* 56px */
-  --font-size-7xl: 4.5rem;    /* 72px */
-  --font-size-8xl: 6rem;      /* 96px */
-  --font-size-9xl: 8rem;      /* 128px */
-
-  --line-height-tight: 1.1;
-  --line-height-snug: 1.375;
-  --line-height-normal: 1.6;
-  --line-height-relaxed: 1.75;
-
-  /* Z-Index Scale */
-  --z-dropdown: 100;
-  --z-sticky: 200;
-  --z-fixed: 300;
-  --z-modal-backdrop: 400;
-  --z-modal: 500;
-  --z-popover: 600;
-  --z-tooltip: 700;
-  --z-toast: 800;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --radius-wobble-sm: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --radius-wobble-md: 18px 6px 20px 8px / 8px 20px 6px 18px;
+  --radius-wobble-lg: 30px 10px 34px 12px / 12px 34px 10px 30px;
+  --border-ink: 2px solid var(--ink);
+  --border-strong: 3px solid var(--ink);
+  --shadow-ink-1: 2px 2px 0 var(--ink);
+  --shadow-ink-2: 4px 4px 0 var(--ink);
+  --shadow-ink-3: 6px 6px 0 var(--ink);
+  --shadow-ink-4: 10px 10px 0 var(--ink);
+  --shadow-color: 8px 8px 0 var(--accent);
+  --shadow-die-cut: 0 0 0 3px var(--die-cut), var(--shadow-ink-2);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 150ms;
+  --dur-fast: 200ms;
+  --dur-base: 300ms;
+  --dur-slow: 500ms;
+  --dur-scene: 800ms;
 }
+/* @tokens-end */
 
 * {
   margin: 0;
