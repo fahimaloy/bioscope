@@ -1,30 +1,32 @@
-'use client'
+'use client';
 
-import { forwardRef, SelectHTMLAttributes } from 'react'
-import { ChevronDown } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { forwardRef, SelectHTMLAttributes, useId } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { FOCUS_VISIBLE } from './shared';
 
 export interface SelectOption {
-  value: string
-  label: string
-  disabled?: boolean
+  value: string;
+  label: string;
+  disabled?: boolean;
 }
 
 export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'onChange'> {
-  options: SelectOption[]
-  placeholder?: string
-  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void
-  error?: string
-  label?: string
+  options: SelectOption[];
+  placeholder?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  error?: string;
+  label?: string;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ options, placeholder, onChange, error, label, className, id, ...props }, ref) => {
-    const selectId = id || `select-${Math.random().toString(36).slice(2, 9)}`
+    const generatedId = useId();
+    const selectId = id || generatedId;
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={selectId} className="block text-sm font-medium text-[var(--ink)] mb-1.5">
+          <label htmlFor={selectId} className="mb-1.5 block text-sm font-medium text-[var(--ink)]">
             {label}
           </label>
         )}
@@ -34,12 +36,15 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             onChange={onChange}
             className={cn(
-              'w-full appearance-none px-3 py-2 pr-8 text-body text-[var(--ink)] bg-white',
-              'border-2 border-[var(--ink)] rounded-input',
-              'focus:outline-none focus:border-primary focus:shadow-input',
-              'disabled:opacity-60 disabled:cursor-not-allowed',
-              error && 'border-[var(--error)]',
-              'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
+              'w-full appearance-none rounded-[var(--radius-md)] border-2 bg-[var(--surface-raised)]',
+              'text-body px-3 py-2 pr-8 text-[var(--text)]',
+              'transition-[border-color,box-shadow] duration-fast ease-out',
+              'focus:border-[var(--ink)] focus:outline-none',
+              'disabled:cursor-not-allowed disabled:opacity-60',
+              FOCUS_VISIBLE,
+              error
+                ? 'border-[var(--error)] focus-visible:ring-[var(--error)]'
+                : 'border-[var(--ink)]',
               className
             )}
             {...props}
@@ -55,12 +60,19 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink)]/50 pointer-events-none" />
+          <ChevronDown
+            className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-subtle)]"
+            aria-hidden="true"
+          />
         </div>
-        {error && <p className="mt-1 text-sm text-[var(--error)]">{error}</p>}
+        {error && (
+          <p className="mt-1 text-sm text-[var(--error)]" role="alert">
+            {error}
+          </p>
+        )}
       </div>
-    )
+    );
   }
-)
+);
 
-Select.displayName = 'Select'
+Select.displayName = 'Select';

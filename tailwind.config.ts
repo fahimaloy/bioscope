@@ -1,4 +1,4 @@
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   darkMode: 'class',
@@ -104,6 +104,7 @@ const config: Config = {
         'fade-out': 'fadeOut 0.2s ease-in',
         'scale-in': 'scaleIn 0.2s ease-out',
         'scale-out': 'scaleOut 0.2s ease-in',
+        shimmer: 'shimmer 1.5s ease-in-out infinite',
       },
       keyframes: {
         float: {
@@ -146,6 +147,10 @@ const config: Config = {
           from: { transform: 'scale(1)', opacity: '1' },
           to: { transform: 'scale(0.95)', opacity: '0' },
         },
+        shimmer: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.4' },
+        },
       },
       spacing: {
         '18': '4.5rem',
@@ -177,5 +182,5 @@ const config: Config = {
     },
   },
   plugins: [],
-}
-export default config
+};
+export default config;

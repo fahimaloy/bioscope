@@ -1,45 +1,52 @@
-'use client'
+'use client';
 
-import { forwardRef, useState, useMemo, useRef, useEffect, ReactNode, HTMLAttributes } from 'react'
-import { cn } from '@/lib/utils'
-import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
-import { Button } from './Button'
-import { Checkbox } from './Checkbox'
-import { DoodleShape, DoodleScribble, DoodleStar } from '@/components/decorative/DoodleElements'
-import { motion } from 'framer-motion'
-import { Pagination } from './Pagination'
+import { useState, useMemo, ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+import { ChevronUp, ChevronDown } from 'lucide-react';
+import { Checkbox } from './Checkbox';
+import { DoodleStar } from '@/components/decorative';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Pagination } from './Pagination';
 
 export interface Column<T> {
-  key: string
-  header: string
-  accessor?: (row: T) => ReactNode
-  cell?: (row: T) => ReactNode
-  sortable?: boolean
-  width?: string
-  align?: 'left' | 'center' | 'right'
-  className?: string
+  key: string;
+  header: string;
+  accessor?: (row: T) => ReactNode;
+  cell?: (row: T) => ReactNode;
+  sortable?: boolean;
+  width?: string;
+  align?: 'left' | 'center' | 'right';
+  className?: string;
 }
 
+/** Row padding per density — `compact` is for the admin's dense data grids. */
+const densityStyles: Record<'comfortable' | 'compact', { cell: string; header: string }> = {
+  comfortable: { cell: 'px-4 py-3', header: 'px-4 py-3' },
+  compact: { cell: 'px-3 py-1.5', header: 'px-3 py-2' },
+};
+
 interface DataTableProps<T> {
-  columns: Column<T>[]
-  data: T[]
-  keyExtractor: (row: T) => string
-  sortable?: boolean
-  onSort?: (key: string, direction: 'asc' | 'desc') => void
-  selectable?: boolean
-  selectedKeys?: Set<string>
-  onSelectionChange?: (keys: Set<string>) => void
+  columns: Column<T>[];
+  data: T[];
+  keyExtractor: (row: T) => string;
+  sortable?: boolean;
+  onSort?: (key: string, direction: 'asc' | 'desc') => void;
+  selectable?: boolean;
+  selectedKeys?: Set<string>;
+  onSelectionChange?: (keys: Set<string>) => void;
   pagination?: {
-    page: number
-    pageSize: number
-    total: number
-    onPageChange: (page: number) => void
-    onPageSizeChange: (size: number) => void
-  }
-  loading?: boolean
-  emptyMessage?: string
-  rowClassName?: (row: T) => string
-  className?: string
+    page: number;
+    pageSize: number;
+    total: number;
+    onPageChange: (page: number) => void;
+    onPageSizeChange: (size: number) => void;
+  };
+  loading?: boolean;
+  emptyMessage?: string;
+  rowClassName?: (row: T) => string;
+  /** `comfortable` (default) or `compact`. */
+  density?: 'comfortable' | 'compact';
+  className?: string;
 }
 
 export function DataTable<T>({
@@ -55,60 +62,62 @@ export function DataTable<T>({
   loading = false,
   emptyMessage = 'No data available',
   rowClassName,
+  density = 'comfortable',
   className,
 }: DataTableProps<T>) {
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null)
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(
+    null
+  );
+  const shouldReduceMotion = useReducedMotion();
+  const padding = densityStyles[density];
 
   const handleSort = (key: string) => {
-    if (!sortable) return
-    const column = columns.find((c) => c.key === key)
-    if (!column?.sortable) return
+    if (!sortable) return;
+    const column = columns.find((c) => c.key === key);
+    if (!column?.sortable) return;
 
-    let direction: 'asc' | 'desc' = 'asc'
+    let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig?.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc'
+      direction = 'desc';
     }
-    setSortConfig({ key, direction })
-    onSort?.(key, direction)
-  }
+    setSortConfig({ key, direction });
+    onSort?.(key, direction);
+  };
 
   const sortedData = useMemo(() => {
-    if (!sortConfig) return data
+    if (!sortConfig) return data;
     return [...data].sort((a, b) => {
-      const aVal = a[sortConfig.key as keyof T]
-      const bVal = b[sortConfig.key as keyof T]
-      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1
-      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [data, sortConfig])
+      const aVal = a[sortConfig.key as keyof T];
+      const bVal = b[sortConfig.key as keyof T];
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [data, sortConfig]);
 
   const handleSelectAll = () => {
     if (selectedKeys.size === sortedData.length) {
-      onSelectionChange?.(new Set())
+      onSelectionChange?.(new Set());
     } else {
-      onSelectionChange?.(new Set(sortedData.map(keyExtractor)))
+      onSelectionChange?.(new Set(sortedData.map(keyExtractor)));
     }
-  }
+  };
 
-  const isAllSelected = selectedKeys.size === sortedData.length && sortedData.length > 0
+  const isAllSelected = selectedKeys.size === sortedData.length && sortedData.length > 0;
 
-  if (loading) {
-    return (
-      <div className={cn('overflow-hidden border-3 border-[var(--ink)] rounded-card bg-white', className)}>
-        <TableSkeleton columns={columns.length} />
-      </div>
-    )
-  }
-
-  return (
-    <div className={cn('overflow-hidden border-3 border-[var(--ink)] rounded-card bg-white', className)}>
+  const table = (
+    <div
+      className={cn(
+        'overflow-hidden rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)]',
+        className
+      )}
+    >
       <div className="overflow-x-auto">
-        <table className="w-full" role="grid">
-          <thead className="bg-[var(--tertiary)] border-b-2 border-[var(--primary)]">
+        <table className="w-full" role="grid" data-density={density}>
+          <thead className="border-b-2 border-[var(--ink)] bg-[var(--paper-deep)]">
             <tr>
               {selectable && (
-                <th className="px-4 py-3 text-left">
+                <th className={cn('text-left', padding.header)} scope="col">
                   <Checkbox
                     checked={isAllSelected ? true : selectedKeys.size > 0 ? 'indeterminate' : false}
                     onCheckedChange={handleSelectAll}
@@ -121,11 +130,13 @@ export function DataTable<T>({
                   key={column.key}
                   scope="col"
                   className={cn(
-                    'px-4 py-3 text-left font-medium text-[var(--ink)]',
-                    'uppercase tracking-wider text-sm',
+                    'text-left text-sm font-medium uppercase tracking-wider text-[var(--ink)]',
+                    padding.header,
                     column.align === 'center' && 'text-center',
                     column.align === 'right' && 'text-right',
-                    column.sortable && sortable && 'cursor-pointer select-none hover:text-primary',
+                    column.sortable &&
+                      sortable &&
+                      'cursor-pointer select-none hover:text-[var(--gold)]',
                     column.className
                   )}
                   style={{ width: column.width }}
@@ -133,25 +144,29 @@ export function DataTable<T>({
                 >
                   <div className="flex items-center gap-2">
                     {column.header}
-                    {column.sortable && sortable && sortConfig?.key === column.key && (
-                      sortConfig.direction === 'asc' ? (
-                        <ChevronUp className="w-4 h-4 text-primary" />
+                    {column.sortable &&
+                      sortable &&
+                      sortConfig?.key === column.key &&
+                      (sortConfig.direction === 'asc' ? (
+                        <ChevronUp className="h-4 w-4 text-[var(--ink)]" aria-hidden="true" />
                       ) : (
-                        <ChevronDown className="w-4 h-4 text-primary" />
-                      )
-                    )}
+                        <ChevronDown className="h-4 w-4 text-[var(--ink)]" aria-hidden="true" />
+                      ))}
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--light)]">
+          <tbody className="divide-y divide-[var(--paper-deep)]">
             {sortedData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (selectable ? 1 : 0)} className="px-4 py-16 text-center">
+                <td
+                  colSpan={columns.length + (selectable ? 1 : 0)}
+                  className={cn('px-4 py-16 text-center', padding.cell)}
+                >
                   <div className="flex flex-col items-center gap-4">
-                    <DoodleShape size="lg" color="primary" animation="float" className="opacity-30" />
-                    <p className="text-body text-[var(--ink)]/50">{emptyMessage}</p>
+                    <DoodleStar size={40} color="gold" animation="float" className="opacity-40" />
+                    <p className="text-body text-[var(--text-muted)]">{emptyMessage}</p>
                   </div>
                 </td>
               </tr>
@@ -159,26 +174,26 @@ export function DataTable<T>({
               sortedData.map((row, rowIndex) => (
                 <motion.tr
                   key={keyExtractor(row)}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: rowIndex * 0.05, duration: 0.3 }}
+                  transition={{ delay: shouldReduceMotion ? 0 : rowIndex * 0.05, duration: 0.3 }}
                   className={cn(
-                    'transition-colors hover:bg-[var(--surface-hover)]',
+                    'transition-colors hover:bg-[var(--paper-deep)]',
                     rowClassName?.(row)
                   )}
                 >
                   {selectable && (
-                    <td className="px-4 py-3">
+                    <td className={padding.cell}>
                       <Checkbox
                         checked={selectedKeys.has(keyExtractor(row))}
                         onCheckedChange={(checked: boolean | 'indeterminate') => {
-                          const newKeys = new Set(selectedKeys)
+                          const newKeys = new Set(selectedKeys);
                           if (checked === true) {
-                            newKeys.add(keyExtractor(row))
+                            newKeys.add(keyExtractor(row));
                           } else {
-                            newKeys.delete(keyExtractor(row))
+                            newKeys.delete(keyExtractor(row));
                           }
-                          onSelectionChange?.(newKeys)
+                          onSelectionChange?.(newKeys);
                         }}
                         aria-label={`Select row ${keyExtractor(row)}`}
                       />
@@ -188,13 +203,18 @@ export function DataTable<T>({
                     <td
                       key={column.key}
                       className={cn(
-                        'px-4 py-3 text-body text-[var(--ink)]',
+                        'text-body text-[var(--ink)]',
+                        padding.cell,
                         column.align === 'center' && 'text-center',
                         column.align === 'right' && 'text-right',
                         column.className
                       )}
                     >
-                      {column.cell ? column.cell(row) : column.accessor ? column.accessor(row) : (row as any)[column.key]}
+                      {column.cell
+                        ? column.cell(row)
+                        : column.accessor
+                          ? column.accessor(row)
+                          : (row as any)[column.key]}
                     </td>
                   ))}
                 </motion.tr>
@@ -205,8 +225,8 @@ export function DataTable<T>({
       </div>
 
       {pagination && (
-        <div className="px-4 py-3 border-t border-[var(--light)] flex items-center justify-between">
-          <div className="text-sm text-[var(--ink)]/60">
+        <div className="flex items-center justify-between gap-4 border-t border-[var(--paper-deep)] px-4 py-3">
+          <div className="text-sm text-[var(--text-muted)]">
             Showing {(pagination.page - 1) * pagination.pageSize + 1} to{' '}
             {Math.min(pagination.page * pagination.pageSize, pagination.total)} of{' '}
             {pagination.total} results
@@ -220,18 +240,40 @@ export function DataTable<T>({
         </div>
       )}
     </div>
-  )
+  );
+
+  if (loading) {
+    return (
+      <div
+        className={cn(
+          'overflow-hidden rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)]',
+          className
+        )}
+      >
+        <TableSkeleton columns={columns.length} density={density} />
+      </div>
+    );
+  }
+
+  return table;
 }
 
 // Skeleton for loading state
-function TableSkeleton({ columns }: { columns: number }) {
+function TableSkeleton({
+  columns,
+  density,
+}: {
+  columns: number;
+  density: 'comfortable' | 'compact';
+}) {
+  const padding = densityStyles[density];
   return (
     <>
-      <thead className="bg-[var(--light)]">
+      <thead className="bg-[var(--paper-deep)]">
         <tr>
           {Array.from({ length: columns }).map((_, i) => (
-            <th key={i} className="px-4 py-3">
-              <div className="h-4 w-3/4 bg-dark/10 rounded animate-pulse" />
+            <th key={i} className={padding.header}>
+              <div className="h-4 w-3/4 animate-pulse rounded-[var(--radius-sm)] bg-[var(--surface-sunken)]" />
             </th>
           ))}
         </tr>
@@ -240,13 +282,13 @@ function TableSkeleton({ columns }: { columns: number }) {
         {Array.from({ length: 5 }).map((_, rowIndex) => (
           <tr key={rowIndex}>
             {Array.from({ length: columns }).map((_, colIndex) => (
-              <td key={colIndex} className="px-4 py-3">
-                <div className="h-4 w-full bg-dark/10 rounded animate-pulse" />
+              <td key={colIndex} className={padding.cell}>
+                <div className="h-4 w-full animate-pulse rounded-[var(--radius-sm)] bg-[var(--surface-sunken)]" />
               </td>
             ))}
           </tr>
         ))}
       </tbody>
     </>
-  )
+  );
 }

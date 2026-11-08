@@ -1,15 +1,19 @@
-'use client'
+'use client';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 interface SkeletonProps {
-  className?: string
-  variant?: 'text' | 'circular' | 'rectangular' | 'card' | 'avatar'
-  width?: string | number
-  height?: string | number
-  animation?: 'pulse' | 'wave' | 'none'
+  className?: string;
+  variant?: 'text' | 'circular' | 'rectangular' | 'card' | 'avatar';
+  width?: string | number;
+  height?: string | number;
+  animation?: 'pulse' | 'wave' | 'none';
 }
 
+/**
+ * Placeholder surface. Purely decorative: `aria-hidden`, no text, and it
+ * carries no interactive semantics.
+ */
 export function Skeleton({
   className,
   variant = 'text',
@@ -17,52 +21,46 @@ export function Skeleton({
   height,
   animation = 'pulse',
 }: SkeletonProps) {
-  const baseStyles = 'bg-[var(--light)] rounded overflow-hidden'
+  const baseStyles = 'overflow-hidden rounded-[var(--radius-sm)] bg-[var(--paper-deep)]';
 
   const variantStyles = {
-    text: 'h-4 rounded',
+    text: 'h-4',
     circular: 'rounded-full',
-    rectangular: 'rounded-input',
-    card: 'rounded-card',
+    rectangular: 'rounded-[var(--radius-sm)]',
+    card: 'rounded-[var(--radius-lg)]',
     avatar: 'rounded-full',
-  }
+  };
 
   const animationStyles = {
     pulse: 'animate-pulse',
-    wave: 'animate-wave',
+    wave: 'animate-shimmer',
     none: '',
-  }
+  };
 
   return (
     <div
-      className={cn(
-        baseStyles,
-        variantStyles[variant],
-        animationStyles[animation],
-        className
-      )}
+      className={cn(baseStyles, variantStyles[variant], animationStyles[animation], className)}
       style={{
         width: width ? (typeof width === 'number' ? `${width}px` : width) : undefined,
         height: height ? (typeof height === 'number' ? `${height}px` : height) : undefined,
       }}
       aria-hidden="true"
     />
-  )
+  );
 }
 
-export function SkeletonText({ lines = 3, className, ...props }: { lines?: number } & SkeletonProps) {
+export function SkeletonText({
+  lines = 3,
+  className,
+  ...props
+}: { lines?: number } & SkeletonProps) {
   return (
     <div className={cn('space-y-2', className)}>
       {Array.from({ length: lines }).map((_, i) => (
-        <Skeleton
-          key={i}
-          variant="text"
-          width={i === lines - 1 ? '60%' : '100%'}
-          {...props}
-        />
+        <Skeleton key={i} variant="text" width={i === lines - 1 ? '60%' : '100%'} {...props} />
       ))}
     </div>
-  )
+  );
 }
 
 export function SkeletonCard({ className, ...props }: SkeletonProps) {
@@ -81,14 +79,24 @@ export function SkeletonCard({ className, ...props }: SkeletonProps) {
         <Skeleton variant="text" width="30%" height={40} {...props} />
       </div>
     </div>
-  )
+  );
 }
 
-export function SkeletonTable({ rows = 5, columns = 4, className, ...props }: { rows?: number; columns?: number } & SkeletonProps) {
+export function SkeletonTable({
+  rows = 5,
+  columns = 4,
+  className,
+  ...props
+}: { rows?: number; columns?: number } & SkeletonProps) {
   return (
-    <div className={cn('overflow-hidden border-3 border-[var(--ink)] rounded-card bg-[var(--surface-card)]', className)}>
+    <div
+      className={cn(
+        'overflow-hidden rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)]',
+        className
+      )}
+    >
       <table className="w-full" role="grid">
-        <thead className="bg-[var(--light)]">
+        <thead className="bg-[var(--paper-deep)]">
           <tr>
             {Array.from({ length: columns }).map((_, i) => (
               <th key={i} className="px-4 py-3">
@@ -97,7 +105,7 @@ export function SkeletonTable({ rows = 5, columns = 4, className, ...props }: { 
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[var(--light)]">
+        <tbody className="divide-y divide-[var(--paper-deep)]">
           {Array.from({ length: rows }).map((_, rowIndex) => (
             <tr key={rowIndex}>
               {Array.from({ length: columns }).map((_, colIndex) => (
@@ -110,12 +118,17 @@ export function SkeletonTable({ rows = 5, columns = 4, className, ...props }: { 
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 
 export function SkeletonProductCard({ className, ...props }: SkeletonProps) {
   return (
-    <div className={cn('bg-[var(--surface-card)] border-3 border-[var(--ink)] rounded-card p-6 shadow-card space-y-4', className)}>
+    <div
+      className={cn(
+        'space-y-4 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-6 shadow-[var(--shadow-ink-3)]',
+        className
+      )}
+    >
       <Skeleton variant="rectangular" width="100%" height={200} {...props} />
       <div className="space-y-2">
         <Skeleton variant="text" width="80%" height={28} {...props} />
@@ -127,12 +140,17 @@ export function SkeletonProductCard({ className, ...props }: SkeletonProps) {
         <Skeleton variant="text" width="60px" height={32} {...props} />
       </div>
     </div>
-  )
+  );
 }
 
 export function SkeletonOrderCard({ className, ...props }: SkeletonProps) {
   return (
-    <div className={cn('bg-[var(--surface-card)] border-3 border-[var(--ink)] rounded-card p-6 shadow-card space-y-4', className)}>
+    <div
+      className={cn(
+        'space-y-4 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-6 shadow-[var(--shadow-ink-3)]',
+        className
+      )}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Skeleton variant="text" width="120px" height={20} {...props} />
@@ -155,19 +173,20 @@ export function SkeletonOrderCard({ className, ...props }: SkeletonProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-// Wave animation for skeleton
+/**
+ * Injectable form of the `wave` skeleton animation, for consumers that render
+ * skeletons outside Tailwind's content globs. Token-only: no colour literal.
+ */
 export const skeletonWaveStyles = `
-@keyframes wave {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
-.animate-wave {
-  background: linear-gradient(90deg, var(--light) 25%, #f3f4f6 50%, var(--light) 75%);
-  background-size: 200% 100%;
-  animation: wave 1.5s ease-in-out infinite;
+.animate-shimmer {
+  animation: shimmer 1.5s ease-in-out infinite;
 }
-`
+`;

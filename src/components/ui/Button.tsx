@@ -1,35 +1,50 @@
-'use client'
+'use client';
 
-import { forwardRef, ButtonHTMLAttributes } from 'react'
-import { cn } from '@/lib/utils'
-import { StickerPeel } from '@/components/decorative/DoodleElements'
+import { forwardRef, ButtonHTMLAttributes } from 'react';
+import { cn } from '@/lib/utils';
+import { FOCUS_VISIBLE_INK } from './shared';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'doodle' | 'doodle-secondary' | 'doodle-outline' | string
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  loading?: boolean
-  icon?: React.ReactNode
-  iconPosition?: 'left' | 'right'
-  fullWidth?: boolean
+  /**
+   * Visual treatment. `primary`, `secondary`, `outline`, `ghost`, and
+   * `destructive` are the defined treatments; any other value falls back to
+   * `primary`, exactly as the pre-rebuild component did for `text`, `accent`,
+   * `rectangular`, and `pills`.
+   *
+   * The `doodle*` variants were removed in the token rebuild — Paper + Pop is
+   * the default brand treatment, not a variant.
+   */
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  loading?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  fullWidth?: boolean;
 }
 
-const sizeStyles = {
-  sm: 'px-4 py-2 text-base',
-  md: 'px-6 py-3 text-lg',
-  lg: 'px-8 py-4 text-xl',
-  xl: 'px-10 py-5 text-2xl',
-}
+/**
+ * Hit targets stay ≥ 44px (contract §6); only the horizontal padding and the
+ * type size step between sizes.
+ */
+const sizeStyles: Record<NonNullable<ButtonProps['size']>, string> = {
+  sm: 'min-h-[44px] px-4 py-2 text-sm',
+  md: 'min-h-[48px] px-6 py-3 text-base',
+  lg: 'min-h-[56px] px-8 py-4 text-lg',
+  xl: 'min-h-[64px] px-10 py-5 text-xl',
+};
 
-const variantStyles = {
-  primary: 'bg-[var(--primary)] text-white border-[var(--ink)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active',
-  secondary: 'bg-[var(--accent)] text-[var(--ink)] border-[var(--ink)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active',
-  outline: 'bg-transparent border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--primary)] hover:text-white hover:border-primary',
-  ghost: 'bg-transparent border-transparent text-[var(--ink)] hover:bg-[var(--light)]',
-  destructive: 'bg-[var(--error)] text-white border-[var(--error)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active',
-  doodle: 'bg-[var(--primary)] text-white border-[var(--ink)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active relative overflow-hidden',
-  'doodle-secondary': 'bg-[var(--accent)] text-[var(--ink)] border-[var(--ink)] shadow-btn hover:shadow-btn-hover active:shadow-btn-active relative overflow-hidden',
-  'doodle-outline': 'bg-transparent border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--primary)] hover:text-white hover:border-primary relative overflow-hidden',
-}
+/**
+ * Filled variants pair their accent with its AA-safe on-token (spec §5.2):
+ * ink on `--gold`, white on `--pink-strong`, white on `--red`.
+ */
+const variantStyles: Record<string, string> = {
+  primary: 'bg-[var(--gold)] text-[var(--ink)]',
+  secondary: 'bg-[var(--pink-strong)] text-[var(--on-pink-strong)]',
+  outline: 'bg-transparent text-[var(--ink)] hover:bg-[var(--paper-raised)]',
+  ghost:
+    'bg-transparent border-transparent text-[var(--ink)] shadow-none hover:bg-[var(--paper-deep)]',
+  destructive: 'bg-[var(--red)] text-[var(--on-red)]',
+};
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -47,29 +62,31 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const isDisabled = disabled || loading
-    const isDoodleVariant = variant === 'doodle' || variant === 'doodle-secondary' || variant === 'doodle-outline'
+    const isDisabled = disabled || loading;
 
     return (
       <button
         ref={ref}
         className={cn(
-          'inline-flex items-center justify-center gap-2 font-display transition-all duration-300',
-          'rounded-pill border-3',
-          'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
-          'disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none',
-          'active:translate-x-[4px] active:translate-y-[4px]',
+          'inline-flex items-center justify-center gap-2 font-display tracking-wide',
+          'rounded-pill border-[3px] border-[var(--ink)]',
+          'shadow-[var(--shadow-ink-2)] hover:shadow-[var(--shadow-ink-3)]',
+          'transition-[transform,box-shadow] duration-fast ease-spring',
+          'hover:-translate-y-1 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
+          'disabled:cursor-not-allowed disabled:opacity-60',
+          FOCUS_VISIBLE_INK,
           sizeStyles[size],
-          (variantStyles as Record<string, string>)[variant] ?? variantStyles.primary,
+          variantStyles[variant] ?? variantStyles.primary,
           fullWidth && 'w-full',
           className
         )}
         disabled={isDisabled}
+        aria-busy={loading || undefined}
         {...props}
       >
         {loading && (
           <svg
-            className="animate-spin h-5 w-5"
+            className="h-5 w-5 animate-spin"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -90,13 +107,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             />
           </svg>
         )}
-        {icon && iconPosition === 'left' && !loading && <span className="flex-shrink-0">{icon}</span>}
+        {icon && iconPosition === 'left' && !loading && (
+          <span className="flex-shrink-0">{icon}</span>
+        )}
         <span>{children}</span>
-        {icon && iconPosition === 'right' && !loading && <span className="flex-shrink-0">{icon}</span>}
-        {isDoodleVariant && <StickerPeel />}
+        {icon && iconPosition === 'right' && !loading && (
+          <span className="flex-shrink-0">{icon}</span>
+        )}
       </button>
-    )
+    );
   }
-)
+);
 
-Button.displayName = 'Button'
+Button.displayName = 'Button';
