@@ -345,7 +345,7 @@ export function EditingTools({
                   trigger={<Button variant="outline" className="w-full justify-between">{selectedLayer.fontFamily || 'Outfit'}</Button>}
                   items={[
                     { value: 'Outfit', label: 'Outfit' },
-                    { value: 'Bangers', label: 'Bangers' },
+                    { value: 'Shrikhand', label: 'Shrikhand' },
                     { value: 'Arial', label: 'Arial' },
                     { value: 'Helvetica', label: 'Helvetica' },
                     { value: 'Georgia', label: 'Georgia' },

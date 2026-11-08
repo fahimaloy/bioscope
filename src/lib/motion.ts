@@ -20,9 +20,19 @@ import { useReducedMotion } from 'framer-motion'
  * | `spring-press` | `stiffness 700, damping 30` | tap/press feedback |
  *
  * Motion is `transform`/`opacity` only, and every entrance stays inside the
- * 600ms scene cap. Loops (`float`, `pulseSoft`) carry a `reducedMotion`
+ * 600ms scene cap. Loops (`float`, `pulseSoft`) carry a reduced-motion
  * fallback so nothing keeps moving and no content is ever left at
  * `opacity: 0` when the user prefers reduced motion.
+ *
+ * The four interactive keys (`hoverLift`, `hoverScale`, `tapPress`,
+ * `focusRing`) are **target-only** maps — the object *is* the hover/tap/focus
+ * target, so pass it straight to the gesture prop:
+ *
+ *   <motion.button whileHover={motionVariants.hoverLift} />
+ *
+ * Do not drive them with `whileHover="animate"`: a gesture *label* only
+ * resolves against the element's own `variants` prop, so without
+ * `variants={motionVariants.hoverLift}` it is a silent no-op.
  */
 
 /** `--ease-spring` — springy overshoot. */
@@ -45,11 +55,13 @@ const SPRING_HOVER = { type: 'spring', stiffness: 500, damping: 30 } as const
 const SPRING_PRESS = { type: 'spring', stiffness: 700, damping: 30 } as const
 
 /**
- * Reduced-motion fallbacks, keyed like `motionVariants`. Loops stop, timed
- * transitions collapse to zero, and every variant that starts at
- * `opacity: 0` still reaches its final state — content is never withheld.
+ * Reduced-motion fallbacks — a top-level map with exactly the same keys as
+ * `motionVariants`, so `useMotionVariants()` is a true drop-in replacement.
+ * Loops stop, timed transitions collapse to zero, gesture targets apply
+ * instantly, and every variant that starts at `opacity: 0` still reaches its
+ * final state — content is never withheld.
  */
-const reducedMotionVariants = {
+export const reducedMotionVariants = {
   // Entrance
   fadeIn: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
   fadeInUp: { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0 } },
@@ -63,6 +75,12 @@ const reducedMotionVariants = {
   float: { animate: { y: 0 }, transition: { duration: 0 } },
   pulseSoft: { initial: { scale: 1 }, animate: { scale: 1 }, transition: { duration: 0 } },
   bounceIn: { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0 } },
+
+  // Interactive — the gesture targets, applied instantly and never looping
+  hoverLift: { scale: 1.02, y: -4, boxShadow: 'var(--shadow-ink-3)', transition: { duration: 0 } },
+  hoverScale: { scale: 1.05, transition: { duration: 0 } },
+  tapPress: { scale: 0.98, transition: { duration: 0 } },
+  focusRing: { boxShadow: '0 0 0 3px var(--ring)', transition: { duration: 0 } },
 
   // Stagger container
   staggerContainer: { animate: { transition: { staggerChildren: 0, delayChildren: 0 } } },
@@ -87,22 +105,20 @@ export const motionVariants = {
   pulseSoft: { initial: { scale: 1 }, animate: { scale: [1, 1.02, 1] as [number, number, number] }, transition: { duration: 2, repeat: Infinity, ease: EASE_IN_OUT } },
   bounceIn: { initial: { opacity: 0, scale: 0.3 }, animate: { opacity: 1, scale: 1 }, transition: SPRING_HOVER },
 
-  // Interactive — rest → target sets; drive them with `whileHover="animate"`,
-  // `whileTap="animate"` or `whileFocus="animate"`.
+  // Interactive — target-only maps; pass straight to `whileHover`/`whileTap`/`whileFocus`.
   hoverLift: {
-    initial: { scale: 1, y: 0, boxShadow: 'var(--shadow-ink-2)' },
-    animate: { scale: 1.02, y: -4, boxShadow: 'var(--shadow-ink-3)' },
-    transition: SPRING_HOVER,
+    scale: 1.02,
+    y: -4,
+    boxShadow: 'var(--shadow-ink-3)',
+    // The shadow steps one notch instantly (spec §5.8); only the lift
+    // (scale/y) rides the spring.
+    transition: { ...SPRING_HOVER, boxShadow: { duration: 0 } },
   },
-  hoverScale: { initial: { scale: 1 }, animate: { scale: 1.05 }, transition: SPRING_HOVER },
-  tapPress: { initial: { scale: 1 }, animate: { scale: 0.98 }, transition: SPRING_PRESS },
+  hoverScale: { scale: 1.05, transition: SPRING_HOVER },
+  tapPress: { scale: 0.98, transition: SPRING_PRESS },
   // Focus rings are state, not motion: the ring appears instantly and the
   // visible ring itself comes from the CSS `:focus-visible` rule.
-  focusRing: {
-    initial: { boxShadow: '0 0 0 0 var(--ring)' },
-    animate: { boxShadow: '0 0 0 3px var(--ring)' },
-    transition: { duration: 0 },
-  },
+  focusRing: { boxShadow: '0 0 0 3px var(--ring)', transition: { duration: 0 } },
 
   // Stagger container
   staggerContainer: { animate: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } },
@@ -110,20 +126,19 @@ export const motionVariants = {
 
   // Page transitions
   pageEnter: { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -24 }, transition: { duration: DUR_BASE, ease: EASE_SPRING } },
-
-  // Reduced-motion fallbacks — swapped in wholesale, never animated in a loop
-  reducedMotion: reducedMotionVariants,
 } as const
 
 export type MotionVariantKey = keyof typeof motionVariants
 
 /**
- * Returns `motionVariants`, or its `reducedMotion` fallbacks when the user
- * prefers reduced motion. Use it where a component would otherwise import
- * `motionVariants` directly, so loops stop and entrances become instant:
+ * Returns `motionVariants`, or `reducedMotionVariants` when the user prefers
+ * reduced motion. The two maps have exactly the same keys, so this is a true
+ * drop-in replacement for importing `motionVariants` directly — loops stop,
+ * entrances become instant, and gesture targets apply immediately:
  *
  *   const variants = useMotionVariants()
  *   <motion.div variants={variants.staggerItem} />
+ *   <motion.button whileHover={variants.hoverLift} />
  */
 export function useMotionVariants() {
   const reduced = useReducedMotion()

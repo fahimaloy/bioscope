@@ -1,20 +1,25 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { motionVariants } from '@/lib/motion'
+import { motionVariants, reducedMotionVariants, useMotionVariants } from '@/lib/motion'
+import type { MotionVariantKey } from '@/lib/motion'
 
 /**
  * Task 0.2 — motion contract.
  *
- * Pins three things the design contract (docs/DESIGN_CONTRACT.md §4) and the
+ * Pins four things the design contract (docs/DESIGN_CONTRACT.md §4) and the
  * task brief require of `src/lib/motion.ts`:
  *
  * 1. the public surface — every key the codebase consumes plus the legacy
- *    keys the brief keeps, all still valid Motion variant objects;
+ *    keys the brief keeps, all still valid Motion variant objects (the four
+ *    gesture keys excepted: they are target-only by design);
  * 2. the motion-token values — springs inside the spec §5.5 ranges and
  *    durations that do not outstay the 600ms entrance scene;
- * 3. the reduced-motion guarantee — no loop runs, and no content is left at
- *    `opacity: 0`, when the user prefers reduced motion.
+ * 3. the reduced-motion guarantee — `reducedMotionVariants` is a drop-in
+ *    with the same keys, no loop runs, and no content is left at
+ *    `opacity: 0`, when the user prefers reduced motion;
+ * 4. the gesture contract — the interactive keys are target-only maps that
+ *    ride the gesture props directly, and the hover shadow steps instantly.
  */
 
 const repoRoot = process.cwd()
@@ -23,8 +28,9 @@ const motionTokens = JSON.parse(
   readFileSync(path.join(repoRoot, 'tokens/src/motion.json'), 'utf8'),
 ) as Record<string, { $value: any }>
 
-/** The module's public surface as a plain record so the assertions can walk it. */
+/** The module's public surfaces as plain records so the assertions can walk them. */
 const variants = motionVariants as unknown as Record<string, Record<string, any>>
+const reduced = reducedMotionVariants as unknown as Record<string, Record<string, any>>
 
 /** `grep -rho 'motionVariants\.[a-zA-Z]*' src | sort -u` today. */
 const CONSUMED_KEYS = [
@@ -51,9 +57,14 @@ const LEGACY_KEYS = [
   'pageEnter',
 ]
 
-const REDUCED_MOTION = 'reducedMotion'
-
-const reduced = variants[REDUCED_MOTION] as Record<string, Record<string, any>>
+/**
+ * The gesture keys are target-only maps — the object *is* the hover/tap/focus
+ * target, passed straight to `whileHover={motionVariants.hoverLift}`. They
+ * deliberately have no `initial`/`animate`: wrapping them in a rest→target set
+ * is what made `whileHover="animate"` a silent no-op (a gesture label only
+ * resolves against the element's own `variants` prop).
+ */
+const GESTURE_KEYS = ['hoverLift', 'hoverScale', 'tapPress', 'focusRing']
 
 function isObject(value: unknown): value is Record<string, any> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -81,20 +92,43 @@ describe('motion variants', () => {
     }
   })
 
-  it('exposes a valid Motion variant object for every key except the reducedMotion sub-map', () => {
-    // `reducedMotion` is a nested map of fallback variants, not a variant
-    // itself: it is swapped in wholesale when the user prefers reduced
-    // motion, so its children — not the map — are variant objects. Asserting
-    // `initial`/`animate` on the map would force flattening it into a single
-    // variant and lose the per-variant fallbacks.
+  it('exposes a valid Motion variant object for every non-gesture key', () => {
+    // The gesture keys are target-only by design (see GESTURE_KEYS); the
+    // `reducedMotion` sub-map is gone — its fallback map is now a top-level
+    // export with the same keys as `motionVariants`.
     for (const [key, variant] of Object.entries(variants)) {
-      if (key === REDUCED_MOTION) continue
+      if (GESTURE_KEYS.includes(key)) continue
       expect(isObject(variant), `${key} is an object`).toBe(true)
       expect(
         isObject(variant.initial) || isObject(variant.animate),
         `${key} defines an initial and/or animate target`,
       ).toBe(true)
     }
+  })
+
+  it('keeps the gesture keys target-only, with their transition at the top level', () => {
+    for (const key of GESTURE_KEYS) {
+      const variant = variants[key]
+      expect(variant.initial, `${key} has no initial`).toBeUndefined()
+      expect(variant.animate, `${key} has no animate`).toBeUndefined()
+      expect(isObject(variant.transition), `${key} carries its transition`).toBe(true)
+    }
+  })
+
+  it('gives reducedMotionVariants exactly the same keys as motionVariants', () => {
+    expect(Object.keys(reduced).sort()).toEqual(Object.keys(variants).sort())
+  })
+
+  it('types useMotionVariants() as a drop-in for motionVariants', () => {
+    // Regression guard for the finding that `useMotionVariants().hoverLift`
+    // (and the other gesture keys) failed with TS2339 while the hook was
+    // documented as a substitute for importing `motionVariants` directly.
+    type Hook = ReturnType<typeof useMotionVariants>
+    expectTypeOf<Hook>().toHaveProperty('hoverLift')
+    expectTypeOf<Hook>().toHaveProperty('hoverScale')
+    expectTypeOf<Hook>().toHaveProperty('tapPress')
+    expectTypeOf<Hook>().toHaveProperty('focusRing')
+    expectTypeOf<keyof Hook>().toEqualTypeOf<MotionVariantKey>()
   })
 
   it('staggerContainer staggers its children', () => {
@@ -104,9 +138,7 @@ describe('motion variants', () => {
   })
 
   it('gives every looping variant a reduced-motion fallback that stops the loop', () => {
-    const looping = Object.entries(variants).filter(
-      ([key, variant]) => key !== REDUCED_MOTION && loopsForever(variant),
-    )
+    const looping = Object.entries(variants).filter(([, variant]) => loopsForever(variant))
     expect(looping.length, 'the module still has looping variants').toBeGreaterThan(0)
 
     for (const [key] of looping) {
@@ -147,7 +179,6 @@ describe('motion variants', () => {
     const springs: Array<Record<string, any>> = []
 
     for (const [key, variant] of Object.entries(variants)) {
-      if (key === REDUCED_MOTION) continue
       const transition = transitionOf(variant)
       if (transition?.type === 'spring') springs.push({ key, ...transition })
     }
@@ -170,12 +201,18 @@ describe('motion variants', () => {
     expect(transitionOf(variants.hoverLift)).toMatchObject({ type: 'spring', ...hover })
   })
 
+  it('steps the hover shadow instantly while the lift rides the spring', () => {
+    const transition = transitionOf(variants.hoverLift)
+    expect(transition?.type).toBe('spring')
+    expect(transition?.boxShadow).toMatchObject({ duration: 0 })
+  })
+
   it('derives its durations from the motion tokens and caps non-looping motion at 600ms', () => {
     expect(transitionOf(variants.fadeIn)?.duration).toBe(seconds('dur-base'))
     expect(transitionOf(variants.tapPress)?.duration).toBeUndefined()
 
     for (const [key, variant] of Object.entries(variants)) {
-      if (key === REDUCED_MOTION || loopsForever(variant)) continue
+      if (loopsForever(variant)) continue
       const duration = transitionOf(variant)?.duration
       if (typeof duration === 'number') {
         expect(duration, `${key} duration`).toBeLessThanOrEqual(0.6)
