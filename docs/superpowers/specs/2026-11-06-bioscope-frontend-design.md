@@ -179,10 +179,13 @@ Authored as DTCG JSON in `tokens/`, compiled by Style Dictionary into CSS variab
 --text-subtle    → --ink-muted
 --text-inverse   → --paper-raised
 --border         → --ink
---border-strong  → --ink
 --ring           → --gold
 --overlay        → color-mix(--ink, 55% transparent)
 ```
+
+`--border-strong` is deliberately **not** a color alias: it is the shape token
+from §5.4 (`3px solid var(--ink)`). Defining it in both places would collide,
+and a second alias to `--ink` would add nothing beyond `--border`.
 
 **Every accent gets an explicit "on" color, and the pairing is measured, not assumed.** White on `--pink` (#E91E63) is 4.35:1 — below AA. Ink on `--violet` is 2.68:1, ink on `--red` is 3.69:1, ink on `--green` is 4.11:1 — all below AA. So the token layer defines an `--on-<accent>` pairing for every accent that carries text:
 
