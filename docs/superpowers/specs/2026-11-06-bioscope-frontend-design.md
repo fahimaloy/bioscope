@@ -165,7 +165,7 @@ Authored as DTCG JSON in `tokens/`, compiled by Style Dictionary into CSS variab
 
 ```
 --brand          → --pink
---on-brand       → --ink
+--on-brand       → #FFFFFF (used ONLY against --pink-strong, never on --pink)
 --accent         → --gold
 --info           → --blue
 --success        → --green
