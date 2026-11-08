@@ -1,15 +1,20 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
-import { Shantell_Sans, Caveat, Nunito } from 'next/font/google'
+import { Shrikhand, Outfit, Caveat } from 'next/font/google'
 import { MotionConfig } from 'framer-motion'
 import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from 'sonner'
 import { Footer } from '@/components/layout/Footer'
 
-const shantell = Shantell_Sans({ subsets: ['latin'], variable: '--font-display', display: 'swap', weight: ['400','700','800'] })
-const caveat = Caveat({ subsets: ['latin'], variable: '--font-hand', display: 'swap', weight: ['400','600','700'] })
-const nunito = Nunito({ subsets: ['latin'], variable: '--font-body', display: 'swap', weight: ['300','400','600','800'] })
+/**
+ * Self-hosted via next/font (spec §5.3): Shrikhand for display, Outfit for
+ * body, Caveat for annotations. The `--font-*` variables are mapped into
+ * Tailwind (`fontFamily.display/body/hand`) and into `globals.css`.
+ */
+const shrikhand = Shrikhand({ subsets: ['latin'], variable: '--font-display', display: 'swap', weight: '400' })
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-body', display: 'swap', weight: ['400', '500', '600', '700'] })
+const caveat = Caveat({ subsets: ['latin'], variable: '--font-hand', display: 'swap', weight: ['400', '600', '700'] })
 
 
 const siteUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
@@ -53,7 +58,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: 'var(--primary)',
+  themeColor: 'var(--pink)',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -65,14 +70,12 @@ export default function RootLayout({
   children: ReactNode
 }) {
   return (
-    <html lang="en" className={`${shantell.variable} ${caveat.variable} ${nunito.variable} scroll-smooth`}>
+    <html lang="en" className={`${shrikhand.variable} ${outfit.variable} ${caveat.variable} scroll-smooth`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://utfs.io" />
       </head>
-      <body className="min-h-screen bg-[var(--bg-color)] font-body antialiased flex flex-col">
+      <body className="min-h-screen bg-paper font-body antialiased flex flex-col">
         <MotionConfig reducedMotion="user">
           <Providers>
             <main className="flex-1">{children}</main>
