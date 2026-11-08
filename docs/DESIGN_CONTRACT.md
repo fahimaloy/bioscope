@@ -129,7 +129,7 @@ tests/**  e2e/**   (beyond updating visual baselines)
 - GitNexus `impact --direction upstream` before editing any symbol; never
   substitute grep for graph analysis.
 
-### GitNexus `detect-changes` and comment-only edits
+### GitNexus `detect-changes` and files it cannot map
 
 `detect-changes` diffs with `-U0` and tests each hunk's new-side line numbers
 against symbol spans **as indexed at the parent commit**. A JSDoc or comment
@@ -140,12 +140,25 @@ that is a workaround for a constraint that does not exist, and `pnpm format`
 would undo it anyway. Two independent runs confirmed the conventional two-line
 form maps every symbol and exits 0.
 
-Files that genuinely cannot map, and are not failures:
-- brand-new files with no indexed symbols — the gate lists them under "No
-  symbols mapped for changed source files" and still exits 0;
-- files that previously had no indexed symbol at all — a config with an
-  anonymous `export default defineConfig({...})` has none, which is why
-  `vitest.config.ts` names its config.
+A changed file that contains **no indexed symbol** cannot be mapped. The gate
+still exits 0, but it prints:
+
+```
+PARTIAL RESULT: changed-symbol or process mapping is incomplete.
+Do not read this as a clean pre-commit check.
+No symbols mapped for changed source files: <file>.
+```
+
+That is a warning, not a pass — the pre-commit check is not clean. Give the
+file a real symbol rather than accepting the warning:
+
+- a barrel should export a manifest constant, as `src/components/ui/index.ts`
+  does with `UI_PRIMITIVE_EXPORTS` (which also pins the API surface against
+  `tests/unit/components/primitives.test.tsx`);
+- a config with an anonymous `export default defineConfig({...})` has no
+  symbol at all, which is why `vitest.config.ts` names its config;
+- brand-new files behave the same way until the index catches up — re-run
+  `node .gitnexus/run.cjs analyze --index-only` and re-check.
 
 ## 9. Copy
 
