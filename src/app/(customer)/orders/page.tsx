@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, CUSTOMER_CANCELLABLE } from '@/lib/order-status'
 import { Eye, Package, Truck, ChevronDown, ChevronUp } from 'lucide-react'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { motion, AnimatePresence } from 'framer-motion'
 import { motionVariants } from '@/lib/motion'
 
@@ -112,7 +112,7 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      <DoodleScatter count={3} />
+      <DoodleBackground shapeCount={3} />
       <div className="max-w-5xl mx-auto">
         <h1 className="font-display text-3xl text-primary mb-6">My Orders</h1>
 

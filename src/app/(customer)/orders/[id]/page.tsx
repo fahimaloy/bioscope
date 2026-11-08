@@ -14,7 +14,7 @@ import { ArrowLeft, Truck, MapPin, CreditCard, RotateCcw, Download, MessageCircl
 import { motion, AnimatePresence } from 'framer-motion'
 import { motionVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 
 interface Order {
   id: string
@@ -123,7 +123,7 @@ export default function OrderDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-        <DoodleScatter count={3} />
+        <DoodleBackground shapeCount={3} />
         <div className="max-w-5xl mx-auto space-y-4">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-48 w-full rounded-card" />
@@ -227,7 +227,7 @@ export default function OrderDetailPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      <DoodleScatter count={3} />
+      <DoodleBackground shapeCount={3} />
       <div className="max-w-5xl mx-auto">
         <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[var(--ink)]/60 hover:text-primary mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to orders

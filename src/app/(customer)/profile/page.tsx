@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/Badge'
 import { formatDate } from '@/lib/utils'
 import { User, Lock, Camera, Save, Eye, EyeOff, MapPin, Plus, Trash2, Edit, Check, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { motion } from 'framer-motion'
 import { motionVariants } from '@/lib/motion'
 
@@ -883,7 +883,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      <DoodleScatter count={3} />
+      <DoodleBackground shapeCount={3} />
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

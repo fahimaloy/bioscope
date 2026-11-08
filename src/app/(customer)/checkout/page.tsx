@@ -20,7 +20,7 @@ import { createOrder } from '@/lib/actions/order'
 import { getSettings } from '@/lib/actions/settings'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { motion } from 'framer-motion'
 
 const STEPS = ['address', 'payment', 'review', 'confirmation'] as const
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-color)] relative pt-24 pb-12 px-4">
-      <DoodleScatter count={6} />
+      <DoodleBackground shapeCount={6} />
       
       <div className="max-w-7xl mx-auto">
         {/* Progress Stepper */}

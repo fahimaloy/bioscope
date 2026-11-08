@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { DoodleStar, StickerPeel, TornEdge, WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
 import { ProductCard } from '@/components/product/ProductCard'
 import { Button } from '@/components/ui/Button'
@@ -42,7 +42,7 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative pt-28 pb-16 px-4 text-center min-h-[90vh] flex items-center justify-center">
-        <DoodleScatter count={8} interactive={true} />
+        <DoodleBackground shapeCount={8} interactive={true} />
         
         {/* Floating emojis */}
         <div className="floating-emojis pointer-events-none absolute inset-0" aria-hidden="true">
@@ -304,7 +304,7 @@ export default function HomePage() {
             transition={{ duration: 0.5 }}
           >
             {/* Decorative scatter in CTA */}
-            <DoodleScatter count={4} className="opacity-20" />
+            <DoodleBackground shapeCount={4} className="opacity-20" />
             
             <motion.h2
               className="font-[var(--font-display)] text-3xl md:text-5xl mb-4 relative z-10"

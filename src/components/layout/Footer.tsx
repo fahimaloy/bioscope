@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { WashiTape, SketchUnderline, DoodleShape, DoodleStar } from '@/components/decorative/DoodleElements'
 import { motionVariants } from '@/lib/motion'
 
@@ -65,7 +65,7 @@ export function Footer() {
   return (
     <footer className="relative bg-[var(--bg-color)] text-[var(--ink)] pt-20 pb-12 overflow-hidden">
       {/* Doodle Background - replaces old bg-shapes system */}
-      <DoodleScatter count={8} />
+      <DoodleBackground shapeCount={8} />
       
       {/* Decorative corner doodles */}
       <DoodleShape size="lg" color="primary" animation="float" className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 opacity-20" />

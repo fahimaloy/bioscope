@@ -9,7 +9,7 @@ import { registerSchema, type RegisterInput } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
 import { motion } from 'framer-motion'
 import { Check, X, Eye, EyeOff } from 'lucide-react'
@@ -109,7 +109,7 @@ function RegisterForm() {
   return (
     <div className="min-h-screen bg-[var(--bg-color)] flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Doodle background scatter */}
-      <DoodleScatter count={4} className="pointer-events-none" />
+      <DoodleBackground shapeCount={4} className="pointer-events-none" />
       
       {/* Floating emoji decorations */}
       <div className="floating-emojis pointer-events-none" aria-hidden="true">

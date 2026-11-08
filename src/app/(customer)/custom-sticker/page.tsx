@@ -1,6 +1,6 @@
 'use client'
 
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -202,7 +202,7 @@ export default function CustomStickerPage() {
   return (
     <div className="min-h-screen bg-[linear-gradient(90deg,transparent_95%,rgba(51,38,26,0.05)_95%),linear-gradient(rgba(51,38,26,0.05)_1px,transparent_1px)] bg-[length:20px_20px]">
       {/* Doodle Scatter Background */}
-      <DoodleScatter count={6} className="pointer-events-none fixed inset-0 z-0" />
+      <DoodleBackground shapeCount={6} className="pointer-events-none fixed inset-0 z-0" />
 
       {/* Mobile Tab Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--paper-deep)] border-t-3 border-[var(--ink)] shadow-[0_-10px_30px_rgba(51,38,26,0.1)] animate-slide-up">

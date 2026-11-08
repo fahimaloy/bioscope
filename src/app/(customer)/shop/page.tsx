@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ProductGrid } from '@/components/product'
-import { DoodleScatter } from '@/components/decorative/DoodleScatter'
+import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
@@ -89,7 +89,7 @@ export default function ShopPage() {
     <div className="min-h-screen bg-[var(--bg-color)]">
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8">
-        <DoodleScatter count={3} className="absolute top-0 left-0 w-full h-full" />
+        <DoodleBackground shapeCount={3} className="absolute top-0 left-0 w-full h-full" />
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="staggered-title text-6xl md:text-8xl mb-6">Our Stickers</h1>
           <p className="subtitle text-2xl md:text-3xl mb-8 max-w-2xl mx-auto">
