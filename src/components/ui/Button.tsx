@@ -27,10 +27,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * type size step between sizes.
  */
 const sizeStyles: Record<NonNullable<ButtonProps['size']>, string> = {
-  sm: 'min-h-[44px] px-4 py-2 text-sm',
-  md: 'min-h-[48px] px-6 py-3 text-base',
-  lg: 'min-h-[56px] px-8 py-4 text-lg',
-  xl: 'min-h-[64px] px-10 py-5 text-xl',
+  sm: 'min-h-[44px] px-4 py-2 text-base',
+  md: 'min-h-[48px] px-6 py-3 text-lg',
+  lg: 'min-h-[56px] px-8 py-4 text-xl',
+  xl: 'min-h-[64px] px-10 py-5 text-2xl',
 };
 
 /**

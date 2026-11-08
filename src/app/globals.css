@@ -649,6 +649,44 @@ input[type="checkbox"], input[type="radio"] {
   accent-color: var(--primary);
 }
 
+/* Range inputs — ColorPicker's HSL ramps use `appearance-none`, which removes
+   the native thumb. Without an explicit thumb rule the control renders as a
+   bare track. Tokens only. */
+input[type="range"] {
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -5px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-ink-1);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow-ink-1);
+}
+
 /* Image Optimization */
 img {
   max-width: 100%;

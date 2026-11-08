@@ -16,7 +16,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createRef } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import type { BadgeProps, CardProps } from '@/components/ui';
+import type { BadgeProps, ButtonProps, CardProps } from '@/components/ui';
 import {
   Accordion,
   ColorPicker,
@@ -117,6 +117,21 @@ describe('Button', () => {
     const { container, unmount } = render(<Button variant="no-such-variant">Go</Button>);
     expect(rootClasses(container)).toContain('bg-[var(--gold)]');
     unmount();
+  });
+
+  it('keeps the restored type scale at every size', () => {
+    const sizes: Array<{ size: NonNullable<ButtonProps['size']>; text: string }> = [
+      { size: 'sm', text: 'text-base' },
+      { size: 'md', text: 'text-lg' },
+      { size: 'lg', text: 'text-xl' },
+      { size: 'xl', text: 'text-2xl' },
+    ];
+
+    for (const { size, text } of sizes) {
+      const { container, unmount } = render(<Button size={size}>Go</Button>);
+      expect(rootClasses(container), `size ${size} uses ${text}`).toContain(text);
+      unmount();
+    }
   });
 
   it('forwards ref, merges className, and disables itself while loading', () => {
@@ -347,6 +362,46 @@ describe('Checkbox', () => {
 
     fireEvent.click(box!);
     expect(box!.getAttribute('aria-checked')).toBe('true');
+    unmount();
+  });
+});
+
+/* ------------------------------------------------------------------ */
+/* ColorPicker                                                          */
+/* ------------------------------------------------------------------ */
+
+describe('ColorPicker', () => {
+  it('emits a fabric-parseable colour, not a CSS custom property, for a preset', () => {
+    const onChange = vi.fn();
+    const { container, unmount } = render(<ColorPicker value="#000000" onChange={onChange} />);
+
+    // jsdom does not resolve custom properties from stylesheets, so stub the
+    // resolver's lookup to stand in for the browser.
+    const getComputedStyleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+      getPropertyValue: (name: string) => (name === '--pink' ? '#E91E63' : ''),
+    } as unknown as CSSStyleDeclaration);
+
+    fireEvent.click(container.querySelector('button')!);
+    fireEvent.click(screen.getByRole('button', { name: 'var(--pink)' }));
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const emitted = onChange.mock.calls[0][0];
+    // fabric's `_tryParsingColor` cannot parse `var(--…)` and would render black.
+    expect(emitted).toBe('#E91E63');
+    expect(emitted).toMatch(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+
+    getComputedStyleSpy.mockRestore();
+    unmount();
+  });
+
+  it('keeps the preset list token-only', () => {
+    const { container, unmount } = render(<ColorPicker value="#000000" onChange={() => {}} />);
+    fireEvent.click(container.querySelector('button')!);
+
+    const presets = screen
+      .getAllByRole('button')
+      .filter((button) => (button.getAttribute('aria-label') ?? '').startsWith('var(--'));
+    expect(presets).toHaveLength(12);
     unmount();
   });
 });
@@ -617,11 +672,31 @@ describe('token-only utility audit', () => {
     'var(--text-primary)',
     'var(--tertiary)',
     'var(--bg-color)',
+    'backdrop-blur',
+  ];
+
+  /**
+   * Contract §5's "no gradients" rule is scoped to brand colour blocks on
+   * section bands and CTAs. A colour picker's hue/saturation/lightness ramps
+   * are the control's own functional affordance, so gradient utilities are
+   * deliberately absent from `BANNED_SUBSTRINGS` — but the ban still holds
+   * everywhere else. `gradientOffenders` below enforces that carve-out: a
+   * gradient may only appear on a `ColorPicker` range input. Raw hex and the
+   * legacy `var(--…)` tokens remain banned everywhere, including the ramps.
+   */
+  const GRADIENT_UTILITIES = [
     'bg-gradient-to-r',
     'bg-gradient-to-l',
     'bg-gradient-to-b',
-    'backdrop-blur',
+    'linear-gradient',
   ];
+
+  /** Elements carrying a gradient that are not ColorPicker range inputs. */
+  const gradientOffenders = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll('[class]')).filter((el) => {
+      const cls = el.getAttribute('class') ?? '';
+      return GRADIENT_UTILITIES.some((g) => cls.includes(g)) && !el.matches('input[type="range"]');
+    });
 
   /** Raw hex and rgb() literals — contract §1. */
   const BANNED_PATTERN = /(#(?:[0-9a-fA-F]{3,8})\b|rgba?\()/i;
@@ -669,8 +744,12 @@ describe('token-only utility audit', () => {
         </Tooltip>
         <Skeleton width={80} height={16} />
         <Pagination currentPage={2} totalPages={5} onPageChange={() => {}} />
+        <ColorPicker value="#000000" onChange={() => {}} />
       </div>
     );
+
+    // Open the picker so its range ramps are part of the audited tree.
+    fireEvent.click(container.querySelector('[aria-haspopup="dialog"]')!);
 
     const classes = renderedClasses(container);
     const offenders = classes.filter(
@@ -678,6 +757,28 @@ describe('token-only utility audit', () => {
     );
 
     expect(offenders).toEqual([]);
+    // The gradient carve-out is scoped to ColorPicker's range inputs.
+    expect(gradientOffenders(container)).toEqual([]);
+    unmount();
+  });
+
+  it('keeps gradients only on the ColorPicker range ramps', () => {
+    const { container, unmount } = render(
+      <ColorPicker value="#333333" onChange={() => {}} showAlpha />
+    );
+    fireEvent.click(container.querySelector('button')!);
+
+    const ranges = Array.from(container.querySelectorAll('input[type="range"]'));
+    expect(ranges).toHaveLength(4);
+    for (const range of ranges) {
+      const cls = range.getAttribute('class') ?? '';
+      expect(cls, 'the range ramp carries a functional gradient').toMatch(/gradient/i);
+      // The ramp stops are tokens, never raw hex.
+      expect(cls).not.toMatch(BANNED_PATTERN);
+    }
+
+    // Nothing else in the picker may carry a gradient.
+    expect(gradientOffenders(container)).toEqual([]);
     unmount();
   });
 });

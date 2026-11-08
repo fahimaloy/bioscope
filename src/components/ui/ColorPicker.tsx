@@ -18,8 +18,10 @@ interface ColorPickerProps {
 /**
  * Presets are CSS custom properties, not hex literals (contract §1). The HSL
  * sliders need a real colour to work from, so `resolveHex` reads the computed
- * value of the token in the browser; a preset that cannot be resolved keeps
- * the previous slider position rather than snapping to black.
+ * value of the token in the browser. Presets are resolved to hex at the output
+ * boundary (`handlePresetClick`) because fabric.js cannot parse CSS custom
+ * properties; a value that cannot be resolved falls back to black, matching
+ * fabric's own `_tryParsingColor` fallback.
  */
 const DEFAULT_PRESETS = [
   'var(--pink)',
@@ -80,10 +82,19 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function
   }, []);
 
   const handlePresetClick = (color: string) => {
-    setCurrentColor(color);
-    onChange(color);
+    // fabric's `_tryParsingColor` cannot parse CSS custom properties: a
+    // `var(--…)` value would render as opaque black. Resolve the token to a
+    // hex string at the primitive's output boundary; the preset list itself
+    // stays token-only (contract §1).
+    const resolved = resolveHex(color) ?? color;
+    setCurrentColor(resolved);
+    onChange(resolved);
     setIsOpen(false);
   };
+
+  /** True when a preset is the current colour, comparing resolved values. */
+  const isPresetActive = (preset: string) =>
+    preset === currentColor || resolveHex(preset) === currentColor;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const color = e.target.value;
@@ -166,14 +177,14 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function
                   className={cn(
                     'h-8 w-8 rounded-full border-2 border-[var(--ink)] transition-transform duration-fast ease-spring',
                     'hover:scale-110',
-                    color === currentColor &&
+                    isPresetActive(color) &&
                       'scale-110 ring-2 ring-[var(--ink)] ring-offset-2 ring-offset-[var(--surface-raised)]',
                     'disabled:cursor-not-allowed disabled:opacity-50',
                     FOCUS_VISIBLE
                   )}
                   style={{ backgroundColor: color }}
                   aria-label={color}
-                  aria-pressed={color === currentColor}
+                  aria-pressed={isPresetActive(color)}
                 />
               ))}
             </div>
@@ -195,7 +206,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function
                   setCurrentColor(newColor);
                   onChange(newColor);
                 }}
-                className="h-2 w-full appearance-none rounded-full bg-[var(--paper-deep)]"
+                className="h-2 w-full appearance-none rounded-full bg-gradient-to-r from-[var(--red)] via-[var(--gold)] to-[var(--violet)]"
                 disabled={disabled}
                 aria-label="Hue"
               />
@@ -217,7 +228,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function
                   setCurrentColor(newColor);
                   onChange(newColor);
                 }}
-                className="h-2 w-full appearance-none rounded-full bg-[var(--paper-deep)]"
+                className="h-2 w-full appearance-none rounded-full bg-gradient-to-r from-[var(--ink-muted)] to-[var(--pink)]"
                 disabled={disabled}
                 aria-label="Saturation"
               />
@@ -239,7 +250,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function
                   setCurrentColor(newColor);
                   onChange(newColor);
                 }}
-                className="h-2 w-full appearance-none rounded-full bg-[var(--paper-deep)]"
+                className="h-2 w-full appearance-none rounded-full bg-gradient-to-r from-[var(--ink)] to-[var(--paper-raised)]"
                 disabled={disabled}
                 aria-label="Lightness"
               />
@@ -257,7 +268,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function
                   step="0.01"
                   value={currentColor.length === 9 ? parseInt(currentColor.slice(7), 16) / 255 : 1}
                   onChange={handleAlphaChange}
-                  className="h-2 w-full appearance-none rounded-full bg-[var(--paper-deep)]"
+                  className="h-2 w-full appearance-none rounded-full bg-gradient-to-r from-transparent to-[var(--pink)]"
                   disabled={disabled}
                   aria-label="Opacity"
                 />
