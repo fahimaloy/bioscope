@@ -129,6 +129,24 @@ tests/**  e2e/**   (beyond updating visual baselines)
 - GitNexus `impact --direction upstream` before editing any symbol; never
   substitute grep for graph analysis.
 
+### GitNexus `detect-changes` and comment-only edits
+
+`detect-changes` diffs with `-U0` and tests each hunk's new-side line numbers
+against symbol spans **as indexed at the parent commit**. A JSDoc or comment
+inserted above an `export` lands inside that indexed span, so it always maps.
+
+Do **not** join a doc comment onto the `export` line to "satisfy" the gate —
+that is a workaround for a constraint that does not exist, and `pnpm format`
+would undo it anyway. Two independent runs confirmed the conventional two-line
+form maps every symbol and exits 0.
+
+Files that genuinely cannot map, and are not failures:
+- brand-new files with no indexed symbols — the gate lists them under "No
+  symbols mapped for changed source files" and still exits 0;
+- files that previously had no indexed symbol at all — a config with an
+  anonymous `export default defineConfig({...})` has none, which is why
+  `vitest.config.ts` names its config.
+
 ## 9. Copy
 
 - English only.
