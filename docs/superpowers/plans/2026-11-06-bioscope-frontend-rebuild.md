@@ -710,6 +710,52 @@ git commit -m "fix(theme): remap shared utility rules onto defined tokens"
 
 ---
 
+### Task 1.7: Replace opacity-modified `var()` arbitrary values with `color-mix`
+
+**Files:**
+- Modify: all of `src/**` (mechanical rewrite, ~509 occurrences at the time of writing)
+- Test: `tests/unit/tailwind-opacity.test.ts`
+
+**Interfaces:**
+- Consumes: the token set (T0.1)
+- Produces: an invariant — no utility class anywhere in `src/` uses the opacity-modifier form on a `var()` arbitrary value, because Tailwind 3.4 silently drops it.
+
+- [ ] **Step 1: Write the failing test**
+
+`tests/unit/tailwind-opacity.test.ts` scans every `.tsx`/`.ts` file under `src/` for the pattern `[a-z-]+-\[var\(--[a-z0-9-]+\]/[0-9]+` and asserts zero matches, printing each offending file:line. It must ignore comments.
+
+- [ ] **Step 2: Run to verify it fails**
+
+Run: `pnpm vitest run tests/unit/tailwind-opacity.test.ts`
+Expected: FAIL, listing ~509 occurrences.
+
+- [ ] **Step 3: Rewrite**
+
+Every occurrence becomes the `color-mix` form, preserving any variant prefix:
+`text-[var(--ink)]/60` → `text-[color-mix(in_srgb,var(--ink)_60%,transparent)]`
+`hover:border-[var(--paper)]/20` → `hover:border-[color-mix(in_srgb,var(--paper)_20%,transparent)]`
+
+Underscores become spaces in Tailwind arbitrary values, so `in_srgb` and the `60%` separator must be written with underscores. Verified working against this exact Tailwind version.
+
+- [ ] **Step 4: Run to verify it passes**
+
+Run: `pnpm vitest run tests/unit/tailwind-opacity.test.ts`
+Expected: PASS.
+
+- [ ] **Step 5: Verify**
+
+Run: `pnpm verify`
+Expected: all gates pass.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src tests/unit/tailwind-opacity.test.ts
+git commit -m "fix(theme): replace no-op var() opacity modifiers with color-mix"
+```
+
+---
+
 ### Task 2.1: Landing page
 
 **Files:**
