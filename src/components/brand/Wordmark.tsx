@@ -87,7 +87,11 @@ const ACCENT_COLORS = {
  */
 const DIE_CUT_FILTER = {
   className: 'die-cut-mark',
-  raw: `drop-shadow(0 0 1px ${colorTokens['die-cut'].$value}) drop-shadow(1px 1px 0 ${colorTokens.ink.$value})`,
+  // Ink offset first, white halo last: a later drop-shadow paints over an
+  // earlier one, so white-first lets the ink shadow cover the halo and leaves
+  // a one-sided sliver at `sm` (21 lighter px, max +3) instead of a ring
+  // (117 px, max +15). See the `.die-cut-mark` rule in globals.css.
+  raw: `drop-shadow(1px 1px 0 ${colorTokens.ink.$value}) drop-shadow(0 0 1px ${colorTokens['die-cut'].$value})`,
 } as const
 
 /**

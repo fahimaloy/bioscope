@@ -96,7 +96,7 @@ describe('Wordmark', () => {
 
     expect(img, 'the raw path renders an img').not.toBeNull()
     expect(img!.style.filter).toBe(
-      'drop-shadow(0 0 1px #FFFFFF) drop-shadow(1px 1px 0 #241B12)'
+      'drop-shadow(1px 1px 0 #241B12) drop-shadow(0 0 1px #FFFFFF)'
     )
   })
 
