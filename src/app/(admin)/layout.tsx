@@ -25,6 +25,13 @@ import { useAuth } from '@/lib/hooks/useAuth'
  * The `isAdmin` guard is unchanged: a non-admin gets the Access Denied state
  * and no sidebar (Ruling 2). `src/middleware.ts` is the primary gate; this
  * is the backstop. The logout action is unchanged.
+ *
+ * Geometry: the top bar reserves its own in-flow slot with `pt-16` on the
+ * content column below, so the `sticky top-16` bar occupies y=64–128 and the
+ * page content starts at y=128. Without that offset the bar's in-flow slot is
+ * y=0–64, `sticky top-16` paints it at y=64–128, and it covers the first 40px
+ * of the content column. `tests/unit/components/admin-sidebar.test.tsx` pins
+ * this with a geometric assertion.
  */
 
 const pageNames: Record<string, string> = {
@@ -74,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div
         className={cn(
-          'flex min-h-screen flex-col transition-[margin] duration-base ease-out',
+          'flex min-h-screen flex-col pt-16 transition-[margin] duration-base ease-out',
           sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
         )}
       >

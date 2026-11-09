@@ -88,10 +88,12 @@ export function AdminSidebar({
 
   return (
     <>
-      {/* Mobile overlay — `--overlay` is the token-system scrim. */}
+      {/* Mobile overlay — `--overlay` is the token-system scrim. It sits above
+          the admin header (z-40) so the whole page dims while the sidebar is
+          open, not just the content column. */}
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-[var(--overlay)] transition-opacity duration-base lg:hidden',
+          'fixed inset-0 z-[var(--z-modal-backdrop)] bg-[var(--overlay)] transition-opacity duration-base lg:hidden',
           mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
         onClick={onCloseMobile}
@@ -140,7 +142,7 @@ export function AdminSidebar({
           <button
             onClick={onCloseMobile}
             className={cn(
-              'absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--ink)] transition-colors duration-fast hover:text-[var(--teal)] lg:hidden',
+              'absolute right-2 top-1/2 flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center p-2 text-[var(--ink)] transition-colors duration-fast hover:text-[var(--teal)] lg:hidden',
               FOCUS_VISIBLE
             )}
             aria-label="Close sidebar"
@@ -152,7 +154,7 @@ export function AdminSidebar({
           <button
             onClick={onToggleCollapse}
             className={cn(
-              'hidden p-2 text-[var(--ink)] transition-colors duration-fast hover:text-[var(--teal)] lg:flex',
+              'hidden min-h-[44px] min-w-[44px] items-center justify-center p-2 text-[var(--ink)] transition-colors duration-fast hover:text-[var(--teal)] lg:flex',
               collapsed && 'mx-auto',
               FOCUS_VISIBLE
             )}
@@ -175,12 +177,12 @@ export function AdminSidebar({
                 href={item.href}
                 onClick={onCloseMobile}
                 className={cn(
-                  'group flex min-h-[44px] items-center gap-3 rounded-md border-l-2 px-3 text-sm font-medium',
+                  'group relative flex min-h-[44px] items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-sm font-medium',
                   'transition-colors duration-fast',
                   FOCUS_VISIBLE,
                   isActive
-                    ? 'border-[var(--gold)] bg-[var(--surface-sunken)] text-[var(--ink)]'
-                    : 'border-transparent text-[var(--text-muted)] hover:bg-[var(--surface-sunken)] hover:text-[var(--ink)]',
+                    ? 'border-l-[var(--gold)] bg-[var(--surface-sunken)] text-[var(--ink)]'
+                    : 'text-[var(--text-muted)] hover:bg-[var(--surface-sunken)] hover:text-[var(--ink)]',
                   collapsed && 'justify-center px-2'
                 )}
                 aria-current={isActive ? 'page' : undefined}
@@ -202,7 +204,7 @@ export function AdminSidebar({
                       <Badge
                         variant="default"
                         size="sm"
-                        className="ml-auto animate-shimmer border-transparent bg-[var(--teal)] text-[var(--on-teal)]"
+                        className="ml-auto animate-pulse-soft border-transparent bg-[var(--teal)] text-[var(--on-teal)]"
                       >
                         {badgeValue > 99 ? '99+' : badgeValue}
                       </Badge>
@@ -211,7 +213,7 @@ export function AdminSidebar({
                 )}
                 {collapsed && badgeValue !== null && badgeValue > 0 && (
                   <span
-                    className="absolute right-2 top-2 h-2.5 w-2.5 animate-shimmer rounded-full bg-[var(--teal)]"
+                    className="absolute right-2 top-2 h-2.5 w-2.5 animate-pulse-soft rounded-full bg-[var(--teal)]"
                     aria-label={`${item.name} has pending items`}
                   />
                 )}
@@ -232,10 +234,10 @@ export function AdminSidebar({
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      'flex min-h-[44px] items-center gap-3 rounded-md px-3 text-sm transition-colors duration-fast',
+                      'flex min-h-[44px] items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-sm transition-colors duration-fast',
                       FOCUS_VISIBLE,
                       isActive
-                        ? 'bg-[var(--surface-sunken)] text-[var(--ink)]'
+                        ? 'border-l-[var(--gold)] bg-[var(--surface-sunken)] text-[var(--ink)]'
                         : 'text-[var(--text-subtle)] hover:bg-[var(--surface-sunken)] hover:text-[var(--ink)]'
                     )}
                     aria-current={isActive ? 'page' : undefined}

@@ -9,6 +9,10 @@
 // admin is calm pro: near-white surfaces, hairline borders, one teal accent,
 // a gold active bar, no offset shadows) and §6 (44px hit targets, visible
 // focus ring, semantic landmarks).
+//
+// The header/content geometry is asserted structurally rather than by pinning
+// class strings: the sticky top bar occupies y=64–128, so the content column
+// must reserve that slot. See the "does not overlap" test below.
 
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
@@ -18,6 +22,7 @@ import { AdminSidebar } from '@/components/layout/AdminSidebar'
 import AdminLayout from '@/app/(admin)/layout'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useNotificationStore } from '@/lib/stores/notificationStore'
+import { ADMIN_HEADER_HEIGHT_PX, CONTENT_TOP_PX } from '@/lib/layout-metrics'
 
 const { mockSignOut, mockLogout } = vi.hoisted(() => ({
   mockSignOut: vi.fn(),
@@ -131,6 +136,83 @@ function mobileOverlay(container: HTMLElement): HTMLElement | null {
   )
 }
 
+/** Tailwind spacing scale (rem → px at the default 16px root). */
+const TAILWIND_SPACING_PX: Record<string, number> = {
+  0: 0,
+  0.5: 2,
+  1: 4,
+  1.5: 6,
+  2: 8,
+  2.5: 10,
+  3: 12,
+  3.5: 14,
+  4: 16,
+  5: 20,
+  6: 24,
+  7: 28,
+  8: 32,
+  9: 36,
+  10: 40,
+  11: 44,
+  12: 48,
+  14: 56,
+  16: 64,
+  20: 80,
+  24: 96,
+  28: 112,
+  32: 128,
+  36: 144,
+  40: 160,
+  44: 176,
+  48: 192,
+  52: 208,
+  56: 224,
+  60: 240,
+  64: 256,
+  72: 288,
+  80: 320,
+  96: 384,
+}
+
+/**
+ * The resolved vertical padding (px) of an element, read from its own classes.
+ * Handles `pt-*` (top only) and `py-*` (both axes).
+ */
+function resolvedVerticalPaddingPx(el: HTMLElement): number {
+  const classes = (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean)
+
+  for (const cls of classes) {
+    const arbitrary = cls.match(/^p[ty]-\[([\d.]+)px\]$/)
+    if (arbitrary) return Number.parseFloat(arbitrary[1])
+
+    const scale = cls.match(/^p[ty]-([\d.]+)$/)
+    if (scale) {
+      const value = TAILWIND_SPACING_PX[scale[1]]
+      if (value !== undefined) return value
+    }
+  }
+  return 0
+}
+
+/** The resolved top padding (px) of an element, read from its own classes. */
+function resolvedTopPaddingPx(el: HTMLElement): number {
+  const classes = (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean)
+
+  for (const cls of classes) {
+    // Arbitrary value: pt-[64px].
+    const arbitrary = cls.match(/^pt-\[([\d.]+)px\]$/)
+    if (arbitrary) return Number.parseFloat(arbitrary[1])
+
+    // Scale value: pt-16.
+    const scale = cls.match(/^pt-([\d.]+)$/)
+    if (scale) {
+      const value = TAILWIND_SPACING_PX[scale[1]]
+      if (value !== undefined) return value
+    }
+  }
+  return 0
+}
+
 /** The sidebar landmark. */
 function sidebar(container: HTMLElement): HTMLElement | null {
   return container.querySelector('aside[aria-label="Admin navigation"]')
@@ -200,13 +282,81 @@ describe('AdminSidebar', () => {
 
     const products = screen.getByRole('link', { name: 'Products' })
     expect(products.getAttribute('aria-current')).toBe('page')
-    expect(products.className, 'the active item carries the gold bar').toContain(
-      'border-[var(--gold)]'
+    expect(products.className, 'the active item carries the gold left bar').toContain(
+      'border-l-[var(--gold)]'
     )
 
     const dashboard = screen.getByRole('link', { name: 'Dashboard' })
     expect(dashboard.getAttribute('aria-current')).toBeNull()
-    expect(dashboard.className).not.toContain('border-[var(--gold)]')
+    expect(dashboard.className).not.toContain('border-l-[var(--gold)]')
+  })
+
+  it('marks the active settings sub-nav item with the same gold left bar', () => {
+    navigation.pathname = '/admin/settings/tax'
+    render(<AdminSidebar />)
+
+    const tax = screen.getByRole('link', { name: 'Tax' })
+    expect(tax.getAttribute('aria-current')).toBe('page')
+    expect(tax.className, 'the sub-nav active item carries the gold bar too').toContain(
+      'border-l-[var(--gold)]'
+    )
+
+    // Prefix matching means the parent `General` route is also active here;
+    // that is the sidebar's pre-existing behaviour, not something this task
+    // changes. The bar is what the sub-nav was missing.
+  })
+
+  it('positions the collapsed badge dot against the item, not the rail', () => {
+    act(() => {
+      useNotificationStore.setState({ pendingOrdersCount: 4 })
+    })
+    render(<AdminSidebar collapsed />)
+
+    const orders = screen.getByRole('link', { name: /Orders/ })
+    expect(orders.getAttribute('class') ?? '', 'the item is the positioning context').toContain(
+      'relative'
+    )
+    const dot = within(orders).getByLabelText('Orders has pending items')
+    expect(dot.parentElement).toBe(orders)
+    expect(dot.className).toContain('absolute')
+  })
+
+  it('uses a visible pulse on the badge instead of the no-op shimmer', () => {
+    act(() => {
+      useNotificationStore.setState({ pendingOrdersCount: 5 })
+    })
+    render(<AdminSidebar />)
+
+    const badge = within(screen.getByRole('link', { name: /Orders/ })).getByText('5')
+    expect(badge.className, 'the badge animates').toContain('animate-pulse-soft')
+    expect(badge.className, 'the shimmer keyframe has no effect on a solid fill').not.toContain(
+      'animate-shimmer'
+    )
+  })
+
+  it('gives the sidebar close and collapse buttons a 44px hit target', () => {
+    const { container } = render(<AdminSidebar onToggleCollapse={() => {}} />)
+
+    for (const name of ['Close sidebar', 'Collapse sidebar']) {
+      const btn = screen.getByRole('button', { name })
+      const classes = btn.getAttribute('class') ?? ''
+      expect(classes, `${name} is 44px tall`).toContain('min-h-[44px]')
+      expect(classes, `${name} is 44px wide`).toContain('min-w-[44px]')
+    }
+    expect(container).not.toBeNull()
+  })
+
+  it('raises the mobile overlay above the admin header so the header dims', () => {
+    const { container } = render(<AdminSidebar mobileOpen />)
+
+    const overlay = mobileOverlay(container)!
+    const overlayZ = overlay.className.match(/z-\[var\(--z-modal-backdrop\)\]/)
+    expect(overlayZ, 'the overlay uses the modal-backdrop token').not.toBeNull()
+
+    // The admin header is z-40; the overlay must outrank it.
+    const headerZ = 40
+    const overlayZValue = 400 // --z-modal-backdrop
+    expect(overlayZValue, 'the overlay is above the header').toBeGreaterThan(headerZ)
   })
 
   it('uses the teal accent for its badge fill, with on-teal text', () => {
@@ -400,6 +550,51 @@ describe('AdminLayout', () => {
       (cls) => BANNED_SUBSTRINGS.some((b) => cls.includes(b)) || BANNED_PATTERN.test(cls)
     )
     expect(offenders).toEqual([])
+  })
+
+  it('reserves the sticky header slot so the content is not overlapped', () => {
+    const { container } = render(
+      <AdminLayout>
+        <h1>Dashboard</h1>
+      </AdminLayout>
+    )
+
+    const header = container.querySelector('header')!
+    // `Dashboard` is also the sidebar's first destination link, so scope to
+    // the h1 rather than using `getByText`.
+    const main = screen.getByRole('heading', { name: 'Dashboard', level: 1 }).closest('main')!
+    expect(header, 'the top bar is a header element').not.toBeNull()
+    expect(main, 'the content column is a main element').not.toBeNull()
+
+    // The sticky bar's in-flow slot is the content column's top padding. The
+    // bar paints at `top-16` (64px) and is 64px tall, so the body must start
+    // at 128px. If the column drops its offset, the bar's slot starts at y=0,
+    // the bar paints at y=64–128, and it covers the first 40px of the body.
+    //
+    // jsdom performs no layout and does not load the project's compiled
+    // Tailwind stylesheet, so `getComputedStyle` returns an empty string for
+    // class-driven declarations and `getBoundingClientRect` is always 0. The
+    // offset is therefore resolved from the classes themselves — the one
+    // layout input that decides whether the bar overlaps the body. A real
+    // rect-vs-rect check was done in Chromium; see the fix-round report.
+    const column = header.parentElement!
+    const columnTop = resolvedTopPaddingPx(column)
+    // `py-6` sets both axes; the main's vertical padding is what the browser
+    // adds on top of the reserved slot.
+    const mainTop = resolvedVerticalPaddingPx(main)
+
+    // `pt-16` is 64px; the bar is 64px tall, so the body starts at 128px.
+    expect(
+      columnTop,
+      'the content column reserves the sticky bar slot (regression: 40px overlap)'
+    ).toBeGreaterThanOrEqual(ADMIN_HEADER_HEIGHT_PX)
+    expect(columnTop + ADMIN_HEADER_HEIGHT_PX, 'the body starts below the bar').toBe(
+      CONTENT_TOP_PX
+    )
+    expect(
+      columnTop + ADMIN_HEADER_HEIGHT_PX + mainTop,
+      'the first body element clears the bar'
+    ).toBe(CONTENT_TOP_PX + 24)
   })
 
   it('imports SketchUnderline from the decorative barrel, not the deprecated shim (Ruling 7)', () => {
