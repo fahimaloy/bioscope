@@ -693,6 +693,17 @@ img {
   height: auto;
 }
 
+/* Die-cut halo for the brand mark (spec §5.1). The logo PNG has transparent
+   corners and an irregular silhouette, so a box-shadow ring would trace the
+   square; a drop-shadow chain follows the alpha outline. Both layers need a
+   non-zero blur: Chromium computes a 0px blur to `none`, and a sub-pixel blur
+   is clipped to zero coverage at `sm`. The browser path applies this class;
+   the raw/OG path uses the literal token values because satori cannot resolve
+   CSS custom properties. */
+.die-cut-mark {
+  filter: drop-shadow(0 0 1px var(--die-cut)) drop-shadow(1px 1px 0 var(--ink));
+}
+
 /* Table Styles */
 table {
   width: 100%;

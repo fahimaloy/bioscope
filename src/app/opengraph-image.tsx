@@ -9,8 +9,9 @@ export const contentType = 'image/png'
 export const alt = 'bioscope'
 
 /**
- * The OG route runs in the Node runtime so it can read the logo from disk.
- * Satori rejects relative image URLs, so the mark is inlined as a data URI.
+ * The OG route runs in the Node runtime so it can read both brand assets from
+ * disk. Satori rejects relative image URLs, so the mark is inlined as a data
+ * URI.
  */
 async function getLogoDataUri(): Promise<string> {
   const logo = await readFile(path.join(process.cwd(), 'public', 'images', 'bioscope-logo.png'))
@@ -18,31 +19,28 @@ async function getLogoDataUri(): Promise<string> {
 }
 
 /**
- * Satori cannot resolve `var(--…)`, so the OG route loads the Shrikhand font
- * itself. The Google Fonts CSS API returns WOFF2 to modern user agents, which
- * satori cannot parse, so request the TTF with a legacy user agent. If the
- * network is unavailable the route falls back to satori's default Noto Sans
- * rather than failing the build.
+ * Satori cannot resolve `var(--…)`, so the OG route loads Shrikhand itself.
+ *
+ * The TTF is committed under `src/app/fonts/` (with its SIL OFL licence) and
+ * read from disk: the Google Fonts CSS API returns WOFF2 to modern user agents,
+ * which satori cannot parse, so a network fetch would mean either a second
+ * build-time download or a silent fallback to satori's default Noto Sans — an
+ * off-brand OG card with a green build. Reading the checked-in file makes the
+ * asset deterministic. A missing file is a real bug, not a network condition,
+ * so this throws rather than degrading.
  */
 async function getShrikhandFont() {
-  try {
-    const css = await fetch('https://fonts.googleapis.com/css2?family=Shrikhand&display=swap', {
-      headers: { 'User-Agent': 'Mozilla/5.0' },
-      signal: AbortSignal.timeout(10_000),
-    }).then((res) => res.text())
-    const blocks = css.match(/@font-face\s*\{[^}]+\}/g) ?? []
-    const latin = blocks.find((block) => /U\+0000-00FF/.test(block)) ?? blocks[blocks.length - 1]
-    const url = latin?.match(/url\((https:[^)]+)\)/)?.[1]
-    if (!url) return undefined
-
-    const data = await fetch(url, { signal: AbortSignal.timeout(10_000) }).then((res) =>
-      res.arrayBuffer()
-    )
-    return { data, name: 'Shrikhand', weight: 400 as const, style: 'normal' as const }
-  } catch {
-    return undefined
-  }
+  const data = await readFile(path.join(process.cwd(), 'src', 'app', 'fonts', 'Shrikhand-Regular.ttf'))
+  return { data, name: 'Shrikhand', weight: 400 as const, style: 'normal' as const }
 }
+
+/**
+ * `lg` measures ~301px wide on the 1200px canvas. Scaling the lockup (rather
+ * than adding a `size` variant) keeps the `Wordmark` API at three sizes while
+ * filling the social card. `transform` is applied about the centre, so the
+ * flex-centred lockup stays centred.
+ */
+const OG_LOCKUP_SCALE = 2.4
 
 export default async function OpengraphImage() {
   const [logoSrc, font] = await Promise.all([getLogoDataUri(), getShrikhandFont()])
@@ -58,8 +56,10 @@ export default async function OpengraphImage() {
         backgroundColor: colorTokens.paper.$value,
       }}
     >
-      <Wordmark raw size="lg" logoSrc={logoSrc} />
+      <div style={{ display: 'flex', transform: `scale(${OG_LOCKUP_SCALE})` }}>
+        <Wordmark raw size="lg" logoSrc={logoSrc} />
+      </div>
     </div>,
-    { ...size, fonts: font ? [font] : undefined }
+    { ...size, fonts: [font] }
   )
 }

@@ -80,6 +80,26 @@ describe('Wordmark', () => {
     expect(classes.filter((cls) => /#(?:[0-9a-f]{3,8})\b/i.test(cls))).toEqual([])
   })
 
+  it('wires the die-cut halo class onto the mark on the browser path', () => {
+    const { container } = render(<Wordmark />)
+    const img = container.querySelector('img')
+
+    expect(img, 'the logo is present').not.toBeNull()
+    // The halo is a plain rule in globals.css (`.die-cut-mark`), not a Tailwind
+    // arbitrary value — a bare multi-function filter string is not generated.
+    expect(img!.getAttribute('class')).toContain('die-cut-mark')
+  })
+
+  it('applies the same die-cut halo to the mark on the raw path', () => {
+    const { container } = render(<Wordmark raw logoSrc="data:image/png;base64,AAAA" />)
+    const img = container.querySelector('img')
+
+    expect(img, 'the raw path renders an img').not.toBeNull()
+    expect(img!.style.filter).toBe(
+      'drop-shadow(0 0 1px #FFFFFF) drop-shadow(1px 1px 0 #241B12)'
+    )
+  })
+
   it('renders a plain img with the same alt and dimensions when raw', () => {
     const logoSrc = 'data:image/png;base64,AAAA'
     const { container } = render(<Wordmark raw logoSrc={logoSrc} />)

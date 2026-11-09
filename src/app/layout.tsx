@@ -16,7 +16,6 @@ const shrikhand = Shrikhand({ subsets: ['latin'], variable: '--font-display', di
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-body', display: 'swap', weight: ['400', '500', '600', '700'] })
 const caveat = Caveat({ subsets: ['latin'], variable: '--font-hand', display: 'swap', weight: ['400', '600', '700'] })
 
-
 const siteUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
 export const metadata: Metadata = {
