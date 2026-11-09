@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
+import { FOCUS_VISIBLE } from '@/components/ui/shared'
 import {
   LayoutDashboard,
   Package,
@@ -25,6 +26,19 @@ import {
 import { useNotificationStore } from '@/lib/stores/notificationStore'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { signOut } from 'next-auth/react'
+
+/**
+ * Task 1.4 — the admin sidebar (spec §13, plan Task 1.4).
+ *
+ * Calm pro: a near-white `--surface-raised` rail with 1px `--border`
+ * hairlines, dense type, and one teal accent (the badge fill, with
+ * `--on-teal` text). The active destination is marked by a gold left bar
+ * (Ruling 1). No offset shadows, no brand borders, no loud Paper + Pop.
+ *
+ * Behaviour is unchanged from the legacy sidebar: the collapse/expand rail,
+ * the mobile overlay, the pending-count badges from `useNotificationStore`,
+ * and the logout action all work exactly as before.
+ */
 
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, badge: null as string | null },
@@ -58,7 +72,7 @@ export function AdminSidebar({
   onCloseMobile,
 }: AdminSidebarProps) {
   const pathname = usePathname()
-  const { user, logout, isAdmin } = useAuth()
+  const { user, logout } = useAuth()
   const { pendingOrdersCount, pendingRequestsCount } = useNotificationStore()
 
   const handleLogout = () => {
@@ -74,11 +88,11 @@ export function AdminSidebar({
 
   return (
     <>
-      {/* Overlay for mobile */}
+      {/* Mobile overlay — `--overlay` is the token-system scrim. */}
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-[var(--ink)]/50 transition-opacity duration-300 lg:hidden',
-          mobileOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          'fixed inset-0 z-40 bg-[var(--overlay)] transition-opacity duration-base lg:hidden',
+          mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
         onClick={onCloseMobile}
         aria-hidden="true"
@@ -87,8 +101,9 @@ export function AdminSidebar({
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed left-0 top-16 bottom-0 z-50 bg-[var(--paper)] border-r-3 border-[var(--ink)]',
-          'flex flex-col transition-all duration-300 ease-[cubic-bezier(0.175,0.885,0.32,1.275)]',
+          'fixed bottom-0 left-0 top-16 z-50 flex flex-col',
+          'border-r border-[var(--border)] bg-[var(--surface-raised)]',
+          'transition-all duration-base ease-out',
           collapsed ? 'w-20' : 'w-64',
           'lg:translate-x-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
@@ -98,48 +113,58 @@ export function AdminSidebar({
         {/* Logo / Toggle */}
         <div
           className={cn(
-            'flex items-center h-20 px-4 border-b-3 border-[var(--ink)] relative',
+            'relative flex h-16 items-center border-b border-[var(--border)] px-4',
             collapsed ? 'justify-center' : 'justify-between'
           )}
         >
           {!collapsed && (
-            <Link href="/admin/dashboard" className="flex items-center gap-2 min-w-0" aria-label="Admin Dashboard">
-              <span className="relative w-10 h-10 flex-shrink-0">
+            <Link
+              href="/admin/dashboard"
+              className={cn('flex min-w-0 items-center gap-2', FOCUS_VISIBLE)}
+              aria-label="Admin Dashboard"
+            >
+              <span className="relative h-9 w-9 flex-shrink-0">
                 <Image
                   src="/images/bioscope-logo.png"
                   alt="Bioscope"
                   fill
                   className="object-contain"
-                  sizes="40px"
+                  sizes="36px"
                 />
               </span>
-              <span className="font-display text-2xl text-primary truncate">bioscope</span>
+              <span className="truncate font-display text-xl text-[var(--ink)]">bioscope</span>
             </Link>
           )}
+
           {/* Mobile close button */}
           <button
             onClick={onCloseMobile}
-            className="lg:hidden absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-input text-[var(--ink)] hover:bg-[var(--light)] transition-colors"
+            className={cn(
+              'absolute right-2 top-1/2 -translate-y-1/2 p-2 text-[var(--ink)] transition-colors duration-fast hover:text-[var(--teal)] lg:hidden',
+              FOCUS_VISIBLE
+            )}
             aria-label="Close sidebar"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
+
           {/* Desktop collapse button */}
           <button
             onClick={onToggleCollapse}
             className={cn(
-              'hidden lg:flex p-2 rounded-input text-[var(--ink)] hover:bg-[var(--light)] hover:text-primary hover:-translate-y-0.5 transition-all duration-200',
-              collapsed ? 'mx-auto' : ''
+              'hidden p-2 text-[var(--ink)] transition-colors duration-fast hover:text-[var(--teal)] lg:flex',
+              collapsed && 'mx-auto',
+              FOCUS_VISIBLE
             )}
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             aria-expanded={!collapsed}
           >
-            {collapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+            {collapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1.5" aria-label="Main navigation">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4" aria-label="Main navigation">
           {navigation.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
             const badgeValue = getBadgeValue(item.badge)
@@ -150,11 +175,12 @@ export function AdminSidebar({
                 href={item.href}
                 onClick={onCloseMobile}
                 className={cn(
-                  'group flex items-center gap-3 px-3 py-3 rounded-input border-l-4 transition-all duration-200',
-                  'hover:-translate-y-0.5 hover:shadow-btn',
+                  'group flex min-h-[44px] items-center gap-3 rounded-md border-l-2 px-3 text-sm font-medium',
+                  'transition-colors duration-fast',
+                  FOCUS_VISIBLE,
                   isActive
-                    ? 'bg-primary/10 border-l-4 border-primary text-primary shadow-btn'
-                    : 'border-l-4 border-transparent text-[var(--text-secondary)] hover:bg-[var(--surface-sunken)] hover:text-primary',
+                    ? 'border-[var(--gold)] bg-[var(--surface-sunken)] text-[var(--ink)]'
+                    : 'border-transparent text-[var(--text-muted)] hover:bg-[var(--surface-sunken)] hover:text-[var(--ink)]',
                   collapsed && 'justify-center px-2'
                 )}
                 aria-current={isActive ? 'page' : undefined}
@@ -162,16 +188,22 @@ export function AdminSidebar({
               >
                 <item.icon
                   className={cn(
-                    'w-5 h-5 flex-shrink-0 transition-colors duration-200',
-                    isActive ? 'text-primary' : 'text-[var(--text-secondary)] group-hover:text-primary'
+                    'h-5 w-5 flex-shrink-0 transition-colors duration-fast',
+                    isActive
+                      ? 'text-[var(--teal)]'
+                      : 'text-[var(--text-muted)] group-hover:text-[var(--ink)]'
                   )}
                   aria-hidden="true"
                 />
                 {!collapsed && (
                   <>
-                    <span className="font-semibold text-body truncate">{item.name}</span>
+                    <span className="truncate font-semibold">{item.name}</span>
                     {badgeValue !== null && badgeValue > 0 && (
-                      <Badge variant="doodle" size="sm" className="ml-auto animate-pulse-soft">
+                      <Badge
+                        variant="default"
+                        size="sm"
+                        className="ml-auto animate-shimmer border-transparent bg-[var(--teal)] text-[var(--on-teal)]"
+                      >
                         {badgeValue > 99 ? '99+' : badgeValue}
                       </Badge>
                     )}
@@ -179,7 +211,7 @@ export function AdminSidebar({
                 )}
                 {collapsed && badgeValue !== null && badgeValue > 0 && (
                   <span
-                    className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-[var(--primary)] border-2 border-[var(--ink)] animate-pulse-soft"
+                    className="absolute right-2 top-2 h-2.5 w-2.5 animate-shimmer rounded-full bg-[var(--teal)]"
                     aria-label={`${item.name} has pending items`}
                   />
                 )}
@@ -189,8 +221,8 @@ export function AdminSidebar({
 
           {/* Settings Section */}
           {!collapsed && (
-            <div className="pt-4 mt-4 border-t-2 border-dashed border-[var(--border-secondary)]">
-              <h3 className="px-3 font-display text-sm text-[var(--text-tertiary)] uppercase tracking-wider mb-3">
+            <div className="mt-4 border-t border-[var(--border)] pt-4">
+              <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-subtle)]">
                 Settings
               </h3>
               {settingsNavigation.map((item) => {
@@ -200,15 +232,22 @@ export function AdminSidebar({
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-input transition-all duration-200 hover:-translate-y-0.5',
+                      'flex min-h-[44px] items-center gap-3 rounded-md px-3 text-sm transition-colors duration-fast',
+                      FOCUS_VISIBLE,
                       isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-[var(--text-tertiary)] hover:bg-[var(--surface-sunken)] hover:text-primary'
+                        ? 'bg-[var(--surface-sunken)] text-[var(--ink)]'
+                        : 'text-[var(--text-subtle)] hover:bg-[var(--surface-sunken)] hover:text-[var(--ink)]'
                     )}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    <item.icon className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-                    <span className="font-medium text-sm truncate">{item.name}</span>
+                    <item.icon
+                      className={cn(
+                        'h-4 w-4 flex-shrink-0',
+                        isActive ? 'text-[var(--teal)]' : 'text-[var(--text-subtle)]'
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span className="truncate font-medium">{item.name}</span>
                   </Link>
                 )
               })}
@@ -217,36 +256,44 @@ export function AdminSidebar({
         </nav>
 
         {/* User Section */}
-        <div className={cn('p-3 border-t-3 border-[var(--ink)]', collapsed && 'px-2')}>
-          <div className={cn('flex items-center gap-3 mb-3', collapsed && 'justify-center mb-0')}>
-            <div className="w-10 h-10 rounded-full bg-primary/10 border-2 border-[var(--ink)] flex items-center justify-center flex-shrink-0">
-              <span className="text-primary font-display text-xl">
+        <div className={cn('border-t border-[var(--border)] p-3', collapsed && 'px-2')}>
+          <div className={cn('mb-3 flex items-center gap-3', collapsed && 'mb-0 justify-center')}>
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--surface-sunken)] text-[var(--teal)]">
+              <span className="font-display text-lg">
                 {user?.name?.charAt(0) || user?.email?.charAt(0) || 'A'}
               </span>
             </div>
             {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-body text-[var(--text-primary)] truncate">{user?.name || 'Admin'}</p>
-                <p className="text-xs text-[var(--text-tertiary)] truncate">{user?.email}</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-[var(--ink)]">
+                  {user?.name || 'Admin'}
+                </p>
+                <p className="truncate text-xs text-[var(--text-subtle)]">{user?.email}</p>
               </div>
             )}
           </div>
           {!collapsed && (
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-pill border-2 border-transparent text-[var(--error)] hover:bg-[var(--error)]/10 hover:border-[var(--error)] hover:-translate-y-0.5 transition-all duration-200"
+              className={cn(
+                'flex min-h-[44px] w-full items-center gap-3 rounded-md px-3 text-sm font-semibold text-[var(--error)] transition-colors duration-fast hover:bg-[var(--surface-sunken)]',
+                FOCUS_VISIBLE
+              )}
             >
-              <LogOut className="w-5 h-5" />
-              <span className="font-semibold text-sm">Logout</span>
+              <LogOut className="h-5 w-5" />
+              <span>Logout</span>
             </button>
           )}
           {collapsed && (
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center p-2.5 rounded-pill border-2 border-transparent text-[var(--error)] hover:bg-[var(--error)]/10 hover:border-[var(--error)] transition-all duration-200"
+              className={cn(
+                'flex min-h-[44px] w-full items-center justify-center rounded-md p-2.5 text-[var(--error)] transition-colors duration-fast hover:bg-[var(--surface-sunken)]',
+                FOCUS_VISIBLE
+              )}
               aria-label="Logout"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="h-5 w-5" />
             </button>
           )}
         </div>
