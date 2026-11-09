@@ -48,7 +48,7 @@ export function MobileNav() {
         )}
         aria-label="Bottom navigation"
       >
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {navItems.map((item) => {
             const isActive =
               pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))

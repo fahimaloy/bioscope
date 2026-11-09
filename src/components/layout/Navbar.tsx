@@ -42,6 +42,7 @@ export function Navbar() {
   const { mobileMenuOpen, setMobileMenuOpen, toggleMobileMenu } = useUIStore()
   const { itemCount, toggleCart } = useCartStore()
   const [scrolled, setScrolled] = useState(false)
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 8)
@@ -79,8 +80,9 @@ export function Navbar() {
             <Wordmark size="md" />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden items-center gap-6 md:flex">
+          {/* Desktop Navigation — from `lg` up: below 1024px the lockup, four
+              pills, cart and auth controls do not fit the 64px bar. */}
+          <div className="hidden items-center gap-6 lg:flex">
             <motion.ul
               variants={motionVariants.staggerContainer}
               initial="initial"
@@ -148,14 +150,26 @@ export function Navbar() {
                     </Link>
                   )}
 
-                  <div className="group relative">
-                    <Button variant="ghost" size="sm" className="gap-2">
+                  <div
+                    className="group relative"
+                    onMouseEnter={() => setAccountMenuOpen(true)}
+                    onMouseLeave={() => setAccountMenuOpen(false)}
+                    onFocus={() => setAccountMenuOpen(true)}
+                    onBlur={() => setAccountMenuOpen(false)}
+                  >
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-2"
+                      aria-haspopup="true"
+                      aria-expanded={accountMenuOpen}
+                    >
                       <User className="h-5 w-5" aria-hidden="true" />
                       <span className="hidden max-w-[10rem] truncate sm:block">
                         {user?.name || user?.email}
                       </span>
                     </Button>
-                    <div className="invisible absolute right-0 top-full z-50 mt-2 w-48 rounded-pill border-2 border-[var(--ink)] bg-[var(--surface-raised)] p-2 opacity-0 shadow-ink-2 transition-all duration-fast ease-out group-hover:visible group-hover:opacity-100">
+                    <div className="invisible absolute right-0 top-full z-50 mt-2 w-48 rounded-pill border-2 border-[var(--ink)] bg-[var(--surface-raised)] p-2 opacity-0 shadow-ink-2 transition-all duration-fast ease-out group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                       <Link
                         href="/profile"
                         className={cn(
@@ -207,7 +221,7 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button
             className={cn(
-              'flex min-h-[44px] min-w-[44px] items-center justify-center rounded-pill text-[var(--ink)] transition-colors duration-fast hover:bg-[var(--paper-deep)] md:hidden',
+              'flex min-h-[44px] min-w-[44px] items-center justify-center rounded-pill text-[var(--ink)] transition-colors duration-fast hover:bg-[var(--paper-deep)] lg:hidden',
               FOCUS_VISIBLE
             )}
             onClick={toggleMobileMenu}
@@ -235,7 +249,7 @@ export function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             style={{ transformOrigin: 'top' }}
-            className="overflow-hidden border-t-2 border-[var(--ink)] bg-[var(--paper)] md:hidden"
+            className="overflow-hidden border-t-2 border-[var(--ink)] bg-[var(--paper)] lg:hidden"
           >
             <div className="space-y-2 px-4 py-4">
               <motion.ul

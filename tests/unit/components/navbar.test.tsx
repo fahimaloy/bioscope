@@ -148,7 +148,58 @@ describe('Navbar', () => {
 
     const toggle = screen.getByRole('button', { name: /open menu/i })
     expect(toggle.getAttribute('aria-controls')).toBe('mobile-menu-panel')
-    expect(toggle.className).toMatch(/md:hidden/)
+    expect(toggle.className).toMatch(/lg:hidden/)
+  })
+
+  it('shows the desktop nav only from the lg breakpoint — the md band must not overflow the 64px bar', () => {
+    const { container } = renderNavbar(<Navbar />)
+
+    // The desktop surface is the element that wraps the desktop link list.
+    const desktopList = container.querySelector('nav ul')
+    expect(desktopList).not.toBeNull()
+    const desktopSurface = desktopList!.parentElement!
+    const classes = desktopSurface.getAttribute('class') ?? ''
+
+    expect(classes, 'desktop nav is hidden below lg').toContain('lg:flex')
+    expect(classes, 'desktop nav must not appear at md — the lockup + pills + auth do not fit').not.toContain('md:flex')
+
+    const toggle = screen.getByRole('button', { name: /open menu/i })
+    expect(toggle.className).toMatch(/lg:hidden/)
+    expect(toggle.className).not.toMatch(/md:hidden/)
+  })
+
+  it('hides the mobile menu panel from the lg breakpoint up', () => {
+    const { container } = renderNavbar(<Navbar />)
+
+    fireEvent.click(screen.getByRole('button', { name: /open menu/i }))
+    const panel = mobileMenu(container)
+    expect(panel).not.toBeNull()
+    expect(panel!.className).toMatch(/lg:hidden/)
+    expect(panel!.className).not.toMatch(/md:hidden/)
+  })
+
+  it('reveals the account menu on keyboard focus and reports its expanded state', () => {
+    act(() => {
+      useAuthStore.setState({ user: { role: 'CUSTOMER', name: 'Ada' } as never, isAuthenticated: true })
+    })
+    const { container } = renderNavbar(<Navbar />)
+
+    const trigger = container.querySelector('button[aria-haspopup="true"]')
+    expect(trigger, 'the account trigger declares a popup').not.toBeNull()
+    expect(trigger!.getAttribute('aria-expanded')).toBe('false')
+
+    // The menu itself must be revealed by focus, not hover alone.
+    const menuClasses = Array.from(container.querySelectorAll('div'))
+      .map((el) => el.getAttribute('class') ?? '')
+      .find((c) => c.includes('group-focus-within:visible') && c.includes('group-focus-within:opacity-100'))
+    expect(menuClasses, 'the account menu is revealed on focus-within').toBeDefined()
+
+    // Focus is what a keyboard user has; the expanded state must follow it.
+    fireEvent.focus(trigger!)
+    expect(trigger!.getAttribute('aria-expanded')).toBe('true')
+
+    fireEvent.blur(trigger!)
+    expect(trigger!.getAttribute('aria-expanded')).toBe('false')
   })
 
   it('is a fixed paper surface with a 2px ink bottom border, on the brief', () => {
@@ -174,7 +225,7 @@ describe('Navbar', () => {
 
     const panel = mobileMenu(container)
     expect(panel, 'the panel mounts once the menu is open').not.toBeNull()
-    expect(panel!.className).toMatch(/md:hidden/)
+    expect(panel!.className).toMatch(/lg:hidden/)
 
     const toggle = screen.getByRole('button', { name: /close menu/i })
     expect(toggle.getAttribute('aria-expanded')).toBe('true')
@@ -204,7 +255,7 @@ describe('Navbar', () => {
 
     const { container } = renderNavbar(<Navbar />)
 
-    // The cart control lives on the desktop surface (`hidden md:flex`); jsdom
+    // The cart control lives on the desktop surface (`hidden lg:flex`); jsdom
     // applies no media queries, so it is in the tree.
     const cart = Array.from(container.querySelectorAll('button')).find((b) =>
       /shopping cart/i.test(b.getAttribute('aria-label') ?? '')
@@ -266,8 +317,8 @@ describe('Navbar', () => {
   it('renders the desktop nav links as pills that fill on hover with a spring', () => {
     const { container } = renderNavbar(<Navbar />)
 
-    // The desktop surface is `hidden md:flex`; jsdom applies no media queries,
-    // so the `md:` breakpoint is treated as matching. Scope the query to the
+    // The desktop surface is `hidden lg:flex`; jsdom applies no media queries,
+    // so the `lg:` breakpoint is treated as matching. Scope the query to the
     // desktop list (the first `ul` inside the bar) so the mobile panel — which
     // is closed — cannot contribute links.
     const desktopList = container.querySelector('nav ul')
@@ -329,5 +380,22 @@ describe('MobileNav', () => {
       (cls) => BANNED_SUBSTRINGS.some((b) => cls.includes(b)) || BANNED_PATTERN.test(cls)
     )
     expect(offenders).toEqual([])
+  })
+
+  it('lays the six tab-bar items in a single row', () => {
+    const { container } = renderNavbar(<MobileNav />)
+
+    const bar = container.querySelector('nav[aria-label="Bottom navigation"]')
+    expect(bar).not.toBeNull()
+
+    // 5 destination links + the More toggle = 6 cells; a 5-column grid wraps
+    // More onto a second row.
+    const grid = Array.from(bar!.children).find((el) =>
+      (el.getAttribute('class') ?? '').split(/\s+/).includes('grid')
+    )
+    expect(grid, 'the tab bar uses a grid').toBeDefined()
+    expect(grid!.getAttribute('class')).toContain('grid-cols-6')
+    expect(grid!.getAttribute('class')).not.toContain('grid-cols-5')
+    expect(grid!.children).toHaveLength(6)
   })
 })
