@@ -1,0 +1,154 @@
+import Image from 'next/image'
+import type { CSSProperties } from 'react'
+import { cn } from '@/lib/utils'
+import colorTokens from '../../../tokens/src/color.json'
+
+export type WordmarkVariant = 'light' | 'dark'
+export type WordmarkSize = 'sm' | 'md' | 'lg'
+
+export interface WordmarkProps {
+  /**
+   * Wordmark colour. `light` is paper-coloured, for use on ink/dark surfaces;
+   * `dark` is ink, for use on paper. The logo image itself never changes.
+   * Default `dark`.
+   */
+  variant?: WordmarkVariant
+  /** Lockup scale. Default `md`. */
+  size?: WordmarkSize
+  /**
+   * Render a plain `<img>` instead of `next/image`, for the OG image runtime
+   * where the image optimizer is unavailable. Colour styling switches from
+   * `var(--…)` utilities to literal token values because satori cannot resolve
+   * CSS custom properties. Default `false`.
+   */
+  raw?: boolean
+  /**
+   * Logo source. Defaults to the site logo path. The OG route passes a base64
+   * data URI because satori rejects relative image URLs.
+   */
+  logoSrc?: string
+  className?: string
+}
+
+interface SizeSpec {
+  /** Square logo edge, in pixels. The source mark is 500×500. */
+  logo: number
+  fontSize: number
+  gap: number
+  textClass: string
+  gapClass: string
+}
+
+const SIZES: Record<WordmarkSize, SizeSpec> = {
+  sm: { logo: 28, fontSize: 20, gap: 8, textClass: 'text-xl', gapClass: 'gap-2' },
+  md: { logo: 40, fontSize: 30, gap: 12, textClass: 'text-3xl', gapClass: 'gap-3' },
+  lg: { logo: 56, fontSize: 48, gap: 16, textClass: 'text-5xl', gapClass: 'gap-4' },
+}
+
+interface ColorSpec {
+  /** Tailwind utility for the browser path (resolves `var(--…)`). */
+  className: string
+  /** Literal token value for the satori/OG path. */
+  raw: string
+}
+
+const VARIANT_COLORS: Record<WordmarkVariant, ColorSpec> = {
+  dark: { className: 'text-[var(--ink)]', raw: colorTokens.ink.$value },
+  light: { className: 'text-[var(--paper)]', raw: colorTokens.paper.$value },
+}
+
+/**
+ * Folk accent colours for the two "o" letters (spec §5.1). `--gold` is
+ * deliberately not used: as text on paper it is ~1.3:1 and fails the "legible
+ * at sm" requirement. Pink and violet are display/decoration accents.
+ */
+const ACCENT_COLORS = {
+  pink: { className: 'text-[var(--pink)]', raw: colorTokens.pink.$value },
+  violet: { className: 'text-[var(--violet)]', raw: colorTokens.violet.$value },
+} as const
+
+/**
+ * The bioscope lockup: the folk-art mark beside the Shrikhand `bioscope`
+ * wordmark. One source of truth, two render paths — `next/image` for the app,
+ * a plain `<img>` for the OG image runtime.
+ */
+export function Wordmark({
+  variant = 'dark',
+  size = 'md',
+  raw = false,
+  logoSrc = '/images/bioscope-logo.png',
+  className,
+}: WordmarkProps) {
+  const spec = SIZES[size]
+  const color = VARIANT_COLORS[variant]
+
+  const boxStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: spec.gap,
+  }
+
+  const wordmarkStyle: CSSProperties = {
+    fontFamily: 'Shrikhand',
+    fontSize: spec.fontSize,
+    lineHeight: 1,
+    color: color.raw,
+  }
+
+  return (
+    <span
+      className={raw ? className : cn('flex items-center', spec.gapClass, className)}
+      style={raw ? boxStyle : undefined}
+    >
+      {raw ? (
+        // The OG image runtime has no image optimizer, so the raw path renders
+        // a plain <img> (Ruling 2). The linter warning is expected here.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={logoSrc}
+          alt="bioscope"
+          width={spec.logo}
+          height={spec.logo}
+          style={{ width: spec.logo, height: spec.logo, objectFit: 'contain' }}
+        />
+      ) : (
+        <Image
+          src={logoSrc}
+          alt="bioscope"
+          width={spec.logo}
+          height={spec.logo}
+          className="shrink-0"
+        />
+      )}
+      <span
+        aria-hidden="true"
+        className={
+          raw
+            ? undefined
+            : cn('font-display leading-none tracking-tight', spec.textClass, color.className)
+        }
+        style={raw ? wordmarkStyle : undefined}
+      >
+        bi
+        <span
+          className={raw ? undefined : ACCENT_COLORS.pink.className}
+          style={raw ? { color: ACCENT_COLORS.pink.raw } : undefined}
+        >
+          o
+        </span>
+        sc
+        <span
+          className={raw ? undefined : ACCENT_COLORS.violet.className}
+          style={raw ? { color: ACCENT_COLORS.violet.raw } : undefined}
+        >
+          o
+        </span>
+        pe
+      </span>
+      {/* The split-letter wordmark above is hidden from assistive tech; this
+          single text node carries the brand name. The OG render path omits it
+          because satori ignores the `sr-only` utility and would draw it. */}
+      {!raw && <span className="sr-only">bioscope</span>}
+    </span>
+  )
+}

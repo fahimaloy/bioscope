@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     description: 'Create custom stickers, browse our collection, or design your own.',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/opengraph-image',
         width: 1200,
         height: 630,
         alt: 'bioscope',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'bioscope — Custom Stickers & Designs',
     description: 'Create custom stickers, browse our collection, or design your own.',
-    images: ['/og-image.jpg'],
+    images: ['/opengraph-image'],
   },
   verification: {
     google: 'google-site-verification-code',
