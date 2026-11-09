@@ -659,6 +659,57 @@ git commit -m "feat(cart): rebuild cart drawer and page wrapper"
 
 ---
 
+### Task 1.6: Remap the shared utility rules onto the token set
+
+**Files:**
+- Modify: `src/app/globals.css`
+- Modify: `tailwind.config.ts` (drop `darkMode: 'class'`; add the missing `boxShadow` keys if shared rules need them)
+- Test: `tests/unit/globals-tokens.test.ts`
+
+**Interfaces:**
+- Consumes: the token set (T0.1)
+- Produces: an invariant — every `var(--…)` referenced anywhere in `globals.css` resolves to a token defined in that file (default `:root` or a media-query `:root`), excluding the `--font-*` variables injected at runtime by `next/font`.
+
+- [ ] **Step 1: Write the failing test**
+
+`tests/unit/globals-tokens.test.ts` reads `src/app/globals.css` as text, collects every `var(--x)` reference and every `--x:` definition, and asserts `references ⊆ definitions ∪ {--font-display, --font-body, --font-hand}`. It must ignore comments.
+
+- [ ] **Step 2: Run to verify it fails**
+
+Run: `pnpm vitest run tests/unit/globals-tokens.test.ts`
+Expected: FAIL, listing the undefined tokens.
+
+- [ ] **Step 3: Remap**
+
+Known undefined references at the time of writing: `--shadow-card`, `--shadow-card-hover`, `--shadow-btn`, `--shadow-btn-hover`, `--shadow-btn-active`, `--shadow-input`, `--shadow-stat`, `--shadow-glass`, `--transition-base`, `--transition-fast`, plus `--surface-card` / `--text-primary` / `--text-secondary` / `--text-tertiary` / `--border-primary` / `--border-secondary` / `--bg-primary` if still present.
+
+Map onto the existing token set — do not add new tokens:
+- elevation: `--shadow-ink-1` (subtle), `--shadow-ink-2` (default card/stat), `--shadow-ink-3` (hover), `--shadow-ink-4` (modal)
+- surfaces: `--surface-raised` for cards/panels, `--surface-sunken` for inputs
+- text: `--text`, `--text-muted`, `--text-subtle`, `--text-inverse`
+- borders: `--border`, `--border-strong`
+- motion: `--dur-fast`, `--dur-base`, `--ease-spring`, `--ease-out`
+- page background: `--paper`
+
+- [ ] **Step 4: Run to verify it passes**
+
+Run: `pnpm vitest run tests/unit/globals-tokens.test.ts`
+Expected: PASS.
+
+- [ ] **Step 5: Verify**
+
+Run: `pnpm verify`
+Expected: all gates pass.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/app/globals.css tailwind.config.ts tests/unit/globals-tokens.test.ts
+git commit -m "fix(theme): remap shared utility rules onto defined tokens"
+```
+
+---
+
 ### Task 2.1: Landing page
 
 **Files:**
