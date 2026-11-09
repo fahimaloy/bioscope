@@ -6,6 +6,7 @@ import './globals.css'
 import { Providers } from '@/components/providers'
 import { Toaster } from 'sonner'
 import { Footer } from '@/components/layout/Footer'
+import { Navbar } from '@/components/layout/Navbar'
 
 /**
  * Self-hosted via next/font (spec §5.3): Shrikhand for display, Outfit for
@@ -77,6 +78,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-paper font-body antialiased flex flex-col">
         <MotionConfig reducedMotion="user">
           <Providers>
+            {/* Ruling 3: the navbar is mounted once, here, so the admin layout's
+                `fixed top-16` header and PageWrapper's `pt-16` offset both land
+                under a real 64px bar. */}
+            <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
             <Toaster

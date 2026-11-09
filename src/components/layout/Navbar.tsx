@@ -2,22 +2,34 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { Wordmark } from '@/components/brand/Wordmark'
 import { Button } from '@/components/ui/Button'
+import { StickerPeel } from '@/components/decorative/StickerPeel'
+import { motion, AnimatePresence } from 'framer-motion'
+import { motionVariants } from '@/lib/motion'
 import { Menu, X, ShoppingCart, User, LogOut, LayoutDashboard } from 'lucide-react'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useUIStore } from '@/lib/stores/uiStore'
 import { useCartStore } from '@/lib/stores/cartStore'
 import { signOut } from 'next-auth/react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { motionVariants } from '@/lib/motion'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
-import { StickerPeel } from '@/components/decorative/DoodleElements'
+import { FOCUS_VISIBLE } from '@/components/ui/shared'
+
+/**
+ * Task 1.2 — the top bar (spec §5.8 / plan Task 1.2).
+ *
+ * Paper surface, 2px ink bottom border, hard offset ink shadow, the
+ * `bioscope` lockup, four nav links as pills that fill on hover with the
+ * spring, and a cart control that opens the cart drawer. The mobile menu is a
+ * full-width panel below the bar with a staggered link entrance.
+ *
+ * Mounted once in `src/app/layout.tsx` (Ruling 3), fixed at `h-16` so
+ * `PageWrapper`'s `pt-16` offset is correct. Every `var(--…)` below resolves
+ * to a token defined in `globals.css`'s `:root`.
+ */
 
 const navLinks = [
-  { href: '/', label: 'Home' },
   { href: '/shop', label: 'Shop' },
   { href: '/custom-sticker', label: 'Custom Sticker' },
   { href: '/about', label: 'About' },
@@ -26,15 +38,15 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname()
-  const router = useRouter()
   const { user, isAuthenticated, logout, isAdmin } = useAuth()
   const { mobileMenuOpen, setMobileMenuOpen, toggleMobileMenu } = useUIStore()
   const { itemCount, toggleCart } = useCartStore()
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handleScroll)
+    const handleScroll = () => setScrolled(window.scrollY > 8)
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -45,60 +57,61 @@ export function Navbar() {
 
   return (
     <nav
+      aria-label="Main"
       className={cn(
-        'fixed top-0 left-0 right-0 z-[100] transition-all duration-300',
-        'bg-[var(--surface-card)]/90 backdrop-blur-md border-b border-[var(--border-secondary)] shadow-glass'
+        'fixed top-0 left-0 right-0 z-[var(--z-dropdown)] h-16',
+        'bg-[var(--paper)] border-b-2 border-[var(--ink)]',
+        'transition-shadow duration-fast ease-out',
+        scrolled ? 'shadow-ink-1' : 'shadow-none'
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2" aria-label="Go to homepage">
-            <Image
-              src="/images/bioscope-logo.png"
-              alt="bioscope"
-              width={120}
-              height={40}
-              className="h-10 w-auto"
-              priority
-            />
+      <div className="mx-auto h-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between gap-4">
+          {/* Lockup */}
+          <Link
+            href="/"
+            aria-label="bioscope — home"
+            className={cn(
+              'flex shrink-0 items-center rounded-pill px-2 py-1',
+              FOCUS_VISIBLE
+            )}
+          >
+            <Wordmark size="md" />
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            <motion.div variants={motionVariants.staggerContainer} initial="initial" animate="animate">
-              <div className="flex items-center gap-6">
-                {navLinks.map((link, index) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      'font-medium text-body transition-all duration-200 relative',
-                      pathname === link.href
-                        ? 'text-[var(--primary)]'
-                        : 'text-[var(--ink)] hover:text-[var(--primary)]'
-                    )}
-                  >
-                    <motion.span
-                      variants={motionVariants.staggerItem}
-                      custom={index}
-                      whileHover={{ rotate: [-3, 3, -3, 0], transition: { duration: 0.4, ease: 'easeInOut' } }}
+          <div className="hidden items-center gap-6 md:flex">
+            <motion.ul
+              variants={motionVariants.staggerContainer}
+              initial="initial"
+              animate="animate"
+              className="flex items-center gap-1"
+            >
+              {navLinks.map((link, index) => {
+                const isActive = pathname === link.href
+                return (
+                  <motion.li key={link.href} variants={motionVariants.staggerItem} custom={index}>
+                    <Link
+                      href={link.href}
+                      aria-current={isActive ? 'page' : undefined}
+                      className={cn(
+                        'relative block rounded-pill border-2 px-4 py-2 font-body text-base font-medium',
+                        'transition-[transform,background-color,color] duration-fast ease-spring',
+                        'hover:-translate-y-0.5',
+                        FOCUS_VISIBLE,
+                        isActive
+                          ? 'border-[var(--ink)] bg-[var(--gold)] text-[var(--ink)] shadow-ink-1'
+                          : 'border-transparent text-[var(--ink)] hover:bg-[var(--paper-deep)]'
+                      )}
                     >
                       {link.label}
-                    </motion.span>
-                    <motion.span
-                      className="absolute bottom-[-4px] left-0 h-[3px] bg-[var(--primary)]"
-                      initial={{ scaleX: 0 }}
-                      animate={pathname === link.href ? { scaleX: 1 } : { scaleX: 0 }}
-                      whileHover={{ scaleX: 1 }}
-                      style={{ transformOrigin: 'left' }}
-                    />
-                  </Link>
-                ))}
-              </div>
-            </motion.div>
+                    </Link>
+                  </motion.li>
+                )
+              })}
+            </motion.ul>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               {isAuthenticated ? (
                 <>
                   <Button
@@ -108,7 +121,7 @@ export function Navbar() {
                     className="relative"
                     aria-label={`Shopping cart${itemCount > 0 ? ` with ${itemCount} items` : ''}`}
                   >
-                    <ShoppingCart className="w-5 h-5" />
+                    <ShoppingCart className="h-5 w-5" aria-hidden="true" />
                     <StickerPeel />
                     <AnimatePresence mode="wait">
                       {itemCount > 0 && (
@@ -118,7 +131,7 @@ export function Navbar() {
                           initial="initial"
                           animate="animate"
                           exit="exit"
-                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[var(--primary)] text-white text-xs flex items-center justify-center"
+                          className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--pink-strong)] text-xs font-semibold text-[var(--on-pink-strong)]"
                         >
                           {itemCount > 99 ? '99+' : itemCount}
                         </motion.span>
@@ -129,49 +142,62 @@ export function Navbar() {
                   {isAdmin && (
                     <Link href="/admin/dashboard" className="hidden sm:block">
                       <Button variant="secondary" size="sm">
-                        <LayoutDashboard className="w-4 h-4 mr-1" />
+                        <LayoutDashboard className="mr-1 h-4 w-4" aria-hidden="true" />
                         Admin
                       </Button>
                     </Link>
                   )}
 
-                  <div className="relative group">
+                  <div className="group relative">
                     <Button variant="ghost" size="sm" className="gap-2">
-                      <User className="w-5 h-5" />
-                      <span className="hidden sm:block">{user?.name || user?.email}</span>
+                      <User className="h-5 w-5" aria-hidden="true" />
+                      <span className="hidden max-w-[10rem] truncate sm:block">
+                        {user?.name || user?.email}
+                      </span>
                     </Button>
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white border-3 border-[var(--ink)] rounded-card shadow-[0_10px_40px_rgba(0,0,0,0.15)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 animate-scale-in">
-                      <div className="p-2">
-                        <Link
-                          href="/profile"
-                          className="block px-3 py-2 text-body text-[var(--ink)] hover:bg-[var(--light)] rounded-input transition-colors"
-                        >
-                          Profile
-                        </Link>
-                        <Link
-                          href="/orders"
-                          className="block px-3 py-2 text-body text-[var(--ink)] hover:bg-[var(--light)] rounded-input transition-colors"
-                        >
-                          My Orders
-                        </Link>
-                        <hr className="my-2 border-[var(--light)]" />
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-left px-3 py-2 text-body text-red-500 hover:bg-[var(--light)] rounded-input transition-colors"
-                        >
-                          Logout
-                        </button>
-                      </div>
+                    <div className="invisible absolute right-0 top-full z-50 mt-2 w-48 rounded-pill border-2 border-[var(--ink)] bg-[var(--surface-raised)] p-2 opacity-0 shadow-ink-2 transition-all duration-fast ease-out group-hover:visible group-hover:opacity-100">
+                      <Link
+                        href="/profile"
+                        className={cn(
+                          'block rounded-pill px-3 py-2 font-body text-base text-[var(--ink)] transition-colors duration-fast hover:bg-[var(--paper-deep)]',
+                          FOCUS_VISIBLE
+                        )}
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        href="/orders"
+                        className={cn(
+                          'block rounded-pill px-3 py-2 font-body text-base text-[var(--ink)] transition-colors duration-fast hover:bg-[var(--paper-deep)]',
+                          FOCUS_VISIBLE
+                        )}
+                      >
+                        My Orders
+                      </Link>
+                      <hr className="my-2 border-[var(--ink)]/20" />
+                      <button
+                        onClick={handleLogout}
+                        className={cn(
+                          'w-full rounded-pill px-3 py-2 text-left font-body text-base text-[var(--error)] transition-colors duration-fast hover:bg-[var(--error)]/10',
+                          FOCUS_VISIBLE
+                        )}
+                      >
+                        Logout
+                      </button>
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <Link href="/login">
-                    <Button variant="ghost" size="sm">Login</Button>
+                    <Button variant="ghost" size="sm">
+                      Login
+                    </Button>
                   </Link>
                   <Link href="/register">
-                    <Button variant="primary" size="sm">Sign Up</Button>
+                    <Button variant="primary" size="sm">
+                      Sign Up
+                    </Button>
                   </Link>
                 </div>
               )}
@@ -180,121 +206,135 @@ export function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-[var(--ink)] hover:text-[var(--primary)] transition-colors"
+            className={cn(
+              'flex min-h-[44px] min-w-[44px] items-center justify-center rounded-pill text-[var(--ink)] transition-colors duration-fast hover:bg-[var(--paper-deep)] md:hidden',
+              FOCUS_VISIBLE
+            )}
             onClick={toggleMobileMenu}
             aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
+            aria-controls="mobile-menu-panel"
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" aria-hidden="true" />
+            ) : (
+              <Menu className="h-6 w-6" aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — full-width panel below the bar */}
       <AnimatePresence mode="wait">
         {mobileMenuOpen && (
           <motion.div
-            id="mobile-menu"
-            key="mobile-menu"
-            initial={{ opacity: 0, scaleY: 0 }}
-            animate={{ opacity: 1, scaleY: 1 }}
-            exit={{ opacity: 0, scaleY: 0 }}
-            transition={{ duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] }}
+            id="mobile-menu-panel"
+            key="mobile-menu-panel"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             style={{ transformOrigin: 'top' }}
-            className="md:hidden relative"
+            className="overflow-hidden border-t-2 border-[var(--ink)] bg-[var(--paper)] md:hidden"
           >
-            <DoodleBackground shapeCount={6} className="inset-0 -z-10" />
-            <div className="bg-[var(--surface-card)]/95 backdrop-blur-md border-t border-[var(--border-secondary)] px-4 py-4 space-y-2">
-              <motion.div
+            <div className="space-y-2 px-4 py-4">
+              <motion.ul
                 variants={motionVariants.staggerContainer}
                 initial="initial"
                 animate="animate"
+                className="flex flex-col gap-1"
               >
-                {navLinks.map((link, index) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      'block px-3 py-3 rounded-input font-medium transition-colors',
-                      pathname === link.href
-                        ? 'bg-[var(--primary)]/10 text-[var(--primary)]'
-                        : 'text-[var(--ink)] hover:bg-[var(--light)]'
-                    )}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <motion.span
-                      variants={motionVariants.staggerItem}
-                      custom={index}
-                    >
-                      {link.label}
-                    </motion.span>
-                  </Link>
-                ))}
-              </motion.div>
+                {navLinks.map((link, index) => {
+                  const isActive = pathname === link.href
+                  return (
+                    <motion.li key={link.href} variants={motionVariants.staggerItem} custom={index}>
+                      <Link
+                        href={link.href}
+                        aria-current={isActive ? 'page' : undefined}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cn(
+                          'flex min-h-[44px] items-center rounded-pill border-2 px-4 py-3 font-body text-base font-medium transition-colors duration-fast',
+                          FOCUS_VISIBLE,
+                          isActive
+                            ? 'border-[var(--ink)] bg-[var(--gold)] text-[var(--ink)] shadow-ink-1'
+                            : 'border-transparent text-[var(--ink)] hover:bg-[var(--paper-deep)]'
+                        )}
+                      >
+                        <span>{link.label}</span>
+                      </Link>
+                    </motion.li>
+                  )
+                })}
+              </motion.ul>
 
               <motion.div
-                className="pt-4 border-t border-[var(--border-secondary)] flex flex-col gap-3"
+                className="flex flex-col gap-2 border-t-2 border-dashed border-[var(--ink)]/30 pt-4"
                 variants={motionVariants.staggerContainer}
                 initial="initial"
                 animate="animate"
               >
                 {isAuthenticated ? (
                   <>
-                    <motion.button
-                      custom={0}
-                      variants={motionVariants.staggerItem}
-                      onClick={() => { toggleCart(); setMobileMenuOpen(false) }}
-                      className="w-full px-3 py-3 rounded-input font-medium text-[var(--ink)] hover:bg-[var(--light)] transition-colors flex items-center gap-3"
-                    >
-                      <ShoppingCart className="w-5 h-5" />
-                      Cart {itemCount > 0 && `(${itemCount})`}
-                    </motion.button>
+                    <motion.div variants={motionVariants.staggerItem} custom={0}>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start gap-3"
+                        onClick={() => {
+                          toggleCart()
+                          setMobileMenuOpen(false)
+                        }}
+                      >
+                        <ShoppingCart className="h-5 w-5" aria-hidden="true" />
+                        Cart {itemCount > 0 && `(${itemCount})`}
+                      </Button>
+                    </motion.div>
 
                     {isAdmin && (
-                      <Link
-                        href="/admin/dashboard"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="w-full px-3 py-3 rounded-input font-medium bg-[var(--secondary)] text-[var(--ink)] hover:bg-[var(--secondary)]/90 transition-colors flex items-center gap-3 text-center"
-                      >
-                        <motion.span
-                          custom={1}
-                          variants={motionVariants.staggerItem}
+                      <motion.div variants={motionVariants.staggerItem} custom={1}>
+                        <Link
+                          href="/admin/dashboard"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block"
                         >
-                          <LayoutDashboard className="w-4 h-4" />
-                          Admin Dashboard
-                        </motion.span>
-                      </Link>
+                          <Button variant="secondary" className="w-full justify-start gap-3">
+                            <LayoutDashboard className="h-5 w-5" aria-hidden="true" />
+                            Admin Dashboard
+                          </Button>
+                        </Link>
+                      </motion.div>
                     )}
 
-                    <motion.button
-                      custom={isAdmin ? 2 : 1}
-                      variants={motionVariants.staggerItem}
-                      onClick={handleLogout}
-                      className="w-full px-3 py-3 rounded-input font-medium text-red-500 border border-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-3"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      Logout
-                    </motion.button>
+                    <motion.div variants={motionVariants.staggerItem} custom={isAdmin ? 2 : 1}>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start gap-3 text-[var(--error)]"
+                        onClick={handleLogout}
+                      >
+                        <LogOut className="h-5 w-5" aria-hidden="true" />
+                        Logout
+                      </Button>
+                    </motion.div>
                   </>
                 ) : (
                   <>
-                    <motion.button
-                      custom={0}
-                      variants={motionVariants.staggerItem}
-                      onClick={() => { setMobileMenuOpen(false); router.push('/login') }}
-                      className="w-full px-3 py-3 rounded-input font-medium border border-[var(--ink)] text-[var(--ink)] hover:bg-[var(--light)] transition-colors"
-                    >
-                      Login
-                    </motion.button>
-                    <motion.button
-                      custom={1}
-                      variants={motionVariants.staggerItem}
-                      onClick={() => { setMobileMenuOpen(false); router.push('/register') }}
-                      className="w-full px-3 py-3 rounded-input font-medium bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 transition-colors"
-                    >
-                      Sign Up
-                    </motion.button>
+                    <motion.div variants={motionVariants.staggerItem} custom={0}>
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="block">
+                        <Button variant="outline" className="w-full">
+                          Login
+                        </Button>
+                      </Link>
+                    </motion.div>
+                    <motion.div variants={motionVariants.staggerItem} custom={1}>
+                      <Link
+                        href="/register"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block"
+                      >
+                        <Button variant="primary" className="w-full">
+                          Sign Up
+                        </Button>
+                      </Link>
+                    </motion.div>
                   </>
                 )}
               </motion.div>

@@ -4,11 +4,20 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/Button'
+import { FOCUS_VISIBLE } from '@/components/ui/shared'
 import { Home, ShoppingBag, Edit3, Info, Mail, X, Menu } from 'lucide-react'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useCartStore } from '@/lib/stores/cartStore'
-import { Button } from '@/components/ui/Button'
 import { signOut } from 'next-auth/react'
+
+/**
+ * Task 1.2 — the bottom tab bar (spec §6 component inventory; owner ruling 1).
+ *
+ * `Navbar` owns the top bar and its mobile dropdown panel; this stays as the
+ * mobile bottom tab bar. Rebuilt onto the token set: paper surface, 2px ink
+ * top border, hard offset ink shadow, token-only colour, 44px hit targets.
+ */
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
@@ -20,7 +29,7 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname()
-  const { user, isAuthenticated, logout, isAdmin } = useAuth()
+  const { isAuthenticated, logout, isAdmin } = useAuth()
   const { itemCount, toggleCart } = useCartStore()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -34,27 +43,33 @@ export function MobileNav() {
       {/* Bottom Navigation Bar */}
       <nav
         className={cn(
-          'fixed bottom-0 left-0 right-0 z-40 md:hidden',
-          'bg-white border-t-3 border-[var(--ink)] shadow-[0_-10px_40px_rgba(0,0,0,0.1)]',
-          isOpen && 'mb-64'
+          'fixed bottom-0 left-0 right-0 z-[var(--z-fixed)] md:hidden',
+          'border-t-2 border-[var(--ink)] bg-[var(--paper)] shadow-ink-2'
         )}
         aria-label="Bottom navigation"
       >
         <div className="grid grid-cols-5">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+            const isActive =
+              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 py-3 px-2 min-h-[44px] transition-colors',
-                  isActive ? 'text-primary' : 'text-[var(--ink)]/60 hover:text-primary'
+                  'flex min-h-[56px] flex-col items-center justify-center gap-1 px-2 py-3 transition-colors duration-fast',
+                  FOCUS_VISIBLE,
+                  isActive
+                    ? 'bg-[var(--gold)] text-[var(--ink)]'
+                    : 'text-[var(--ink-muted)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]'
                 )}
                 aria-current={isActive ? 'page' : undefined}
                 onClick={() => setIsOpen(false)}
               >
-                <item.icon className={cn('w-6 h-6', isActive && 'fill-current')} aria-hidden="true" />
+                <item.icon
+                  className={cn('h-6 w-6', isActive && 'fill-current')}
+                  aria-hidden="true"
+                />
                 <span className="text-xs font-medium">{item.label}</span>
               </Link>
             )
@@ -64,14 +79,21 @@ export function MobileNav() {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={cn(
-              'flex flex-col items-center justify-center gap-1 py-3 px-2 min-h-[44px] transition-colors',
-              'text-[var(--ink)]/60 hover:text-primary'
+              'flex min-h-[56px] flex-col items-center justify-center gap-1 px-2 py-3 transition-colors duration-fast',
+              FOCUS_VISIBLE,
+              isOpen
+                ? 'bg-[var(--gold)] text-[var(--ink)]'
+                : 'text-[var(--ink-muted)] hover:bg-[var(--paper-deep)] hover:text-[var(--ink)]'
             )}
             aria-expanded={isOpen}
             aria-controls="mobile-nav-menu"
             aria-label={isOpen ? 'Close menu' : 'Open menu'}
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? (
+              <X className="h-6 w-6" aria-hidden="true" />
+            ) : (
+              <Menu className="h-6 w-6" aria-hidden="true" />
+            )}
             <span className="text-xs font-medium">{isOpen ? 'Close' : 'More'}</span>
           </button>
         </div>
@@ -80,28 +102,31 @@ export function MobileNav() {
         <div
           id="mobile-nav-menu"
           className={cn(
-            'md:hidden border-t border-[var(--light)] bg-white animate-slide-in',
+            'border-t-2 border-[var(--ink)] bg-[var(--paper-raised)]',
             isOpen ? 'block' : 'hidden'
           )}
         >
-          <div className="px-4 py-4 space-y-2">
+          <div className="space-y-2 px-4 py-4">
             {/* Cart */}
             {isAuthenticated && (
               <Button
                 variant="outline"
                 className="w-full justify-start gap-3"
-                onClick={() => { toggleCart(); setIsOpen(false) }}
+                onClick={() => {
+                  toggleCart()
+                  setIsOpen(false)
+                }}
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="h-5 w-5" aria-hidden="true" />
                 Cart {itemCount > 0 && `(${itemCount})`}
               </Button>
             )}
 
             {/* Admin Link */}
             {isAuthenticated && isAdmin && (
-              <Link href="/admin/dashboard" onClick={() => setIsOpen(false)}>
+              <Link href="/admin/dashboard" onClick={() => setIsOpen(false)} className="block">
                 <Button variant="secondary" className="w-full justify-start gap-3">
-                  <Edit3 className="w-5 h-5" />
+                  <Edit3 className="h-5 w-5" aria-hidden="true" />
                   Admin Dashboard
                 </Button>
               </Link>
@@ -111,19 +136,23 @@ export function MobileNav() {
             {isAuthenticated ? (
               <Button
                 variant="outline"
-                className="w-full justify-start gap-3 text-red-500 border-red-500"
+                className="w-full justify-start gap-3 text-[var(--error)]"
                 onClick={handleLogout}
               >
-                <X className="w-5 h-5" />
+                <X className="h-5 w-5" aria-hidden="true" />
                 Logout
               </Button>
             ) : (
               <div className="grid grid-cols-2 gap-3">
-                <Link href="/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full">Login</Button>
+                <Link href="/login" onClick={() => setIsOpen(false)} className="block">
+                  <Button variant="outline" className="w-full">
+                    Login
+                  </Button>
                 </Link>
-                <Link href="/register" onClick={() => setIsOpen(false)}>
-                  <Button variant="primary" className="w-full">Sign Up</Button>
+                <Link href="/register" onClick={() => setIsOpen(false)} className="block">
+                  <Button variant="primary" className="w-full">
+                    Sign Up
+                  </Button>
                 </Link>
               </div>
             )}
@@ -135,12 +164,12 @@ export function MobileNav() {
       {isAuthenticated && !isOpen && (
         <Button
           onClick={toggleCart}
-          className="fixed bottom-24 right-4 md:hidden z-30 shadow-[0_10px_40px_rgba(0,0,0,0.2)]"
+          className="fixed bottom-24 right-4 z-[var(--z-fixed)] md:hidden"
           aria-label={`Shopping cart${itemCount > 0 ? ` with ${itemCount} items` : ''}`}
         >
-          <ShoppingBag className="w-6 h-6" />
+          <ShoppingBag className="h-6 w-6" aria-hidden="true" />
           {itemCount > 0 && (
-            <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center">
+            <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--pink-strong)] text-xs font-semibold text-[var(--on-pink-strong)]">
               {itemCount > 99 ? '99+' : itemCount}
             </span>
           )}
