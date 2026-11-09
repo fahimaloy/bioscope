@@ -104,9 +104,11 @@ describe('Footer', () => {
   it('renders the wordmark and links all 16 real destinations', () => {
     render(<Footer />)
 
-    // The lockup: the mark image plus the accessible brand name.
+    // The lockup: the mark image plus the accessible brand name on its link.
+    // The old assertion passed on the sr-only text node alone; the link's
+    // accessible name pins the lockup link itself.
     expect(screen.getByRole('img', { name: 'bioscope' })).toBeInTheDocument()
-    expect(screen.getAllByText('bioscope').length).toBeGreaterThan(0)
+    expect(screen.getByRole('link', { name: 'bioscope — home' })).toBeInTheDocument()
 
     for (const { href, label } of DESTINATIONS) {
       const link = screen.getByRole('link', { name: label })
@@ -188,19 +190,32 @@ describe('Footer', () => {
 
     expect(container.querySelector('form')).toBeNull()
     expect(container.querySelector('input')).toBeNull()
+    expect(container.querySelector('[name="footer-email"]')).toBeNull()
     expect(screen.queryByRole('heading', { name: /newsletter/i })).toBeNull()
     expect(screen.queryByRole('button', { name: /subscribe/i })).toBeNull()
+    expect(screen.queryByText(/subscribe/i)).toBeNull()
 
-    // The legacy handler was `console.log` + a TODO; no backend exists.
+    // The legacy handler was `console.log` + a TODO; no backend exists. The
+    // rendered tree proves the form and its copy are gone; the source scan is
+    // kept only as a backstop for the handler, which leaves no rendered trace.
     const source = readFileSync('src/components/layout/Footer.tsx', 'utf8')
     expect(source).not.toContain('console.log')
-    expect(source).not.toContain('footer-email')
-    expect(source).not.toContain('Subscribe')
   })
 
   it('does not import the deprecated DoodleElements shim (Ruling 5)', () => {
-    const source = readFileSync('src/components/layout/Footer.tsx', 'utf8')
+    const { container } = render(<Footer />)
 
+    // Rendered tree: the shim's DoodleShape/DoodleScribble/DoodleStar all draw
+    // organic SVGs, while the footer legitimately renders only the TornEdge
+    // (0 0 100 12) and the 24×24 lucide contact icons.
+    const svgs = Array.from(container.querySelectorAll('svg'))
+    expect(svgs.length).toBeGreaterThan(0)
+    for (const svg of svgs) {
+      expect(['0 0 100 12', '0 0 24 24']).toContain(svg.getAttribute('viewBox'))
+    }
+
+    // Backstop: the shim is never imported.
+    const source = readFileSync('src/components/layout/Footer.tsx', 'utf8')
     expect(source).not.toContain('DoodleElements')
     expect(source).not.toContain('DoodleShape')
     expect(source).not.toContain('DoodleBackground')

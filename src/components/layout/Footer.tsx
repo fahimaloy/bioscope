@@ -87,8 +87,15 @@ const SOCIAL = [
   { label: 'LinkedIn', href: 'https://linkedin.com/company/bioscope' },
 ] as const
 
-/** A destination row: 44px tall so the hit target clears contract §6. */
-const LINK_CLASS = `flex min-h-[44px] items-center text-body text-[var(--paper)]/75 transition-colors duration-fast hover:text-[var(--paper)] ${FOCUS_VISIBLE}`
+/**
+ * A destination row: 44px tall so the hit target clears contract §6.
+ *
+ * Translucent paper is written as `color-mix`, not an opacity modifier:
+ * Tailwind 3.4 emits no rule for `text-[var(--paper)]/75` (the `/75` modifier
+ * does not apply to a `var()` arbitrary value), so the class silently does
+ * nothing. `color-mix(in srgb, …)` compiles and resolves at paint time.
+ */
+const LINK_CLASS = `flex min-h-[44px] items-center font-body text-[color-mix(in_srgb,var(--paper)_75%,transparent)] transition-colors duration-fast hover:text-[var(--paper)] ${FOCUS_VISIBLE}`
 
 export function Footer() {
   return (
@@ -118,7 +125,7 @@ export function Footer() {
             {/* TODO: owner copy */}
             <motion.p
               variants={motionVariants.staggerItem}
-              className="mt-6 max-w-sm text-body leading-relaxed text-[var(--paper)]/75"
+              className="mt-6 max-w-sm font-body leading-relaxed text-[color-mix(in_srgb,var(--paper)_75%,transparent)]"
             >
               Custom stickers, vinyl and holographic, designed and printed in Dhaka.
             </motion.p>
@@ -132,7 +139,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   whileHover={motionVariants.hoverLift}
                   whileTap={motionVariants.tapPress}
-                  className={`inline-flex min-h-[44px] items-center rounded-pill border-2 border-[var(--paper)]/30 px-4 text-sm font-medium text-[var(--paper)] transition-colors duration-fast hover:border-[var(--paper)] hover:bg-[var(--paper)] hover:text-[var(--ink)] ${FOCUS_VISIBLE}`}
+                  className={`inline-flex min-h-[44px] items-center rounded-pill border-2 border-[color-mix(in_srgb,var(--paper)_30%,transparent)] px-4 text-sm font-medium text-[var(--paper)] transition-colors duration-fast hover:border-[var(--paper)] hover:bg-[var(--paper)] hover:text-[var(--ink)] ${FOCUS_VISIBLE}`}
                 >
                   {social.label}
                 </motion.a>
@@ -150,12 +157,12 @@ export function Footer() {
               initial="hidden"
               animate="visible"
             >
-              <motion.h3
+              <motion.h2
                 variants={motionVariants.staggerItem}
                 className="font-display text-lg uppercase tracking-wider text-[var(--paper)]"
               >
                 {column.title}
-              </motion.h3>
+              </motion.h2>
               <ul className="mt-4 space-y-1">
                 {column.links.map((link) => (
                   <motion.li key={link.href} variants={motionVariants.staggerItem}>
@@ -174,7 +181,7 @@ export function Footer() {
           variants={motionVariants.staggerContainer}
           initial="hidden"
           animate="visible"
-          className="mt-16 grid grid-cols-1 gap-4 border-t-2 border-[var(--paper)]/20 pt-10 sm:grid-cols-3"
+          className="mt-16 grid grid-cols-1 gap-4 border-t-2 border-[color-mix(in_srgb,var(--paper)_20%,transparent)] pt-10 sm:grid-cols-3"
         >
           {CONTACT.map(({ icon: Icon, label, href, note }) => {
             const external = href.startsWith('http')
@@ -183,14 +190,16 @@ export function Footer() {
                 <a
                   href={href}
                   {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  className={`flex items-start gap-4 rounded-md text-body text-[var(--paper)] transition-colors duration-fast hover:text-[var(--paper-raised)] ${FOCUS_VISIBLE}`}
+                  className={`flex items-start gap-4 rounded-md font-body text-[var(--paper)] transition-colors duration-fast hover:text-[var(--paper-raised)] ${FOCUS_VISIBLE}`}
                 >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill border-2 border-[var(--paper)]/30">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill border-2 border-[color-mix(in_srgb,var(--paper)_30%,transparent)]">
                     <Icon size={18} strokeWidth={2} aria-hidden="true" />
                   </span>
                   <span>
                     <span className="block font-medium">{label}</span>
-                    <span className="mt-0.5 block text-sm text-[var(--paper)]/60">{note}</span>
+                    <span className="mt-0.5 block text-sm text-[color-mix(in_srgb,var(--paper)_60%,transparent)]">
+                      {note}
+                    </span>
                   </span>
                 </a>
               </motion.li>
@@ -199,11 +208,13 @@ export function Footer() {
         </motion.ul>
 
         {/* Bottom bar. */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t-2 border-[var(--paper)]/20 pt-8 sm:flex-row">
-          <p className="text-sm text-[var(--paper)]/60">
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t-2 border-[color-mix(in_srgb,var(--paper)_20%,transparent)] pt-8 sm:flex-row">
+          <p className="text-sm text-[color-mix(in_srgb,var(--paper)_60%,transparent)]">
             © {new Date().getFullYear()} bioscope. All rights reserved.
           </p>
-          <p className="text-sm text-[var(--paper)]/60">Made with care in Bangladesh</p>
+          <p className="text-sm text-[color-mix(in_srgb,var(--paper)_60%,transparent)]">
+            Made with care in Bangladesh
+          </p>
         </div>
       </div>
     </footer>
