@@ -594,34 +594,6 @@ h1, h2, h3, .logo, .footer-logo {
   }
 }
 
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #1A1A1A;
-    --bg-secondary: #242424;
-    --bg-tertiary: #2D2D2D;
-    --bg-inverse: #FFFFFF;
-    --text-primary: #F5F5F5;
-    --text-secondary: #BDBDBD;
-    --text-tertiary: #8E8E8E;
-    --text-inverse: #1A1A1A;
-    --surface: #242424;
-    --surface-hover: #2D2D2D;
-    --surface-active: #383838;
-    --surface-elevated: #2D2D2D;
-    --surface-card: #242424;
-    --border-primary: #FFFFFF;
-    --border-secondary: #404040;
-    --border-focus: var(--primary);
-    --shadow-xs: 2px 2px 0px #FFFFFF;
-    --shadow-sm: 4px 4px 0px #FFFFFF;
-    --shadow-md: 6px 6px 0px var(--secondary);
-    --shadow-lg: 8px 8px 0px var(--secondary);
-    --shadow-xl: 12px 12px 0px var(--primary);
-    --shadow-inner: inset 2px 2px 0px #FFFFFF;
-  }
-}
-
 /* Focus Styles for Accessibility */
 :focus-visible {
   outline: 3px solid var(--accent);
@@ -755,7 +727,7 @@ th {
 
 .sonner-toast.error {
   border-color: var(--error) !important;
-  box-shadow: 8px 8px 0px var(--error) !important;
+  box-shadow: var(--shadow-ink-2) !important;
 }
 
 .sonner-toast.warning {
@@ -782,22 +754,22 @@ th {
 /* Toast title - semibold */
 .sonner-toast .sonner-title {
   font-weight: 600 !important;
-  color: var(--text-primary) !important;
+  color: var(--text) !important;
 }
 
 /* Toast description text color */
 .sonner-toast .sonner-description {
-  color: var(--text-primary) !important;
+  color: var(--text) !important;
 }
 
 /* Toast close button */
 .sonner-toast .sonner-close {
-  color: var(--text-tertiary) !important;
+  color: var(--text-muted) !important;
   opacity: 1 !important;
 }
 
 .sonner-toast .sonner-close:hover {
-  color: var(--text-primary) !important;
+  color: var(--text) !important;
   background: transparent !important;
 }
 
@@ -809,13 +781,13 @@ th {
   border: 2px solid var(--ink) !important;
   padding: 0.5rem 1rem !important;
   background: transparent !important;
-  color: var(--text-primary) !important;
-  transition: all var(--transition-fast) !important;
+  color: var(--text) !important;
+  transition: all var(--dur-fast) !important;
 }
 
 .sonner-toast .sonner-action:hover {
   background: var(--ink) !important;
-  color: var(--surface-card) !important;
+  color: var(--text-inverse) !important;
 }
 
 /* Toast progress bar */
