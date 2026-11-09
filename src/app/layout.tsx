@@ -81,7 +81,6 @@ export default function RootLayout({
             <Footer />
             <Toaster
               position="bottom-right"
-              theme="system"
               toastOptions={{
                 className: 'sonner-toast',
               }}

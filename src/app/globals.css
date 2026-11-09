@@ -740,16 +740,17 @@ th {
 
 /* Toast Customization */
 .sonner-toast {
-  border-radius: var(--radius-xl) !important; /* 20px */
+  border-radius: var(--radius-xl) !important; /* 24px */
   border: 3px solid var(--ink) !important;
-  box-shadow: var(--shadow-card) !important;
+  box-shadow: var(--shadow-ink-2) !important;
   font-family: var(--font-body) !important;
-  background: var(--surface-card) !important;
+  background: var(--surface-raised) !important;
+  color: var(--text) !important;
 }
 
 .sonner-toast.success {
   border-color: var(--success) !important;
-  box-shadow: var(--shadow-stat) !important;
+  box-shadow: var(--shadow-ink-2) !important;
 }
 
 .sonner-toast.error {
@@ -759,12 +760,12 @@ th {
 
 .sonner-toast.warning {
   border-color: var(--warning) !important;
-  box-shadow: var(--shadow-card) !important;
+  box-shadow: var(--shadow-ink-2) !important;
 }
 
 .sonner-toast.info {
   border-color: var(--info) !important;
-  box-shadow: var(--shadow-card) !important;
+  box-shadow: var(--shadow-ink-2) !important;
 }
 
 /* Toast icon bounceIn animation */

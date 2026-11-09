@@ -27,10 +27,6 @@ interface UIState {
   toggleSearch: () => void
   setSearchOpen: (open: boolean) => void
 
-  // Theme
-  theme: 'light' | 'dark' | 'system'
-  setTheme: (theme: 'light' | 'dark' | 'system') => void
-
   // Loading states
   globalLoading: boolean
   setGlobalLoading: (loading: boolean) => void
@@ -71,10 +67,6 @@ export const useUIStore = create<UIState>()(
       toggleSearch: () => set((state) => ({ searchOpen: !state.searchOpen })),
       setSearchOpen: (open) => set({ searchOpen: open }),
 
-      // Theme
-      theme: 'system',
-      setTheme: (theme) => set({ theme }),
-
       // Loading
       globalLoading: false,
       setGlobalLoading: (loading) => set({ globalLoading: loading }),
@@ -87,7 +79,6 @@ export const useUIStore = create<UIState>()(
       name: 'sticker-ui',
       partialize: (state) => ({
         sidebarCollapsed: state.sidebarCollapsed,
-        theme: state.theme,
       }),
     }
   )
@@ -124,12 +115,6 @@ export const useSearch = () =>
     open: state.searchOpen,
     toggle: state.toggleSearch,
     setOpen: state.setSearchOpen,
-  }))
-
-export const useTheme = () =>
-  useUIStore((state) => ({
-    theme: state.theme,
-    setTheme: state.setTheme,
   }))
 
 export const useGlobalLoading = () =>
