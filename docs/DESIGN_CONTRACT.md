@@ -69,7 +69,8 @@ environment, so the contract lives here and every task brief references it.
 ## 5. Brand surfaces (Paper + Pop)
 
 - **Ink borders:** 3px solid `--ink` on cards, buttons, badges, and section
-  frames. 2px on dense/data surfaces (tables, inputs, admin).
+  frames. 2px on dense/data surfaces (tables, inputs). **1px hairlines on the
+  calm-pro admin panel** — the admin is the deliberate exception, per spec §13.
 - **Offset shadows:** hard, never blurred — `--shadow-ink-2` (4px) on small
   elements, `--shadow-ink-3` (6px) on cards, `--shadow-ink-4` (10px) on hero
   and CTA bands. Hover grows the shadow one step and lifts 3–4px on a spring.
