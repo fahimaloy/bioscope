@@ -135,7 +135,9 @@ h1, h2, h3, .logo, .footer-logo {
   background: rgba(255, 255, 255, 0.9);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-glass);
+  /* Contract §5: no gradients, no glass. The blurred treatment is dead, so
+     the strongest elevation is a hard ink offset. */
+  box-shadow: var(--shadow-ink-4);
 }
 
 /* Background Shapes */
@@ -182,12 +184,12 @@ h1, h2, h3, .logo, .footer-logo {
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: 3px solid var(--ink);
   cursor: pointer;
-  box-shadow: var(--shadow-btn);
+  box-shadow: var(--shadow-ink-2);
 }
 
 .btn:active {
   transform: translate(4px, 4px);
-  box-shadow: var(--shadow-btn-active);
+  box-shadow: var(--shadow-ink-1);
 }
 
 .btn-primary {
@@ -202,14 +204,14 @@ h1, h2, h3, .logo, .footer-logo {
 
 .btn:hover {
   transform: translateY(-5px);
-  box-shadow: var(--shadow-btn-hover);
+  box-shadow: var(--shadow-ink-3);
 }
 
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
-  box-shadow: var(--shadow-btn);
+  box-shadow: var(--shadow-ink-2);
 }
 
 /* Cards */
@@ -218,7 +220,7 @@ h1, h2, h3, .logo, .footer-logo {
   padding: 2.5rem;
   border-radius: 20px;
   border: 3px solid var(--ink);
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-ink-2);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-align: center;
   position: relative;
@@ -227,7 +229,7 @@ h1, h2, h3, .logo, .footer-logo {
 
 .card:hover {
   transform: translateY(-10px) scale(1.02);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-ink-3);
 }
 
 .card-icon {
@@ -270,7 +272,7 @@ h1, h2, h3, .logo, .footer-logo {
 .form-group select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: var(--shadow-input);
+  box-shadow: var(--shadow-ink-1);
 }
 
 /* Floating Labels */
@@ -325,7 +327,7 @@ h1, h2, h3, .logo, .footer-logo {
   padding: 1.5rem;
   border-radius: 20px;
   border: 3px solid var(--ink);
-  box-shadow: var(--shadow-stat);
+  box-shadow: var(--shadow-ink-2);
   min-width: 150px;
 }
 
@@ -450,12 +452,12 @@ h1, h2, h3, .logo, .footer-logo {
 
 /* Utility Classes */
 .animate-fade-in { animation: fade-in 0.3s ease-out; }
-.animate-fade-in-up { animation: fade-in-up 0.4s var(--transition-base); }
-.animate-fade-in-down { animation: fade-in-down 0.4s var(--transition-base); }
-.animate-scale-in { animation: scale-in 0.3s var(--transition-base); }
-.animate-scale-out { animation: scale-out 0.2s var(--transition-base); }
-.animate-slide-in-right { animation: slide-in-right 0.3s var(--transition-base); }
-.animate-slide-in-left { animation: slide-in-left 0.3s var(--transition-base); }
+.animate-fade-in-up { animation: fade-in-up 0.4s var(--ease-out); }
+.animate-fade-in-down { animation: fade-in-down 0.4s var(--ease-out); }
+.animate-scale-in { animation: scale-in 0.3s var(--ease-out); }
+.animate-scale-out { animation: scale-out 0.2s var(--ease-out); }
+.animate-slide-in-right { animation: slide-in-right 0.3s var(--ease-out); }
+.animate-slide-in-left { animation: slide-in-left 0.3s var(--ease-out); }
 .animate-wobble { animation: wobble 0.5s ease-in-out; }
 .animate-float-gentle { animation: float-gentle 3s ease-in-out infinite; }
 .animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
@@ -807,7 +809,7 @@ th {
   background: white;
   border: 3px solid var(--ink);
   border-radius: 20px;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-ink-2);
   padding: 0.5rem;
 }
 
@@ -839,7 +841,7 @@ th {
 .tabs-trigger[data-state="active"] {
   background: white;
   color: var(--primary);
-  box-shadow: var(--shadow-btn);
+  box-shadow: var(--shadow-ink-2);
 }
 
 /* Badge */
