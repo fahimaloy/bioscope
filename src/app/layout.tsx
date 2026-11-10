@@ -7,6 +7,7 @@ import { Providers } from '@/components/providers'
 import { Toaster } from 'sonner'
 import { Footer } from '@/components/layout/Footer'
 import { Navbar } from '@/components/layout/Navbar'
+import { CartDrawer } from '@/components/cart/CartDrawer'
 
 /**
  * Self-hosted via next/font (spec §5.3): Shrikhand for display, Outfit for
@@ -90,6 +91,10 @@ export default function RootLayout({
                 className: 'sonner-toast',
               }}
             />
+            {/* Ruling 3: mounted once, here, so every route — including `/` and
+                `/admin/*` — has cart access. It is closed by default and only
+                opens from the cart store. */}
+            <CartDrawer />
           </Providers>
         </MotionConfig>
       </body>

@@ -1,21 +1,41 @@
 'use client'
 
-import { ReactNode } from 'react'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
+import type { ReactNode } from 'react'
+import { GrainOverlay, GridPaper } from '@/components/decorative'
 import { cn } from '@/lib/utils'
 
 interface PageWrapperProps {
   children: ReactNode
-  background?: 'default' | 'doodle' | 'grid' | 'none'
+  /**
+   * `default` — the standard page background: `--paper` plus the spec §5.4
+   * paper-grain texture. `grid` — the default plus `GridPaper`. `none` — no
+   * background at all (the page supplies its own surface).
+   */
+  background?: 'default' | 'grid' | 'none'
   className?: string
 }
 
-export function PageWrapper({ children, background = 'doodle', className }: PageWrapperProps) {
+/**
+ * Task 1.5 — the customer page wrapper.
+ *
+ * `default` is the paper page with the fixed grain overlay (spec §5.4);
+ * `grid` adds the graph-paper backdrop for the custom builder; `none` leaves
+ * the surface to the page. The bottom padding clears the fixed `MobileNav`
+ * bar (`pb-20` = 80px against the bar's 72px, an 8px margin) and relaxes to
+ * `pb-12` from `md` up, where the bar is hidden.
+ */
+export function PageWrapper({ children, background = 'default', className }: PageWrapperProps) {
   return (
-    <div className={cn('min-h-screen bg-[var(--bg-primary)] relative', className)}>
-      {background === 'doodle' && <DoodleBackground shapeCount={6} />}
-      {/* {background === 'grid' && <GridBackground />} */}
-      <main className="relative z-10 pt-16 pb-12">{children}</main>
+    <div
+      className={cn(
+        'relative min-h-screen',
+        background !== 'none' && 'bg-[var(--paper)]',
+        className
+      )}
+    >
+      {background !== 'none' && <GrainOverlay />}
+      {background === 'grid' && <GridPaper />}
+      <main className="relative z-10 pt-16 pb-20 md:pb-12">{children}</main>
     </div>
   )
 }
