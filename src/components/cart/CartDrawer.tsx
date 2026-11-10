@@ -47,14 +47,13 @@ export function CartDrawer() {
     isOpenRef.current = isOpen
   }, [isOpen])
 
-  // Open: capture the invoking element, lock scroll, reveal, focus the dialog.
+  // Open: capture the invoking element, lock scroll, reveal.
   // Close: unlock scroll. The exit animation runs before `isVisible` flips.
   useEffect(() => {
     if (isOpen) {
       restoreFocusRef.current = document.activeElement as HTMLElement | null
       document.body.style.overflow = 'hidden'
       setIsVisible(true)
-      asideRef.current?.focus()
     } else {
       document.body.style.overflow = ''
     }
@@ -62,6 +61,15 @@ export function CartDrawer() {
       document.body.style.overflow = ''
     }
   }, [isOpen])
+
+  // Focus only after the reveal commit. `focus()` on an element that still
+  // carries `invisible` (`visibility: hidden`) is a no-op in a real browser,
+  // so focusing inside the effect above would leave focus on <body> — the
+  // drawer must be visible before it can receive focus (review finding 1).
+  useEffect(() => {
+    if (!isVisible) return
+    asideRef.current?.focus()
+  }, [isVisible])
 
   // ESC closes; Tab is trapped while the drawer is open (ruling 9).
   useEffect(() => {
@@ -75,16 +83,32 @@ export function CartDrawer() {
       }
       if (event.key !== 'Tab') return
 
-      const focusables = asideRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-      if (!focusables || focusables.length === 0) return
+      const aside = asideRef.current
+      const focusables = aside?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      if (!aside || !focusables || focusables.length === 0) return
 
       const first = focusables[0]
       const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+      // The aside is itself a tab stop (tabIndex={-1}) but is excluded from
+      // FOCUSABLE_SELECTOR, so treat focus on it as "not inside the trap".
+      const isAside = active === aside
+      const isInside = !isAside && active !== null && aside.contains(active)
 
-      if (event.shiftKey && document.activeElement === first) {
+      // Focus is outside the drawer — or on the dialog surface — so the
+      // browser default would walk out of the modal. Pull it back in: Tab
+      // enters at the top, Shift+Tab at the bottom (review finding 2).
+      if (!isInside) {
+        event.preventDefault()
+        if (event.shiftKey) last.focus()
+        else first.focus()
+        return
+      }
+
+      if (event.shiftKey && active === first) {
         event.preventDefault()
         last.focus()
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && active === last) {
         event.preventDefault()
         first.focus()
       }

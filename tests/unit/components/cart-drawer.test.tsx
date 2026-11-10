@@ -249,6 +249,102 @@ describe('CartDrawer', () => {
     expect(document.activeElement).toBe(last)
   })
 
+  it('pulls focus back into the drawer when Tab is pressed from outside', () => {
+    function Harness() {
+      return (
+        <>
+          <button type="button">Outside the drawer</button>
+          <CartDrawer />
+        </>
+      )
+    }
+    openCartWithItems()
+    render(<Harness />)
+
+    const dialog = screen.getByRole('dialog')
+    const outside = screen.getByRole('button', { name: 'Outside the drawer' })
+    outside.focus()
+    expect(dialog.contains(document.activeElement)).toBe(false)
+
+    fireEvent.keyDown(document, { key: 'Tab' })
+
+    expect(dialog.contains(document.activeElement)).toBe(true)
+  })
+
+  it('pulls focus to the last element on Shift+Tab from outside', () => {
+    function Harness() {
+      return (
+        <>
+          <button type="button">Outside the drawer</button>
+          <CartDrawer />
+        </>
+      )
+    }
+    openCartWithItems()
+    render(<Harness />)
+
+    const dialog = screen.getByRole('dialog')
+    const focusables = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+    const outside = screen.getByRole('button', { name: 'Outside the drawer' })
+    outside.focus()
+
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
+
+    expect(document.activeElement).toBe(focusables[focusables.length - 1])
+  })
+
+  it('moves focus from the dialog surface to the first element on Tab', () => {
+    openCartWithItems()
+    render(<CartDrawer />)
+
+    const dialog = screen.getByRole('dialog')
+    const focusables = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+
+    // The post-open focus target is the dialog surface itself (tabIndex={-1}).
+    expect(document.activeElement).toBe(dialog)
+
+    fireEvent.keyDown(document, { key: 'Tab' })
+
+    expect(document.activeElement).toBe(focusables[0])
+  })
+
+  it('wraps Shift+Tab from the dialog surface to the last element', () => {
+    openCartWithItems()
+    render(<CartDrawer />)
+
+    const dialog = screen.getByRole('dialog')
+    const focusables = Array.from(dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+    expect(document.activeElement).toBe(dialog)
+
+    fireEvent.keyDown(document, { key: 'Tab', shiftKey: true })
+
+    expect(document.activeElement).toBe(focusables[focusables.length - 1])
+  })
+
+  it('focuses the dialog only after it becomes visible, never while still `invisible`', () => {
+    const recorded: string[] = []
+    const originalFocus = HTMLElement.prototype.focus
+    HTMLElement.prototype.focus = function focus(this: HTMLElement, options?: FocusOptions) {
+      if (this.getAttribute('role') === 'dialog') recorded.push(this.className)
+      return originalFocus.call(this, options)
+    } as typeof HTMLElement.prototype.focus
+
+    try {
+      // Render closed (aside carries `invisible`), then open — the transition
+      // a real browser performs. jsdom's `focus()` ignores `visibility`, so
+      // this pins the invariant by recording the class at call time.
+      render(<CartDrawer />)
+      act(() => {
+        useCartStore.setState({ items: [item], itemCount: 2, subtotal: 500, isOpen: true })
+      })
+
+      expect(recorded.length).toBeGreaterThan(0)
+      expect(recorded.some((cls) => cls.includes('invisible'))).toBe(false)
+    } finally {
+      HTMLElement.prototype.focus = originalFocus
+    }
+  })
+
   it('restores focus to the invoking element on close', async () => {
     function Harness() {
       return (
