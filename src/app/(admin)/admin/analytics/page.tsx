@@ -237,10 +237,10 @@ export default function AnalyticsPage() {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'var(--surface-card)',
+                      backgroundColor: 'var(--surface-raised)',
                       border: '3px solid var(--ink)',
                       borderRadius: '20px',
-                      boxShadow: 'var(--shadow-card)',
+                      boxShadow: 'var(--shadow-ink-2)',
                       fontFamily: 'var(--font-body)',
                     }}
                     formatter={(value: number) => [formatNumber(value), 'Orders']}
@@ -381,10 +381,10 @@ export default function AnalyticsPage() {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: 'var(--surface-card)',
+                      backgroundColor: 'var(--surface-raised)',
                       border: '3px solid var(--ink)',
                       borderRadius: '20px',
-                      boxShadow: 'var(--shadow-card)',
+                      boxShadow: 'var(--shadow-ink-2)',
                       fontFamily: 'var(--font-body)',
                     }}
                     formatter={(value: number) => [formatCurrency(value), 'Revenue']}

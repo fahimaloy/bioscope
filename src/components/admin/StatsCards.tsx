@@ -301,10 +301,10 @@ export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'var(--surface-card)',
+                  backgroundColor: 'var(--surface-raised)',
                   border: '3px solid var(--ink)',
                   borderRadius: '20px',
-                  boxShadow: 'var(--shadow-card)',
+                  boxShadow: 'var(--shadow-ink-2)',
                   fontFamily: 'var(--font-body)',
                 }}
                 formatter={(value: number) => [formatCurrency(value), 'Revenue']}
@@ -513,7 +513,7 @@ export function ActivityFeed({ activities, limit = 6 }: { activities: ActivityIt
                   <motion.div
                     className="relative z-10 w-9 h-9 rounded-full border-3 flex items-center justify-center"
                     style={{
-                      backgroundColor: 'var(--surface-card)',
+                      backgroundColor: 'var(--surface-raised)',
                       borderColor: getTypeColor(),
                       boxShadow: isLast ? '0 0 0 4px var(--accent)' : 'none',
                     }}

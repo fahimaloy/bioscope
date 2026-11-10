@@ -79,6 +79,17 @@ const config: Config = {
         'ink-4': 'var(--shadow-ink-4)',
         color: 'var(--shadow-color)',
         'die-cut': 'var(--shadow-die-cut)',
+        // Utility-form shadows used by components (`shadow-card`, `shadow-input`,
+        // `shadow-btn`, …). These map onto the same ink scale as the legacy
+        // `.card` / `.btn` / `.form-group` rules in globals.css.
+        card: 'var(--shadow-ink-2)',
+        'card-hover': 'var(--shadow-ink-3)',
+        btn: 'var(--shadow-ink-2)',
+        'btn-hover': 'var(--shadow-ink-3)',
+        'btn-active': 'var(--shadow-ink-1)',
+        input: 'var(--shadow-ink-1)',
+        stat: 'var(--shadow-ink-2)',
+        glass: 'var(--shadow-ink-4)',
       },
       transitionTimingFunction: {
         spring: 'var(--ease-spring)',
