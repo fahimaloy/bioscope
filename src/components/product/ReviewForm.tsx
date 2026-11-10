@@ -100,7 +100,7 @@ export function ReviewForm({
                 'p-2 rounded-input transition-colors',
                 rating >= star
                   ? 'text-primary'
-                  : 'text-[var(--ink)]/20 hover:text-primary/50'
+                  : 'text-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:text-primary/50'
               )}
               aria-label={`${star} star${star > 1 ? 's' : ''}`}
               aria-checked={rating >= star}
@@ -217,7 +217,7 @@ export function StarRating({
             <Star
               className={cn(
                 sizeClasses[size],
-                filled ? 'fill-primary text-primary' : partial ? 'fill-primary/50 text-primary/50' : 'text-[var(--ink)]/20'
+                filled ? 'fill-primary text-primary' : partial ? 'fill-primary/50 text-primary/50' : 'text-[color-mix(in_srgb,var(--ink)_20%,transparent)]'
               )}
             />
           </button>
@@ -266,7 +266,7 @@ export function ReviewHelpfulButton({
         onClick={() => handleVote('helpful')}
         className={cn(
           'flex items-center gap-1 text-sm transition-colors',
-          voted === 'helpful' ? 'text-primary' : 'text-[var(--ink)]/60 hover:text-primary'
+          voted === 'helpful' ? 'text-primary' : 'text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-primary'
         )}
       >
         <svg className={cn('w-5 h-5', voted === 'helpful' && 'fill-current')} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} fill="none">
@@ -278,7 +278,7 @@ export function ReviewHelpfulButton({
         onClick={() => handleVote('not-helpful')}
         className={cn(
           'flex items-center gap-1 text-sm transition-colors',
-          voted === 'not-helpful' ? 'text-red-500' : 'text-[var(--ink)]/60 hover:text-red-500'
+          voted === 'not-helpful' ? 'text-red-500' : 'text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-red-500'
         )}
       >
         <svg className={cn('w-5 h-5', voted === 'not-helpful' && 'fill-current')} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} fill="none">

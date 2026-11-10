@@ -432,14 +432,14 @@ export function StickerCanvas({
       {/* Rulers */}
       {rulers && (
         <>
-          <div className="absolute top-0 left-8 w-full h-8 bg-white/90 backdrop-blur-sm border-b border-[var(--ink)]/20 overflow-hidden ruler-top z-10">
+          <div className="absolute top-0 left-8 w-full h-8 bg-white/90 backdrop-blur-sm border-b border-[color-mix(in_srgb,var(--ink)_20%,transparent)] overflow-hidden ruler-top z-10">
             <canvas className="w-full h-full" width={width * 2} height={30} />
           </div>
-          <div className="absolute top-8 left-0 w-8 h-full bg-white/90 backdrop-blur-sm border-r border-[var(--ink)]/20 overflow-hidden ruler-left z-10">
+          <div className="absolute top-8 left-0 w-8 h-full bg-white/90 backdrop-blur-sm border-r border-[color-mix(in_srgb,var(--ink)_20%,transparent)] overflow-hidden ruler-left z-10">
             <canvas className="w-full h-full" width={30} height={height * 2} />
           </div>
           {/* Corner */}
-          <div className="absolute top-0 left-0 w-8 h-8 bg-white/90 backdrop-blur-sm border-b border-r border-[var(--ink)]/20 z-20" />
+          <div className="absolute top-0 left-0 w-8 h-8 bg-white/90 backdrop-blur-sm border-b border-r border-[color-mix(in_srgb,var(--ink)_20%,transparent)] z-20" />
         </>
       )}
 
@@ -538,6 +538,6 @@ export function StickerPreview({
   }, [design])
 
   return (
-    <canvas ref={canvasRef} className={cn('rounded-input border border-[var(--ink)]/20', className)} width={width} height={height} />
+    <canvas ref={canvasRef} className={cn('rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]', className)} width={width} height={height} />
   )
 }

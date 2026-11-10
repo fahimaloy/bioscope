@@ -92,7 +92,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
       >
         <div>
           <h2 className="font-display text-2xl text-primary">Settings</h2>
-          <p className="text-[var(--ink)]/60">Configure your store settings</p>
+          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Configure your store settings</p>
         </div>
         <div className="flex gap-3">
           {saved && (
@@ -339,7 +339,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                       type="color"
                       value={appearanceSettings.primaryColor}
                       onChange={(e) => setAppearanceSettings((prev) => ({ ...prev, primaryColor: e.target.value }))}
-                      className="w-full h-12 rounded-input border-2 border-[var(--ink)]/30 cursor-pointer transition-all hover:border-primary"
+                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-primary"
                     />
                     <Input
                       value={appearanceSettings.primaryColor}
@@ -356,7 +356,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                       type="color"
                       value={appearanceSettings.secondaryColor}
                       onChange={(e) => setAppearanceSettings((prev) => ({ ...prev, secondaryColor: e.target.value }))}
-                      className="w-full h-12 rounded-input border-2 border-[var(--ink)]/30 cursor-pointer transition-all hover:border-primary"
+                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-primary"
                     />
                     <Input
                       value={appearanceSettings.secondaryColor}
@@ -373,7 +373,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                       type="color"
                       value={appearanceSettings.accentColor}
                       onChange={(e) => setAppearanceSettings((prev) => ({ ...prev, accentColor: e.target.value }))}
-                      className="w-full h-12 rounded-input border-2 border-[var(--ink)]/30 cursor-pointer transition-all hover:border-primary"
+                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-primary"
                     />
                     <Input
                       value={appearanceSettings.accentColor}
@@ -400,10 +400,10 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                     <input
                       type="file"
                       accept="image/*"
-                      className="w-full px-4 py-3 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input text-body"
+                      className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
                     />
                     {appearanceSettings.logo && (
-                      <img src={appearanceSettings.logo} alt="Logo preview" className="mt-2 h-16 rounded-input border-2 border-[var(--ink)]/10" />
+                      <img src={appearanceSettings.logo} alt="Logo preview" className="mt-2 h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
                     )}
                   </div>
                 </div>
@@ -413,10 +413,10 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                     <input
                       type="file"
                       accept="image/*"
-                      className="w-full px-4 py-3 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input text-body"
+                      className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
                     />
                     {appearanceSettings.favicon && (
-                      <img src={appearanceSettings.favicon} alt="Favicon preview" className="mt-2 w-16 h-16 rounded-input border-2 border-[var(--ink)]/10" />
+                      <img src={appearanceSettings.favicon} alt="Favicon preview" className="mt-2 w-16 h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
                     )}
                   </div>
                 </div>

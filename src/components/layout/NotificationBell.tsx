@@ -109,10 +109,10 @@ export function NotificationBell() {
           {/* List */}
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-[var(--ink)]/50">
-                <Bell className="w-12 h-12 mx-auto mb-3 text-[var(--ink)]/20" />
+              <div className="p-8 text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+                <Bell className="w-12 h-12 mx-auto mb-3 text-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
                 <p className="text-body">No notifications yet</p>
-                <p className="text-sm text-[var(--ink)]/40 mt-1">You're all caught up!</p>
+                <p className="text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] mt-1">You're all caught up!</p>
               </div>
             ) : (
               <ul className="divide-y divide-light" role="list" aria-label="Notifications">
@@ -132,7 +132,7 @@ export function NotificationBell() {
                       <div
                         className={cn(
                           'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                          !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--ink)]/50'
+                          !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
                         )}
                       >
                         {getIcon(notification.type)}
@@ -141,17 +141,17 @@ export function NotificationBell() {
                         <div className="flex items-start justify-between gap-2">
                           <h4 className={cn(
                             'font-medium text-body truncate',
-                            !notification.isRead ? 'text-[var(--ink)]' : 'text-[var(--ink)]/70'
+                            !notification.isRead ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]'
                           )}>
                             {notification.title}
                           </h4>
-                          <time className="text-xs text-[var(--ink)]/40 flex-shrink-0 whitespace-nowrap">
+                          <time className="text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)] flex-shrink-0 whitespace-nowrap">
                             {formatDateTime(notification.createdAt)}
                           </time>
                         </div>
                         <p className={cn(
                           'text-sm mt-1 truncate',
-                          !notification.isRead ? 'text-[var(--ink)]/70' : 'text-[var(--ink)]/50'
+                          !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
                         )}>
                           {notification.message}
                         </p>

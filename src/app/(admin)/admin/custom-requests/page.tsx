@@ -157,7 +157,7 @@ export default function CustomRequestsPage() {
           <img
             src={row.imageUrl}
             alt={row.originalName}
-            className="w-20 h-20 rounded-input object-cover border-2 border-[var(--ink)]/20 cursor-zoom-in hover:opacity-80 transition-opacity"
+            className="w-20 h-20 rounded-input object-cover border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] cursor-zoom-in hover:opacity-80 transition-opacity"
             onClick={() => handleImageClick(row.imageUrl, row.originalName)}
             loading="lazy"
           />
@@ -172,7 +172,7 @@ export default function CustomRequestsPage() {
         <div>
           <span className="font-medium text-[var(--ink)]">{row.user?.name ?? '—'}</span>
           <br />
-          <span className="text-sm text-[var(--ink)]/50">{row.user?.email}</span>
+          <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{row.user?.email}</span>
         </div>
       ),
     },
@@ -182,7 +182,7 @@ export default function CustomRequestsPage() {
       cell: (row: CustomRequest) => (
         <div className="text-sm space-y-2">
           <span className="font-medium text-[var(--ink)]">{row.originalName}</span>
-          <div className="flex flex-wrap gap-3 text-[var(--ink)]/70">
+          <div className="flex flex-wrap gap-3 text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
             <span>{row.width}×{row.height}cm</span>
             <span>{row.quantity} pcs</span>
             <span>{row.material}</span>
@@ -219,7 +219,7 @@ export default function CustomRequestsPage() {
             size="sm"
             onClick={() => handleImageClick(row.imageUrl, row.originalName)}
             aria-label="View design"
-            className="text-[var(--ink)]/50 hover:text-primary"
+            className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary"
           >
             <Eye className="w-4 h-4" />
           </Button>
@@ -268,7 +268,7 @@ export default function CustomRequestsPage() {
               size="sm"
               onClick={() => handlePriceClick(row)}
               aria-label="Edit price"
-              className="text-xs text-[var(--ink)]/50 hover:text-primary"
+              className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary"
             >
               <Edit2 className="w-4 h-4" />
             </Button>
@@ -284,26 +284,26 @@ export default function CustomRequestsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Custom Requests</h1>
-            <p className="text-[var(--ink)]/60">Review and manage custom sticker requests</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Review and manage custom sticker requests</p>
           </div>
         </div>
 
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/40" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
               <input
                 type="text"
                 placeholder="Search requests..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input text-body"
+                className="w-full pl-10 pr-4 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
               />
             </div>
             <select
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-              className="w-48 border-2 border-[var(--ink)]/30 rounded-input bg-white py-2 px-4 text-body focus:border-primary focus:shadow-input focus:outline-none"
+              className="w-48 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white py-2 px-4 text-body focus:border-primary focus:shadow-input focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="PENDING">PENDING</option>
@@ -346,9 +346,9 @@ export default function CustomRequestsPage() {
           <img
             src={imageModalSrc}
             alt={imageModalAlt}
-            className="max-w-full max-h-[70vh] mx-auto rounded-input border-2 border-[var(--ink)]/20"
+            className="max-w-full max-h-[70vh] mx-auto rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]"
           />
-          <p className="mt-4 text-body text-[var(--ink)]/60">{imageModalAlt}</p>
+          <p className="mt-4 text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{imageModalAlt}</p>
         </div>
       </Modal>
 

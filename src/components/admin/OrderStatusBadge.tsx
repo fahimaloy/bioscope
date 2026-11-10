@@ -69,7 +69,7 @@ export function OrderStatusSelector({
     <select
       value={currentStatus}
       onChange={(e) => onChange(e.target.value as OrderStatus)}
-      className={cn('px-3 py-2 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input text-body text-[var(--ink)]', className)}
+      className={cn('px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body text-[var(--ink)]', className)}
     >
       {statuses.map((status) => {
         const config = statusConfig[status]
@@ -108,7 +108,7 @@ export function OrderStatusFlow({ currentStatus }: { currentStatus: OrderStatus 
             <div className="relative">
               <div className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all',
-                isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-primary/10 text-primary border-2 border-primary' : 'bg-[var(--light)] text-[var(--ink)]/40'
+                isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-primary/10 text-primary border-2 border-primary' : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_40%,transparent)]'
               )}>
                 {isCompleted ? '✓' : isCurrent ? (index + 1) : ''}
               </div>
@@ -120,7 +120,7 @@ export function OrderStatusFlow({ currentStatus }: { currentStatus: OrderStatus 
             </div>
             <div className={cn(
               'text-center min-w-[80px]',
-              isActive ? 'text-[var(--ink)]' : 'text-[var(--ink)]/40'
+              isActive ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_40%,transparent)]'
             )}>
               <p className="text-xs font-medium truncate">{statusConfig[status]?.label || status}</p>
             </div>
@@ -172,15 +172,15 @@ export function OrderStatusTimeline({
                 <Badge variant={config.variant} size="sm">
                   {config.label}
                 </Badge>
-                <time className="text-sm text-[var(--ink)]/50">
+                <time className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
                   {new Date(entry.timestamp).toLocaleString()}
                 </time>
               </div>
               {entry.note && (
-                <p className="text-sm text-[var(--ink)]/60">{entry.note}</p>
+                <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{entry.note}</p>
               )}
               {entry.updatedBy && (
-                <p className="text-xs text-[var(--ink)]/40">Updated by {entry.updatedBy}</p>
+                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">Updated by {entry.updatedBy}</p>
               )}
             </div>
           </div>

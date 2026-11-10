@@ -61,7 +61,7 @@ export function CheckoutProgressStepper({
                     ? `bg-[var(--${color})] text-white border-[var(--${color})]`
                     : isCurrent
                     ? `bg-[var(--${color})]/10 text-[var(--${color})] border-[var(--${color})] animate-pulse-soft`
-                    : 'bg-[var(--light)] text-[var(--ink)]/40 border-[var(--ink)]/30'
+                    : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_40%,transparent)] border-[color-mix(in_srgb,var(--ink)_30%,transparent)]'
                 )}
               >
                 {isCompleted ? (
@@ -84,7 +84,7 @@ export function CheckoutProgressStepper({
                 transition={{ delay: index * 0.1 + 0.2, duration: 0.3 }}
                 className={cn(
                   'mt-3 text-sm font-medium text-center max-w-[100px] hidden sm:block',
-                  isCompleted || isCurrent ? 'text-[var(--ink)]' : 'text-[var(--ink)]/40'
+                  isCompleted || isCurrent ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_40%,transparent)]'
                 )}
               >
                 {label}

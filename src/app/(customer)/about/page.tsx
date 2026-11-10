@@ -87,7 +87,7 @@ export default function AboutPage() {
               <StaggeredText as="h1" className="mb-6" style={{ fontSize: 'clamp(4rem, 10vw, 8rem)' }}>
                 ABOUT US
               </StaggeredText>
-              <p className="subtitle text-2xl md:text-3xl mb-8 max-w-2xl mx-auto text-[var(--ink)]/70">
+              <p className="subtitle text-2xl md:text-3xl mb-8 max-w-2xl mx-auto text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
                 Making Awesome Fun Things Happen with Custom Stickers
               </p>
               <div className="flex flex-wrap justify-center gap-4">
@@ -127,7 +127,7 @@ export default function AboutPage() {
                       duration={2000}
                       className="text-4xl font-display text-primary mb-2"
                     >
-                      <p className="font-black text-uppercase text-sm mt-1 text-[var(--ink)]/60">{stat.label}</p>
+                      <p className="font-black text-uppercase text-sm mt-1 text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{stat.label}</p>
                     </CounterAnimation>
                   </Card>
                 </motion.div>
@@ -164,7 +164,7 @@ export default function AboutPage() {
               
               <motion.div
                 variants={sectionItemVariants}
-                className="space-y-8 text-lg text-[var(--ink)]/70 leading-relaxed"
+                className="space-y-8 text-lg text-[color-mix(in_srgb,var(--ink)_70%,transparent)] leading-relaxed"
               >
                 <p>
                   BioScope started with a simple idea: everyone deserves to express themselves through custom designs. 
@@ -222,7 +222,7 @@ export default function AboutPage() {
                     <material.icon className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="font-display text-xl text-primary mb-2">{material.name}</h3>
-                  <p className="text-[var(--ink)]/70 text-sm">{material.desc}</p>
+                  <p className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)] text-sm">{material.desc}</p>
                 </Card>
               ))}
             </motion.div>
@@ -252,7 +252,7 @@ export default function AboutPage() {
               <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
                 Meet Our Team
               </span>
-              <p className="text-[var(--ink)]/60 mt-2">The people behind the stickers</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2">The people behind the stickers</p>
             </motion.div>
 
             <motion.div
@@ -272,7 +272,7 @@ export default function AboutPage() {
                     </div>
                     <h3 className="font-display text-lg text-[var(--ink)] mb-1">{member.name}</h3>
                     <p className="text-primary text-sm mb-2">{member.role}</p>
-                    <p className="text-[var(--ink)]/60 text-sm">{member.bio}</p>
+                    <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] text-sm">{member.bio}</p>
                   </Card>
                 </motion.div>
               ))}
@@ -336,7 +336,7 @@ export default function AboutPage() {
             className="relative z-10"
           >
             <h2 className="font-display text-3xl md:text-4xl text-primary mb-6">Ready to Create?</h2>
-            <p className="text-xl text-[var(--ink)]/60 mb-8 max-w-xl mx-auto">
+            <p className="text-xl text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-8 max-w-xl mx-auto">
               Join thousands of happy customers who trust us for their custom sticker needs.
             </p>
             <div className="flex flex-wrap justify-center gap-4">

@@ -265,7 +265,7 @@ export const ImageUpload = forwardRef<HTMLDivElement, ImageUploadProps>(function
                 >
                   <div className="aspect-square overflow-hidden rounded-[var(--radius-md)] border-2 border-[var(--ink)] bg-[var(--paper-deep)]">
                     {file.status === 'uploading' ? (
-                      <div className="bg-[var(--surface-raised)]/80 absolute inset-0 flex items-center justify-center">
+                      <div className="bg-[color-mix(in_srgb,var(--surface-raised)_80%,transparent)] absolute inset-0 flex items-center justify-center">
                         <Loader2 className="h-8 w-8 animate-spin text-[var(--ink)]" />
                         <div className="absolute bottom-2 text-xs text-[var(--text-muted)]">
                           {file.progress}%

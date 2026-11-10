@@ -58,7 +58,7 @@ export function CartSummary({
         <div className="space-y-4 border-t border-[var(--light)] pt-4">
           {/* Subtotal */}
           <div className="flex justify-between text-body">
-            <span className="text-[var(--ink)]/70">Subtotal</span>
+            <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Subtotal</span>
             <span className="font-display text-primary">{formatCurrency(subtotal, currency)}</span>
           </div>
 
@@ -75,7 +75,7 @@ export function CartSummary({
 
           {/* Tax */}
           <div className="flex justify-between text-body">
-            <span className="text-[var(--ink)]/70 flex items-center gap-1">
+            <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)] flex items-center gap-1">
               <Shield className="w-4 h-4" />
               Tax
             </span>
@@ -84,7 +84,7 @@ export function CartSummary({
 
           {/* Delivery */}
           <div className="flex justify-between text-body">
-            <span className="text-[var(--ink)]/70 flex items-center gap-1">
+            <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)] flex items-center gap-1">
               <Truck className="w-4 h-4" />
               Delivery
             </span>
@@ -101,7 +101,7 @@ export function CartSummary({
               style={{ transformOrigin: 'top' }}
               className="space-y-2"
             >
-              <p className="text-sm text-[var(--ink)]/50 text-center">
+              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] text-center">
                 Add <span className="font-medium text-primary">{formatCurrency(deliveryRemaining, currency)}</span> more for free delivery!
               </p>
               <div className="w-full h-3 bg-[var(--light)] rounded-full overflow-hidden">
@@ -113,7 +113,7 @@ export function CartSummary({
                   style={{ transformOrigin: 'left' }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-[var(--ink)]/40">
+              <div className="flex justify-between text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">
                 <span>0</span>
                 <span>{formatCurrency(freeDeliveryThreshold, currency)}</span>
               </div>
@@ -129,15 +129,15 @@ export function CartSummary({
 
         {/* Trust Badges */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[var(--light)]">
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--ink)]/60">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
             <Package className="w-5 h-5 text-primary" />
             <span>Free delivery over {formatCurrency(freeDeliveryThreshold, currency)}</span>
           </div>
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--ink)]/60">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
             <Tag className="w-5 h-5 text-primary" />
             <span>Easy returns</span>
           </div>
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--ink)]/60">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
             <Shield className="w-5 h-5 text-primary" />
             <span>Secure payment</span>
           </div>
@@ -159,7 +159,7 @@ export function CartSummary({
         </Button>
 
         {total > 0 && (
-          <p className="text-xs text-center text-[var(--ink)]/50">
+          <p className="text-xs text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
             Delivery calculated at checkout. Tax included where applicable.
           </p>
         )}
@@ -185,7 +185,7 @@ export function MiniCartSummary({
   return (
     <Card variant="doodle" padding="md" className={cn('space-y-3', className)}>
       <div className="flex justify-between text-body">
-        <span className="text-[var(--ink)]/70">Subtotal</span>
+        <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Subtotal</span>
         <span className="font-display text-primary">{formatCurrency(subtotal, currency)}</span>
       </div>
       <div className="flex justify-between text-lg font-display border-t border-[var(--ink)] pt-3">

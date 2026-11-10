@@ -114,7 +114,7 @@ export default function AdminDashboardPage() {
       >
         <div>
           <h1 className="font-display text-3xl text-primary">Dashboard</h1>
-          <p className="text-[var(--ink)]/60">Welcome back! Here&apos;s what&apos;s happening with your store.</p>
+          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Welcome back! Here&apos;s what&apos;s happening with your store.</p>
         </div>
         <div className="flex flex-wrap gap-3">
           {quickActions.map((action) => (
@@ -229,7 +229,7 @@ function SecondaryStatCard({ label, value, icon: Icon, color, trend, trendUp }: 
       </div>
       <div className="text-xl font-display text-[var(--ink)] mb-1">{value}</div>
       <SketchUnderline className="inline-block">
-        <p className="font-medium text-body text-[var(--ink)]/70 text-sm">{label}</p>
+        <p className="font-medium text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)] text-sm">{label}</p>
       </SketchUnderline>
     </Card>
   )
@@ -251,7 +251,7 @@ function QuickLinkCard({ title, desc, icon: Icon, href, color }: {
           </div>
         </div>
         <h3 className="font-display text-lg text-[var(--ink)] mb-1">{title}</h3>
-        <p className="text-sm text-[var(--ink)]/60 mb-4">{desc}</p>
+        <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-4">{desc}</p>
         <span className="inline-flex items-center gap-1 text-sm font-medium text-primary group-hover:underline transition-colors">
           View →
         </span>

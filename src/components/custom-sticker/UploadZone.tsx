@@ -169,7 +169,7 @@ export function UploadZone({
             ? 'border-primary bg-primary/5'
             : error
             ? 'border-red-500'
-            : 'border-[var(--ink)]/30 hover:border-primary',
+            : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary',
           disabled && 'opacity-60 cursor-not-allowed'
         )}
         onDragEnter={handleDrag}
@@ -180,7 +180,7 @@ export function UploadZone({
       >
         {displayImage ? (
           <>
-            <div className="relative w-full max-w-md aspect-square rounded-input overflow-hidden border-2 border-[var(--ink)]/20 bg-[var(--light)]">
+            <div className="relative w-full max-w-md aspect-square rounded-input overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] bg-[var(--light)]">
               <img
                 src={displayImage}
                 alt="Uploaded design preview"
@@ -206,11 +206,11 @@ export function UploadZone({
           </>
         ) : (
           <>
-            <Upload className="w-16 h-16 text-[var(--ink)]/30 mx-auto mb-4" />
-            <p className="text-body text-[var(--ink)]/60 mb-2">
+            <Upload className="w-16 h-16 text-[color-mix(in_srgb,var(--ink)_30%,transparent)] mx-auto mb-4" />
+            <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-2">
               {multiple ? 'Drag & drop images here, or click to select' : 'Drag & drop an image here, or click to select'}
             </p>
-            <p className="text-sm text-[var(--ink)]/40 mb-4">
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] mb-4">
               {multiple ? `Up to ${maxFiles} files` : 'Single file'} • Max {maxSize}MB • {acceptedTypes}
             </p>
             <Button variant="secondary" size="sm" disabled={disabled || uploading}>
@@ -230,10 +230,10 @@ export function UploadZone({
 
       {/* Paste Support */}
       <div className="mt-4 text-center">
-        <kbd className="px-2 py-1 text-xs bg-[var(--light)] text-[var(--ink)]/60 rounded border border-[var(--ink)]/20 font-mono">
+        <kbd className="px-2 py-1 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_60%,transparent)] rounded border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] font-mono">
           Ctrl + V
         </kbd>{' '}
-        <span className="text-sm text-[var(--ink)]/50">to paste image from clipboard</span>
+        <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">to paste image from clipboard</span>
       </div>
     </div>
   )
@@ -279,7 +279,7 @@ export function CompactUploadZone({
   return (
     <div className={cn('flex flex-wrap gap-2', className)}>
       {files.map((file, index) => (
-        <div key={index} className="relative w-20 h-20 rounded-input overflow-hidden border-2 border-[var(--ink)]/20">
+        <div key={index} className="relative w-20 h-20 rounded-input overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
           <img src={URL.createObjectURL(file)} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
           <button
             type="button"
@@ -299,7 +299,7 @@ export function CompactUploadZone({
         <div
           className={cn(
             'w-20 h-20 rounded-input border-3 border-dashed flex items-center justify-center cursor-pointer transition-colors',
-            dragActive ? 'border-primary bg-primary/5' : 'border-[var(--ink)]/30 hover:border-primary',
+            dragActive ? 'border-primary bg-primary/5' : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
           onDragEnter={(e) => { e.preventDefault(); setDragActive(true) }}
@@ -322,7 +322,7 @@ export function CompactUploadZone({
             input.click()
           }}
         >
-          <span className="text-2xl text-[var(--ink)]/40">+</span>
+          <span className="text-2xl text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">+</span>
         </div>
       )}
     </div>

@@ -54,7 +54,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
       <Link
         href={`/shop/${product.slug}`}
         className={cn(
-          'flex items-center gap-4 p-3 bg-white rounded-input border-2 border-[var(--ink)]/20 hover:border-primary/50 transition-colors',
+          'flex items-center gap-4 p-3 bg-white rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors',
           className
         )}
       >
@@ -68,7 +68,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
               sizes="64px"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">
+            <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
               <Tag className="w-12 h-12" />
             </div>
           )}
@@ -78,7 +78,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
           <div className="flex items-center gap-2 mt-1">
             <span className="text-lg font-display text-primary">{basePrice.toLocaleString()} BDT</span>
             {hasDiscount && (
-              <span className="text-sm text-[var(--ink)]/40 line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+              <span className="text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
             )}
           </div>
         </div>
@@ -106,7 +106,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
               />
             </Link>
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">
+            <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
               <Tag className="w-12 h-12" />
             </div>
           )}
@@ -132,7 +132,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
 
           {/* Wishlist */}
           <button
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[var(--ink)]/60 hover:text-red-500 hover:bg-red-50 transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-red-500 hover:bg-red-50 transition-colors"
             aria-label="Add to wishlist"
           >
             <Heart className="w-4 h-4" />
@@ -146,24 +146,24 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
           </Link>
 
           {product.description && (
-            <p className="text-body text-[var(--ink)]/60 mb-3 line-clamp-2 flex-1 min-h-0">{product.description}</p>
+            <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-3 line-clamp-2 flex-1 min-h-0">{product.description}</p>
           )}
 
           {/* Dimensions */}
           {product.allowedDimensions.length > 1 && (
             <div className="mb-3">
-              <p className="text-xs text-[var(--ink)]/50 mb-1">Available sizes:</p>
+              <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mb-1">Available sizes:</p>
               <div className="flex flex-wrap gap-1">
                 {product.allowedDimensions.slice(0, 4).map((dim) => (
                   <span
                     key={`${dim.width}x${dim.height}`}
-                    className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/70 rounded-full"
+                    className="px-2 py-0.5 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_70%,transparent)] rounded-full"
                   >
                     {dim.label}
                   </span>
                 ))}
                 {product.allowedDimensions.length > 4 && (
-                  <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/50 rounded-full">
+                  <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] rounded-full">
                     +{product.allowedDimensions.length - 4} more
                   </span>
                 )}
@@ -176,7 +176,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
             <div>
               <span className="text-2xl font-display text-primary">{basePrice.toLocaleString()} BDT</span>
               {hasDiscount && (
-                <span className="ml-2 text-sm text-[var(--ink)]/40 line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+                <span className="ml-2 text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
               )}
             </div>
 
@@ -259,8 +259,8 @@ export function ProductGrid({ products, variant = 'default', className, emptyMes
   if (products.length === 0) {
     return (
       <div className="text-center py-16">
-        <Tag className="w-16 h-16 text-[var(--ink)]/20 mx-auto mb-4" />
-        <p className="text-body text-[var(--ink)]/60">{emptyMessage}</p>
+        <Tag className="w-16 h-16 text-[color-mix(in_srgb,var(--ink)_20%,transparent)] mx-auto mb-4" />
+        <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{emptyMessage}</p>
       </div>
     )
   }
@@ -305,12 +305,12 @@ export function FeaturedProduct({ product }: { product: Product }) {
           {product.category?.name || 'Featured'}
         </span>
         <h1 className="font-display text-4xl md:text-5xl text-[var(--ink)] mb-4">{product.name}</h1>
-        <p className="text-lg text-[var(--ink)]/70 mb-6 leading-relaxed">{product.description}</p>
+        <p className="text-lg text-[color-mix(in_srgb,var(--ink)_70%,transparent)] mb-6 leading-relaxed">{product.description}</p>
 
         <div className="flex items-center gap-4 mb-6">
           <span className="text-3xl font-display text-primary">{product.basePrice.toLocaleString()} BDT</span>
           {product.compareAtPrice && product.compareAtPrice > product.basePrice && (
-            <span className="text-xl text-[var(--ink)]/40 line-through">{product.compareAtPrice.toLocaleString()} BDT</span>
+            <span className="text-xl text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice.toLocaleString()} BDT</span>
           )}
         </div>
 

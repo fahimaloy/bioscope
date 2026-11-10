@@ -153,7 +153,7 @@ export function AddressForm({
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingAddress(null); resetForm() }}
-                  className="text-[var(--ink)]/50 hover:text-primary transition-colors"
+                  className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors"
                 >
                   Cancel
                 </button>
@@ -235,12 +235,12 @@ export function AddressForm({
                 />
               </div>
 
-              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-input bg-[var(--light)]/50 border-2 border-[var(--ink)]/20 hover:border-[var(--ink)]/40 transition-colors">
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-input bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--ink)_40%,transparent)] transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.isDefault}
                   onChange={(e) => setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))}
-                  className="w-5 h-5 text-primary border-2 border-[var(--ink)] rounded-sm focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[var(--surface-card)] appearance-none cursor-pointer"
+                  className="w-5 h-5 text-primary border-2 border-[var(--ink)] rounded-sm focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[var(--surface-raised)] appearance-none cursor-pointer"
                 />
                 <span className="text-sm font-medium text-[var(--ink)]">Set as default address</span>
               </label>
@@ -267,9 +267,9 @@ export function AddressForm({
             className="text-center py-12"
           >
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--light)] flex items-center justify-center">
-              <MapPin className="w-8 h-8 text-[var(--ink)]/40" />
+              <MapPin className="w-8 h-8 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
             </div>
-            <p className="text-[var(--ink)]/60 mb-4 font-medium">No saved addresses</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-4 font-medium">No saved addresses</p>
             {!readOnly && (
               <Button variant="secondary" size="sm" onClick={() => { setEditingAddress(null); resetForm(); setShowForm(true) }}>
                 <Plus className="w-4 h-4 mr-2" />
@@ -354,7 +354,7 @@ function AddressCard({
         'relative cursor-pointer transition-all duration-300',
         isSelected
           ? 'border-primary shadow-card-hover ring-2 ring-primary/30'
-          : 'border-[var(--ink)]/30 hover:border-primary'
+          : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary'
       )}
       onClick={onSelect}
     >
@@ -376,8 +376,8 @@ function AddressCard({
               {deliveryZoneLabels[address.deliveryZone]}
             </span>
           </div>
-          <p className="text-body text-[var(--ink)]/80 mb-1">{address.phone}</p>
-          <p className="text-sm text-[var(--ink)]/60">
+          <p className="text-body text-[color-mix(in_srgb,var(--ink)_80%,transparent)] mb-1">{address.phone}</p>
+          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
             {address.addressLine1}
             {address.addressLine2 && `, ${address.addressLine2}`}
             {`, ${address.city}, ${address.district}, ${address.division}`}
@@ -401,7 +401,7 @@ function AddressCard({
             {onEdit && (
               <button
                 onClick={(e) => { e.stopPropagation(); onEdit() }}
-                className="p-2 text-[var(--ink)]/50 hover:text-primary hover:bg-[var(--light)] rounded-input transition-colors"
+                className="p-2 text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary hover:bg-[var(--light)] rounded-input transition-colors"
                 aria-label="Edit address"
               >
                 <Edit3 className="w-4 h-4" />
@@ -410,7 +410,7 @@ function AddressCard({
             {onDelete && (
               <button
                 onClick={(e) => { e.stopPropagation(); onDelete() }}
-                className="p-2 text-[var(--ink)]/50 hover:text-red-500 hover:bg-red-50 rounded-input transition-colors"
+                className="p-2 text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-red-500 hover:bg-red-50 rounded-input transition-colors"
                 aria-label="Delete address"
               >
                 <Trash2 className="w-4 h-4" />
@@ -419,7 +419,7 @@ function AddressCard({
             {onSetDefault && !address.isDefault && (
               <button
                 onClick={(e) => { e.stopPropagation(); onSetDefault() }}
-                className="p-2 text-[var(--ink)]/50 hover:text-primary hover:bg-[var(--light)] rounded-input transition-colors"
+                className="p-2 text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary hover:bg-[var(--light)] rounded-input transition-colors"
                 aria-label="Set as default"
               >
                 <CheckCircle className="w-4 h-4" />

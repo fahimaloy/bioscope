@@ -60,7 +60,7 @@ const columns = [
         </div>
         <div>
           <p className="font-medium text-body text-[var(--ink)]">{row.name ?? '—'}</p>
-          <p className="text-sm text-[var(--ink)]/50 truncate max-w-xs">{row.email}</p>
+          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] truncate max-w-xs">{row.email}</p>
         </div>
       </div>
     ), 
@@ -70,7 +70,7 @@ const columns = [
     key: 'phone', 
     header: 'Phone', 
     accessor: (row: any) => (
-      <span className="text-sm text-[var(--ink)]/70">{row.phone ?? '—'}</span>
+      <span className="text-sm text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{row.phone ?? '—'}</span>
     ),
     sortable: true,
     width: '160px',
@@ -103,14 +103,14 @@ const columns = [
     key: 'status', 
     header: 'Latest Order', 
     width: '140px',
-    accessor: (row: any) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[var(--ink)]/40">—</span>,
+    accessor: (row: any) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">—</span>,
   },
   { 
     key: 'joined', 
     header: 'Joined', 
     width: '140px',
     accessor: (row: any) => (
-      <span className="text-sm text-[var(--ink)]/60">{formatDate(row.createdAt)}</span>
+      <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{formatDate(row.createdAt)}</span>
     ), 
     sortable: true 
   },
@@ -162,7 +162,7 @@ export default function CustomersPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Customers</h1>
-            <p className="text-[var(--ink)]/60">Manage and analyze your customer base</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Manage and analyze your customer base</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">{pager.total} Total</Badge>
@@ -181,7 +181,7 @@ export default function CustomersPage() {
             value={pager.total} 
             icon={<Users className="w-5 h-5" />} 
             color="var(--primary)" 
-            iconBg="bg-[var(--primary)]/10 text-[var(--primary)]"
+            iconBg="bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-[var(--primary)]"
             index={0}
           />
           <StatCard 
@@ -189,7 +189,7 @@ export default function CustomersPage() {
             value={customers.length} 
             icon={<User className="w-5 h-5" />} 
             color="var(--secondary)" 
-            iconBg="bg-[var(--secondary)]/10 text-[var(--secondary)]"
+            iconBg="bg-[color-mix(in_srgb,var(--secondary)_10%,transparent)] text-[var(--secondary)]"
             index={1}
           />
           <StatCard 
@@ -197,7 +197,7 @@ export default function CustomersPage() {
             value={formatCurrency(totalRevenue)} 
             icon={<DollarSign className="w-5 h-5" />} 
             color="var(--success)" 
-            iconBg="bg-[var(--success)]/10 text-[var(--success)]"
+            iconBg="bg-[color-mix(in_srgb,var(--success)_10%,transparent)] text-[var(--success)]"
             index={2}
           />
           <StatCard 
@@ -205,7 +205,7 @@ export default function CustomersPage() {
             value={customers.length ? formatCurrency(totalRevenue / Math.max(1, totalOrders)) : '—'} 
             icon={<ShoppingBag className="w-5 h-5" />} 
             color="var(--accent)" 
-            iconBg="bg-[var(--accent)]/10 text-[var(--accent)]"
+            iconBg="bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] text-[var(--accent)]"
             index={3}
           />
         </motion.div>
@@ -220,13 +220,13 @@ export default function CustomersPage() {
             <StickerPeel />
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1 min-w-[250px] max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/40" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
                 <input
                   type="text"
                   placeholder="Search name, email, phone..."
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input text-body"
+                  className="w-full pl-10 pr-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
                 />
               </div>
               <Button
@@ -251,7 +251,7 @@ export default function CustomersPage() {
                 <div className="flex flex-wrap gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[var(--ink)]">Spend Tier:</span>
-                    <select className="px-3 py-2 border-2 border-[var(--ink)]/30 rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none">
+                    <select className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none">
                       <option value="">All Tiers</option>
                       {spendTiers.map(t => (
                         <option key={t.label} value={t.label}>{t.icon} {t.label}</option>
@@ -260,11 +260,11 @@ export default function CustomersPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[var(--ink)]">Min Orders:</span>
-                    <input type="number" min="0" className="w-24 px-3 py-2 border-2 border-[var(--ink)]/30 rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none" />
+                    <input type="number" min="0" className="w-24 px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none" />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[var(--ink)]">Date From:</span>
-                    <input type="date" className="px-3 py-2 border-2 border-[var(--ink)]/30 rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none" />
+                    <input type="date" className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none" />
                   </div>
                 </div>
               </motion.div>
@@ -339,7 +339,7 @@ function StatCard({ label, value, icon, color, iconBg, index }: StatCardProps) {
           format={(v) => typeof value === 'string' ? value : formatNumber(v)}
         />
         <SketchUnderline className="inline-block">
-          <p className="font-medium text-body text-[var(--ink)]/70 text-sm">{label}</p>
+          <p className="font-medium text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)] text-sm">{label}</p>
         </SketchUnderline>
       </Card>
     </motion.div>

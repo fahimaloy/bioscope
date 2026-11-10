@@ -112,7 +112,7 @@ function AddressCard({
             <button
               type="button"
               onClick={onCancelEdit}
-              className="text-[var(--ink)]/50 hover:text-primary transition-colors"
+              className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors"
               aria-label="Cancel editing"
             >
               ✕
@@ -208,8 +208,8 @@ function AddressCard({
                 {address.deliveryZone === 'INSIDE_DHAKA' ? 'Inside Dhaka' : 'Outside Dhaka'}
               </Badge>
             </div>
-            <p className="text-body text-[var(--ink)]/70">{address.phone}</p>
-            <p className="text-[var(--ink)]/60 mt-1">
+            <p className="text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{address.phone}</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-1">
               {address.addressLine1}
               {address.addressLine2 && `, ${address.addressLine2}`}
               <br />
@@ -282,7 +282,7 @@ function AddAddressForm({ onCancel, onSubmit }: { onCancel: () => void; onSubmit
           <button
             type="button"
             onClick={onCancel}
-            className="text-[var(--ink)]/50 hover:text-primary transition-colors"
+            className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors"
             aria-label="Cancel adding address"
           >
             ✕
@@ -372,16 +372,16 @@ function OrderHistoryCard({ order }: { order: Order }) {
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border border-[var(--ink)]/20">
-              <div className="w-full h-full flex items-center justify-center text-[var(--ink)]/30">📦</div>
+            <div className="w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+              <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">📦</div>
             </div>
             <div>
               <p className="font-medium text-body text-[var(--ink)]">{order.orderNumber}</p>
-              <p className="text-sm text-[var(--ink)]/50">{order.items} items • {order.total.toLocaleString()} BDT</p>
+              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{order.items} items • {order.total.toLocaleString()} BDT</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-sm text-[var(--ink)]/50">{order.date}</span>
+            <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{order.date}</span>
             <Badge variant={order.status === 'DELIVERED' ? 'success' : 'secondary'} size="sm">{order.status}</Badge>
             <a href={`/orders/${order.id}`}>
               <Button variant="ghost" size="sm">View</Button>
@@ -397,7 +397,7 @@ function SecurityTips() {
   return (
     <Card variant="doodle" className="p-6">
       <h3 className="font-display text-lg text-primary mb-4">Security Tips</h3>
-      <ul className="space-y-3 text-[var(--ink)]/70">
+      <ul className="space-y-3 text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
         <li className="flex items-center gap-2">
           <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm">1</span>
           Use a unique, strong password
@@ -459,7 +459,7 @@ function NotificationSettings() {
                   <label key={opt.key} className="flex items-center justify-between cursor-pointer p-3 rounded-input hover:bg-[var(--light)] transition-colors">
                     <div className="flex-1">
                       <p className="font-medium text-body text-[var(--ink)]">{opt.label}</p>
-                      <p className="text-sm text-[var(--ink)]/50">{opt.description}</p>
+                      <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{opt.description}</p>
                     </div>
                     <button
                       type="button"
@@ -470,7 +470,7 @@ function NotificationSettings() {
                         'relative w-11 h-6 rounded-pill border-3 transition-all duration-200',
                         notifications[opt.key as keyof typeof notifications]
                           ? 'bg-primary border-primary'
-                          : 'bg-[var(--ink)]/20 border-[var(--ink)]/30'
+                          : 'bg-[color-mix(in_srgb,var(--ink)_20%,transparent)] border-[color-mix(in_srgb,var(--ink)_30%,transparent)]'
                       )}
                       aria-label={opt.label}
                     >
@@ -663,7 +663,7 @@ function AccountTab({ user }: { user: typeof mockUser }) {
                   <span className="text-3xl font-display text-primary">{getInitials(user?.name || 'User')}</span>
                 </div>
               )}
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors border-3 border-[var(--surface-card)] shadow-btn">
+              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors border-3 border-[var(--surface-raised)] shadow-btn">
                 <Camera className="w-4 h-4" />
                 <input
                   type="file"
@@ -675,7 +675,7 @@ function AccountTab({ user }: { user: typeof mockUser }) {
             </div>
             <div>
               <h2 className="font-display text-2xl text-[var(--ink)]">{user?.name || 'User'}</h2>
-              <p className="text-[var(--ink)]/60">{user?.email}</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{user?.email}</p>
               <Badge variant="outline" size="sm" className="mt-2 inline-block">
                 {user?.role === 'ADMIN' ? 'Admin' : 'Customer'}
               </Badge>
@@ -703,7 +703,7 @@ function AccountTab({ user }: { user: typeof mockUser }) {
               disabled
               className="bg-[var(--light)]"
             />
-            <p className="text-sm text-[var(--ink)]/50">Email cannot be changed. Contact support if needed.</p>
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Email cannot be changed. Contact support if needed.</p>
 
             <div className="flex justify-end pt-4 border-t border-[var(--light)]">
               <Button type="submit" size="lg" variant="doodle" loading={isLoading}>
@@ -713,15 +713,15 @@ function AccountTab({ user }: { user: typeof mockUser }) {
             </div>
           </form>
 
-          <div className="p-4 bg-[var(--light)] rounded-input border border-[var(--ink)]/20">
+          <div className="p-4 bg-[var(--light)] rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
             <h3 className="font-medium text-body text-[var(--ink)] mb-2">Account Info</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-[var(--ink)]/50">Member Since</p>
+                <p className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Member Since</p>
                 <p className="font-medium">{formatDate(user?.createdAt || new Date())}</p>
               </div>
               <div>
-                <p className="text-[var(--ink)]/50">Email Verified</p>
+                <p className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Email Verified</p>
                 <p className="font-medium">{user?.emailVerified ? 'Yes' : 'No'}</p>
               </div>
             </div>
@@ -794,7 +794,7 @@ function SecurityTab() {
               <button
                 type="button"
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-[38px] text-[var(--ink)]/50 hover:text-primary transition-colors"
+                className="absolute right-3 top-[38px] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors"
               >
                 {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -811,7 +811,7 @@ function SecurityTab() {
               <button
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-[38px] text-[var(--ink)]/50 hover:text-primary transition-colors"
+                className="absolute right-3 top-[38px] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors"
               >
                 {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -828,7 +828,7 @@ function SecurityTab() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-[38px] text-[var(--ink)]/50 hover:text-primary transition-colors"
+                className="absolute right-3 top-[38px] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors"
               >
                 {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -892,7 +892,7 @@ export default function ProfilePage() {
           className="mb-8"
         >
           <h1 className="font-display text-3xl text-primary mb-2">My Profile</h1>
-          <p className="text-[var(--ink)]/60">Manage your account settings</p>
+          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Manage your account settings</p>
         </motion.div>
 
         <Tabs defaultValue={activeTab} onChange={setActiveTab} variant="pills">
@@ -909,10 +909,10 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
                   'relative px-4 py-3 rounded-[30px] text-body font-medium transition-all duration-300',
-                  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-card)]',
+                  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-raised)]',
                   activeTab === tab.value
                     ? 'bg-white text-primary shadow-btn'
-                    : 'text-[var(--ink)]/70 hover:text-[var(--ink)] hover:bg-white/50'
+                    : 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)] hover:text-[var(--ink)] hover:bg-white/50'
                 )}
               >
                 <tab.icon className="w-4 h-4 mr-1" />

@@ -199,7 +199,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
                     selectedImage === index
                       ? 'border-primary scale-105 shadow-[0_0_0_3px_rgba(255,107,107,0.3)]'
-                      : 'border-transparent hover:border-[var(--ink)]/30'
+                      : 'border-transparent hover:border-[color-mix(in_srgb,var(--ink)_30%,transparent)]'
                   )}
                   aria-label={`View image ${index + 1}`}
                   aria-current={selectedImage === index ? 'true' : 'false'}
@@ -225,7 +225,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <span className="font-display text-4xl text-primary">{finalPrice.toLocaleString()} BDT</span>
             {hasDiscount && (
               <>
-                <span className="text-xl text-[var(--ink)]/40 line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+                <span className="text-xl text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
                 <Badge variant="error" size="md">-{discountPercent}%</Badge>
               </>
             )}
@@ -236,7 +236,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Tax Info */}
           {product.taxPercent > 0 && (
-            <p className="text-sm text-[var(--ink)]/60">
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
               Price includes {product.isTaxInclusive ? '' : 'excludes '}tax ({product.taxPercent}%)
             </p>
           )}
@@ -264,7 +264,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                         'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2',
                         selectedDimension?.id === dim.id
                           ? 'border-primary bg-primary/10 text-primary shadow-[0_0_0_3px_rgba(255,107,107,0.2)] animate-pulse-soft'
-                          : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary hover:bg-[var(--light)]'
+                          : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary hover:bg-[var(--light)]'
                       )}
                       aria-pressed={selectedDimension?.id === dim.id}
                       role="radio"
@@ -285,7 +285,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <fieldset>
               <legend className="font-medium text-body text-[var(--ink)] mb-3">Quantity</legend>
               <div className="flex items-center gap-4 flex-wrap">
-                <div className="flex items-center border-3 border-[var(--ink)]/30 rounded-input overflow-hidden">
+                <div className="flex items-center border-3 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input overflow-hidden">
                   <Button
                     variant="doodle-outline"
                     size="sm"
@@ -319,7 +319,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   </Button>
                 </div>
                 {matchingQtyConfig && (
-                  <span className="text-sm text-[var(--ink)]/60">{matchingQtyConfig.label}</span>
+                  <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{matchingQtyConfig.label}</span>
                 )}
               </div>
             </fieldset>
@@ -338,7 +338,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                             key={material}
                             className={cn(
                               'px-4 py-2 rounded-input border-2 text-sm transition-all',
-                              'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                              'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                             )}
                           >
                             {material.replace('_', ' ')}
@@ -356,7 +356,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                             key={finish}
                             className={cn(
                               'px-4 py-2 rounded-input border-2 text-sm transition-all',
-                              'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                              'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                             )}
                           >
                             {finish}
@@ -374,7 +374,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                             key={cut}
                             className={cn(
                               'px-4 py-2 rounded-input border-2 text-sm transition-all',
-                              'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                              'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                             )}
                           >
                             {cut.replace('_', ' ')}
@@ -423,25 +423,25 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Delivery Info */}
           <div className="grid sm:grid-cols-3 gap-4 pt-4 border-t border-[var(--light)]">
-            <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[var(--ink)]/20">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
               <Truck className="w-6 h-6 text-primary flex-shrink-0" />
               <div>
                 <p className="font-medium text-sm text-[var(--ink)]">Free Delivery</p>
-                <p className="text-xs text-[var(--ink)]/50">On orders over 2000 BDT</p>
+                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">On orders over 2000 BDT</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[var(--ink)]/20">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
               <RotateCcw className="w-6 h-6 text-primary flex-shrink-0" />
               <div>
                 <p className="font-medium text-sm text-[var(--ink)]">Easy Returns</p>
-                <p className="text-xs text-[var(--ink)]/50">30-day return policy</p>
+                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">30-day return policy</p>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[var(--ink)]/20">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
               <Shield className="w-6 h-6 text-primary flex-shrink-0" />
               <div>
                 <p className="font-medium text-sm text-[var(--ink)]">Secure Payment</p>
-                <p className="text-xs text-[var(--ink)]/50">COD & Bank Transfer</p>
+                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">COD & Bank Transfer</p>
               </div>
             </div>
           </div>
@@ -457,35 +457,35 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </TabsList>
 
         <TabsContent value="description" className="prose prose-dark max-w-none">
-          {product.description || <p className="text-[var(--ink)]/60">No description available.</p>}
+          {product.description || <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">No description available.</p>}
         </TabsContent>
 
         <TabsContent value="specifications" className="space-y-4">
           <dl className="grid sm:grid-cols-2 gap-4">
-            <div className="bg-white rounded-input p-4 border border-[var(--ink)]/20">
-              <dt className="text-sm text-[var(--ink)]/50">Base Price</dt>
+            <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Base Price</dt>
               <dd className="font-display text-xl text-primary">{product.basePrice.toLocaleString()} BDT</dd>
             </div>
-            <div className="bg-white rounded-input p-4 border border-[var(--ink)]/20">
-              <dt className="text-sm text-[var(--ink)]/50">Tax</dt>
+            <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Tax</dt>
               <dd className="font-display text-xl text-primary">{product.taxPercent}%</dd>
             </div>
-            <div className="bg-white rounded-input p-4 border border-[var(--ink)]/20">
-              <dt className="text-sm text-[var(--ink)]/50">Dimensions Available</dt>
+            <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Dimensions Available</dt>
               <dd className="font-display text-xl text-primary">{product.allowedDimensions.length}</dd>
             </div>
-            <div className="bg-white rounded-input p-4 border border-[var(--ink)]/20">
-              <dt className="text-sm text-[var(--ink)]/50">Quantity Tiers</dt>
+            <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Quantity Tiers</dt>
               <dd className="font-display text-xl text-primary">{product.allowedQuantities.length}</dd>
             </div>
-            <div className="bg-white rounded-input p-4 border border-[var(--ink)]/20">
-              <dt className="text-sm text-[var(--ink)]/50">Inventory</dt>
+            <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Inventory</dt>
               <dd className="font-display text-xl text-primary">
                 {product.trackInventory ? product.stock : 'Not tracked'}
               </dd>
             </div>
-            <div className="bg-white rounded-input p-4 border border-[var(--ink)]/20">
-              <dt className="text-sm text-[var(--ink)]/50">Status</dt>
+            <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Status</dt>
               <dd className="font-display text-xl text-primary">{product.isActive ? 'Active' : 'Inactive'}</dd>
             </div>
           </dl>
@@ -493,7 +493,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
         <TabsContent value="reviews">
           <div className="text-center py-12">
-            <p className="text-[var(--ink)]/60">Reviews coming soon...</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Reviews coming soon...</p>
           </div>
         </TabsContent>
       </Tabs>

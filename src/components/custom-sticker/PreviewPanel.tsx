@@ -261,7 +261,7 @@ export function PreviewPanel({
 function SpecItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="p-3 bg-[var(--light)] rounded-input">
-      <div className="text-xs text-[var(--ink)]/50 uppercase tracking-wider mb-1">{label}</div>
+      <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] uppercase tracking-wider mb-1">{label}</div>
       <div className="font-display text-lg text-primary">{value}</div>
     </div>
   )
@@ -280,7 +280,7 @@ function SpecDetail({
       <div className="text-3xl mb-2">{icon}</div>
       <div className="font-medium text-body text-[var(--ink)]">{label}</div>
       <div className="font-display text-lg text-primary mt-1">{value}</div>
-      <div className="text-xs text-[var(--ink)]/50 mt-1">{description}</div>
+      <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-1">{description}</div>
       {badge && (
         <Badge variant="secondary" size="sm" className="mt-2 mx-auto w-fit">
           {badge}
@@ -293,7 +293,7 @@ function SpecDetail({
 // Material Texture Preview
 function MaterialTexturePreview({ material, finish }: { material: MaterialType; finish: FinishType }) {
   const getTextureStyle = () => {
-    const base = 'w-full h-20 rounded-input border-2 border-[var(--ink)]/20 relative overflow-hidden'
+    const base = 'w-full h-20 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] relative overflow-hidden'
     switch (material) {
       case 'vinyl':
         return `${base} bg-gradient-to-br from-gray-100 via-white to-gray-200`
@@ -342,7 +342,7 @@ function MaterialTexturePreview({ material, finish }: { material: MaterialType; 
           )}
         </div>
       </div>
-      <p className="text-xs text-[var(--ink)]/50 mt-2 text-center">
+      <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-2 text-center">
         {MATERIAL_INFO[material].description} • {FINISH_INFO[finish].description}
       </p>
     </div>
@@ -357,7 +357,7 @@ function CutLinePreview({ cutType }: { cutType: CutType }) {
         <span className="font-medium text-body text-[var(--ink)]">Cut Line Preview</span>
         <Badge variant="secondary" size="sm">{CUT_INFO[cutType].name}</Badge>
       </div>
-      <div className="relative w-full h-24 flex items-center justify-center bg-[var(--light)] rounded-input border-2 border-[var(--ink)]/20">
+      <div className="relative w-full h-24 flex items-center justify-center bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
         {/* Sticker shape */}
         <div className="relative w-32 h-32">
           {/* Background sticker */}
@@ -369,8 +369,8 @@ function CutLinePreview({ cutType }: { cutType: CutType }) {
               {/* Kiss cut - inner line */}
               <div className="absolute inset-2 border-2 border-dashed border-primary/60 rounded-full" />
               {/* Backing paper */}
-              <div className="absolute -inset-2 border-2 border-dashed border-[var(--ink)]/30 rounded-full" />
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-2 bg-[var(--ink)]/30 rounded-t-full" />
+              <div className="absolute -inset-2 border-2 border-dashed border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-full" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-2 bg-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-t-full" />
             </>
           )}
           
@@ -396,7 +396,7 @@ function CutLinePreview({ cutType }: { cutType: CutType }) {
           )}
         </div>
       </div>
-      <p className="text-xs text-[var(--ink)]/50 mt-2 text-center">
+      <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-2 text-center">
         {CUT_INFO[cutType].description}
       </p>
     </div>
@@ -450,7 +450,7 @@ function Sticker3DPreview({ design, material, finish, cutType }: { design: Stick
         </div>
         
         {/* Cut line indicator */}
-        <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 text-center text-xs text-[var(--ink)]/50">
+        <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 text-center text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
           {CUT_INFO[cutType].name} • {MATERIAL_INFO[material].name} • {FINISH_INFO[finish].name}
         </div>
       </div>
@@ -470,8 +470,8 @@ function MockupPreview({ design }: { design: StickerDesign }) {
   return (
     <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
       {mockups.map((mockup) => (
-        <div key={mockup.name} className={`${mockup.bg} rounded-xl p-6 relative overflow-hidden border-2 border-[var(--ink)]/20`}>
-          <div className="absolute top-2 right-2 text-xs text-[var(--ink)]/50 flex items-center gap-1">
+        <div key={mockup.name} className={`${mockup.bg} rounded-xl p-6 relative overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]`}>
+          <div className="absolute top-2 right-2 text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] flex items-center gap-1">
             <mockup.icon className="w-3 h-3" />
             {mockup.name}
           </div>

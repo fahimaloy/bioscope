@@ -62,7 +62,7 @@ export function EditingTools({
 
   if (!selectedLayer) {
     return (
-      <div className={cn('p-4 text-center text-[var(--ink)]/50', className)}>
+      <div className={cn('p-4 text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]', className)}>
         <p className="text-body">Select a layer to edit</p>
       </div>
     )
@@ -334,7 +334,7 @@ export function EditingTools({
                 value={selectedLayer.text || ''}
                 onChange={(e) => onUpdateLayer(selectedLayer.id, { text: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input text-body text-[var(--ink)] resize-y min-h-[80px]"
+                className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body text-[var(--ink)] resize-y min-h-[80px]"
                 disabled={selectedLayer.locked}
               />
             </div>
@@ -462,7 +462,7 @@ export function EditingTools({
                       'p-3 rounded-input border-3 transition-all',
                       selectedLayer.shapeType === shape
                         ? 'border-primary bg-primary/10'
-                        : 'border-[var(--ink)]/30 hover:border-primary'
+                        : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary'
                     )}
                     disabled={selectedLayer.locked}
                   >

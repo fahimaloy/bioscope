@@ -123,7 +123,7 @@ export default function CheckoutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-[var(--ink)]/60 mb-6"
+            className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-6"
           >
             Please sign in to complete your purchase.
           </motion.p>

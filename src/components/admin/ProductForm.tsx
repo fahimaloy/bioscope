@@ -251,7 +251,7 @@ export function ProductForm({
                   <label className="block font-medium text-body text-[var(--ink)]">Status</label>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[var(--ink)]/20 hover:border-primary/50 transition-colors">
+                  <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.isActive}
@@ -260,7 +260,7 @@ export function ProductForm({
                     />
                     <span className="text-sm text-[var(--ink)]">Active</span>
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[var(--ink)]/20 hover:border-primary/50 transition-colors">
+                  <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.isFeatured}
@@ -279,7 +279,7 @@ export function ProductForm({
         <TabsContent value="images" className="space-y-6 pt-4">
           <Card className="p-6 space-y-6">
             <label className="block font-medium text-body text-[var(--ink)]">Product Images</label>
-            <div className="relative border-3 border-dashed border-[var(--secondary)] rounded-card p-8 transition-all duration-200 hover:border-[var(--primary)] hover:bg-[var(--primary)]/5">
+            <div className="relative border-3 border-dashed border-[var(--secondary)] rounded-card p-8 transition-all duration-200 hover:border-[var(--primary)] hover:bg-[color-mix(in_srgb,var(--primary)_5%,transparent)]">
               <ImageUpload
                 value={formData.images}
                 onChange={(files) => setFormData((prev) => ({ ...prev, images: files.map((f) => (typeof f === 'string' ? f : URL.createObjectURL(f))) }))}
@@ -331,7 +331,7 @@ export function ProductForm({
             />
             <div className="mt-4 space-y-3">
               {formData.allowedQuantities.map((qty) => (
-                <div key={qty.id} className="flex items-center gap-3 p-3 bg-[var(--light)] rounded-input border border-[var(--ink)]/20 hover:border-primary/50 transition-colors">
+                <div key={qty.id} className="flex items-center gap-3 p-3 bg-[var(--light)] rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
                   <Input
                     type="number"
                     label="Min Qty"
@@ -459,7 +459,7 @@ export function ProductForm({
                   onChange={(e) => setFormData((prev) => ({ ...prev, sortOrder: parseInt(e.target.value) || 0 }))}
                   min={0}
                 />
-                <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[var(--ink)]/20 hover:border-primary/50 transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
                   <input
                     type="checkbox"
                     checked={formData.isActive}
@@ -468,7 +468,7 @@ export function ProductForm({
                   />
                   <span className="text-sm text-[var(--ink)]">Active</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[var(--ink)]/20 hover:border-primary/50 transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
                   <input
                     type="checkbox"
                     checked={formData.isFeatured}
@@ -526,7 +526,7 @@ export function ProductForm({
                 min={0}
                 step={0.01}
               />
-              <label className="flex items-center gap-2 cursor-pointer mt-6 p-3 bg-[var(--light)] rounded-input border-2 border-[var(--ink)]/20 hover:border-primary/50 transition-colors">
+              <label className="flex items-center gap-2 cursor-pointer mt-6 p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.isTaxInclusive}
@@ -540,7 +540,7 @@ export function ProductForm({
 
           <Card className="p-6 space-y-6">
             <h4 className="font-medium text-body text-[var(--ink)]">Inventory</h4>
-            <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[var(--ink)]/20 hover:border-primary/50 transition-colors">
+            <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
               <input
                 type="checkbox"
                 checked={formData.trackInventory}
@@ -614,7 +614,7 @@ function CustomizationField({
               'px-3 py-1.5 rounded-input text-sm font-medium transition-all',
               value.includes(option)
                 ? 'bg-primary text-white shadow-btn'
-                : 'bg-[var(--light)] text-[var(--ink)] hover:bg-dark/10 border border-[var(--ink)]/20'
+                : 'bg-[var(--light)] text-[var(--ink)] hover:bg-dark/10 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]'
             )}
           >
             {option}

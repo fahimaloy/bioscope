@@ -63,7 +63,7 @@ export default function SettingsPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Settings</h1>
-            <p className="text-[var(--ink)]/60">Configure your store settings</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Configure your store settings</p>
           </div>
           <div className="flex items-center gap-3">
             {saved && (
@@ -72,7 +72,7 @@ export default function SettingsPage() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: -10 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                className="flex items-center gap-2 px-4 py-2 bg-[var(--success)]/10 border-2 border-[var(--success)] rounded-pill text-[var(--success)] text-sm font-medium animate-fade-in"
+                className="flex items-center gap-2 px-4 py-2 bg-[color-mix(in_srgb,var(--success)_10%,transparent)] border-2 border-[var(--success)] rounded-pill text-[var(--success)] text-sm font-medium animate-fade-in"
               >
                 <CheckCircle className="w-4 h-4" />
                 <span>Settings saved!</span>

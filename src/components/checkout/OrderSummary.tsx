@@ -87,7 +87,7 @@ export function CheckoutOrderSummary({
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.3 }}
-            className="flex items-center gap-3 p-3 bg-[var(--light)]/50 rounded-input border-2 border-[var(--ink)]/20 hover:border-[var(--ink)]/40 transition-colors"
+            className="flex items-center gap-3 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--ink)_40%,transparent)] transition-colors"
           >
             <img
               src={item.productImage || '/images/sticker-placeholder.svg'}
@@ -96,7 +96,7 @@ export function CheckoutOrderSummary({
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-[var(--ink)] truncate">{item.productName}</p>
-              <p className="text-xs text-[var(--ink)]/50">{item.width} × {item.height} cm • Qty: {item.quantity}</p>
+              <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{item.width} × {item.height} cm • Qty: {item.quantity}</p>
             </div>
             <span className="font-display text-primary whitespace-nowrap">{formatCurrency(item.unitPrice * item.quantity)}</span>
           </motion.div>
@@ -105,7 +105,7 @@ export function CheckoutOrderSummary({
 
       <div className="border-t border-[var(--light)] pt-3 space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-[var(--ink)]/70">Subtotal</span>
+          <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Subtotal</span>
           <span className="font-display text-primary">{formatCurrency(subtotal)}</span>
         </div>
 
@@ -117,12 +117,12 @@ export function CheckoutOrderSummary({
         )}
 
         <div className="flex justify-between text-sm">
-          <span className="text-[var(--ink)]/70">Tax</span>
+          <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Tax</span>
           <span className="font-display text-primary">{formatCurrency(taxAmount)}</span>
         </div>
 
         <div className="flex justify-between text-sm">
-          <span className="text-[var(--ink)]/70">Delivery</span>
+          <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Delivery</span>
           <span className="font-display text-primary">
             {deliveryCharge > 0 ? formatCurrency(deliveryCharge) : 'Free'}
           </span>
@@ -133,7 +133,7 @@ export function CheckoutOrderSummary({
             initial={{ opacity: 0, scaleY: 0 }}
             animate={{ opacity: 1, scaleY: 1 }}
             style={{ transformOrigin: 'top' }}
-            className="text-xs text-[var(--ink)]/50 text-center bg-[var(--accent)]/50 rounded-input p-2 border border-[var(--accent)]/30"
+            className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] text-center bg-[color-mix(in_srgb,var(--accent)_50%,transparent)] rounded-input p-2 border border-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
           >
             Add {formatCurrency(deliveryRemaining)} more for free delivery!
           </motion.p>

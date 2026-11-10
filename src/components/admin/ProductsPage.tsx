@@ -20,7 +20,7 @@ const COLUMNS: Column<any>[] = [
     key: 'image', 
     header: 'Image', 
     cell: ({ row }: { row: any }) => (
-      <div className="relative w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border-2 border-[var(--ink)]/20">
+      <div className="relative w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
         {row.images?.[0] ? (
           <Image
             src={row.images[0]}
@@ -148,7 +148,7 @@ export default function ProductsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Products</h1>
-            <p className="text-[var(--ink)]/60">Manage your product catalog</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Manage your product catalog</p>
           </div>
           <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
             <Plus className="w-4 h-4 mr-2" />
@@ -159,7 +159,7 @@ export default function ProductsPage() {
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/40" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
               <label htmlFor="product-search" className="sr-only">Search products</label>
               <input
                 id="product-search"
@@ -167,7 +167,7 @@ export default function ProductsPage() {
                 placeholder="Search products..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input"
+                className="w-full pl-10 pr-4 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
               />
             </div>
             <Select

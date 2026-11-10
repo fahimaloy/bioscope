@@ -93,7 +93,7 @@ export function ExportPreview({
             </div>
             <div>
               <h2 className="font-display text-xl text-primary">Export Preview</h2>
-              <p className="text-sm text-[var(--ink)]/50">{dimensions} • {pixels} • ~{fileSize}</p>
+              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{dimensions} • {pixels} • ~{fileSize}</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} aria-label="Close">
@@ -130,7 +130,7 @@ export function ExportPreview({
             {/* Export Status */}
             <div className="mt-4 space-y-2">
               {Object.entries(exportResults).map(([format, result]) => (
-                <div key={format} className="flex items-center justify-between p-3 bg-white rounded-input border border-[var(--ink)]/20">
+                <div key={format} className="flex items-center justify-between p-3 bg-white rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
                   <div className="flex items-center gap-2">
                     <CheckCircle className="w-5 h-5 text-green-500" />
                     <span className="font-medium text-body text-[var(--ink)]">{format.toUpperCase()}</span>
@@ -158,11 +158,11 @@ export function ExportPreview({
                       'p-3 rounded-input border-3 text-center transition-all',
                       options.format === format
                         ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                        : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                     )}
                   >
                     <div className="font-display text-lg mb-1">{format.toUpperCase()}</div>
-                    <div className="text-xs text-[var(--ink)]/50">
+                    <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
                       {format === 'png' && 'Transparent, lossless'}
                       {format === 'jpg' && 'Compressed, smaller'}
                       {format === 'pdf' && 'Print-ready, vector'}
@@ -224,10 +224,10 @@ export function ExportPreview({
                       'p-3 rounded-input border-3 text-center transition-all',
                       options.background === bg
                         ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                        : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                     )}
                   >
-                    <div className="w-12 h-12 mx-auto mb-2 rounded-input border border-[var(--ink)]/20">
+                    <div className="w-12 h-12 mx-auto mb-2 rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
                       {bg === 'transparent' && (
                         <div className="w-full h-full bg-[linear-gradient(45deg,_#ccc_25%,_transparent_25%),_linear-gradient(45deg,_transparent_75%,_#ccc_75%)] bg-[size:20px_20px]" />
                       )}
@@ -288,7 +288,7 @@ export function ExportPreview({
                     <select
                       value={options.colorProfile}
                       onChange={(e) => setOptions((prev) => ({ ...prev, colorProfile: e.target.value as any }))}
-                      className="w-full px-3 py-2 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input"
+                      className="w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
                     >
                       <option value="sRGB">sRGB (Web)</option>
                       <option value="CMYK">CMYK (Print)</option>
@@ -374,15 +374,15 @@ export function ExportSettingsSummary({ options }: { options: ExportOptions }) {
       <div className="grid grid-cols-3 gap-4 text-center">
         <div>
           <div className="text-xl font-display text-primary">{options.dpi}</div>
-          <div className="text-xs text-[var(--ink)]/50">DPI</div>
+          <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">DPI</div>
         </div>
         <div>
           <div className="text-xl font-display text-primary">{options.quality}%</div>
-          <div className="text-xs text-[var(--ink)]/50">Quality</div>
+          <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Quality</div>
         </div>
         <div>
           <div className="text-xl font-display text-primary">{options.scale}x</div>
-          <div className="text-xs text-[var(--ink)]/50">Scale</div>
+          <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Scale</div>
         </div>
       </div>
       <div className="flex flex-wrap gap-2 mt-2">

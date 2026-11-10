@@ -121,7 +121,7 @@ export function DimensionControls({
               step={0.1}
               className="flex-1"
             />
-            <div className="flex items-center gap-1 text-sm text-[var(--ink)]/60">
+            <div className="flex items-center gap-1 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
               <span>Min:</span>
               <span className="font-medium">{minWidth}</span>
               <span>Max:</span>
@@ -149,7 +149,7 @@ export function DimensionControls({
               step={0.1}
               className="flex-1"
             />
-            <div className="flex items-center gap-1 text-sm text-[var(--ink)]/60">
+            <div className="flex items-center gap-1 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
               <span>Min:</span>
               <span className="font-medium">{minHeight}</span>
               <span>Max:</span>
@@ -228,11 +228,11 @@ export function DimensionControls({
                   'p-3 rounded-input border-3 text-center text-sm transition-all',
                   width === preset.width && height === preset.height
                     ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                    : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                 )}
               >
                 <span className="font-display">{preset.label}</span>
-                <div className="text-xs text-[var(--ink)]/60 mt-1">
+                <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-1">
                   {preset.width} × {preset.height} cm
                 </div>
               </button>
@@ -246,24 +246,24 @@ export function DimensionControls({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{area}</div>
-            <div className="text-xs text-[var(--ink)]/60">Area (cm²)</div>
+            <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Area (cm²)</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{pixelsWidth.toLocaleString()}</div>
-            <div className="text-xs text-[var(--ink)]/60">Width (px @ {dpi} DPI)</div>
+            <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Width (px @ {dpi} DPI)</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{pixelsHeight.toLocaleString()}</div>
-            <div className="text-xs text-[var(--ink)]/60">Height (px @ {dpi} DPI)</div>
+            <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Height (px @ {dpi} DPI)</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{megapixels}</div>
-            <div className="text-xs text-[var(--ink)]/60">Megapixels</div>
+            <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Megapixels</div>
           </div>
         </div>
 
         {/* Quality indicator */}
-        <div className="mt-4 pt-4 border-t border-[var(--ink)]/20">
+        <div className="mt-4 pt-4 border-t border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-[var(--ink)]">Print Quality:</span>
             <div className="flex items-center gap-2">
@@ -347,7 +347,7 @@ export function CompactDimensionControls({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs text-[var(--ink)]/60 mb-1">Width (cm)</label>
+          <label className="block text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-1">Width (cm)</label>
           <Input
             type="number"
             value={width}
@@ -359,7 +359,7 @@ export function CompactDimensionControls({
           />
         </div>
         <div>
-          <label className="block text-xs text-[var(--ink)]/60 mb-1">Height (cm)</label>
+          <label className="block text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-1">Height (cm)</label>
           <Input
             type="number"
             value={height}
@@ -372,7 +372,7 @@ export function CompactDimensionControls({
         </div>
       </div>
 
-      <div className="text-xs text-[var(--ink)]/50">
+      <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
         {width} × {height} cm • {Math.round(width * dpi / 2.54)} × {Math.round(height * dpi / 2.54)} px @ {dpi} DPI
       </div>
     </div>

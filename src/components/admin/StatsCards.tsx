@@ -111,7 +111,7 @@ function StatCard({ value, label, icon: Icon, color, trend, trendUp, format, ind
           <div className="relative group">
             <div className={cn(
               'w-12 h-12 rounded-input flex items-center justify-center animate-float-gentle transition-all duration-300',
-              'bg-[var(--ink)]/5',
+              'bg-[color-mix(in_srgb,var(--ink)_5%,transparent)]',
               `text-[${color}]`
             )}>
               <Icon className="w-6 h-6" />
@@ -128,7 +128,7 @@ function StatCard({ value, label, icon: Icon, color, trend, trendUp, format, ind
           format={format === 'currency' ? (v) => formatCurrency(v) : format === 'percent' ? (v) => `${v.toFixed(1)}%` : (v) => formatNumber(v)}
         />
         <SketchUnderline className="inline-block">
-          <p className="font-medium text-body text-[var(--ink)]/70">{label}</p>
+          <p className="font-medium text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{label}</p>
         </SketchUnderline>
       </Card>
     </motion.div>
@@ -160,7 +160,7 @@ export function LiveStatCard({
         </div>
       </div>
       <div className="text-2xl font-display text-[var(--ink)] mb-1">{formatNumber(value)}</div>
-      <p className="text-sm font-medium text-[var(--ink)]/60">{label}</p>
+      <p className="text-sm font-medium text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{label}</p>
     </div>
   )
 }
@@ -234,7 +234,7 @@ function SummaryCard({
         format={format === 'currency' ? (v) => formatCurrency(v) : format === 'percent' ? (v) => `${v.toFixed(1)}%` : (v) => formatNumber(v)}
       />
       <SketchUnderline className="inline-block">
-        <p className="text-sm font-medium text-[var(--ink)]/60">{label}</p>
+        <p className="text-sm font-medium text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{label}</p>
       </SketchUnderline>
     </Card>
   )
@@ -310,7 +310,7 @@ export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue
                 formatter={(value: number) => [formatCurrency(value), 'Revenue']}
                 labelFormatter={(date) => new Date(date).toLocaleDateString('en-BD', { weekday: 'short', month: 'short', day: 'numeric' })}
                 itemStyle={{ color: 'var(--primary)', fontWeight: 800, fontFamily: 'var(--font-display)' }}
-                labelStyle={{ color: 'var(--ink)/60', fontSize: '12px' }}
+                labelStyle={{ color: 'color-mix(in srgb, var(--ink) 60%, transparent)', fontSize: '12px' }}
                 wrapperStyle={{ outline: 'none' }}
               />
               <Area
@@ -341,7 +341,7 @@ export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue
                     cy={entry.revenue}
                     r={5}
                     fill="var(--primary)"
-                    stroke="var(--surface-card)"
+                    stroke="var(--surface-raised)"
                     strokeWidth={3}
                     className="opacity-0 group-hover:opacity-100 transition-opacity"
                     whileHover={{ scale: 2 }}
@@ -353,7 +353,7 @@ export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue
           </ResponsiveContainer>
         </div>
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--light)]">
-          <div className="flex items-center gap-4 text-sm text-[var(--ink)]/60">
+          <div className="flex items-center gap-4 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--primary)' }} />
               Revenue
@@ -367,7 +367,7 @@ export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue
             <p className="font-display text-lg text-[var(--ink)]">
               {formatCurrency(data[data.length - 1]?.revenue ?? 0)}
             </p>
-            <p className="text-xs text-[var(--ink)]/50">Today</p>
+            <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Today</p>
           </div>
         </div>
       </Card>
@@ -424,7 +424,7 @@ export function OrderStatusDistribution({ distribution }: { distribution: Record
                 <div className="flex-1">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-[var(--ink)]">{status.label}</span>
-                    <span className="text-[var(--ink)]/60 font-display">{count}</span>
+                    <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] font-display">{count}</span>
                   </div>
                   <div className="h-2 bg-[var(--light)] rounded-full overflow-hidden">
                     <motion.div
@@ -436,7 +436,7 @@ export function OrderStatusDistribution({ distribution }: { distribution: Record
                     />
                   </div>
                 </div>
-                <span className="text-sm font-medium text-[var(--ink)]/60 w-10 text-right font-display">{percentage.toFixed(1)}%</span>
+                <span className="text-sm font-medium text-[color-mix(in_srgb,var(--ink)_60%,transparent)] w-10 text-right font-display">{percentage.toFixed(1)}%</span>
               </motion.div>
             )
           })}
@@ -528,7 +528,7 @@ export function ActivityFeed({ activities, limit = 6 }: { activities: ActivityIt
                 </div>
                 
                 {/* Activity content */}
-                <div className="bg-[var(--light)]/50 border-2 border-[var(--light)] rounded-card p-4 hover:border-primary hover:shadow-md transition-all duration-300">
+                <div className="bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[var(--light)] rounded-card p-4 hover:border-primary hover:shadow-md transition-all duration-300">
                   {activity.href ? (
                     <a href={activity.href} className="block">
                       <ActivityContent activity={activity} typeColor={getTypeColor()} timeAgo={timeAgo} />
@@ -543,7 +543,7 @@ export function ActivityFeed({ activities, limit = 6 }: { activities: ActivityIt
           
           {displayActivities.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-[var(--ink)]/50 text-sm">No recent activity.</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)] text-sm">No recent activity.</p>
             </div>
           )}
         </div>
@@ -560,9 +560,9 @@ function ActivityContent({ activity, typeColor, timeAgo }: { activity: ActivityI
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-body text-[var(--ink)] truncate">{activity.title}</p>
-        <p className="text-sm text-[var(--ink)]/60 truncate mt-0.5">{activity.description}</p>
+        <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] truncate mt-0.5">{activity.description}</p>
       </div>
-      <span className="text-xs text-[var(--ink)]/50 whitespace-nowrap font-mono">{timeAgo}</span>
+      <span className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] whitespace-nowrap font-mono">{timeAgo}</span>
     </div>
   )
 }

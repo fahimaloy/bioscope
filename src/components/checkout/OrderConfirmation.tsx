@@ -74,7 +74,7 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.4 }}
-          className="text-body text-[var(--ink)]/60"
+          className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)]"
         >
           Thank you for your order. We'll notify you when it ships.
         </motion.p>
@@ -95,9 +95,9 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             className="inline-block"
           >
-            <p className="text-sm text-[var(--ink)]/60 uppercase tracking-wider mb-2">Order Number</p>
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] uppercase tracking-wider mb-2">Order Number</p>
             <p className="font-display text-4xl text-primary tracking-wide">{order.orderNumber}</p>
-            <p className="text-sm text-[var(--ink)]/50 mt-1">Placed on {formatDate(order.createdAt)}</p>
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-1">Placed on {formatDate(order.createdAt)}</p>
           </motion.div>
         </Card>
       </motion.div>
@@ -128,7 +128,7 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
             <MapPin className="w-5 h-5" />
             Shipping Address
           </h3>
-          <div className="space-y-1 text-[var(--ink)]/70">
+          <div className="space-y-1 text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
             <p className="font-medium">{order.shippingName}</p>
             <p>{order.shippingPhone}</p>
             <p>{order.shippingAddress}</p>
@@ -151,16 +151,16 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
           </h3>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-[var(--ink)]/60">Method</span>
+              <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Method</span>
               <span className="font-medium">{paymentMethodLabels[order.paymentMethod] || order.paymentMethod}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[var(--ink)]/60">Status</span>
+              <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Status</span>
               <span className="font-medium capitalize">{order.paymentStatus.toLowerCase()}</span>
             </div>
             {order.transactionId && (
               <div className="flex justify-between">
-                <span className="text-[var(--ink)]/60">Transaction ID</span>
+                <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Transaction ID</span>
                 <span className="font-mono text-sm">{order.transactionId}</span>
               </div>
             )}
@@ -176,7 +176,7 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
       >
         <Card variant="doodle" padding="none" className="relative overflow-hidden">
           <StickerPeel />
-          <div className="p-4 border-b border-[var(--light)] bg-[var(--light)]/50">
+          <div className="p-4 border-b border-[var(--light)] bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)]">
             <h3 className="font-display text-lg text-primary">Order Items</h3>
           </div>
           <div className="divide-y divide-[var(--light)]">
@@ -195,8 +195,8 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-body text-[var(--ink)] truncate">{item.productName}</p>
-                  <p className="text-sm text-[var(--ink)]/60">{item.width} × {item.height} cm</p>
-                  <p className="text-sm text-[var(--ink)]/50">Qty: {item.quantity} × {formatCurrency(item.unitPrice)}</p>
+                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{item.width} × {item.height} cm</p>
+                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Qty: {item.quantity} × {formatCurrency(item.unitPrice)}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-display text-primary">{formatCurrency(item.totalPrice)}</p>
@@ -218,15 +218,15 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
           <h3 className="font-display text-lg text-primary mb-4">Price Breakdown</h3>
           <div className="space-y-2">
             <div className="flex justify-between text-body">
-              <span className="text-[var(--ink)]/70">Subtotal</span>
+              <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Subtotal</span>
               <span className="font-display text-primary">{formatCurrency(order.subtotal)}</span>
             </div>
             <div className="flex justify-between text-body">
-              <span className="text-[var(--ink)]/70">Tax</span>
+              <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Tax</span>
               <span className="font-display text-primary">{formatCurrency(order.taxAmount)}</span>
             </div>
             <div className="flex justify-between text-body">
-              <span className="text-[var(--ink)]/70">Delivery</span>
+              <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Delivery</span>
               <span className="font-display text-primary">
                 {order.deliveryCharge > 0 ? formatCurrency(order.deliveryCharge) : 'Free'}
               </span>
@@ -251,13 +251,13 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.4 }}
       >
-        <Card variant="outlined" padding="lg" className="border-[var(--ink)]/30 relative">
+        <Card variant="outlined" padding="lg" className="border-[color-mix(in_srgb,var(--ink)_30%,transparent)] relative">
           <StickerPeel />
           <h3 className="font-display text-lg text-primary mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5" />
             What Happens Next?
           </h3>
-          <ol className="space-y-3 text-[var(--ink)]/70">
+          <ol className="space-y-3 text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
             {[
               'We\'ll confirm your order within 24 hours',
               'Your stickers will be printed and prepared for shipping',
@@ -422,7 +422,7 @@ export function OrderConfirmationCard({ order, onViewDetails }: { order: Order; 
       <div className="flex items-center justify-between mb-3">
         <div>
           <p className="font-display text-lg text-primary">{order.orderNumber}</p>
-          <p className="text-sm text-[var(--ink)]/50">{formatDate(order.createdAt)}</p>
+          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{formatDate(order.createdAt)}</p>
         </div>
         <Badge variant={getStatusVariant(order.status)} size="md">
           {statusLabels[order.status] || order.status}
@@ -430,7 +430,7 @@ export function OrderConfirmationCard({ order, onViewDetails }: { order: Order; 
       </div>
 
       <div className="flex items-center justify-between text-sm">
-        <span className="text-[var(--ink)]/60">{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
+        <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
         <span className="font-display text-primary">{formatCurrency(order.total)}</span>
       </div>
 

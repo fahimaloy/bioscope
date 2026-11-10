@@ -162,7 +162,7 @@ function AdjustmentSlider({
         </label>
         <span className={cn(
           'text-sm font-display',
-          isDefault ? 'text-[var(--ink)]/50' : 'text-primary'
+          isDefault ? 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]' : 'text-primary'
         )}>
           {value > 0 ? '+' : ''}{value - defaultValue}%
         </span>
@@ -216,7 +216,7 @@ function ColorBalanceChannel({
             `bg-gradient-to-r from-${color}-500 via-transparent to-${color}-500`
           )}
         />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-full text-xs font-medium text-[var(--ink)]/60">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-full text-xs font-medium text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
           {value > 0 ? '+' : ''}{value}
         </div>
       </div>

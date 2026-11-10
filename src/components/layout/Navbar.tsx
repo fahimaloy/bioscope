@@ -188,11 +188,11 @@ export function Navbar() {
                       >
                         My Orders
                       </Link>
-                      <hr className="my-2 border-[var(--ink)]/20" />
+                      <hr className="my-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
                       <button
                         onClick={handleLogout}
                         className={cn(
-                          'w-full rounded-pill px-3 py-2 text-left font-body text-base text-[var(--error)] transition-colors duration-fast hover:bg-[var(--error)]/10',
+                          'w-full rounded-pill px-3 py-2 text-left font-body text-base text-[var(--error)] transition-colors duration-fast hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]',
                           FOCUS_VISIBLE
                         )}
                       >
@@ -282,7 +282,7 @@ export function Navbar() {
               </motion.ul>
 
               <motion.div
-                className="flex flex-col gap-2 border-t-2 border-dashed border-[var(--ink)]/30 pt-4"
+                className="flex flex-col gap-2 border-t-2 border-dashed border-[color-mix(in_srgb,var(--ink)_30%,transparent)] pt-4"
                 variants={motionVariants.staggerContainer}
                 initial="initial"
                 animate="animate"

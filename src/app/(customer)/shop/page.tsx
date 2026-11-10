@@ -108,7 +108,7 @@ export default function ShopPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-[var(--ink)]/60">Categories:</span>
+              <span className="text-sm font-medium text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Categories:</span>
               <AnimatePresence mode="popLayout">
                 <div key={selectedCategory} className="flex flex-wrap items-center gap-2" role="group" aria-label="Product categories">
                   {categoryPills.map((cat) => (
@@ -127,7 +127,7 @@ export default function ShopPage() {
 
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-[var(--ink)]/60">Sort by:</label>
+                <label className="text-sm font-medium text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Sort by:</label>
                 <Select
                   options={selectOptions}
                   value={sortBy}
@@ -142,7 +142,7 @@ export default function ShopPage() {
                   className={`p-2 rounded-input transition-all duration-200 ${
                     viewMode === 'grid'
                       ? 'bg-white shadow-sm text-primary'
-                      : 'text-[var(--ink)]/60 hover:text-primary'
+                      : 'text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-primary'
                   }`}
                   aria-label="Grid view"
                 >
@@ -153,7 +153,7 @@ export default function ShopPage() {
                   className={`p-2 rounded-input transition-all duration-200 ${
                     viewMode === 'list'
                       ? 'bg-white shadow-sm text-primary'
-                      : 'text-[var(--ink)]/60 hover:text-primary'
+                      : 'text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-primary'
                   }`}
                   aria-label="List view"
                 >
@@ -163,7 +163,7 @@ export default function ShopPage() {
             </div>
           </div>
 
-          <p className="text-sm text-[var(--ink)]/60">
+          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
             Showing <span className="font-medium">{products.length}</span> of{' '}
             <span className="font-medium">{pager.total}</span> products
           </p>
@@ -205,7 +205,7 @@ export default function ShopPage() {
             <div className="text-center py-16">
               <DoodleShape size="lg" color="primary" animation="float" className="mx-auto mb-6 opacity-50" />
               <h3 className="font-display text-xl text-[var(--ink)] mb-2">No products found</h3>
-              <p className="text-[var(--ink)]/60 mb-6">Try adjusting your filters or browse all categories</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-6">Try adjusting your filters or browse all categories</p>
               <Button variant="doodle" size="lg" onClick={() => { setSelectedCategory('all'); setPage(1) }}>
                 <span className="mr-2">✨</span>
                 Clear Filters

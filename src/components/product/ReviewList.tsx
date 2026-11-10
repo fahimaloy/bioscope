@@ -63,11 +63,11 @@ export function ReviewList({
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={cn('w-5 h-5', star <= Math.round(averageRating) ? 'fill-primary text-primary' : 'text-[var(--ink)]/20')}
+                    className={cn('w-5 h-5', star <= Math.round(averageRating) ? 'fill-primary text-primary' : 'text-[color-mix(in_srgb,var(--ink)_20%,transparent)]')}
                   />
                 ))}
               </div>
-              <p className="text-sm text-[var(--ink)]/50 mt-1">{totalReviews} reviews</p>
+              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-1">{totalReviews} reviews</p>
             </div>
             <div className="flex-1 space-y-2">
               {[5, 4, 3, 2, 1].map((star) => {
@@ -75,14 +75,14 @@ export function ReviewList({
                 const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
                 return (
                   <div key={star} className="flex items-center gap-3">
-                    <span className="text-sm text-[var(--ink)]/60 w-8">{star}★</span>
+                    <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] w-8">{star}★</span>
                     <div className="flex-1 h-2 bg-[var(--light)] rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full transition-all duration-500"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span className="text-sm text-[var(--ink)]/50 w-10 text-right">{count}</span>
+                    <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] w-10 text-right">{count}</span>
                   </div>
                 )
               })}
@@ -111,7 +111,7 @@ export function ReviewList({
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <span className="text-sm text-[var(--ink)]/50">{Math.round(percentage)}%</span>
+                  <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{Math.round(percentage)}%</span>
                 </div>
               )
             })}
@@ -122,11 +122,11 @@ export function ReviewList({
       {/* Filters & Sort */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--ink)]/60">Filter:</span>
+          <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Filter:</span>
           <select
             value={filterRating}
             onChange={(e) => setFilterRating(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-            className="px-3 py-1.5 text-sm border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input"
+            className="px-3 py-1.5 text-sm border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
           >
             <option value="all">All Ratings</option>
             {[5, 4, 3, 2, 1].map((star) => (
@@ -139,11 +139,11 @@ export function ReviewList({
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--ink)]/60">Sort by:</span>
+          <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-3 py-1.5 text-sm border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input"
+            className="px-3 py-1.5 text-sm border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
           >
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
@@ -158,7 +158,7 @@ export function ReviewList({
       <div className="space-y-6">
         {filteredReviews.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[var(--ink)]/60">No reviews match your filters</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">No reviews match your filters</p>
           </div>
         ) : (
           filteredReviews.map((review) => (
@@ -193,7 +193,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
           </div>
           <div>
             <p className="font-medium text-body text-[var(--ink)]">{review.user?.name || 'Anonymous'}</p>
-            <p className="text-sm text-[var(--ink)]/50">{formatDate(review.createdAt)}</p>
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{formatDate(review.createdAt)}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={cn('w-6 h-6', star <= review.rating ? 'fill-primary text-primary' : 'text-[var(--ink)]/20')}
+            className={cn('w-6 h-6', star <= review.rating ? 'fill-primary text-primary' : 'text-[color-mix(in_srgb,var(--ink)_20%,transparent)]')}
           />
         ))}
       </div>
@@ -221,7 +221,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
         <h4 className="font-medium text-body text-[var(--ink)] mb-2">{review.title}</h4>
       )}
 
-      <p className="text-body text-[var(--ink)]/70 leading-relaxed mb-3">{displayText}</p>
+      <p className="text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)] leading-relaxed mb-3">{displayText}</p>
 
       {isLong && (
         <Button
@@ -249,7 +249,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
       <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[var(--light)]">
         <button
           className={cn(
-            'flex items-center gap-1 text-sm text-[var(--ink)]/60 hover:text-primary transition-colors',
+            'flex items-center gap-1 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-primary transition-colors',
             helpful && 'text-primary'
           )}
           onClick={() => setHelpful(!helpful)}
@@ -259,7 +259,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
         </button>
         <button
           className={cn(
-            'flex items-center gap-1 text-sm text-[var(--ink)]/60 hover:text-red-500 transition-colors',
+            'flex items-center gap-1 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-red-500 transition-colors',
             notHelpful && 'text-red-500'
           )}
           onClick={() => setNotHelpful(!notHelpful)}
@@ -267,7 +267,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
           <ThumbsDown className={cn('w-4 h-4', notHelpful && 'fill-current')} />
           <span>Not Helpful</span>
         </button>
-        <button className="flex items-center gap-1 text-sm text-[var(--ink)]/60 hover:text-red-500 transition-colors ml-auto">
+        <button className="flex items-center gap-1 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-red-500 transition-colors ml-auto">
           <Flag className="w-4 h-4" />
           <span>Report</span>
         </button>
@@ -296,11 +296,11 @@ export function ReviewSummary({
           {[1, 2, 3, 4, 5].map((star) => (
             <Star
               key={star}
-              className={cn('w-4 h-4', star <= Math.round(averageRating) ? 'fill-primary text-primary' : 'text-[var(--ink)]/20')}
+              className={cn('w-4 h-4', star <= Math.round(averageRating) ? 'fill-primary text-primary' : 'text-[color-mix(in_srgb,var(--ink)_20%,transparent)]')}
             />
           ))}
         </div>
-        <p className="text-sm text-[var(--ink)]/50 mt-1">{totalReviews} reviews</p>
+        <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-1">{totalReviews} reviews</p>
       </div>
       <div className="flex-1 space-y-1">
         {[5, 4, 3, 2, 1].map((star) => {
@@ -308,14 +308,14 @@ export function ReviewSummary({
           const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
           return (
             <div key={star} className="flex items-center gap-2">
-              <span className="text-xs text-[var(--ink)]/60 w-6">{star}★</span>
+              <span className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)] w-6">{star}★</span>
               <div className="flex-1 h-1.5 bg-dark/10 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-300"
                   style={{ width: `${percentage}%` }}
                 />
               </div>
-              <span className="text-xs text-[var(--ink)]/50 w-8 text-right">{count}</span>
+              <span className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] w-8 text-right">{count}</span>
             </div>
           )
         })}

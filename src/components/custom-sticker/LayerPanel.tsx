@@ -59,10 +59,10 @@ export function LayerPanel({
       {/* Layer List */}
       <div className={cn('flex-1 overflow-y-auto', expanded ? '' : 'hidden')}>
         {layers.length === 0 ? (
-          <div className="p-8 text-center text-[var(--ink)]/50">
-            <Layers className="w-12 h-12 mx-auto mb-3 text-[var(--ink)]/20" />
+          <div className="p-8 text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+            <Layers className="w-12 h-12 mx-auto mb-3 text-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
             <p className="text-body">No layers yet</p>
-            <p className="text-sm text-[var(--ink)]/40 mt-1">Click + to add your first layer</p>
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] mt-1">Click + to add your first layer</p>
           </div>
         ) : (
           <ul className="divide-y divide-light/50" role="list" aria-label="Layers">
@@ -82,7 +82,7 @@ export function LayerPanel({
                 >
                   {/* Drag Handle */}
                   <button
-                    className="p-1 text-[var(--ink)]/30 hover:text-primary transition-colors"
+                    className="p-1 text-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:text-primary transition-colors"
                     aria-label="Drag to reorder"
                   >
                     <GripVertical className="w-4 h-4" />
@@ -105,13 +105,13 @@ export function LayerPanel({
                     <div className="flex items-center gap-2">
                       <span className={cn(
                         'font-medium text-sm truncate',
-                        isSelected ? 'text-[var(--ink)]' : 'text-[var(--ink)]/70'
+                        isSelected ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]'
                       )}>
                         {layer.type === 'text' ? (layer.text?.substring(0, 20) || 'Text') : layer.type}
                       </span>
-                      {layer.locked && <Lock className="w-3 h-3 text-[var(--ink)]/40" />}
+                      {layer.locked && <Lock className="w-3 h-3 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-[var(--ink)]/50">
+                    <div className="flex items-center gap-2 text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
                       <span>z: {layer.zIndex}</span>
                       <span>•</span>
                       <span>Opacity: {Math.round((layer.opacity ?? 1) * 100)}%</span>
@@ -123,7 +123,7 @@ export function LayerPanel({
                     onClick={() => onToggleVisibility(layer.id)}
                     className={cn(
                       'p-1 rounded transition-colors',
-                      layer.visible ? 'text-[var(--ink)]' : 'text-[var(--ink)]/30'
+                      layer.visible ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_30%,transparent)]'
                     )}
                     aria-label={layer.visible ? 'Hide layer' : 'Show layer'}
                   >
@@ -135,7 +135,7 @@ export function LayerPanel({
                     onClick={() => onToggleLock(layer.id)}
                     className={cn(
                       'p-1 rounded transition-colors',
-                      layer.locked ? 'text-primary' : 'text-[var(--ink)]/30'
+                      layer.locked ? 'text-primary' : 'text-[color-mix(in_srgb,var(--ink)_30%,transparent)]'
                     )}
                     aria-label={layer.locked ? 'Unlock layer' : 'Lock layer'}
                   >
@@ -144,7 +144,7 @@ export function LayerPanel({
 
                   {/* Actions Menu */}
                   <div className="relative">
-                    <button className="p-1 text-[var(--ink)]/30 hover:text-primary transition-colors" aria-label="More options">
+                    <button className="p-1 text-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:text-primary transition-colors" aria-label="More options">
                       <MoreVertical className="w-4 h-4" />
                     </button>
                     <LayerActionsMenu
@@ -165,7 +165,7 @@ export function LayerPanel({
 
       {/* Collapsed View */}
       {!expanded && (
-        <div className="p-4 border-t border-[var(--light)] text-center text-[var(--ink)]/50">
+        <div className="p-4 border-t border-[var(--light)] text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
           <button
             onClick={() => setExpanded(true)}
             className="text-primary hover:underline text-sm"
@@ -202,7 +202,7 @@ function LayerActionsMenu({
     <>
       <button
         onClick={(e) => { e.stopPropagation(); setOpen(!open) }}
-        className="p-1 text-[var(--ink)]/30 hover:text-primary transition-colors"
+        className="p-1 text-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:text-primary transition-colors"
         aria-label="Layer actions"
       >
         <MoreVertical className="w-4 h-4" />

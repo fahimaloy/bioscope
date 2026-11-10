@@ -70,7 +70,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
             </div>
             <div>
               <h3 className="font-display text-xl text-primary">Global Tax Settings</h3>
-              <p className="text-[var(--ink)]/60">Configure default tax behavior for all products</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Configure default tax behavior for all products</p>
             </div>
           </div>
         </div>
@@ -92,7 +92,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
                 step={0.01}
                 className="pr-12"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink)]/50 font-medium">%</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_50%,transparent)] font-medium">%</span>
             </div>
           </div>
 
@@ -133,17 +133,17 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-2xl font-display text-primary">100.00</div>
-              <div className="text-xs text-[var(--ink)]/50">Base Price</div>
+              <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Base Price</div>
             </div>
             <div>
               <div className="text-2xl font-display text-primary">+{globalTax.toFixed(2)}%</div>
-              <div className="text-xs text-[var(--ink)]/50">Tax Amount</div>
+              <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Tax Amount</div>
             </div>
             <div>
               <div className="text-2xl font-display text-primary">
                 {taxInclusive ? '100.00' : (100 + globalTax).toFixed(2)}
               </div>
-              <div className="text-xs text-[var(--ink)]/50">Final Price</div>
+              <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Final Price</div>
             </div>
           </div>
         </div>
@@ -212,7 +212,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
                       <span className="font-medium text-body text-[var(--ink)]">{category.name}</span>
                       <Badge variant="primary" size="sm">{category.rate.toFixed(2)}%</Badge>
                     </div>
-                    <p className="text-sm text-[var(--ink)]/50 mt-1">{category.description || 'No description'}</p>
+                    <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-1">{category.description || 'No description'}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm" onClick={() => {
@@ -245,7 +245,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
           <Calculator className="w-6 h-6 text-accent" />
           <div>
             <h4 className="font-medium text-body text-[var(--ink)]">Product-Specific Tax</h4>
-            <p className="text-sm text-[var(--ink)]/60">
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
               Individual products can override global tax settings. When editing a product,
               you can set a specific tax percentage and additional charge that applies only to that product.
             </p>

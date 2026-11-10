@@ -19,7 +19,7 @@ export default function NotFound() {
           <DoodleShape size="sm" color="ink" animation="rotate" style={{ bottom: '20%', left: '15%', opacity: 0.08, animationDelay: '-3s' }} />
         </div>
 
-        <div className="relative bg-[var(--surface-card)] border-3 border-[var(--ink)] rounded-card p-10 shadow-card space-y-6">
+        <div className="relative bg-[var(--surface-raised)] border-3 border-[var(--ink)] rounded-card p-10 shadow-card space-y-6">
           {/* Lost sticker character - skull sticker */}
           <div className="relative mx-auto w-48 h-48">
             <DoodleShape size="xl" color="primary" animation="float" className="opacity-20" />
@@ -49,7 +49,7 @@ export default function NotFound() {
           </h1>
 
           {/* Message */}
-          <p className="text-body text-[var(--ink)]/70 leading-relaxed">
+          <p className="text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)] leading-relaxed">
             This page must have peeled off and gotten stuck somewhere. Let's get you back on track.
           </p>
 

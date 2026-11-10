@@ -135,7 +135,7 @@ export default function ContactPage() {
           <h1 className="font-display text-4xl md:text-5xl text-primary mb-4 relative">
             <span className="sketch-underline">Contact Us</span>
           </h1>
-          <p className="text-xl text-[var(--ink)]/60 max-w-2xl mx-auto">
+          <p className="text-xl text-[color-mix(in_srgb,var(--ink)_60%,transparent)] max-w-2xl mx-auto">
             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </motion.div>
@@ -163,10 +163,10 @@ export default function ContactPage() {
                     <div className="absolute top-[-4px] right-[-4px] w-4 h-4 bg-[var(--accent)] border-2 border-[var(--ink)] rounded-tr-full shadow-[2px_2px_0_var(--ink)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                   <h3 className="font-display text-lg text-primary mb-2 text-center">{item.title}</h3>
-                  <a href={item.href} className="block text-[var(--ink)]/70 text-center font-medium mb-2 hover:text-primary transition-colors">
+                  <a href={item.href} className="block text-[color-mix(in_srgb,var(--ink)_70%,transparent)] text-center font-medium mb-2 hover:text-primary transition-colors">
                     {item.value}
                   </a>
-                  <p className="text-sm text-[var(--ink)]/50 text-center">{item.desc}</p>
+                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] text-center">{item.desc}</p>
                 </Card>
               </motion.div>
             ))}
@@ -181,7 +181,7 @@ export default function ContactPage() {
           >
             <Card variant="doodle" padding="xl" className="relative">
               {/* Torn edge top effect */}
-              <TornEdge position="top" className="absolute top-0 left-0 right-0 h-4 bg-[var(--surface-card)] border-3 border-[var(--ink)] border-b-0" />
+              <TornEdge position="top" className="absolute top-0 left-0 right-0 h-4 bg-[var(--surface-raised)] border-3 border-[var(--ink)] border-b-0" />
               
               <StickerPeel />
               <WashiTape rotation={-2} width={160} height={30} className="absolute -top-6 left-6 opacity-90" />
@@ -411,7 +411,7 @@ export default function ContactPage() {
               <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
                 Frequently Asked Questions
               </span>
-              <p className="text-[var(--ink)]/60 mt-2">Quick answers to common questions</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2">Quick answers to common questions</p>
             </div>
             <div className="max-w-3xl mx-auto space-y-4">
               {faqs.map((faq, index) => (
@@ -426,7 +426,7 @@ export default function ContactPage() {
                     <StickerPeel />
                     <WashiTape rotation={-1} width={80} height={18} className="absolute -top-3 right-4 opacity-70 text-xs" />
                     <button
-                      className="w-full p-4 text-left flex items-center justify-between hover:bg-[var(--light)]/50 transition-colors"
+                      className="w-full p-4 text-left flex items-center justify-between hover:bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] transition-colors"
                       onClick={() => {}}
                     >
                       <span className="font-medium text-body text-[var(--ink)] pr-4">{faq.q}</span>

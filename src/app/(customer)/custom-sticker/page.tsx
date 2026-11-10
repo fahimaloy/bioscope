@@ -215,7 +215,7 @@ export default function CustomStickerPage() {
                 'flex flex-col items-center gap-1 py-3 px-2 transition-all',
                 mobileTab === tab
                   ? 'text-primary'
-                  : 'text-[var(--ink)]/50'
+                  : 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
               )}
             >
               {tab === 'tools' && <Layers className="w-6 h-6" />}
@@ -233,7 +233,7 @@ export default function CustomStickerPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4">
             <div>
               <h1 className="font-[var(--font-display)] text-2xl sm:text-3xl text-primary">Custom Sticker Builder</h1>
-              <p className="text-[var(--ink)]/60">Design your perfect sticker</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Design your perfect sticker</p>
             </div>
 
             {/* Material/Finish/Cut Badges + Quantity + Live Price */}
@@ -250,7 +250,7 @@ export default function CustomStickerPage() {
 
               {/* Quantity Stepper */}
               <div className="flex items-center gap-2 bg-white border-3 border-[var(--ink)] rounded-pill px-3 py-1.5 shadow-sm">
-                <span className="text-sm text-[var(--ink)]/60 mr-2">Qty</span>
+                <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mr-2">Qty</span>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--ink)] hover:bg-[var(--light)] transition-colors"
@@ -303,7 +303,7 @@ export default function CustomStickerPage() {
                 <h2 className="font-display text-xl text-primary">Tools</h2>
                 <button
                   onClick={() => setShowToolsMobile(false)}
-                  className="p-2 text-[var(--ink)]/50 hover:text-primary transition-colors"
+                  className="p-2 text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors"
                 >
                   <ChevronUp className="w-6 h-6" />
                 </button>
@@ -382,7 +382,7 @@ export default function CustomStickerPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-[var(--ink)]/60">Zoom:</span>
+                  <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Zoom:</span>
                   <Button variant="ghost" size="sm" onClick={actions.zoomOut} aria-label="Zoom out">
                     <ZoomOut className="w-4 h-4" />
                   </Button>
@@ -492,7 +492,7 @@ export default function CustomStickerPage() {
                 Open Tools Panel
               </button>
               <div className="bg-[var(--light)] rounded-card border-3 border-[var(--ink)] p-4">
-                <p className="text-center text-[var(--ink)]/50">Tap the button above to open tools</p>
+                <p className="text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Tap the button above to open tools</p>
               </div>
             </motion.div>
           )}
@@ -620,11 +620,11 @@ function ToolsPanel({
                         'p-3 rounded-input border-3 text-sm text-center transition-all',
                         material === mat.value
                           ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                          : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                       )}
                     >
                       <div className="font-medium">{mat.label}</div>
-                      <div className="text-xs text-[var(--ink)]/60">{mat.description}</div>
+                      <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{mat.description}</div>
                       <div className="text-xs font-display text-primary mt-1">{mat.priceMultiplier}x</div>
                     </button>
                   ))}
@@ -643,11 +643,11 @@ function ToolsPanel({
                         'p-3 rounded-input border-3 text-sm text-center transition-all',
                         finish === fin.value
                           ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                          : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                       )}
                     >
                       <div className="font-medium">{fin.label}</div>
-                      <div className="text-xs text-[var(--ink)]/60">{fin.description}</div>
+                      <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{fin.description}</div>
                       <div className="text-xs font-display text-primary mt-1">{fin.priceMultiplier}x</div>
                     </button>
                   ))}
@@ -666,11 +666,11 @@ function ToolsPanel({
                         'p-3 rounded-input border-3 text-sm text-center transition-all',
                         cutType === cut.value
                           ? 'border-primary bg-primary/10 text-primary'
-                          : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                          : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                       )}
                     >
                       <div className="font-medium">{cut.label}</div>
-                      <div className="text-xs text-[var(--ink)]/60">{cut.description}</div>
+                      <div className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{cut.description}</div>
                       <div className="text-xs font-display text-primary mt-1">{cut.priceMultiplier}x</div>
                     </button>
                   ))}
@@ -689,7 +689,7 @@ function ToolsPanel({
                     max={10000}
                     className="flex-1"
                   />
-                  <div className="text-sm text-[var(--ink)]/60">pcs</div>
+                  <div className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">pcs</div>
                 </div>
               </div>
             </AccordionContent>
@@ -720,7 +720,7 @@ function ToolsPanel({
                   onResetTransform={() => {}}
                 />
               ) : (
-                <div className="flex-1 flex items-center justify-center text-[var(--ink)]/50">
+                <div className="flex-1 flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
                   <p className="text-body">Select a layer to edit</p>
                 </div>
               )}

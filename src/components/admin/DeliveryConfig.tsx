@@ -70,7 +70,7 @@ export function DeliveryConfig({ onChange, initialSettings = {} }: DeliveryConfi
             </div>
             <div>
               <h3 className="font-display text-xl text-primary">Delivery Zones</h3>
-              <p className="text-[var(--ink)]/60">Configure delivery charges per zone</p>
+              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Configure delivery charges per zone</p>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={() => setShowZones(!showZones)}>
@@ -128,7 +128,7 @@ export function DeliveryConfig({ onChange, initialSettings = {} }: DeliveryConfi
                       <Badge variant="primary" size="sm">{zone.charge} BDT</Badge>
                       <Badge variant="secondary" size="sm">{zone.days} days</Badge>
                     </div>
-                    <p className="text-sm text-[var(--ink)]/50 mt-1">{zone.districts.join(', ') || 'All districts'}</p>
+                    <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-1">{zone.districts.join(', ') || 'All districts'}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm" onClick={() => {

@@ -58,7 +58,7 @@ export function ProductConfigurator({
           <span className="text-3xl font-display text-primary">{totalPrice.toLocaleString()} BDT</span>
         </div>
         {product.taxPercent > 0 && (
-          <div className="text-sm text-[var(--ink)]/60 mt-2">
+          <div className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2">
             Tax ({product.taxPercent}%): {(totalPrice * product.taxPercent / 100).toFixed(2)} BDT
           </div>
         )}
@@ -111,7 +111,7 @@ export function ProductConfigurator({
 
         <div className="flex items-center gap-4 flex-wrap">
           {/* Visual quantity selector */}
-          <div className="flex items-center border-3 border-[var(--ink)]/30 rounded-input overflow-hidden">
+          <div className="flex items-center border-3 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input overflow-hidden">
             <Button
               variant="doodle-outline"
               size="sm"
@@ -165,7 +165,7 @@ export function ProductConfigurator({
 
         {/* Price per unit indicator */}
         {product.allowedQuantities.length > 1 && (
-          <p className="text-sm text-[var(--ink)]/60">
+          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
             Price per unit: <span className="font-medium text-primary">{unitPrice.toLocaleString()} BDT</span>
           </p>
         )}
@@ -291,7 +291,7 @@ function CustomField({
             type="text"
             value={value || ''}
             onChange={(e) => onChange?.(e.target.value)}
-            className="w-full px-4 py-3 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input"
+            className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
             placeholder={field.label}
           />
         </div>

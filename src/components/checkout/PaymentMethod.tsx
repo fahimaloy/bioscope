@@ -54,7 +54,7 @@ export function PaymentMethod({ selectedMethod, onChange, className, readOnly = 
               'relative cursor-pointer transition-all duration-300',
               selectedMethod === method.value
                 ? 'border-primary shadow-card-hover ring-2 ring-primary/30'
-                : 'border-[var(--ink)]/30 hover:border-primary'
+                : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary'
             )}
             whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
@@ -92,7 +92,7 @@ export function PaymentMethod({ selectedMethod, onChange, className, readOnly = 
                       <Badge variant="primary" size="sm">{method.badge}</Badge>
                     )}
                   </div>
-                  <p className="text-sm text-[var(--ink)]/60 mb-2">{method.description}</p>
+                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-2">{method.description}</p>
                   {method.fee > 0 && (
                     <p className="text-xs text-orange-600">Processing fee: {method.fee} BDT</p>
                   )}
@@ -108,7 +108,7 @@ export function PaymentMethod({ selectedMethod, onChange, className, readOnly = 
                   transition={{ type: 'spring', stiffness: 260, damping: 20 }}
                   className="flex items-center justify-center w-10 h-10 flex-shrink-0"
                 >
-                  <div className="w-6 h-6 rounded-full border-2 border-[var(--ink)]/30 flex items-center justify-center">
+                  <div className="w-6 h-6 rounded-full border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] flex items-center justify-center">
                     {selectedMethod === method.value && (
                       <CheckCircle className="w-4 h-4 text-primary" />
                     )}
@@ -121,12 +121,12 @@ export function PaymentMethod({ selectedMethod, onChange, className, readOnly = 
       </RadioGroup>
 
       {/* Payment Details */}
-      <Card variant="outlined" padding="md" className="border-[var(--ink)]/30">
+      <Card variant="outlined" padding="md" className="border-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
         <h4 className="font-display text-base text-primary mb-3 flex items-center gap-2">
           <Shield className="w-5 h-5" />
           Payment Information
         </h4>
-        <ul className="space-y-2 text-sm text-[var(--ink)]/70">
+        <ul className="space-y-2 text-sm text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
           <li className="flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-primary" />
             <span>All payments are processed securely via SSLCommerz</span>
@@ -167,7 +167,7 @@ export function SimplePaymentMethod({ selectedMethod, onChange, className, readO
               'p-4 rounded-card border-3 text-center transition-all duration-300',
               selectedMethod === method.value
                 ? `border-[var(--${method.color})] bg-[var(--${method.color})]/10 text-[var(--${method.color})] shadow-card`
-                : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
             )}
           >
             <div className={cn('w-10 h-10 mx-auto mb-2 rounded-xl flex items-center justify-center', `bg-[var(--${method.color})]/15`)}>

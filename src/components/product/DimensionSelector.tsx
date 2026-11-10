@@ -44,7 +44,7 @@ export function DimensionSelector({
             if (dim) onChange(dim)
           }}
           disabled={disabled}
-          className="w-full px-4 py-3 border-2 border-[var(--ink)]/30 rounded-input focus:border-primary focus:shadow-input text-body text-[var(--ink)]"
+          className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body text-[var(--ink)]"
         >
           <option value="">Select size</option>
           {dimensions.map((dim) => (
@@ -69,7 +69,7 @@ export function DimensionSelector({
                 'flex items-center gap-2 px-4 py-3 rounded-input border-3 cursor-pointer transition-all',
                 selectedDimension?.id === dim.id
                   ? 'border-primary bg-primary/10 text-primary'
-                  : 'border-[var(--ink)]/30 text-[var(--ink)] hover:border-primary'
+                  : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
               )}
             >
               <input
@@ -112,7 +112,7 @@ export function DimensionSelector({
               disabled={disabled}
             >
               <span className="block font-display">{dim.label}</span>
-              <div className="text-sm text-[var(--ink)]/60">
+              <div className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
                 {dim.width} × {dim.height} cm
               </div>
               {dim.priceMultiplier !== 1 && (
@@ -173,7 +173,7 @@ export function DimensionSelector({
             size="md"
             className={cn(
               'px-4 py-3 rounded-input font-medium transition-all min-w-[110px]',
-              'border-dashed border-[var(--ink)]/30 text-[var(--ink)]/50 hover:border-primary hover:bg-[var(--light)]'
+              'border-dashed border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:border-primary hover:bg-[var(--light)]'
             )}
             onClick={() => setExpanded(true)}
             disabled={disabled}
@@ -204,13 +204,13 @@ export function DimensionDisplay({
       {visible.map((dim) => (
         <span
           key={dim.id}
-          className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/70 rounded-full"
+          className="px-2 py-0.5 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_70%,transparent)] rounded-full"
         >
           {dim.label}
         </span>
       ))}
       {remaining > 0 && (
-        <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--ink)]/50 rounded-full">
+        <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] rounded-full">
           +{remaining} more
         </span>
       )}
@@ -243,7 +243,7 @@ export function DimensionComparisonTable({
             <tr
               key={dim.id}
               className={cn(
-                'border-b border-[var(--light)]/50 transition-colors',
+                'border-b border-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] transition-colors',
                 selectedDimension?.id === dim.id && 'bg-primary/5'
               )}
             >

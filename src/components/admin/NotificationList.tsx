@@ -80,7 +80,7 @@ export function NotificationList({
           </div>
           <div>
             <h3 className="font-display text-xl text-primary">Notifications</h3>
-            <p className="text-sm text-[var(--ink)]/60">
+            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
               {notifications.length} total • {unreadCount} unread
             </p>
           </div>
@@ -105,7 +105,7 @@ export function NotificationList({
                 'px-3 py-1.5 rounded-input text-sm font-medium transition-all',
                 filter === f
                   ? 'bg-primary text-white shadow-btn'
-                  : 'bg-[var(--light)] text-[var(--ink)]/70 hover:bg-dark/10 border border-[var(--ink)]/20'
+                  : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_70%,transparent)] hover:bg-dark/10 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]'
               )}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -132,8 +132,8 @@ export function NotificationList({
       <div className="space-y-2 max-h-[600px] overflow-y-auto">
         {filteredNotifications.length === 0 ? (
           <div className="text-center py-12">
-            <Bell className="w-16 h-16 mx-auto mb-4 text-[var(--ink)]/20" />
-            <p className="text-body text-[var(--ink)]/60">
+            <Bell className="w-16 h-16 mx-auto mb-4 text-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
+            <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
               {filter === 'unread' ? 'No unread notifications' :
                filter === 'read' ? 'No read notifications' :
                'No notifications yet'}
@@ -157,7 +157,7 @@ export function NotificationList({
                 <div
                   className={cn(
                     'w-10 h-10 rounded-input flex items-center justify-center flex-shrink-0',
-                    !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--ink)]/50'
+                    !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
                   )}
                 >
                   {Icon}
@@ -166,22 +166,22 @@ export function NotificationList({
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <h4 className={cn(
                       'font-medium text-body truncate',
-                      !notification.isRead ? 'text-[var(--ink)]' : 'text-[var(--ink)]/70'
+                      !notification.isRead ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]'
                     )}>
                       {notification.title}
                     </h4>
-                    <time className="text-xs text-[var(--ink)]/50 whitespace-nowrap">
+                    <time className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] whitespace-nowrap">
                       {formatDateTime(notification.createdAt)}
                     </time>
                   </div>
                   <p className={cn(
                     'text-sm truncate',
-                    !notification.isRead ? 'text-[var(--ink)]/70' : 'text-[var(--ink)]/50'
+                    !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
                   )}>
                     {notification.message}
                   </p>
                   {isExpanded && notification.data && (
-                    <div className="mt-2 p-2 bg-[var(--light)] rounded-input text-xs text-[var(--ink)]/60 font-mono">
+                    <div className="mt-2 p-2 bg-[var(--light)] rounded-input text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)] font-mono">
                       <pre>{JSON.stringify(notification.data, null, 2)}</pre>
                     </div>
                   )}
@@ -289,8 +289,8 @@ export function NotificationBellDropdown({
 
           <div className="max-h-96 overflow-y-auto">
             {recentNotifications.length === 0 ? (
-              <div className="p-8 text-center text-[var(--ink)]/50">
-                <Bell className="w-12 h-12 mx-auto mb-3 text-[var(--ink)]/20" />
+              <div className="p-8 text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+                <Bell className="w-12 h-12 mx-auto mb-3 text-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
                 <p className="text-body">No notifications yet</p>
               </div>
             ) : (
@@ -319,14 +319,14 @@ export function NotificationBellDropdown({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <h4 className={cn('font-medium text-sm truncate', !notification.isRead ? 'text-[var(--ink)]' : 'text-[var(--ink)]/70')}>
+                        <h4 className={cn('font-medium text-sm truncate', !notification.isRead ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]')}>
                           {notification.title}
                         </h4>
-                        <time className="text-xs text-[var(--ink)]/50 whitespace-nowrap">
+                        <time className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] whitespace-nowrap">
                           {formatDateTime(notification.createdAt)}
                         </time>
                       </div>
-                      <p className={cn('text-xs truncate', !notification.isRead ? 'text-[var(--ink)]/70' : 'text-[var(--ink)]/50')}>
+                      <p className={cn('text-xs truncate', !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]')}>
                         {notification.message}
                       </p>
                     </div>

@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Analytics</h1>
-            <p className="text-[var(--ink)]/60">Track your store performance with detailed insights</p>
+            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Track your store performance with detailed insights</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">Live Data</Badge>
@@ -246,7 +246,7 @@ export default function AnalyticsPage() {
                     formatter={(value: number) => [formatNumber(value), 'Orders']}
                     labelFormatter={(date) => date}
                     itemStyle={{ color: 'var(--secondary)', fontWeight: 800, fontFamily: 'var(--font-display)' }}
-                    labelStyle={{ color: 'var(--ink)/60', fontSize: '12px' }}
+                    labelStyle={{ color: 'color-mix(in srgb, var(--ink) 60%, transparent)', fontSize: '12px' }}
                     wrapperStyle={{ outline: 'none' }}
                   />
                   <Area
@@ -277,7 +277,7 @@ export default function AnalyticsPage() {
                         cy={entry.orders}
                         r={5}
                         fill="var(--secondary)"
-                        stroke="var(--surface-card)"
+                        stroke="var(--surface-raised)"
                         strokeWidth={3}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                         whileHover={{ scale: 2 }}
@@ -289,7 +289,7 @@ export default function AnalyticsPage() {
               </ResponsiveContainer>
             </div>
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--light)]">
-              <div className="flex items-center gap-4 text-sm text-[var(--ink)]/60">
+              <div className="flex items-center gap-4 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
                 <span className="flex items-center gap-1">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--secondary)' }} />
                   Orders
@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
                 <p className="font-display text-lg text-[var(--ink)]">
                   {formatNumber(monthly[monthly.length - 1]?.orders ?? 0)}
                 </p>
-                <p className="text-xs text-[var(--ink)]/50">This Month</p>
+                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">This Month</p>
               </div>
             </div>
           </Card>
@@ -314,7 +314,7 @@ export default function AnalyticsPage() {
               {topProducts.length === 0 ? (
                 <div className="text-center py-12">
                   <DoodleShape size="lg" color="primary" animation="float" className="mx-auto opacity-30 mb-4" />
-                  <p className="text-body text-[var(--ink)]/50">No order data yet.</p>
+                  <p className="text-body text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">No order data yet.</p>
                 </div>
               ) : (
                 topProducts.map((product, index) => (
@@ -323,21 +323,21 @@ export default function AnalyticsPage() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05, type: 'spring', stiffness: 100, damping: 15 }}
-                    className="flex items-center gap-4 p-3 bg-[var(--light)]/50 border-2 border-[var(--light)] rounded-card hover:border-primary hover:shadow-md transition-all duration-300 group"
+                    className="flex items-center gap-4 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[var(--light)] rounded-card hover:border-primary hover:shadow-md transition-all duration-300 group"
                   >
                     <div className="relative w-12 h-12 flex-shrink-0">
                       <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] rounded-input opacity-20" />
-                      <div className="relative w-full h-full rounded-input flex items-center justify-center bg-white border-2 border-[var(--ink)]/10">
+                      <div className="relative w-full h-full rounded-input flex items-center justify-center bg-white border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]">
                         <span className="font-display text-primary text-lg">{index + 1}</span>
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-body text-[var(--ink)] truncate">{product.name}</p>
-                      <p className="text-sm text-[var(--ink)]/50">{formatNumber(product.sales)} units sold</p>
+                      <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{formatNumber(product.sales)} units sold</p>
                     </div>
                     <div className="text-right">
                       <p className="font-display text-primary">{formatCurrency(product.revenue)}</p>
-                      <p className="text-xs text-[var(--ink)]/50">Revenue</p>
+                      <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Revenue</p>
                     </div>
                   </motion.div>
                 ))
@@ -389,14 +389,14 @@ export default function AnalyticsPage() {
                     }}
                     formatter={(value: number) => [formatCurrency(value), 'Revenue']}
                     itemStyle={{ color: 'var(--primary)', fontWeight: 800, fontFamily: 'var(--font-display)' }}
-                    labelStyle={{ color: 'var(--ink)/60', fontSize: '12px' }}
+                    labelStyle={{ color: 'color-mix(in srgb, var(--ink) 60%, transparent)', fontSize: '12px' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
             </div>
             <div className="flex flex-wrap gap-2 mt-4 justify-center">
               {topProducts.slice(0, 6).map((p, i) => (
-                <span key={p.name} className="flex items-center gap-1.5 text-xs text-[var(--ink)]/70">
+                <span key={p.name} className="flex items-center gap-1.5 text-xs text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
                   <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: chartColors[i % chartColors.length] }} />
                   {p.name.length > 15 ? p.name.slice(0, 12) + '...' : p.name}
                 </span>
@@ -421,7 +421,7 @@ export default function AnalyticsPage() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full" role="grid">
-                <thead className="bg-[var(--tertiary)] border-b-2 border-[var(--primary)]">
+                <thead className="bg-[var(--surface-sunken)] border-b-2 border-[var(--primary)]">
                   <tr>
                     <th scope="col" className="px-4 py-3 text-left font-medium text-[var(--ink)] uppercase tracking-wider text-sm">Rank</th>
                     <th scope="col" className="px-4 py-3 text-left font-medium text-[var(--ink)] uppercase tracking-wider text-sm">Customer</th>
@@ -436,7 +436,7 @@ export default function AnalyticsPage() {
                       <td colSpan={5} className="px-4 py-16 text-center">
                         <div className="flex flex-col items-center gap-4">
                           <DoodleShape size="lg" color="primary" animation="float" className="opacity-30" />
-                          <p className="text-body text-[var(--ink)]/50">No customer data yet.</p>
+                          <p className="text-body text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">No customer data yet.</p>
                         </div>
                       </td>
                     </tr>
@@ -447,7 +447,7 @@ export default function AnalyticsPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.05, type: 'spring', stiffness: 100, damping: 15 }}
-                        className="transition-colors hover:bg-[var(--surface-hover)]"
+                        className="transition-colors hover:bg-[var(--surface-raised)]"
                       >
                         <td className="px-4 py-3">
                           <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white font-display text-sm">
@@ -457,7 +457,7 @@ export default function AnalyticsPage() {
                         <td className="px-4 py-3">
                           <div>
                             <p className="font-medium text-body text-[var(--ink)]">{customer.name}</p>
-                            <p className="text-sm text-[var(--ink)]/50">{customer.email}</p>
+                            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{customer.email}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -467,7 +467,7 @@ export default function AnalyticsPage() {
                           <span className="font-display text-primary">{formatCurrency(customer.totalSpent)}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-[var(--ink)]/70">{formatCurrency(customer.orderCount > 0 ? customer.totalSpent / customer.orderCount : 0)}</span>
+                          <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{formatCurrency(customer.orderCount > 0 ? customer.totalSpent / customer.orderCount : 0)}</span>
                         </td>
                       </motion.tr>
                     ))
@@ -492,7 +492,7 @@ export default function AnalyticsPage() {
             color="var(--primary)"
             trend="All time"
             trendUp={true}
-            iconBg="bg-[var(--primary)]/10 text-[var(--primary)]"
+            iconBg="bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-[var(--primary)]"
           />
           <MetricCard
             label="Customer Lifetime Value"
@@ -501,7 +501,7 @@ export default function AnalyticsPage() {
             color="var(--secondary)"
             trend="All time"
             trendUp={true}
-            iconBg="bg-[var(--secondary)]/10 text-[var(--secondary)]"
+            iconBg="bg-[color-mix(in_srgb,var(--secondary)_10%,transparent)] text-[var(--secondary)]"
           />
           <MetricCard
             label="Orders / Customer"
@@ -510,7 +510,7 @@ export default function AnalyticsPage() {
             color="var(--accent)"
             trend="All time"
             trendUp={true}
-            iconBg="bg-[var(--accent)]/10 text-[var(--accent)]"
+            iconBg="bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] text-[var(--accent)]"
           />
           <MetricCard
             label="Pending Orders"
@@ -519,7 +519,7 @@ export default function AnalyticsPage() {
             color="var(--error)"
             trend="Needs action"
             trendUp={false}
-            iconBg="bg-[var(--error)]/10 text-[var(--error)]"
+            iconBg="bg-[color-mix(in_srgb,var(--error)_10%,transparent)] text-[var(--error)]"
           />
         </motion.div>
       </div>
@@ -550,7 +550,7 @@ function MetricCard({ label, value, icon, color, trend, trendUp, iconBg }: Metri
       </div>
       <div className="text-xl font-display text-[var(--ink)] mb-1">{value}</div>
       <SketchUnderline className="inline-block">
-        <p className="font-medium text-body text-[var(--ink)]/70 text-sm">{label}</p>
+        <p className="font-medium text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)] text-sm">{label}</p>
       </SketchUnderline>
     </Card>
   )

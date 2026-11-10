@@ -71,7 +71,7 @@ export function QuantitySelector({
     <div className={cn('flex items-center gap-4 flex-wrap', className)}>
       {/* Input with buttons */}
       <motion.div
-        className="flex items-center border-3 border-[var(--ink)]/30 rounded-input overflow-hidden"
+        className="flex items-center border-3 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input overflow-hidden"
         animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
         transition={{ duration: 0.4 }}
       >
@@ -127,7 +127,7 @@ export function QuantitySelector({
 
       {/* Price per unit display */}
       {selectedConfig && quantityConfigs.length > 1 && (
-        <span className="text-sm text-[var(--ink)]/60">
+        <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
           {selectedConfig.pricePerUnit.toLocaleString()} BDT/unit
         </span>
       )}

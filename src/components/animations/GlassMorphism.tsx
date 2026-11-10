@@ -26,7 +26,7 @@ export const GlassMorphism = forwardRef<HTMLDivElement, GlassMorphismProps>(
           'bg-white/90',
           blurStyles[blur],
           'shadow-glass',
-          border && 'border border-[var(--ink)]/10',
+          border && 'border border-[color-mix(in_srgb,var(--ink)_10%,transparent)]',
           className
         )}
         style={{
@@ -67,7 +67,7 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        'bg-white/90 backdrop-blur-md shadow-glass border border-[var(--ink)]/10 rounded-card',
+        'bg-white/90 backdrop-blur-md shadow-glass border border-[color-mix(in_srgb,var(--ink)_10%,transparent)] rounded-card',
         'transition-all duration-400',
         paddingStyles[padding],
         hover && 'hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] hover:-translate-y-2',
