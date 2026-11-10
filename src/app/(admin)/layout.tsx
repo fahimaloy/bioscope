@@ -85,8 +85,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
         )}
       >
-        {/* Top Bar */}
-        <header className="sticky top-16 z-40 border-b border-[var(--border)] bg-[var(--surface-raised)]">
+        {/* Top Bar — z-30 sits below the mobile overlay (z-40), so the top bar
+            dims while the sidebar is open. */}
+        <header className="sticky top-16 z-30 border-b border-[var(--border)] bg-[var(--surface-raised)]">
           <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <div className="flex min-w-0 items-center gap-4">
               <button

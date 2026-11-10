@@ -218,6 +218,33 @@ function sidebar(container: HTMLElement): HTMLElement | null {
   return container.querySelector('aside[aria-label="Admin navigation"]')
 }
 
+/**
+ * The z-index tokens from `src/app/globals.css`. Mirrored here because jsdom
+ * does not load the compiled stylesheet; changing a token value should be
+ * accompanied by a change here.
+ */
+const Z_TOKENS: Record<string, number> = {
+  '--z-dropdown': 100,
+  '--z-sticky': 200,
+  '--z-fixed': 300,
+  '--z-modal-backdrop': 400,
+  '--z-modal': 500,
+  '--z-popover': 600,
+  '--z-tooltip': 700,
+  '--z-toast': 800,
+}
+
+/** The resolved z-index of an element, read from its own classes. */
+function resolvedZIndex(el: HTMLElement): number | null {
+  for (const cls of (el.getAttribute('class') ?? '').split(/\s+/)) {
+    const token = cls.match(/^z-\[var\((--z-[a-z-]+)\)\]$/)
+    if (token) return Z_TOKENS[token[1]] ?? null
+    const numeric = cls.match(/^z-(\d+)$/)
+    if (numeric) return Number(numeric[1])
+  }
+  return null
+}
+
 /** The admin user object the mocked `useAuth` returns. */
 function adminUser(overrides: Record<string, unknown> = {}) {
   return {
@@ -346,17 +373,32 @@ describe('AdminSidebar', () => {
     expect(container).not.toBeNull()
   })
 
-  it('raises the mobile overlay above the admin header so the header dims', () => {
-    const { container } = render(<AdminSidebar mobileOpen />)
+  it('layers the mobile overlay between the admin header and the sidebar rail', () => {
+    const { container } = render(
+      <AdminLayout>
+        <div>orders body</div>
+      </AdminLayout>
+    )
 
+    const header = container.querySelector('header')!
     const overlay = mobileOverlay(container)!
-    const overlayZ = overlay.className.match(/z-\[var\(--z-modal-backdrop\)\]/)
-    expect(overlayZ, 'the overlay uses the modal-backdrop token').not.toBeNull()
+    const rail = sidebar(container)!
+    expect(header, 'the top bar is a header element').not.toBeNull()
+    expect(overlay, 'the mobile overlay is present').not.toBeNull()
+    expect(rail, 'the sidebar rail is present').not.toBeNull()
 
-    // The admin header is z-40; the overlay must outrank it.
-    const headerZ = 40
-    const overlayZValue = 400 // --z-modal-backdrop
-    expect(overlayZValue, 'the overlay is above the header').toBeGreaterThan(headerZ)
+    const headerZ = resolvedZIndex(header)
+    const overlayZ = resolvedZIndex(overlay)
+    const railZ = resolvedZIndex(rail)
+    expect(headerZ, 'the header has a resolvable z-index').not.toBeNull()
+    expect(overlayZ, 'the overlay has a resolvable z-index').not.toBeNull()
+    expect(railZ, 'the rail has a resolvable z-index').not.toBeNull()
+
+    // The overlay must dim the top bar…
+    expect(overlayZ! > headerZ!, 'the overlay is above the header').toBe(true)
+    // …but stay below the rail. A scrim above the rail intercepts taps on every
+    // nav item, so the menu could only be closed, never navigated.
+    expect(overlayZ! < railZ!, 'the overlay is below the rail').toBe(true)
   })
 
   it('uses the teal accent for its badge fill, with on-teal text', () => {

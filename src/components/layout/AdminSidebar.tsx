@@ -89,11 +89,15 @@ export function AdminSidebar({
   return (
     <>
       {/* Mobile overlay — `--overlay` is the token-system scrim. It sits above
-          the admin header (z-40) so the whole page dims while the sidebar is
-          open, not just the content column. */}
+          the admin header (z-30) so the top bar dims while the sidebar is
+          open, and below the sidebar rail (z-50) so the rail stays bright and
+          every nav item remains tappable. The modal-backdrop token (400) would
+          paint the scrim over the rail, the brand navbar (100) and the mobile
+          nav (300), so taps would land on the scrim and only close the menu
+          instead of navigating. */}
       <div
         className={cn(
-          'fixed inset-0 z-[var(--z-modal-backdrop)] bg-[var(--overlay)] transition-opacity duration-base lg:hidden',
+          'fixed inset-0 z-40 bg-[var(--overlay)] transition-opacity duration-base lg:hidden',
           mobileOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         )}
         onClick={onCloseMobile}
