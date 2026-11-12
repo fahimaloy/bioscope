@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { checkoutSchema, type CheckoutInput } from '@/lib/validations/order'
@@ -14,14 +14,13 @@ import { CheckoutOrderSummary } from '@/components/checkout/OrderSummary'
 import { PaymentMethod } from '@/components/checkout/PaymentMethod'
 import { OrderConfirmation } from '@/components/checkout/OrderConfirmation'
 import { CheckoutProgressStepper } from '@/components/checkout/CheckoutProgressStepper'
-import { formatCurrency } from '@/lib/utils'
-import { Loader2, Truck, Shield, CheckCircle } from 'lucide-react'
+import { Loader2, Truck, CheckCircle } from 'lucide-react'
 import { createOrder } from '@/lib/actions/order'
 import { getSettings } from '@/lib/actions/settings'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
+import { DoodleScatter } from '@/components/decorative'
 import { motion } from 'framer-motion'
+import { useMotionVariants } from '@/lib/motion'
 
 const STEPS = ['address', 'payment', 'review', 'confirmation'] as const
 type Step = (typeof STEPS)[number]
@@ -29,22 +28,20 @@ type Step = (typeof STEPS)[number]
 const STEP_LABELS = ['Address', 'Payment', 'Review', 'Confirmation']
 
 export default function CheckoutPage() {
-  const router = useRouter()
   const { user, isAuthenticated } = useAuth()
   const items = useCartItems()
   const subtotal = useCartSubtotal()
   const clearCart = useCartStore((s) => s.clearCart)
+  const variants = useMotionVariants()
   const [step, setStep] = useState<Step>('address')
   const [isLoading, setIsLoading] = useState(false)
   const [settings, setSettings] = useState<any>(null)
   const [order, setOrder] = useState<any>(null)
 
   const {
-    register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
   } = useForm<CheckoutInput>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -110,62 +107,71 @@ export default function CheckoutPage() {
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[var(--bg-color)] relative flex items-center justify-center px-4 pt-24">
+      <div className="min-h-screen bg-[var(--paper)] relative flex items-center justify-center px-4 pt-24">
         <Card variant="doodle" padding="xl" className="w-full max-w-md text-center relative">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-display text-2xl text-primary mb-4"
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            className="font-display text-2xl text-[var(--text)] mb-4"
           >
             Sign In Required
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
             transition={{ delay: 0.1 }}
-            className="text-[var(--text-subtle)] mb-6"
+            className="text-[var(--text-muted)] mb-6"
           >
             Please sign in to complete your purchase.
           </motion.p>
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+          <motion.div
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
             transition={{ delay: 0.2 }}
-            onClick={() => router.push('/login?callbackUrl=/checkout')}
-            className="w-full"
           >
-            <Button className="w-full" variant="primary" size="lg">
-              Sign In
-            </Button>
-          </motion.button>
+            {/* Ruling 3: the login page reads `callbackUrl`, not `redirect`. */}
+            <Link href="/login?callbackUrl=/checkout" className="block">
+              <Button className="w-full" variant="primary" size="lg">
+                Sign In
+              </Button>
+            </Link>
+          </motion.div>
         </Card>
       </div>
     )
   }
 
-  // Redirect to cart if empty
-  if (items.length === 0) {
+  // Redirect to cart if empty. The confirmation step keeps its card: placing an
+  // order clears the cart, so an empty cart is the *result* of the last step,
+  // not a reason to leave it.
+  if (items.length === 0 && step !== 'confirmation') {
     return (
-      <div className="min-h-screen bg-[var(--bg-color)] relative flex items-center justify-center px-4 pt-24">
+      <div className="min-h-screen bg-[var(--paper)] relative flex items-center justify-center px-4 pt-24">
         <Card variant="doodle" padding="xl" className="w-full max-w-md text-center relative">
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-display text-2xl text-primary mb-4"
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            className="font-display text-2xl text-[var(--text)] mb-4"
           >
             Cart is Empty
           </motion.h1>
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+          <motion.div
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
             transition={{ delay: 0.1 }}
-            onClick={() => router.push('/cart')}
           >
-            <Button className="w-full" variant="primary" size="lg">
-              <Truck className="w-4 h-4 mr-2" />
-              Go to Cart
-            </Button>
-          </motion.button>
+            <Link href="/cart" className="block">
+              <Button className="w-full" variant="primary" size="lg">
+                <Truck className="w-4 h-4 mr-2" />
+                Go to Cart
+              </Button>
+            </Link>
+          </motion.div>
         </Card>
       </div>
     )
@@ -194,7 +200,10 @@ export default function CheckoutPage() {
               })
               if (res.ok) {
                 const json = await res.json()
-                if (json?.data?.id) setValue('addressId', json.data.id)
+                // `POST /api/addresses` returns `created({ address })`, so the
+                // id is at `data.address.id` — not `data.id`.
+                const addressId = json?.data?.address?.id ?? json?.data?.id
+                if (addressId) setValue('addressId', addressId)
                 toast.success('Address saved')
               } else {
                 const json = await res.json().catch(() => null)
@@ -213,12 +222,13 @@ export default function CheckoutPage() {
       case 'review':
         return (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
             className="space-y-6"
           >
             <div>
-              <h3 className="font-display text-lg text-primary mb-4">Shipping Address</h3>
+              <h3 className="font-display text-lg text-[var(--brand)] mb-4">Shipping Address</h3>
               <AddressForm
                 addresses={user?.addresses || []}
                 selectedAddressId={selectedAddressId}
@@ -227,7 +237,7 @@ export default function CheckoutPage() {
               />
             </div>
             <div>
-              <h3 className="font-display text-lg text-primary mb-4">Payment Method</h3>
+              <h3 className="font-display text-lg text-[var(--brand)] mb-4">Payment Method</h3>
               <PaymentMethod
                 selectedMethod={paymentMethod}
                 onChange={() => {}}
@@ -244,23 +254,24 @@ export default function CheckoutPage() {
             />
           </motion.div>
         )
-      case 'confirmation':
-        return order ? (
-          <OrderConfirmation order={order} />
-        ) : null
+      default:
+        return null
     }
   }
 
+  const stepTitle = step.charAt(0).toUpperCase() + step.slice(1)
+
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] relative pt-24 pb-12 px-4">
-      <DoodleBackground shapeCount={6} />
-      
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[var(--paper)] relative pt-24 pb-12 px-4">
+      {/* One decor accent per section (contract §3). */}
+      <DoodleScatter count={6} seed="checkout" />
+
+      <div className="max-w-7xl mx-auto relative">
         {/* Progress Stepper */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.175, 0.885, 0.32, 1.275] }}
+          variants={variants.fadeInDown}
+          initial="initial"
+          animate="animate"
           className="mb-8"
         >
           <CheckoutProgressStepper
@@ -271,63 +282,66 @@ export default function CheckoutPage() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="grid lg:grid-cols-3 gap-8"
+          variants={variants.fadeInUp}
+          initial="initial"
+          animate="animate"
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-8"
         >
-          {/* Form Steps */}
+          {/* Form Steps / Confirmation */}
           <div className="lg:col-span-2">
             <Card variant="doodle" padding="lg" className="relative">
-              {(step as string) !== 'confirmation' && (
+              {step === 'confirmation' ? (
+                order ? <OrderConfirmation order={order} /> : null
+              ) : (
                 <>
                   <motion.h2
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    variants={variants.fadeInUp}
+                    initial="initial"
+                    animate="animate"
                     transition={{ delay: 0.3 }}
-                    className="font-display text-xl text-primary mb-6"
+                    className="font-display text-xl text-[var(--brand)] mb-6"
                   >
-                    {step.charAt(0).toUpperCase() + step.slice(1)}
+                    {stepTitle}
                   </motion.h2>
                   <form onSubmit={handleSubmit(onSubmit)}>
                     {renderStep()}
-                    {step !== 'confirmation' && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                        className="flex justify-between mt-8 pt-6 border-t border-[var(--light)]"
-                      >
-                        {step !== 'address' && (
-                          <Button type="button" variant="secondary" onClick={handleBack}>
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                            Back
-                          </Button>
-                        )}
-                        {step === 'review' ? (
-                          <Button type="submit" variant="primary" size="lg" loading={isLoading}>
-                            {isLoading ? (
-                              <>
-                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                Placing Order...
-                              </>
-                            ) : (
-                              <>
-                                Place Order
-                                <CheckCircle className="w-4 h-4 ml-2" />
-                              </>
-                            )}
-                          </Button>
-                        ) : (
-                          <Button type="button" variant="primary" size="lg" onClick={handleNext}>
-                            Continue
-                            <Truck className="w-4 h-4 ml-2" />
-                          </Button>
-                        )}
-                      </motion.div>
-                    )}
+                    <motion.div
+                      variants={variants.fadeInUp}
+                      initial="initial"
+                      animate="animate"
+                      transition={{ delay: 0.4 }}
+                      className="flex justify-between mt-8 pt-6 border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)]"
+                    >
+                      {step !== 'address' && (
+                        <Button type="button" variant="secondary" onClick={handleBack}>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                          Back
+                        </Button>
+                      )}
+                      {step === 'review' ? (
+                        <Button type="submit" variant="primary" size="lg" loading={isLoading}>
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                              Placing Order...
+                            </>
+                          ) : (
+                            <>
+                              Place Order
+                              <CheckCircle className="w-4 h-4 ml-2" />
+                            </>
+                          )}
+                        </Button>
+                      ) : (
+                        <Button type="button" variant="primary" size="lg" onClick={handleNext}>
+                          Continue
+                          <Truck className="w-4 h-4 ml-2" />
+                        </Button>
+                      )}
+                    </motion.div>
                   </form>
                 </>
               )}
@@ -336,11 +350,12 @@ export default function CheckoutPage() {
 
           {/* Order Summary - Sticky Sidebar */}
           <div className="lg:col-span-1">
-            {(step as string) !== 'confirmation' && (
+            {step !== 'confirmation' && (
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4, duration: 0.5 }}
+                variants={variants.fadeInUp}
+                initial="initial"
+                animate="animate"
+                transition={{ delay: 0.4 }}
               >
                 <CheckoutOrderSummary
                   items={items}

@@ -6,8 +6,9 @@ import { Input, Select } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import type { Address } from '@/types'
-import { MapPin, Home, Building2, Plus, Edit3, Trash2, CheckCircle, Loader2 } from 'lucide-react'
+import { MapPin, Plus, Edit3, Trash2, CheckCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useMotionVariants } from '@/lib/motion'
 
 const divisions = [
   'Dhaka', 'Chittagong', 'Rajshahi', 'Khulna', 'Barisal', 'Sylhet', 'Rangpur', 'Mymensingh'
@@ -47,6 +48,7 @@ export function AddressForm({
   className,
   readOnly = false,
 }: AddressFormProps) {
+  const variants = useMotionVariants()
   const [showForm, setShowForm] = useState(false)
   const [editingAddress, setEditingAddress] = useState<Address | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -128,8 +130,8 @@ export function AddressForm({
     <div className={cn('space-y-6', className)}>
       {!readOnly && (
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-xl text-primary">Shipping Address</h3>
-          <Button variant="secondary" size="sm" onClick={() => { setEditingAddress(null); resetForm(); setShowForm(true) }}>
+          <h3 className="font-display text-xl text-[var(--brand)]">Shipping Address</h3>
+          <Button type="button" variant="secondary" size="sm" onClick={() => { setEditingAddress(null); resetForm(); setShowForm(true) }}>
             <Plus className="w-4 h-4 mr-2" />
             Add New Address
           </Button>
@@ -139,21 +141,21 @@ export function AddressForm({
       {/* Address Form */}
       {showForm && !readOnly && (
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
+          variants={variants.fadeInUp}
+          initial="initial"
+          animate="animate"
           transition={{ duration: 0.3, ease: [0.175, 0.885, 0.32, 1.275] }}
         >
           <Card variant="doodle" padding="lg" className="relative">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="font-display text-lg text-primary">
+                <h4 className="font-display text-lg text-[var(--brand)]">
                   {editingAddress ? 'Edit Address' : 'Add New Address'}
                 </h4>
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingAddress(null); resetForm() }}
-                  className="text-[var(--text-subtle)] hover:text-primary transition-colors"
+                  className="text-[var(--text-subtle)] hover:text-[var(--brand)] transition-colors"
                 >
                   Cancel
                 </button>
@@ -235,17 +237,17 @@ export function AddressForm({
                 />
               </div>
 
-              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-input bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--ink)_40%,transparent)] transition-colors">
+              <label className="flex items-center gap-3 cursor-pointer p-3 rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--ink)_40%,transparent)] transition-colors">
                 <input
                   type="checkbox"
                   checked={formData.isDefault}
                   onChange={(e) => setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))}
-                  className="w-5 h-5 text-primary border-2 border-[var(--ink)] rounded-sm focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[var(--surface-raised)] appearance-none cursor-pointer"
+                  className="w-5 h-5 text-[var(--brand)] border-2 border-[var(--ink)] rounded-sm focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 focus:ring-offset-[var(--surface-raised)] appearance-none cursor-pointer"
                 />
-                <span className="text-sm font-medium text-[var(--ink)]">Set as default address</span>
+                <span className="text-sm font-medium text-[var(--text)]">Set as default address</span>
               </label>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-[var(--light)]">
+              <div className="flex justify-end gap-3 pt-4 border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)]">
                 <Button type="button" variant="secondary" onClick={() => { setShowForm(false); setEditingAddress(null); resetForm() }}>
                   Cancel
                 </Button>
@@ -262,16 +264,17 @@ export function AddressForm({
       <div className="space-y-3">
         {addresses.length === 0 ? (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
             className="text-center py-12"
           >
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--light)] flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--paper-deep)] flex items-center justify-center">
               <MapPin className="w-8 h-8 text-[var(--text-subtle)]" />
             </div>
             <p className="text-[var(--text-subtle)] mb-4 font-medium">No saved addresses</p>
             {!readOnly && (
-              <Button variant="secondary" size="sm" onClick={() => { setEditingAddress(null); resetForm(); setShowForm(true) }}>
+              <Button type="button" variant="secondary" size="sm" onClick={() => { setEditingAddress(null); resetForm(); setShowForm(true) }}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Your First Address
               </Button>
@@ -281,8 +284,9 @@ export function AddressForm({
           addresses.map((address, index) => (
             <motion.div
               key={address.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              variants={variants.fadeInUp}
+              initial="initial"
+              animate="animate"
               transition={{ delay: index * 0.05 }}
             >
               <AddressCard
@@ -300,10 +304,12 @@ export function AddressForm({
 
         {!readOnly && addresses.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
           >
             <Button
+              type="button"
               variant="outline"
               className="w-full"
               onClick={() => { setEditingAddress(null); resetForm(); setShowForm(true) }}
@@ -340,43 +346,38 @@ function AddressCard({
     OUTSIDE_DHAKA: 'Outside Dhaka',
   }
 
-  const zoneColors = {
-    INSIDE_DHAKA: 'green',
-    OUTSIDE_DHAKA: 'blue',
-  }
-
   return (
     <Card
       variant="doodle"
       padding="md"
       hover={!readOnly}
       className={cn(
-        'relative cursor-pointer transition-all duration-300',
+        'relative cursor-pointer transition-colors duration-300',
         isSelected
-          ? 'border-primary shadow-card-hover ring-2 ring-primary/30'
-          : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary'
+          ? 'border-[var(--brand)] shadow-ink-3 ring-2 ring-[var(--brand)]'
+          : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-[var(--brand)]'
       )}
       onClick={onSelect}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center flex-wrap gap-2 mb-2">
-            <span className="font-display text-lg text-[var(--ink)]">{address.name}</span>
+            <span className="font-display text-lg text-[var(--text)]">{address.name}</span>
             {address.isDefault && (
-              <span className="px-2 py-1 text-xs font-medium bg-primary text-white rounded-pill">
+              <span className="px-2 py-1 text-xs font-medium bg-[var(--brand)] text-[var(--text)] rounded-pill">
                 Default
               </span>
             )}
             <span className={cn(
               'px-2 py-1 text-xs font-medium rounded-pill border',
               address.deliveryZone === 'INSIDE_DHAKA'
-                ? 'bg-green-50 text-green-700 border-green-200'
-                : 'bg-blue-50 text-blue-700 border-blue-200'
+                ? 'bg-[color-mix(in_srgb,var(--success)_12%,transparent)] text-[var(--text)] border-[color-mix(in_srgb,var(--success)_40%,transparent)]'
+                : 'bg-[color-mix(in_srgb,var(--blue)_12%,transparent)] text-[var(--text)] border-[color-mix(in_srgb,var(--blue)_40%,transparent)]'
             )}>
               {deliveryZoneLabels[address.deliveryZone]}
             </span>
           </div>
-          <p className="text-body text-[color-mix(in_srgb,var(--ink)_80%,transparent)] mb-1">{address.phone}</p>
+          <p className="text-[var(--text-muted)] mb-1">{address.phone}</p>
           <p className="text-sm text-[var(--text-subtle)]">
             {address.addressLine1}
             {address.addressLine2 && `, ${address.addressLine2}`}
@@ -388,20 +389,22 @@ function AddressCard({
         {!readOnly && (
           <div className="flex flex-col gap-2 ml-4 flex-shrink-0">
             <button
+              type="button"
               onClick={(e) => { e.stopPropagation(); onSelect() }}
               className={cn(
-                'px-3 py-1.5 rounded-pill text-sm font-medium transition-all duration-200',
+                'px-3 py-1.5 rounded-pill text-sm font-medium transition-colors duration-200',
                 isSelected
-                  ? 'bg-primary text-white shadow-btn'
-                  : 'bg-[var(--light)] text-[var(--ink)] hover:bg-primary/10 hover:text-primary'
+                  ? 'bg-[var(--brand)] text-[var(--text)] shadow-ink-2'
+                  : 'bg-[var(--paper-deep)] text-[var(--text)] hover:bg-[color-mix(in_srgb,var(--brand)_10%,transparent)] hover:text-[var(--brand)]'
               )}
             >
               {isSelected ? 'Selected' : 'Select'}
             </button>
             {onEdit && (
               <button
+                type="button"
                 onClick={(e) => { e.stopPropagation(); onEdit() }}
-                className="p-2 text-[var(--text-subtle)] hover:text-primary hover:bg-[var(--light)] rounded-input transition-colors"
+                className="p-2 text-[var(--text-subtle)] hover:text-[var(--brand)] hover:bg-[var(--paper-deep)] rounded-[var(--radius-md)] transition-colors"
                 aria-label="Edit address"
               >
                 <Edit3 className="w-4 h-4" />
@@ -409,8 +412,9 @@ function AddressCard({
             )}
             {onDelete && (
               <button
+                type="button"
                 onClick={(e) => { e.stopPropagation(); onDelete() }}
-                className="p-2 text-[var(--text-subtle)] hover:text-red-500 hover:bg-red-50 rounded-input transition-colors"
+                className="p-2 text-[var(--text-subtle)] hover:text-[var(--error)] hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)] rounded-[var(--radius-md)] transition-colors"
                 aria-label="Delete address"
               >
                 <Trash2 className="w-4 h-4" />
@@ -418,8 +422,9 @@ function AddressCard({
             )}
             {onSetDefault && !address.isDefault && (
               <button
+                type="button"
                 onClick={(e) => { e.stopPropagation(); onSetDefault() }}
-                className="p-2 text-[var(--text-subtle)] hover:text-primary hover:bg-[var(--light)] rounded-input transition-colors"
+                className="p-2 text-[var(--text-subtle)] hover:text-[var(--brand)] hover:bg-[var(--paper-deep)] rounded-[var(--radius-md)] transition-colors"
                 aria-label="Set as default"
               >
                 <CheckCircle className="w-4 h-4" />
@@ -429,8 +434,8 @@ function AddressCard({
         )}
 
         {isSelected && readOnly && (
-          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 ml-4">
-            <CheckCircle className="w-4 h-4 text-white" />
+          <div className="w-6 h-6 rounded-full bg-[var(--brand)] flex items-center justify-center flex-shrink-0 ml-4">
+            <CheckCircle className="w-4 h-4 text-[var(--text)]" />
           </div>
         )}
       </div>
