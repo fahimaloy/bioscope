@@ -55,15 +55,18 @@ export function ReviewList({
     <div className={cn('space-y-6', className)}>
       {/* Review Summary */}
       <div className="grid lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-card border-3 border-[var(--ink)] p-6 shadow-card">
+        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] p-6 shadow-ink-3">
           <div className="flex items-center gap-8">
             <div className="text-center">
-              <div className="text-5xl font-display text-primary">{averageRating.toFixed(1)}</div>
+              <div className="text-5xl font-display text-[var(--brand)]">{averageRating.toFixed(1)}</div>
               <div className="flex items-center justify-center gap-1 mt-2">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={cn('w-5 h-5', star <= Math.round(averageRating) ? 'fill-primary text-primary' : 'text-[var(--text-subtle)]')}
+                    className={cn(
+                      'w-5 h-5',
+                      star <= Math.round(averageRating) ? 'fill-[var(--brand)] text-[var(--brand)]' : 'text-[var(--text-subtle)]'
+                    )}
                   />
                 ))}
               </div>
@@ -76,9 +79,9 @@ export function ReviewList({
                 return (
                   <div key={star} className="flex items-center gap-3">
                     <span className="text-sm text-[var(--text-subtle)] w-8">{star}★</span>
-                    <div className="flex-1 h-2 bg-[var(--light)] rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-[color-mix(in_srgb,var(--ink)_10%,transparent)] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-primary rounded-full transition-all duration-500"
+                        className="h-full bg-[var(--brand)] rounded-full transition-all duration-500"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -96,18 +99,18 @@ export function ReviewList({
         </div>
 
         {/* Rating Distribution Summary */}
-        <div className="bg-[var(--light)] rounded-card p-6 border-2 border-[var(--ink)]">
-          <h3 className="font-display text-xl text-[var(--ink)] mb-4">Rating Breakdown</h3>
+        <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] p-6 border-2 border-[var(--ink)]">
+          <h3 className="font-display text-xl text-[var(--text)] mb-4">Rating Breakdown</h3>
           <div className="space-y-3">
             {[5, 4, 3, 2, 1].map((star) => {
               const count = ratingDistribution[star] || 0
               const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
               return (
                 <div key={star} className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-[var(--ink)] w-8">{star}★</span>
-                  <div className="flex-1 h-3 bg-dark/10 rounded-full overflow-hidden">
+                  <span className="text-sm font-medium text-[var(--text)] w-8">{star}★</span>
+                  <div className="flex-1 h-3 bg-[color-mix(in_srgb,var(--ink)_10%,transparent)] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary rounded-full transition-all duration-500"
+                      className="h-full bg-[var(--brand)] rounded-full transition-all duration-500"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -122,11 +125,14 @@ export function ReviewList({
       {/* Filters & Sort */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--text-subtle)]">Filter:</span>
+          <label htmlFor="review-filter" className="text-sm text-[var(--text-subtle)]">
+            Filter:
+          </label>
           <select
+            id="review-filter"
             value={filterRating}
             onChange={(e) => setFilterRating(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-            className="px-3 py-1.5 text-sm border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
+            className="px-3 py-1.5 text-sm border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-[var(--radius-md)] focus:border-[var(--brand)] focus:shadow-ink-2"
           >
             <option value="all">All Ratings</option>
             {[5, 4, 3, 2, 1].map((star) => (
@@ -139,11 +145,14 @@ export function ReviewList({
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--text-subtle)]">Sort by:</span>
+          <label htmlFor="review-sort" className="text-sm text-[var(--text-subtle)]">
+            Sort by:
+          </label>
           <select
+            id="review-sort"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="px-3 py-1.5 text-sm border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
+            className="px-3 py-1.5 text-sm border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-[var(--radius-md)] focus:border-[var(--brand)] focus:shadow-ink-2"
           >
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
@@ -161,9 +170,7 @@ export function ReviewList({
             <p className="text-[var(--text-subtle)]">No reviews match your filters</p>
           </div>
         ) : (
-          filteredReviews.map((review) => (
-            <ReviewCard key={review.id} review={review} productId={productId} />
-          ))
+          filteredReviews.map((review) => <ReviewCard key={review.id} review={review} productId={productId} />)
         )}
 
         {/* Pagination would go here */}
@@ -183,16 +190,16 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
   const displayText = showFull || !isLong ? text : text.substring(0, 300) + '...'
 
   return (
-    <article className="bg-white rounded-card border-3 border-[var(--ink)] p-6 shadow-card">
+    <article className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] p-6 shadow-ink-3">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-primary font-display text-lg">
+          <div className="w-10 h-10 rounded-full bg-[color-mix(in_srgb,var(--brand)_10%,transparent)] flex items-center justify-center">
+            <span className="text-[var(--brand)] font-display text-lg">
               {review.user?.name?.charAt(0) || 'U'}
             </span>
           </div>
           <div>
-            <p className="font-medium text-body text-[var(--ink)]">{review.user?.name || 'Anonymous'}</p>
+            <p className="font-medium text-[var(--text)]">{review.user?.name || 'Anonymous'}</p>
             <p className="text-sm text-[var(--text-subtle)]">{formatDate(review.createdAt)}</p>
           </div>
         </div>
@@ -212,23 +219,21 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={cn('w-6 h-6', star <= review.rating ? 'fill-primary text-primary' : 'text-[var(--text-subtle)]')}
+            className={cn('w-6 h-6', star <= review.rating ? 'fill-[var(--brand)] text-[var(--brand)]' : 'text-[var(--text-subtle)]')}
           />
         ))}
       </div>
 
-      {review.title && (
-        <h4 className="font-medium text-body text-[var(--ink)] mb-2">{review.title}</h4>
-      )}
+      {review.title && <h4 className="font-medium text-[var(--text)] mb-2">{review.title}</h4>}
 
-      <p className="text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)] leading-relaxed mb-3">{displayText}</p>
+      <p className="text-[var(--text-muted)] leading-relaxed mb-3">{displayText}</p>
 
       {isLong && (
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setShowFull(!showFull)}
-          className="text-primary"
+          className="text-[var(--brand)]"
         >
           {showFull ? 'Show less' : 'Read more'}
         </Button>
@@ -238,7 +243,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
       {review.images.length > 0 && (
         <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
           {review.images.map((image, index) => (
-            <div key={index} className="relative w-24 h-24 flex-shrink-0 rounded-input overflow-hidden">
+            <div key={index} className="relative w-24 h-24 flex-shrink-0 rounded-[var(--radius-md)] overflow-hidden">
               <Image src={image} alt={`Review photo ${index + 1}`} fill className="object-cover" sizes="96px" />
             </div>
           ))}
@@ -246,11 +251,12 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
       )}
 
       {/* Helpful Buttons */}
-      <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[var(--light)]">
+      <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)]">
         <button
+          type="button"
           className={cn(
-            'flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-primary transition-colors',
-            helpful && 'text-primary'
+            'flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-[var(--brand)] transition-colors',
+            helpful && 'text-[var(--brand)]'
           )}
           onClick={() => setHelpful(!helpful)}
         >
@@ -258,16 +264,20 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
           <span>Helpful</span>
         </button>
         <button
+          type="button"
           className={cn(
-            'flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-red-500 transition-colors',
-            notHelpful && 'text-red-500'
+            'flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-[var(--error)] transition-colors',
+            notHelpful && 'text-[var(--error)]'
           )}
           onClick={() => setNotHelpful(!notHelpful)}
         >
           <ThumbsDown className={cn('w-4 h-4', notHelpful && 'fill-current')} />
           <span>Not Helpful</span>
         </button>
-        <button className="flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-red-500 transition-colors ml-auto">
+        <button
+          type="button"
+          className="flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-[var(--error)] transition-colors ml-auto"
+        >
           <Flag className="w-4 h-4" />
           <span>Report</span>
         </button>
@@ -291,12 +301,15 @@ export function ReviewSummary({
   return (
     <div className={cn('flex items-center gap-4', className)}>
       <div className="text-center">
-        <div className="text-3xl font-display text-primary">{averageRating.toFixed(1)}</div>
+        <div className="text-3xl font-display text-[var(--brand)]">{averageRating.toFixed(1)}</div>
         <div className="flex items-center justify-center gap-1 mt-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <Star
               key={star}
-              className={cn('w-4 h-4', star <= Math.round(averageRating) ? 'fill-primary text-primary' : 'text-[var(--text-subtle)]')}
+              className={cn(
+                'w-4 h-4',
+                star <= Math.round(averageRating) ? 'fill-[var(--brand)] text-[var(--brand)]' : 'text-[var(--text-subtle)]'
+              )}
             />
           ))}
         </div>
@@ -309,9 +322,9 @@ export function ReviewSummary({
           return (
             <div key={star} className="flex items-center gap-2">
               <span className="text-xs text-[var(--text-subtle)] w-6">{star}★</span>
-              <div className="flex-1 h-1.5 bg-dark/10 rounded-full overflow-hidden">
+              <div className="flex-1 h-1.5 bg-[color-mix(in_srgb,var(--ink)_10%,transparent)] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-primary rounded-full transition-all duration-300"
+                  className="h-full bg-[var(--brand)] rounded-full transition-all duration-300"
                   style={{ width: `${percentage}%` }}
                 />
               </div>

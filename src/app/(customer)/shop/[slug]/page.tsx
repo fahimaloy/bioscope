@@ -2,9 +2,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getProductBySlug, getRelatedProducts } from '@/lib/actions/product'
 import { ProductDetail } from '@/components/product/ProductDetail'
-import { ProductCard } from '@/components/product/ProductCard'
+import { ProductGrid } from '@/components/product/ProductCard'
 import { ReviewList } from '@/components/product/ReviewList'
-import { Card } from '@/components/ui/Card'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,20 +45,24 @@ export default async function ProductPage({ params }: { params: { slug: string }
   for (const r of reviews) ratingDistribution[r.rating] = (ratingDistribution[r.rating] ?? 0) + 1
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
+    <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
       <div className="max-w-7xl mx-auto">
         <nav className="flex items-center gap-2 text-sm text-[var(--text-subtle)] mb-6">
-          <Link href="/" className="hover:text-primary">Home</Link>
+          <Link href="/" className="text-[var(--brand)] hover:underline">
+            Home
+          </Link>
           <span>/</span>
-          <Link href="/shop" className="hover:text-primary">Shop</Link>
+          <Link href="/shop" className="text-[var(--brand)] hover:underline">
+            Shop
+          </Link>
           <span>/</span>
-          <span className="text-[var(--ink)]">{product.name}</span>
+          <span className="text-[var(--text)]">{product.name}</span>
         </nav>
 
         <ProductDetail product={serializeProduct(product) as any} />
 
         <section className="mt-16">
-          <h2 className="font-display text-2xl text-primary mb-6">Reviews ({totalReviews})</h2>
+          <h2 className="font-display text-2xl text-[var(--brand)] mb-6">Reviews ({totalReviews})</h2>
           <ReviewList
             reviews={reviews as any}
             productId={product.id}
@@ -73,22 +76,18 @@ export default async function ProductPage({ params }: { params: { slug: string }
         {related.length > 0 && (
           <section className="mt-16">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-2xl text-primary">Related Products</h2>
+              <h2 className="font-display text-2xl text-[var(--brand)]">Related Products</h2>
               <Link
                 href={`/shop?category=${product.category?.slug}`}
-                className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+                className="text-sm font-medium text-[var(--brand)] hover:underline flex items-center gap-1"
               >
                 View All
                 <span>→</span>
               </Link>
             </div>
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 snap-x" role="list">
-              {related.map((p) => (
-                <div key={p.id} className="flex-shrink-0 snap-center w-64" role="listitem">
-                  <ProductCard product={serializeProduct(p) as any} variant="compact" />
-                </div>
-              ))}
-            </div>
+            {/* Task 2.2's grid owns the column map; `featured` is 1/2/3 columns
+                (the plan's "4-column grid" would need a ProductGrid change). */}
+            <ProductGrid products={related.map((p) => serializeProduct(p) as any)} variant="featured" />
           </section>
         )}
       </div>
