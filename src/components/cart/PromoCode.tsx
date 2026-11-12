@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Tag, CheckCircle, XCircle, RotateCcw } from 'lucide-react'
+import { CheckCircle, XCircle, RotateCcw } from 'lucide-react'
 
 interface PromoCodeProps {
   onApply?: (code: string) => void
@@ -41,19 +41,19 @@ export function PromoCode({ onApply, discountAmount = 0, appliedCode = null, cla
 
   if (appliedCode) {
     return (
-      <div className={cn('bg-green-50 border-2 border-green-200 rounded-input p-4', className)}>
+      <div className={cn('bg-[color-mix(in_srgb,var(--success)_10%,transparent)] border-2 border-[color-mix(in_srgb,var(--success)_40%,transparent)] rounded-[var(--radius-md)] p-4', className)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600" />
+            <CheckCircle className="w-5 h-5 text-[var(--success)]" />
             <div>
-              <p className="font-medium text-green-800">Promo Applied</p>
-              <p className="text-sm text-green-600">{appliedCode}</p>
+              <p className="font-medium text-[var(--success)]">Promo Applied</p>
+              <p className="text-sm text-[var(--text)]">{appliedCode}</p>
             </div>
           </div>
           {discountAmount > 0 && (
-            <span className="font-display text-green-700">-{discountAmount.toLocaleString()} BDT</span>
+            <span className="font-display text-[var(--success)]">-{discountAmount.toLocaleString()} BDT</span>
           )}
-          <Button variant="ghost" size="sm" onClick={handleRemove} className="text-red-500 hover:bg-red-50">
+          <Button variant="ghost" size="sm" onClick={handleRemove} className="text-[var(--error)] hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]">
             <XCircle className="w-4 h-4" />
           </Button>
         </div>
@@ -63,7 +63,7 @@ export function PromoCode({ onApply, discountAmount = 0, appliedCode = null, cla
 
   return (
     <div className={cn('space-y-3', className)}>
-      <label className="block text-sm font-medium text-[var(--ink)]">Promo Code</label>
+      <label className="block text-sm font-medium text-[var(--text)]">Promo Code</label>
       <div className="flex gap-2">
         <Input
           value={code}
@@ -85,7 +85,7 @@ export function PromoCode({ onApply, discountAmount = 0, appliedCode = null, cla
         </Button>
       </div>
       {error && (
-        <p className="text-sm text-red-500 flex items-center gap-1">
+        <p className="text-sm text-[var(--error)] flex items-center gap-1">
           <XCircle className="w-4 h-4" />
           {error}
         </p>

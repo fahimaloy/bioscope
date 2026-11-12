@@ -1,68 +1,139 @@
 'use client'
 
-import { useCartStore, useCartItems, useCartSubtotal } from '@/lib/stores/cartStore'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { ArrowLeft, Package, ShoppingCart, Trash2 } from 'lucide-react'
+import { useCartItems, useCartStore, useCartSubtotal } from '@/lib/stores/cartStore'
+import { useAuth } from '@/lib/hooks/useAuth'
+import { useMotionVariants } from '@/lib/motion'
+import { DoodleArrow } from '@/components/decorative'
 import { Button } from '@/components/ui/Button'
 import { CartItem } from '@/components/cart/CartItem'
 import { CartSummary } from '@/components/cart/CartSummary'
-import { Trash2, ShoppingCart, ArrowLeft, Package } from 'lucide-react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { motionVariants } from '@/lib/motion'
-import { DoodleShape } from '@/components/decorative/DoodleElements'
+
+/**
+ * The server's own defaults (`getPricingSettings()` in
+ * `src/lib/actions/settings.ts`). They are the fallback until
+ * `/api/settings/public` resolves, and when it fails.
+ */
+const DEFAULT_TAX_PERCENT = 5
+const DEFAULT_DELIVERY_CHARGE = 60
+const DEFAULT_FREE_DELIVERY_THRESHOLD = 2000
+
+/** The public settings the summary needs (`GET /api/settings/public`). */
+interface PublicSettings {
+  global_tax_percent?: number | string
+  delivery_inside_dhaka_charge?: number | string
+  free_delivery_threshold?: number | string
+}
+
+/** Coerce a setting to a finite number, falling back to the server default. */
+function toNumber(value: number | string | undefined, fallback: number): number {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
 
 export default function CartPage() {
   const items = useCartItems()
   const subtotal = useCartSubtotal()
   const { removeItem, updateQuantity, clearCart } = useCartStore()
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
+  const variants = useMotionVariants()
 
-  // Tax calculation (10% for example)
-  const taxAmount = Math.round(subtotal * 0.1)
-  // Delivery charge - free over 2000
-  const freeDeliveryThreshold = 2000
-  const deliveryCharge = subtotal >= freeDeliveryThreshold ? 0 : 60
-  const discountAmount = 0 // Will be handled by promo code
+  const [taxPercent, setTaxPercent] = useState(DEFAULT_TAX_PERCENT)
+  const [deliveryChargeSetting, setDeliveryChargeSetting] = useState(DEFAULT_DELIVERY_CHARGE)
+  const [freeDeliveryThreshold, setFreeDeliveryThreshold] = useState(
+    DEFAULT_FREE_DELIVERY_THRESHOLD,
+  )
+
+  // Tax and delivery are settings-driven (Ruling 5). The pre-rebuild page
+  // hardcoded a 10% tax and never read `/api/settings/public`.
+  useEffect(() => {
+    let cancelled = false
+
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/settings/public')
+        if (!response.ok) return
+        const body = await response.json()
+        const settings = (body?.data ?? {}) as PublicSettings
+        if (cancelled) return
+        setTaxPercent(toNumber(settings.global_tax_percent, DEFAULT_TAX_PERCENT))
+        setDeliveryChargeSetting(
+          toNumber(settings.delivery_inside_dhaka_charge, DEFAULT_DELIVERY_CHARGE),
+        )
+        setFreeDeliveryThreshold(
+          toNumber(settings.free_delivery_threshold, DEFAULT_FREE_DELIVERY_THRESHOLD),
+        )
+      } catch {
+        // Keep the server defaults when the settings endpoint is unreachable.
+      }
+    }
+
+    loadSettings()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const taxAmount = Math.round((subtotal * taxPercent) / 100)
+  // Inside-Dhaka is the estimate; the summary keeps the "calculated at
+  // checkout" note so the estimate is never presented as final.
+  const deliveryCharge = subtotal >= freeDeliveryThreshold ? 0 : deliveryChargeSetting
+  const discountAmount = 0
   const total = subtotal + taxAmount + deliveryCharge - discountAmount
+
+  // Ruling 6: the checkout CTA is a real navigation, not a dead button.
+  const checkoutHref = isAuthenticated ? '/checkout' : '/login?redirect=/checkout'
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-        <div className="max-w-2xl mx-auto text-center py-16">
+      <div className="min-h-screen bg-[var(--paper)] px-4 pb-12 pt-24">
+        <div className="mx-auto max-w-2xl py-16 text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 100, damping: 15 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
             className="relative mb-8"
           >
-            <DoodleShape size="xl" color="primary" animation="float" className="mx-auto mb-4 opacity-30" />
-            <DoodleShape size="lg" color="secondary" animation="float" className="absolute -top-10 -right-10 opacity-20" style={{ animationDelay: '1s' }} />
-            <DoodleShape size="md" color="accent" animation="wobble" className="absolute -bottom-10 -left-10 opacity-20" style={{ animationDelay: '0.5s' }} />
-            <div className="relative z-10 w-32 h-32 mx-auto mb-6 bg-[var(--light)] rounded-full flex items-center justify-center shadow-card">
-              <ShoppingCart className="w-16 h-16 text-[var(--text-subtle)]" />
+            {/* One decor accent per section (contract §3): a single DoodleArrow. */}
+            <DoodleArrow size={64} color="pink" animation="float" className="mx-auto mb-6" />
+            <div className="mx-auto mb-6 flex h-32 w-32 items-center justify-center rounded-full bg-[var(--paper-deep)] shadow-ink-3">
+              <ShoppingCart className="h-16 w-16 text-[var(--text-subtle)]" />
             </div>
           </motion.div>
+
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="font-display text-3xl md:text-4xl text-[var(--ink)] mb-4"
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ delay: 0.1 }}
+            className="font-display text-3xl md:text-4xl text-[var(--text)] mb-4"
           >
             Your cart is empty
           </motion.h1>
+
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="text-[var(--text-subtle)] mb-8 text-lg"
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ delay: 0.2 }}
+            className="text-[var(--text-muted)] mb-8 text-lg"
           >
-            Looks like you haven't added any stickers yet.
+            Looks like you haven&apos;t added any stickers yet.
           </motion.p>
+
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+            variants={variants.fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ delay: 0.3 }}
           >
             <Link href="/shop">
-              <Button variant="doodle" size="xl">
+              <Button variant="primary" size="xl">
                 <Package className="w-6 h-6 mr-2" />
                 Continue Shopping
               </Button>
@@ -74,34 +145,34 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[var(--paper)] px-4 pb-12 pt-24">
+      <div className="mx-auto max-w-7xl">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          variants={variants.fadeInUp}
+          initial="initial"
+          animate="animate"
+          className="mb-8 flex items-center justify-between"
         >
           <div>
-            <h1 className="font-display text-3xl md:text-4xl text-primary">Shopping Cart</h1>
-            <p className="text-[var(--text-subtle)]">{items.length} item{items.length !== 1 ? 's' : ''} in your cart</p>
+            <h1 className="font-display text-3xl md:text-4xl text-[var(--text)]">Shopping Cart</h1>
+            <p className="text-[var(--text-muted)]">
+              {items.length} item{items.length !== 1 ? 's' : ''} in your cart
+            </p>
           </div>
-          {items.length > 0 && (
-            <Button variant="ghost" onClick={clearCart} className="text-red-500 hover:bg-red-50">
-              <Trash2 className="w-4 h-4 mr-1" />
-              Clear Cart
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            onClick={clearCart}
+            className="text-[var(--error)] hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
+          >
+            <Trash2 className="w-4 h-4 mr-1" />
+            Clear Cart
+          </Button>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid lg:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            <motion.div variants={motionVariants.staggerContainer}>
+            <motion.div variants={variants.staggerContainer} initial="initial" animate="animate">
               {items.map((item) => (
                 <CartItem
                   key={`${item.productId}-${item.width}-${item.height}`}
@@ -129,16 +200,17 @@ export default function CartPage() {
               discountAmount={discountAmount}
               total={total}
               freeDeliveryThreshold={freeDeliveryThreshold}
-              onCheckout={() => {}}
+              onCheckout={() => router.push(checkoutHref)}
             />
           </div>
-        </motion.div>
+        </div>
 
         {/* Continue Shopping */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          variants={variants.fadeInUp}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
           className="mt-8 text-center"
         >
           <Link href="/shop">
