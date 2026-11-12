@@ -180,7 +180,7 @@ export function ProductCard({
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col min-h-0 p-4">
+      <div className="flex flex-1 flex-col min-h-0 p-3 sm:p-4">
         <Link href={`/shop/${product.slug}`}>
           <h3 className="font-display text-xl text-[var(--text)] line-clamp-1">{product.name}</h3>
         </Link>
@@ -214,13 +214,13 @@ export function ProductCard({
         )}
 
         {/* Price & Actions */}
-        <div className="mt-auto flex items-center justify-between gap-2 border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)] pt-3">
-          <div>
-            <span className="font-display text-2xl text-[var(--brand)]">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)] pt-3">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+            <span className="font-display text-lg sm:text-2xl text-[var(--brand)]">
               {formatCurrency(basePrice)}
             </span>
             {hasDiscount && (
-              <span className="ml-2 text-sm text-[var(--text-subtle)] line-through">
+              <span className="text-sm text-[var(--text-subtle)] line-through">
                 {formatCurrency(compareAtPriceValue!)}
               </span>
             )}
@@ -228,7 +228,7 @@ export function ProductCard({
 
           {showActions &&
             (inCart ? (
-              <div className="flex items-center gap-2 rounded-pill border-2 border-[var(--ink)] bg-[var(--pink-strong)] px-3 py-1 text-[var(--on-pink-strong)]">
+              <div className="ml-auto flex items-center gap-2 rounded-pill border-2 border-[var(--ink)] bg-[var(--pink-strong)] px-3 py-1 text-[var(--on-pink-strong)]">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -263,6 +263,7 @@ export function ProductCard({
               <Button
                 variant="primary"
                 size="sm"
+                className="ml-auto"
                 aria-label={`Add ${product.name} to cart`}
                 onClick={(e) => {
                   e.preventDefault()
