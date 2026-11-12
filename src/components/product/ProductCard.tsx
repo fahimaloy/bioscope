@@ -50,13 +50,20 @@ export function ProductCard({
   const inCart = useIsInCart(product.id, defaultDimension?.width, defaultDimension?.height)
   const quantity = useGetItemQuantity(product.id, defaultDimension?.width, defaultDimension?.height)
 
-  const basePrice = defaultDimension
-    ? product.basePrice * defaultDimension.priceMultiplier
-    : product.basePrice
+  // Prisma `Decimal` fields serialise to JSON strings (`"80.00"`), so the
+  // comparison and arithmetic below must coerce: a raw `>` on two strings is
+  // lexicographic (`"110.00" > "80.00"` is false) and silently suppresses the
+  // discount badge. Coerce once, at this presentation edge.
+  const basePriceValue = Number(product.basePrice)
+  const compareAtPriceValue = product.compareAtPrice != null ? Number(product.compareAtPrice) : null
 
-  const hasDiscount = product.compareAtPrice != null && product.compareAtPrice > product.basePrice
+  const basePrice = defaultDimension
+    ? basePriceValue * defaultDimension.priceMultiplier
+    : basePriceValue
+
+  const hasDiscount = compareAtPriceValue != null && compareAtPriceValue > basePriceValue
   const discountPercent = hasDiscount
-    ? Math.round(((product.compareAtPrice! - product.basePrice) / product.compareAtPrice!) * 100)
+    ? Math.round(((compareAtPriceValue - basePriceValue) / compareAtPriceValue) * 100)
     : 0
 
   const addToCart = () => {
@@ -101,7 +108,7 @@ export function ProductCard({
             </span>
             {hasDiscount && (
               <span className="text-sm text-[var(--text-subtle)] line-through">
-                {formatCurrency(product.compareAtPrice!)}
+                {formatCurrency(compareAtPriceValue!)}
               </span>
             )}
           </div>
@@ -214,7 +221,7 @@ export function ProductCard({
             </span>
             {hasDiscount && (
               <span className="ml-2 text-sm text-[var(--text-subtle)] line-through">
-                {formatCurrency(product.compareAtPrice!)}
+                {formatCurrency(compareAtPriceValue!)}
               </span>
             )}
           </div>
@@ -342,11 +349,11 @@ export function FeaturedProduct({ product }: { product: Product }) {
 
         <div className="mb-6 flex items-center gap-4">
           <span className="font-display text-3xl text-[var(--brand)]">
-            {formatCurrency(product.basePrice)}
+            {formatCurrency(Number(product.basePrice))}
           </span>
-          {product.compareAtPrice && product.compareAtPrice > product.basePrice && (
+          {product.compareAtPrice != null && Number(product.compareAtPrice) > Number(product.basePrice) && (
             <span className="text-xl text-[var(--text-subtle)] line-through">
-              {formatCurrency(product.compareAtPrice)}
+              {formatCurrency(Number(product.compareAtPrice))}
             </span>
           )}
         </div>

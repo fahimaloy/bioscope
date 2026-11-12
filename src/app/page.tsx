@@ -114,7 +114,15 @@ export default function HomePage() {
   const variants = useMotionVariants()
   const query = useQuery(featuredProductsOptions())
 
-  const featured = (query.data as FeaturedResponse | undefined)?.data?.data ?? []
+  // `/api/products` serialises Prisma `Decimal` fields as JSON strings; coerce
+  // at this presentation edge so `ProductCard` compares numbers, not strings.
+  const featured = ((query.data as FeaturedResponse | undefined)?.data?.data ?? []).map(
+    (product) => ({
+      ...product,
+      basePrice: Number(product.basePrice),
+      compareAtPrice: product.compareAtPrice != null ? Number(product.compareAtPrice) : null,
+    }),
+  )
   // The static list is a fallback for an empty result, not a placeholder while
   // the query is in flight (that is what the skeletons are for).
   const products = featured.length > 0 ? featured : FALLBACK_FEATURED
