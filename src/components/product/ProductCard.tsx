@@ -288,6 +288,21 @@ interface ProductGridProps {
   emptyMessage?: string
 }
 
+/**
+ * Column classes are full literals — Tailwind scans source text, so a
+ * template-built `grid-cols-` class never matches a utility and emits no
+ * CSS (the grid silently rendered one column at every viewport). Mirrors
+ * `GRID_COLUMNS` in `@/components/ui/GlobalLoading`.
+ *
+ * `default` is the uniform 1:1 shop grid (spec §13): 2 cols mobile,
+ * 3 tablet, 4 desktop.
+ */
+const GRID_COLUMNS = {
+  default: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
+  compact: 'grid-cols-1',
+  featured: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+} as const
+
 export function ProductGrid({
   products,
   variant = 'default',
@@ -303,11 +318,9 @@ export function ProductGrid({
     )
   }
 
-  const gridColumns = variant === 'compact' ? 1 : '1 sm:2 lg:3 xl:4'
-
   return (
     <motion.div
-      className={cn('grid gap-6', `grid-cols-${gridColumns}`, className)}
+      className={cn('grid gap-6', GRID_COLUMNS[variant], className)}
       variants={motionVariants.staggerContainer}
       initial="hidden"
       animate="visible"

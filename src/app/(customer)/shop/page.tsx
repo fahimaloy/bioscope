@@ -3,16 +3,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ProductGrid } from '@/components/product'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { SkeletonProductCard } from '@/components/ui/Skeleton'
-import { Grid, List } from 'lucide-react'
 import { Select } from '@/components/ui/Select'
-import { DoodleShape } from '@/components/decorative/DoodleElements'
+import { DoodleScatter, DoodleSparkle } from '@/components/decorative'
+import { FOCUS_VISIBLE_INK } from '@/components/ui/shared'
 import { motion, AnimatePresence } from 'framer-motion'
-import { motionVariants } from '@/lib/motion'
+import { useMotionVariants } from '@/lib/motion'
+import { cn } from '@/lib/utils'
 
 const sortOptions = [
   { value: 'featured', label: 'Featured', sortBy: 'sortOrder', sortOrder: 'asc' },
@@ -37,11 +37,26 @@ function normalize(p: any) {
 
 const selectOptions = sortOptions.map(opt => ({ value: opt.value, label: opt.label }))
 
+/**
+ * CTA anchor treatment — mirrors the `Button` Paper + Pop classes. `Button`
+ * has no `href`/`asChild`, and an anchor wrapping a `<button>` nests two
+ * interactives (contract §6), so CTAs are real anchors. Kept in sync with
+ * `@/components/ui/Button`.
+ */
+const CTA_LINK_CLASSES = [
+  'inline-flex min-h-[56px] items-center justify-center gap-2 rounded-pill border-[3px] border-[var(--ink)]',
+  'px-8 py-4 font-display text-xl tracking-wide',
+  'shadow-ink-2 transition-[transform,box-shadow] duration-fast ease-spring',
+  'hover:-translate-y-1 hover:shadow-ink-3',
+  'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
+  FOCUS_VISIBLE_INK,
+].join(' ')
+
 export default function ShopPage() {
+  const variants = useMotionVariants()
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [sortBy, setSortBy] = useState<(typeof sortOptions)[number]['value']>('featured')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [products, setProducts] = useState<any[]>([])
   const [pager, setPager] = useState({ total: 0, totalPages: 1 })
   const [page, setPage] = useState(1)
@@ -86,13 +101,13 @@ export default function ShopPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)]">
-      {/* Hero Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
-        <DoodleBackground shapeCount={3} className="absolute top-0 left-0 w-full h-full" />
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="staggered-title text-6xl md:text-8xl mb-6">Our Stickers</h1>
-          <p className="subtitle text-2xl md:text-3xl mb-8 max-w-2xl mx-auto">
+    <div className="min-h-screen bg-[var(--paper)]">
+      {/* Hero — one decor accent: a single DoodleScatter (contract §3). */}
+      <section className="relative overflow-hidden py-20 px-4 sm:px-6 lg:px-8">
+        <DoodleScatter count={6} seed="shop-hero" />
+        <div className="relative max-w-7xl mx-auto text-center">
+          <h1 className="font-display text-6xl md:text-8xl text-[var(--text)] mb-6">Our Stickers</h1>
+          <p className="font-hand text-2xl md:text-3xl text-[var(--text-muted)] mb-8 max-w-2xl mx-auto">
             Discover unique, high-quality stickers for every occasion
           </p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -104,84 +119,61 @@ export default function ShopPage() {
       </section>
 
       {/* Filters & Toolbar */}
-      <div className="bg-white border-b border-[var(--light)] px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-[var(--surface-raised)] border-b border-[color-mix(in_srgb,var(--ink)_15%,transparent)] px-4 sm:px-6 lg:px-8 py-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium text-[var(--text-subtle)]">Categories:</span>
-              <AnimatePresence mode="popLayout">
-                <div key={selectedCategory} className="flex flex-wrap items-center gap-2" role="group" aria-label="Product categories">
-                  {categoryPills.map((cat) => (
-                    <Button
-                      key={cat.id}
-                      variant={selectedCategory === cat.id ? 'doodle' : 'doodle-outline'}
-                      size="sm"
-                      onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
-                    >
-                      {cat.name}
-                    </Button>
-                  ))}
-                </div>
-              </AnimatePresence>
+              <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Product categories">
+                {categoryPills.map((cat) => (
+                  <Button
+                    key={cat.id}
+                    variant={selectedCategory === cat.id ? 'primary' : 'outline'}
+                    size="sm"
+                    aria-pressed={selectedCategory === cat.id}
+                    onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
+                  >
+                    {cat.name}
+                  </Button>
+                ))}
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-[var(--text-subtle)]">Sort by:</label>
+                <label htmlFor="shop-sort" className="text-sm font-medium text-[var(--text-subtle)]">
+                  Sort by:
+                </label>
                 <Select
+                  id="shop-sort"
                   options={selectOptions}
                   value={sortBy}
                   onChange={(e) => { setSortBy(e.target.value as typeof sortBy); setPage(1) }}
                   className="min-w-[200px]"
                 />
               </div>
-
-              <div className="flex items-center gap-1 bg-[var(--light)] rounded-input p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-input transition-all duration-200 ${
-                    viewMode === 'grid'
-                      ? 'bg-white shadow-sm text-primary'
-                      : 'text-[var(--text-subtle)] hover:text-primary'
-                  }`}
-                  aria-label="Grid view"
-                >
-                  <Grid className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-input transition-all duration-200 ${
-                    viewMode === 'list'
-                      ? 'bg-white shadow-sm text-primary'
-                      : 'text-[var(--text-subtle)] hover:text-primary'
-                  }`}
-                  aria-label="List view"
-                >
-                  <List className="w-5 h-5" />
-                </button>
-              </div>
             </div>
           </div>
 
-          <p className="text-sm text-[var(--text-subtle)]">
+          <p className="text-sm text-[var(--text-muted)]">
             Showing <span className="font-medium">{products.length}</span> of{' '}
             <span className="font-medium">{pager.total}</span> products
           </p>
         </div>
       </div>
 
-      {/* Product Grid */}
+      {/* Product Grid — uniform 1:1 (spec §13), no list view. */}
       <section className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-              variants={motionVariants.staggerContainer}
-              initial="hidden"
-              animate="visible"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6"
+              variants={variants.staggerContainer}
+              initial="initial"
+              animate="animate"
             >
               {[...Array(8)].map((_, i) => (
-                <motion.div key={i} variants={motionVariants.staggerItem}>
+                <motion.div key={i} variants={variants.staggerItem}>
                   <SkeletonProductCard />
                 </motion.div>
               ))}
@@ -189,25 +181,22 @@ export default function ShopPage() {
           ) : products.length > 0 ? (
             <AnimatePresence mode="popLayout">
               <motion.div
-                key={selectedCategory + '-' + sortBy + '-' + viewMode}
-                variants={motionVariants.staggerContainer}
-                initial="hidden"
-                animate="visible"
+                key={`${selectedCategory}-${sortBy}`}
+                variants={variants.staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true, margin: '-100px' }}
                 exit="exit"
               >
-                <ProductGrid
-                  products={products as any}
-                  variant={viewMode === 'list' ? 'compact' : 'default'}
-                />
+                <ProductGrid products={products as any} variant="default" />
               </motion.div>
             </AnimatePresence>
           ) : (
-            <div className="text-center py-16">
-              <DoodleShape size="lg" color="primary" animation="float" className="mx-auto mb-6 opacity-50" />
-              <h3 className="font-display text-xl text-[var(--ink)] mb-2">No products found</h3>
-              <p className="text-[var(--text-subtle)] mb-6">Try adjusting your filters or browse all categories</p>
-              <Button variant="doodle" size="lg" onClick={() => { setSelectedCategory('all'); setPage(1) }}>
-                <span className="mr-2">✨</span>
+            <div className="py-16 text-center">
+              <DoodleSparkle size={64} color="gold" animation="float" className="mx-auto mb-6" />
+              <h2 className="font-display text-2xl text-[var(--text)] mb-2">No products found</h2>
+              <p className="text-[var(--text-muted)] mb-6">Try adjusting your filters or browse all categories</p>
+              <Button variant="primary" size="lg" onClick={() => { setSelectedCategory('all'); setPage(1) }}>
                 Clear Filters
               </Button>
             </div>
@@ -221,18 +210,20 @@ export default function ShopPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-dark text-white">
+      {/* CTA Section — ink band; `--paper-deep` on `--ink` measures 13.8:1. */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-[var(--ink)] text-[var(--paper)]">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="section-title text-white mb-6">Can't Find What You're Looking For?</h2>
-          <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
+          <h2 className="font-display text-4xl md:text-5xl text-[var(--paper)] mb-6">
+            Can&apos;t Find What You&apos;re Looking For?
+          </h2>
+          <p className="text-lg text-[var(--paper-deep)] mb-8 max-w-xl mx-auto">
             Create your own custom stickers with our easy-to-use design tool. Upload your artwork, customize dimensions, and choose from premium materials.
           </p>
-          <Link href="/custom-sticker">
-            <Button variant="secondary" size="lg" className="w-full sm:w-auto">
-              <span className="mr-2">✨</span>
-              Design Custom Stickers
-            </Button>
+          <Link
+            href="/custom-sticker"
+            className={cn(CTA_LINK_CLASSES, 'bg-[var(--pink-strong)] text-[var(--on-pink-strong)]')}
+          >
+            Design Custom Stickers
           </Link>
         </div>
       </section>

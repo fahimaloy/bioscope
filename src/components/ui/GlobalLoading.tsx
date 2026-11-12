@@ -74,17 +74,17 @@ export function SkeletonProductCard({ className, ...props }: React.HTMLAttribute
 }
 
 /**
- * Responsive 1/2/3/4-column grid matching ProductGrid. The class map is
- * written out in full — a computed `grid-cols-${n}` string is invisible to
+ * Responsive 2/3/4-column grid matching ProductGrid. The class map is
+ * written out in full — a template-built `grid-cols-` class is invisible to
  * Tailwind's scanner and silently renders unstyled.
  */
 const GRID_COLUMNS = {
-  default: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+  default: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
   compact: 'grid-cols-1',
   featured: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
 } as const;
 
-// SkeletonProductGrid - responsive 1/2/3/4 cols matching ProductGrid
+// SkeletonProductGrid - responsive 2/3/4 cols matching ProductGrid
 export function SkeletonProductGrid({
   count = 6,
   variant = 'default',
