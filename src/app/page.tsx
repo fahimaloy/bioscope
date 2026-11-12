@@ -1,359 +1,286 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
-import { DoodleStar, StickerPeel, TornEdge, WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
+import { useQuery } from '@tanstack/react-query'
+import { ArrowRight } from 'lucide-react'
+import { DoodleScatter, MarqueeRibbon, SketchUnderline } from '@/components/decorative'
+import { PageWrapper } from '@/components/layout/PageWrapper'
 import { ProductCard } from '@/components/product/ProductCard'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import { motionVariants } from '@/lib/motion'
+import { SkeletonProductCard } from '@/components/ui/Skeleton'
+import { cn } from '@/lib/utils'
+import { useMotionVariants } from '@/lib/motion'
+import { featuredProductsOptions } from '@/lib/queries/products'
+import type { Product } from '@/types'
+
+/**
+ * Landing — spec §13 (visual board: hero = **Editorial**, card = **Clean
+ * sheet**, landing leads with **featured products + custom sticker CTA**).
+ *
+ * Order: Editorial hero → `MarqueeRibbon` → featured products → custom-sticker
+ * CTA band. One decor accent per section maximum (contract §3): the hero
+ * carries a single `DoodleScatter`, the marquee band *is* the accent, the
+ * featured grid is deliberately bare (the cards repeat at scale, so restraint
+ * is the treatment), and the CTA band carries one `DoodleScatter`.
+ *
+ * The deprecated full-bleed doodle background is not in the spec §5.7 decor
+ * set and is gone; the hero uses `DoodleScatter` (capped at 6, contract §3)
+ * because the Editorial hero needs a scattered paper-craft field around the
+ * headline, not a shape wash.
+ *
+ * Icons are Lucide, never emoji (spec §5.6): the pre-rebuild floating emoji
+ * decoration and the emoji step icons are removed, and there is no
+ * "How it works" section — the brief's landing is hero, marquee, featured
+ * products, CTA band.
+ */
+
+const MARQUEE_ITEMS = ['VINYL', 'PAPER', 'HOLOGRAPHIC', 'KRAFT', 'CUSTOM', 'BIODIVERSITY']
+
+const HERO_IMAGE = '/images/stickers/skull_sticker.png'
+
+/** The shape of `GET /api/products?featured=true` (`ok()` envelope). */
+interface FeaturedResponse {
+  success: boolean
+  data: { data: Product[]; pagination: unknown }
+}
+
+/**
+ * The CTA link treatment. `Button` has no `href`/`asChild`, and an anchor
+ * wrapping a `<button>` nests two interactives — so the CTAs are real anchors
+ * carrying the Paper + Pop treatment (contract §6). Kept in sync with
+ * `@/components/ui/Button`.
+ */
+const CTA_LINK_CLASSES = [
+  'inline-flex min-h-[56px] items-center justify-center gap-2 rounded-pill border-[3px] border-[var(--ink)]',
+  'px-8 py-4 font-display text-xl tracking-wide',
+  'shadow-ink-2 transition-[transform,box-shadow] duration-fast ease-spring',
+  'hover:-translate-y-1 hover:shadow-ink-3',
+  'active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
+].join(' ')
+
+const CTA_LINK_FILLS = {
+  primary: 'bg-[var(--gold)] text-[var(--ink)]',
+  secondary: 'bg-[var(--pink-strong)] text-[var(--on-pink-strong)]',
+} as const
+
+/** Static fallback, rendered only when the featured query returns an empty list. */
+function fallbackProduct(id: string, name: string, slug: string, basePrice: number): Product {
+  return {
+    id,
+    name,
+    slug,
+    description: null,
+    basePrice,
+    compareAtPrice: null,
+    images: [],
+    categoryId: 'fallback',
+    allowedDimensions: [
+      {
+        id: `${id}-d`,
+        width: 5,
+        height: 5,
+        label: '5×5cm',
+        priceMultiplier: 1,
+        isDefault: true,
+        sortOrder: 0,
+      },
+    ],
+    allowedQuantities: [],
+    customizationOptions: null,
+    taxPercent: 0,
+    additionalCharge: 0,
+    isTaxInclusive: false,
+    trackInventory: false,
+    stock: 0,
+    lowStockThreshold: 0,
+    isActive: true,
+    isFeatured: true,
+    sortOrder: 0,
+    metaTitle: null,
+    metaDescription: null,
+    createdAt: new Date('2026-01-01T00:00:00Z'),
+    updatedAt: new Date('2026-01-01T00:00:00Z'),
+  }
+}
+
+const FALLBACK_FEATURED: Product[] = [
+  fallbackProduct('fallback-1', 'Vintage Doodle Pack', 'vintage-doodle-pack', 350),
+  fallbackProduct('fallback-2', 'Retro Space Cat', 'retro-space-cat', 420),
+  fallbackProduct('fallback-3', 'Kraft Flower Kit', 'kraft-flower-kit', 280),
+]
 
 export default function HomePage() {
-  // Staggered title letters
-  const titleLines = [
-    'Make Awesome',
-    'Fun Things Stick'
-  ]
+  const variants = useMotionVariants()
+  const query = useQuery(featuredProductsOptions())
 
-  // Marquee items with doodle stars
-  const marqueeItems = [
-    'VINYL', 'PAPER', 'HOLOGRAPHIC', 'KRAFT', 'CUSTOM', 'BIODIVERSITY'
-  ]
-
-  // Featured products data (will be replaced with real data)
-  const featuredProducts = [
-    { id: '1', name: 'Vintage Doodle Pack', slug: 'vintage-doodle-pack', basePrice: 350, compareAtPrice: null, images: ['/placeholder.jpg'], allowedDimensions: [{ width: 50, height: 50, label: '5x5cm', priceMultiplier: 1, isDefault: true }], isFeatured: true, category: { name: 'vinyl' } },
-    { id: '2', name: 'Retro Space Cat', slug: 'retro-space-cat', basePrice: 420, compareAtPrice: null, images: ['/placeholder.jpg'], allowedDimensions: [{ width: 50, height: 50, label: '5x5cm', priceMultiplier: 1, isDefault: true }], isFeatured: true, category: { name: 'holographic' } },
-    { id: '3', name: 'Kraft Flower Kit', slug: 'kraft-flower-kit', basePrice: 280, compareAtPrice: null, images: ['/placeholder.jpg'], allowedDimensions: [{ width: 50, height: 50, label: '5x5cm', priceMultiplier: 1, isDefault: true }], isFeatured: true, category: { name: 'kraft' } },
-  ]
-
-  // How it works steps
-  const steps = [
-    { num: '01', title: 'Design', desc: 'Pick or doodle your own sticker art.', icon: '✏️' },
-    { num: '02', title: 'Print', desc: 'We cut, print, and finish with craft.', icon: '🖨️' },
-    { num: '03', title: 'Stick', desc: 'Add to journals, laptops, or life.', icon: '📎' },
-  ]
+  const featured = (query.data as FeaturedResponse | undefined)?.data?.data ?? []
+  // The static list is a fallback for an empty result, not a placeholder while
+  // the query is in flight (that is what the skeletons are for).
+  const products = featured.length > 0 ? featured : FALLBACK_FEATURED
 
   return (
-    <main id="main-content" className="min-h-screen bg-[var(--bg-color)] overflow-x-hidden relative">
-      {/* Grain texture overlay */}
-      <div className="grain" aria-hidden="true" />
+    <PageWrapper>
+      {/* ── Editorial hero ───────────────────────────────────────────────
+          Oversized Shrikhand headline, the word "Fun" in `--pink` (display
+          type on the vivid accent, contract §2), a hand-written line, two real
+          CTAs, and the sticker in an organic blob frame (`--radius-wobble-lg`).
+          Single decor accent: one DoodleScatter. */}
+      <section className="relative overflow-hidden px-4 pb-16 pt-12 md:pt-16">
+        <DoodleScatter count={6} seed="landing-hero" />
 
-      {/* Hero Section */}
-      <section className="relative pt-28 pb-16 px-4 text-center min-h-[90vh] flex items-center justify-center">
-        <DoodleBackground shapeCount={8} interactive={true} />
-        
-        {/* Floating emojis */}
-        <div className="floating-emojis pointer-events-none absolute inset-0" aria-hidden="true">
-          <span className="emoji e1">✨</span>
-          <span className="emoji e2">🎨</span>
-          <span className="emoji e3">✂️</span>
-          <span className="emoji e4">📦</span>
-        </div>
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={variants.staggerContainer}
+          className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2"
+        >
+          <div>
+            <motion.h1
+              variants={variants.staggerItem}
+              className="font-display text-5xl leading-[1.05] text-[var(--text)] md:text-6xl lg:text-7xl"
+            >
+              Make Awesome <span className="text-[var(--pink)]">Fun</span> Things Stick
+            </motion.h1>
 
-        <div className="relative z-10 max-w-5xl mx-auto w-full">
-          {/* Staggered Title */}
-          <div className="staggered-title mb-8">
-            {titleLines.map((line, lineIndex) => (
-              <div key={lineIndex} className="w-full flex justify-center">
-                {line.split('').map((char, charIndex) => (
-                  <span
-                    key={`${lineIndex}-${charIndex}`}
-                    style={{
-                      animationDelay: `${(lineIndex * line.length + charIndex) * 50}ms`,
-                      display: char === ' ' ? 'inline-block' : 'inline-block',
-                      width: char === ' ' ? '0.4em' : 'auto'
-                    }}
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </div>
-            ))}
+            {/* TODO: owner copy */}
+            <motion.p
+              variants={variants.staggerItem}
+              className="mt-6 max-w-xl font-hand text-xl text-[var(--text-muted)] md:text-2xl"
+            >
+              <SketchUnderline color="pink">
+                Design doodles. Print stickers. Spread nostalgia.
+              </SketchUnderline>
+            </motion.p>
+
+            <motion.div
+              variants={variants.staggerItem}
+              className="mt-10 flex flex-wrap gap-4"
+            >
+              <Link
+                href="/shop"
+                className={cn(CTA_LINK_CLASSES, CTA_LINK_FILLS.primary)}
+              >
+                Browse Stickers
+              </Link>
+              <Link
+                href="/custom-sticker"
+                className={cn(CTA_LINK_CLASSES, CTA_LINK_FILLS.secondary)}
+              >
+                Design Custom
+                <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </Link>
+            </motion.div>
           </div>
 
-          {/* Subtitle with sketch underline */}
-          <motion.p 
-            className="font-[var(--font-hand)] text-xl md:text-2xl text-[color-mix(in_srgb,var(--ink)_80%,transparent)] mb-10 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-          >
-            <SketchUnderline className="inline-block">
-              Design doodles. Print stickers. Spread nostalgia.
-            </SketchUnderline>
-          </motion.p>
-
-          {/* CTA Buttons with StickerPeel */}
+          {/* Sticker in an organic blob frame — the Editorial hero image. */}
           <motion.div
-            className="flex justify-center gap-4 flex-wrap mb-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
+            variants={variants.staggerItem}
+            className="relative mx-auto w-full max-w-sm"
           >
-            <Link href="/shop">
-              <Button variant="doodle" size="lg">
-                Browse Stickers
-              </Button>
-            </Link>
-            <Link href="/custom-sticker">
-              <Button variant="doodle-secondary" size="lg">
-                Design Custom
-              </Button>
-            </Link>
+            <div className="overflow-hidden rounded-[var(--radius-wobble-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] shadow-ink-4">
+              <Image
+                src={HERO_IMAGE}
+                alt="bioscope sticker"
+                width={640}
+                height={640}
+                priority
+                className="h-auto w-full"
+              />
+            </div>
           </motion.div>
-
-          {/* Trust Badges with sketch underline */}
-          <motion.div
-            className="flex justify-center gap-3 flex-wrap"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.5 }}
-          >
-            <Badge size="lg" variant="doodle" className="relative">
-              <SketchUnderline>Free Delivery over 2000 BDT</SketchUnderline>
-            </Badge>
-            <Badge variant="secondary" size="lg" className="relative">
-              <SketchUnderline>Weatherproof</SketchUnderline>
-            </Badge>
-            <Badge variant="accent" size="lg" className="relative">
-              <SketchUnderline>Custom Welcome</SketchUnderline>
-            </Badge>
-          </motion.div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* Enhanced Marquee */}
-      <div className="marquee py-4 mb-16 relative overflow-hidden">
-        <WashiTape width={200} rotation={-3} className="top-0 left-1/4 -translate-x-1/2" />
-        <WashiTape width={200} rotation={3} className="top-0 right-1/4 translate-x-1/2" />
-        <div className="marquee-inner relative z-10">
-          {marqueeItems.map((item, i) => (
-            <span key={i} className="flex items-center gap-2">
-              {item}
-              <DoodleStar size="sm" color="accent" animation="float" className="inline-block" />
-            </span>
-          ))}
-          {marqueeItems.map((item, i) => (
-            <span key={`${i}-dup`} className="flex items-center gap-2">
-              {item}
-              <DoodleStar size="sm" color="accent" animation="float" className="inline-block" />
-            </span>
-          ))}
-        </div>
-      </div>
+      {/* ── Marquee ribbon (the band is the accent) ───────────────────── */}
+      <MarqueeRibbon items={MARQUEE_ITEMS} />
 
-      {/* Featured Section */}
-      <section className="py-16 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+      {/* ── Featured products ────────────────────────────────────────────
+          Real data from `featuredProductsOptions()`. No decor accent here:
+          the cards are the restrained surface that repeats at scale. */}
+      <section className="mx-auto max-w-7xl px-4 py-16">
+        <motion.div
+          initial="initial"
+          animate="animate"
+          variants={variants.staggerContainer}
+          className="mb-12 text-center"
+        >
           <motion.h2
-            className="font-[var(--font-display)] text-4xl md:text-6xl text-[var(--ink)]"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            variants={variants.staggerItem}
+            className="font-display text-4xl text-[var(--text)] md:text-6xl"
           >
             Featured Stickers
           </motion.h2>
+          {/* TODO: owner copy */}
           <motion.p
-            className="font-[var(--font-hand)] text-lg text-[var(--text-muted)] mt-2"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            variants={variants.staggerItem}
+            className="mt-2 font-hand text-lg text-[var(--text-muted)]"
           >
             Hand-picked favorites from our community
           </motion.p>
-        </div>
-
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          variants={motionVariants.staggerContainer}
-        >
-          {featuredProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              variants={motionVariants.staggerItem}
-              className="h-full"
-            >
-              <ProductCard
-                product={product as any}
-                variant="featured"
-                showActions={true}
-              />
-            </motion.div>
-          ))}
         </motion.div>
 
-        {/* View All Link */}
-        <motion.div
-          className="text-center mt-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-        >
-          <Link href="/shop">
-            <Button variant="doodle-outline" size="lg" className="group">
-              View All Stickers
-              <DoodleStar size="sm" color="accent" className="ml-2 group-hover:animate-wobble transition-transform" />
-            </Button>
-          </Link>
-        </motion.div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-20 px-4 max-w-6xl mx-auto relative">
-        <TornEdge position="top" className="absolute top-0 left-0 right-0 h-8 bg-[var(--bg-color)]" />
-        <TornEdge position="bottom" className="absolute bottom-0 left-0 right-0 h-8 bg-[var(--bg-color)]" />
-
-        <div className="relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            <motion.h2 className="font-[var(--font-display)] text-4xl md:text-5xl text-[var(--ink)]">
-              How It Works
-            </motion.h2>
-            <motion.p className="font-[var(--font-hand)] text-lg text-[var(--text-muted)] mt-3">
-              Three simple steps to sticky happiness
-            </motion.p>
-          </motion.div>
-
-          <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-12">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.num}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.15, duration: 0.5 }}
-                className="relative flex-1 max-w-xs"
-              >
-                {/* Doodle card with StickerPeel */}
-                <div className="relative bg-[var(--paper)] border-3 border-[var(--ink)] rounded-[20px_4px_20px_4px] shadow-[8px_8px_0_var(--secondary)] hover:shadow-[12px_12px_0_var(--primary)] transition-all duration-500 p-8 text-center group">
-                  <StickerPeel className="top-0 right-0" />
-                  
-                  {/* Step number with Bangers */}
-                  <div className="mb-4">
-                    <span className="font-[var(--font-display)] text-7xl md:text-8xl text-[var(--text-subtle)] group-hover:text-[var(--text)] transition-colors duration-500">
-                      {step.num}
-                    </span>
-                  </div>
-
-                  {/* Icon */}
-                  <div className="text-6xl mb-4 animate-float-gentle" aria-hidden="true">
-                    {step.icon}
-                  </div>
-
-                  {/* Title */}
-                  <motion.h3 className="font-[var(--font-display)] text-2xl md:text-3xl text-[var(--ink)] mb-3">
-                    {step.title}
-                  </motion.h3>
-
-                  {/* Description */}
-                  <motion.p className="font-[var(--font-hand)] text-lg text-[color-mix(in_srgb,var(--ink)_70%,transparent)] max-w-xs mx-auto">
-                    {step.desc}
-                  </motion.p>
-
-                  {/* Decorative accent */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <DoodleStar size="md" color="primary" animation="float" />
-                  </div>
-                </div>
-
-                {/* Connector line between steps (desktop only) */}
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-20 left-full w-full h-1 bg-gradient-to-r from-[var(--primary)] via-[var(--accent)] to-[var(--pink)] rounded-full opacity-50" aria-hidden="true" />
-                )}
-              </motion.div>
+        {query.isLoading ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <SkeletonProductCard key={index} />
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 max-w-4xl mx-auto relative">
-        {/* Torn edge background */}
-        <div className="absolute inset-0 -z-10">
-          <TornEdge position="top" className="w-full h-full bg-[var(--ink)]" />
-        </div>
-
-        <div className="relative z-10 text-center">
-          {/* Washi tape accent */}
-          <div className="flex justify-center mb-8">
-            <WashiTape width={280} rotation={-1} className="relative">
-              <span className="font-[var(--font-display)] text-sm text-[var(--ink)] tracking-wider">
-                SPECIAL OFFER
-              </span>
-            </WashiTape>
-          </div>
-
+        ) : (
           <motion.div
-            className="bg-[var(--ink)] text-[var(--paper)] rounded-[30px_8px] p-10 md:p-14 shadow-[12px_12px_0_var(--accent)] relative overflow-hidden"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={variants.staggerContainer}
+            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
           >
-            {/* Decorative scatter in CTA */}
-            <DoodleBackground shapeCount={4} className="opacity-20" />
-            
-            <motion.h2
-              className="font-[var(--font-display)] text-3xl md:text-5xl mb-4 relative z-10"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              Can&apos;t Find It?
-            </motion.h2>
-            
-            <motion.p
-              className="font-[var(--font-hand)] text-xl mb-8 max-w-xl mx-auto relative z-10"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
-              Design your own custom sticker with our easy builder. Upload art, pick materials, done.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="relative z-10"
-            >
-              <Link href="/custom-sticker">
-                <Button
-                  variant="doodle-secondary"
-                  size="xl"
-                  className="animate-pulse-soft group relative"
-                >
-                  Design Custom Stickers
-                  <DoodleStar size="sm" color="primary" className="ml-3 group-hover:animate-wobble transition-transform" aria-hidden="true" />
-                </Button>
-              </Link>
-            </motion.div>
-
-            {/* Trust indicator */}
-            <motion.p
-              className="font-[var(--font-hand)] text-sm text-[color-mix(in_srgb,var(--paper)_60%,transparent)] mt-8 relative z-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              10,000+ happy creators · 50,000+ stickers printed · Made with 💛 in Bangladesh
-            </motion.p>
+            {products.map((product) => (
+              <motion.div key={product.id} variants={variants.staggerItem} className="h-full">
+                <ProductCard product={product} variant="featured" showActions />
+              </motion.div>
+            ))}
           </motion.div>
+        )}
+
+        <div className="mt-10 text-center">
+          <Link href="/shop" className={cn(CTA_LINK_CLASSES, CTA_LINK_FILLS.primary)}>
+            View All Stickers
+          </Link>
         </div>
       </section>
-    </main>
+
+      {/* ── Custom-sticker CTA band ──────────────────────────────────────
+          One color block (`--gold`) with an ink border and the 10px hero-scale
+          offset shadow; one decor accent (DoodleScatter). */}
+      <section className="mx-auto max-w-4xl px-4 pb-20">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...variants.staggerItem.transition, duration: 0.5 }}
+          className="relative overflow-hidden rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--gold)] p-10 text-center text-[var(--ink)] shadow-ink-4 md:p-14"
+        >
+          <DoodleScatter count={4} seed="landing-cta" />
+
+          <h2 className="relative z-10 mb-4 font-display text-3xl md:text-5xl">
+            Can&apos;t Find It?
+          </h2>
+          {/* TODO: owner copy */}
+          <p className="relative z-10 mx-auto mb-8 max-w-xl font-hand text-xl">
+            Design your own custom sticker with our easy builder. Upload art, pick materials,
+            done.
+          </p>
+          <div className="relative z-10">
+            <Link
+              href="/custom-sticker"
+              className={cn(CTA_LINK_CLASSES, CTA_LINK_FILLS.secondary)}
+            >
+              Design Custom Stickers
+              <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </Link>
+          </div>
+        </motion.div>
+      </section>
+    </PageWrapper>
   )
 }
