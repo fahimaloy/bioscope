@@ -15,6 +15,14 @@ function serializeProduct(p: any) {
     compareAtPrice: p.compareAtPrice != null ? Number(p.compareAtPrice) : null,
     taxPercent: Number(p.taxPercent ?? 0),
     additionalCharge: Number(p.additionalCharge ?? 0),
+    // `priceMultiplier` is a Prisma Decimal on each dimension. Left uncoerced it
+    // reaches ProductDetail as a string (or a Decimal object), so `!== 1` was
+    // always true — the default size rendered a spurious "0%" — and
+    // `(m - 1) * 100` printed `+19.999999999999996%` for a 1.2x size.
+    allowedDimensions: p.allowedDimensions?.map((d: any) => ({
+      ...d,
+      priceMultiplier: Number(d.priceMultiplier),
+    })),
     reviews: undefined,
     _count: undefined,
   }

@@ -272,7 +272,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
                       <span className="block font-display">{dim.label}</span>
                       {dim.priceMultiplier !== 1 && (
                         <span className="text-xs text-primary/80">
-                          {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
+                          {dim.priceMultiplier > 1 ? '+' : ''}
+                          {Math.round((dim.priceMultiplier - 1) * 100)}%
                         </span>
                       )}
                     </button>
