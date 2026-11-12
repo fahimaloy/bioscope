@@ -160,7 +160,7 @@ export function LiveStatCard({
         </div>
       </div>
       <div className="text-2xl font-display text-[var(--ink)] mb-1">{formatNumber(value)}</div>
-      <p className="text-sm font-medium text-[var(--text-muted)]">{label}</p>
+      <p className="text-sm font-medium text-[var(--text-subtle)]">{label}</p>
     </div>
   )
 }
@@ -234,7 +234,7 @@ function SummaryCard({
         format={format === 'currency' ? (v) => formatCurrency(v) : format === 'percent' ? (v) => `${v.toFixed(1)}%` : (v) => formatNumber(v)}
       />
       <SketchUnderline className="inline-block">
-        <p className="text-sm font-medium text-[var(--text-muted)]">{label}</p>
+        <p className="text-sm font-medium text-[var(--text-subtle)]">{label}</p>
       </SketchUnderline>
     </Card>
   )
@@ -353,7 +353,7 @@ export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue
           </ResponsiveContainer>
         </div>
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--light)]">
-          <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
+          <div className="flex items-center gap-4 text-sm text-[var(--text-subtle)]">
             <span className="flex items-center gap-1">
               <span className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--primary)' }} />
               Revenue
@@ -424,7 +424,7 @@ export function OrderStatusDistribution({ distribution }: { distribution: Record
                 <div className="flex-1">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-medium text-[var(--ink)]">{status.label}</span>
-                    <span className="text-[var(--text-muted)] font-display">{count}</span>
+                    <span className="text-[var(--text-subtle)] font-display">{count}</span>
                   </div>
                   <div className="h-2 bg-[var(--light)] rounded-full overflow-hidden">
                     <motion.div
@@ -436,7 +436,7 @@ export function OrderStatusDistribution({ distribution }: { distribution: Record
                     />
                   </div>
                 </div>
-                <span className="text-sm font-medium text-[var(--text-muted)] w-10 text-right font-display">{percentage.toFixed(1)}%</span>
+                <span className="text-sm font-medium text-[var(--text-subtle)] w-10 text-right font-display">{percentage.toFixed(1)}%</span>
               </motion.div>
             )
           })}
@@ -560,7 +560,7 @@ function ActivityContent({ activity, typeColor, timeAgo }: { activity: ActivityI
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-body text-[var(--ink)] truncate">{activity.title}</p>
-        <p className="text-sm text-[var(--text-muted)] truncate mt-0.5">{activity.description}</p>
+        <p className="text-sm text-[var(--text-subtle)] truncate mt-0.5">{activity.description}</p>
       </div>
       <span className="text-xs text-[var(--text-subtle)] whitespace-nowrap font-mono">{timeAgo}</span>
     </div>

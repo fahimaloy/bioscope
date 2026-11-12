@@ -269,7 +269,7 @@ export function AddressForm({
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[var(--light)] flex items-center justify-center">
               <MapPin className="w-8 h-8 text-[var(--text-subtle)]" />
             </div>
-            <p className="text-[var(--text-muted)] mb-4 font-medium">No saved addresses</p>
+            <p className="text-[var(--text-subtle)] mb-4 font-medium">No saved addresses</p>
             {!readOnly && (
               <Button variant="secondary" size="sm" onClick={() => { setEditingAddress(null); resetForm(); setShowForm(true) }}>
                 <Plus className="w-4 h-4 mr-2" />
@@ -377,7 +377,7 @@ function AddressCard({
             </span>
           </div>
           <p className="text-body text-[color-mix(in_srgb,var(--ink)_80%,transparent)] mb-1">{address.phone}</p>
-          <p className="text-sm text-[var(--text-muted)]">
+          <p className="text-sm text-[var(--text-subtle)]">
             {address.addressLine1}
             {address.addressLine2 && `, ${address.addressLine2}`}
             {`, ${address.city}, ${address.district}, ${address.division}`}

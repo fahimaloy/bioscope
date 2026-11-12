@@ -74,7 +74,7 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.4 }}
-          className="text-body text-[var(--text-muted)]"
+          className="text-body text-[var(--text-subtle)]"
         >
           Thank you for your order. We'll notify you when it ships.
         </motion.p>
@@ -95,7 +95,7 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             className="inline-block"
           >
-            <p className="text-sm text-[var(--text-muted)] uppercase tracking-wider mb-2">Order Number</p>
+            <p className="text-sm text-[var(--text-subtle)] uppercase tracking-wider mb-2">Order Number</p>
             <p className="font-display text-4xl text-primary tracking-wide">{order.orderNumber}</p>
             <p className="text-sm text-[var(--text-subtle)] mt-1">Placed on {formatDate(order.createdAt)}</p>
           </motion.div>
@@ -151,16 +151,16 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
           </h3>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-[var(--text-muted)]">Method</span>
+              <span className="text-[var(--text-subtle)]">Method</span>
               <span className="font-medium">{paymentMethodLabels[order.paymentMethod] || order.paymentMethod}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[var(--text-muted)]">Status</span>
+              <span className="text-[var(--text-subtle)]">Status</span>
               <span className="font-medium capitalize">{order.paymentStatus.toLowerCase()}</span>
             </div>
             {order.transactionId && (
               <div className="flex justify-between">
-                <span className="text-[var(--text-muted)]">Transaction ID</span>
+                <span className="text-[var(--text-subtle)]">Transaction ID</span>
                 <span className="font-mono text-sm">{order.transactionId}</span>
               </div>
             )}
@@ -195,7 +195,7 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
                 />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-body text-[var(--ink)] truncate">{item.productName}</p>
-                  <p className="text-sm text-[var(--text-muted)]">{item.width} × {item.height} cm</p>
+                  <p className="text-sm text-[var(--text-subtle)]">{item.width} × {item.height} cm</p>
                   <p className="text-sm text-[var(--text-subtle)]">Qty: {item.quantity} × {formatCurrency(item.unitPrice)}</p>
                 </div>
                 <div className="text-right">
@@ -430,7 +430,7 @@ export function OrderConfirmationCard({ order, onViewDetails }: { order: Order; 
       </div>
 
       <div className="flex items-center justify-between text-sm">
-        <span className="text-[var(--text-muted)]">{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
+        <span className="text-[var(--text-subtle)]">{order.items.length} item{order.items.length !== 1 ? 's' : ''}</span>
         <span className="font-display text-primary">{formatCurrency(order.total)}</span>
       </div>
 

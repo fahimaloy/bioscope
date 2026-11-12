@@ -75,7 +75,7 @@ export function ReviewList({
                 const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
                 return (
                   <div key={star} className="flex items-center gap-3">
-                    <span className="text-sm text-[var(--text-muted)] w-8">{star}★</span>
+                    <span className="text-sm text-[var(--text-subtle)] w-8">{star}★</span>
                     <div className="flex-1 h-2 bg-[var(--light)] rounded-full overflow-hidden">
                       <div
                         className="h-full bg-primary rounded-full transition-all duration-500"
@@ -122,7 +122,7 @@ export function ReviewList({
       {/* Filters & Sort */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--text-muted)]">Filter:</span>
+          <span className="text-sm text-[var(--text-subtle)]">Filter:</span>
           <select
             value={filterRating}
             onChange={(e) => setFilterRating(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
@@ -139,7 +139,7 @@ export function ReviewList({
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-[var(--text-muted)]">Sort by:</span>
+          <span className="text-sm text-[var(--text-subtle)]">Sort by:</span>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
@@ -158,7 +158,7 @@ export function ReviewList({
       <div className="space-y-6">
         {filteredReviews.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-[var(--text-muted)]">No reviews match your filters</p>
+            <p className="text-[var(--text-subtle)]">No reviews match your filters</p>
           </div>
         ) : (
           filteredReviews.map((review) => (
@@ -249,7 +249,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
       <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[var(--light)]">
         <button
           className={cn(
-            'flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-primary transition-colors',
+            'flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-primary transition-colors',
             helpful && 'text-primary'
           )}
           onClick={() => setHelpful(!helpful)}
@@ -259,7 +259,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
         </button>
         <button
           className={cn(
-            'flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-red-500 transition-colors',
+            'flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-red-500 transition-colors',
             notHelpful && 'text-red-500'
           )}
           onClick={() => setNotHelpful(!notHelpful)}
@@ -267,7 +267,7 @@ function ReviewCard({ review, productId }: { review: Review; productId: string }
           <ThumbsDown className={cn('w-4 h-4', notHelpful && 'fill-current')} />
           <span>Not Helpful</span>
         </button>
-        <button className="flex items-center gap-1 text-sm text-[var(--text-muted)] hover:text-red-500 transition-colors ml-auto">
+        <button className="flex items-center gap-1 text-sm text-[var(--text-subtle)] hover:text-red-500 transition-colors ml-auto">
           <Flag className="w-4 h-4" />
           <span>Report</span>
         </button>
@@ -308,7 +308,7 @@ export function ReviewSummary({
           const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0
           return (
             <div key={star} className="flex items-center gap-2">
-              <span className="text-xs text-[var(--text-muted)] w-6">{star}★</span>
+              <span className="text-xs text-[var(--text-subtle)] w-6">{star}★</span>
               <div className="flex-1 h-1.5 bg-dark/10 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-300"

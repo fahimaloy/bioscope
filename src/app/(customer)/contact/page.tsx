@@ -135,7 +135,7 @@ export default function ContactPage() {
           <h1 className="font-display text-4xl md:text-5xl text-primary mb-4 relative">
             <span className="sketch-underline">Contact Us</span>
           </h1>
-          <p className="text-xl text-[var(--text-muted)] max-w-2xl mx-auto">
+          <p className="text-xl text-[var(--text-subtle)] max-w-2xl mx-auto">
             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </motion.div>
@@ -411,7 +411,7 @@ export default function ContactPage() {
               <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
                 Frequently Asked Questions
               </span>
-              <p className="text-[var(--text-muted)] mt-2">Quick answers to common questions</p>
+              <p className="text-[var(--text-subtle)] mt-2">Quick answers to common questions</p>
             </div>
             <div className="max-w-3xl mx-auto space-y-4">
               {faqs.map((faq, index) => (

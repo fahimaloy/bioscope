@@ -207,7 +207,7 @@ export function UploadZone({
         ) : (
           <>
             <Upload className="w-16 h-16 text-[var(--text-subtle)] mx-auto mb-4" />
-            <p className="text-body text-[var(--text-muted)] mb-2">
+            <p className="text-body text-[var(--text-subtle)] mb-2">
               {multiple ? 'Drag & drop images here, or click to select' : 'Drag & drop an image here, or click to select'}
             </p>
             <p className="text-sm text-[var(--text-subtle)] mb-4">
@@ -230,7 +230,7 @@ export function UploadZone({
 
       {/* Paste Support */}
       <div className="mt-4 text-center">
-        <kbd className="px-2 py-1 text-xs bg-[var(--light)] text-[var(--text-muted)] rounded border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] font-mono">
+        <kbd className="px-2 py-1 text-xs bg-[var(--light)] text-[var(--text-subtle)] rounded border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] font-mono">
           Ctrl + V
         </kbd>{' '}
         <span className="text-sm text-[var(--text-subtle)]">to paste image from clipboard</span>

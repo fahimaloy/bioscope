@@ -233,7 +233,7 @@ export default function CustomStickerPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4">
             <div>
               <h1 className="font-[var(--font-display)] text-2xl sm:text-3xl text-primary">Custom Sticker Builder</h1>
-              <p className="text-[var(--text-muted)]">Design your perfect sticker</p>
+              <p className="text-[var(--text-subtle)]">Design your perfect sticker</p>
             </div>
 
             {/* Material/Finish/Cut Badges + Quantity + Live Price */}
@@ -250,7 +250,7 @@ export default function CustomStickerPage() {
 
               {/* Quantity Stepper */}
               <div className="flex items-center gap-2 bg-white border-3 border-[var(--ink)] rounded-pill px-3 py-1.5 shadow-sm">
-                <span className="text-sm text-[var(--text-muted)] mr-2">Qty</span>
+                <span className="text-sm text-[var(--text-subtle)] mr-2">Qty</span>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--ink)] hover:bg-[var(--light)] transition-colors"
@@ -382,7 +382,7 @@ export default function CustomStickerPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-[var(--text-muted)]">Zoom:</span>
+                  <span className="text-sm text-[var(--text-subtle)]">Zoom:</span>
                   <Button variant="ghost" size="sm" onClick={actions.zoomOut} aria-label="Zoom out">
                     <ZoomOut className="w-4 h-4" />
                   </Button>
@@ -624,7 +624,7 @@ function ToolsPanel({
                       )}
                     >
                       <div className="font-medium">{mat.label}</div>
-                      <div className="text-xs text-[var(--text-muted)]">{mat.description}</div>
+                      <div className="text-xs text-[var(--text-subtle)]">{mat.description}</div>
                       <div className="text-xs font-display text-primary mt-1">{mat.priceMultiplier}x</div>
                     </button>
                   ))}
@@ -647,7 +647,7 @@ function ToolsPanel({
                       )}
                     >
                       <div className="font-medium">{fin.label}</div>
-                      <div className="text-xs text-[var(--text-muted)]">{fin.description}</div>
+                      <div className="text-xs text-[var(--text-subtle)]">{fin.description}</div>
                       <div className="text-xs font-display text-primary mt-1">{fin.priceMultiplier}x</div>
                     </button>
                   ))}
@@ -670,7 +670,7 @@ function ToolsPanel({
                       )}
                     >
                       <div className="font-medium">{cut.label}</div>
-                      <div className="text-xs text-[var(--text-muted)]">{cut.description}</div>
+                      <div className="text-xs text-[var(--text-subtle)]">{cut.description}</div>
                       <div className="text-xs font-display text-primary mt-1">{cut.priceMultiplier}x</div>
                     </button>
                   ))}
@@ -689,7 +689,7 @@ function ToolsPanel({
                     max={10000}
                     className="flex-1"
                   />
-                  <div className="text-sm text-[var(--text-muted)]">pcs</div>
+                  <div className="text-sm text-[var(--text-subtle)]">pcs</div>
                 </div>
               </div>
             </AccordionContent>

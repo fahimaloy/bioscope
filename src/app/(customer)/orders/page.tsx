@@ -142,7 +142,7 @@ export default function OrdersPage() {
         ) : orders.length === 0 ? (
           <Card className="p-10 text-center">
             <Package className="w-10 h-10 mx-auto text-[var(--text-subtle)] mb-3" />
-            <p className="text-[var(--text-muted)] mb-4">No orders yet.</p>
+            <p className="text-[var(--text-subtle)] mb-4">No orders yet.</p>
             <Link href="/shop">
               <Button variant="primary">Start Shopping</Button>
             </Link>
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                               <span className="font-medium text-[var(--ink)]">Items ({order.items.length})</span>
                               <button
                                 onClick={(e) => { e.stopPropagation(); toggleExpand(order.id) }}
-                                className="text-sm text-[var(--text-muted)] hover:text-primary flex items-center gap-1"
+                                className="text-sm text-[var(--text-subtle)] hover:text-primary flex items-center gap-1"
                               >
                                 <ChevronUp className="w-4 h-4" /> Collapse
                               </button>

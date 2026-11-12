@@ -264,7 +264,7 @@ export function AdminSidebar({
         {/* User Section */}
         <div className={cn('border-t border-[var(--border)] p-3', collapsed && 'px-2')}>
           <div className={cn('mb-3 flex items-center gap-3', collapsed && 'mb-0 justify-center')}>
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--surface-sunken)] text-[var(--teal)]">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--surface-sunken)] text-[var(--ink)]">
               <span className="font-display text-lg">
                 {user?.name?.charAt(0) || user?.email?.charAt(0) || 'A'}
               </span>

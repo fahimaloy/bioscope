@@ -97,7 +97,7 @@ export function OrderTimeline({ order, className }: OrderTimelineProps) {
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-display text-xl text-primary">Order Timeline</h3>
-        <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+        <div className="flex items-center gap-2 text-sm text-[var(--text-subtle)]">
           <span className="font-medium">Current Status:</span>
           <span className="font-display text-primary">{statusLabels[order.status] || order.status}</span>
         </div>
@@ -131,7 +131,7 @@ export function OrderTimeline({ order, className }: OrderTimelineProps) {
                   </time>
                 </div>
                 {entry.note && (
-                  <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
+                  <p className="text-sm text-[var(--text-subtle)]">{entry.note}</p>
                 )}
                 {entry.updatedBy && (
                   <p className="text-xs text-[var(--text-subtle)]">Updated by {entry.updatedBy}</p>
@@ -179,7 +179,8 @@ export function SimpleOrderStatusBadge({ status }: { status: string }) {
       variants[status] === 'warning' && 'bg-yellow-100 text-yellow-800',
       variants[status] === 'primary' && 'bg-primary/10 text-primary',
       variants[status] === 'secondary' && 'bg-secondary/10 text-secondary',
-      variants[status] === 'accent' && 'bg-accent/20 text-accent',
+      variants[status] === 'accent' &&
+        'bg-[color-mix(in_srgb,var(--accent)_20%,transparent)] text-[var(--ink)]',
       variants[status] === 'default' && 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_70%,transparent)]',
     )}>
       {statusLabels[status] || status}

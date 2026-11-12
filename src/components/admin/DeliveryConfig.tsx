@@ -70,7 +70,7 @@ export function DeliveryConfig({ onChange, initialSettings = {} }: DeliveryConfi
             </div>
             <div>
               <h3 className="font-display text-xl text-primary">Delivery Zones</h3>
-              <p className="text-[var(--text-muted)]">Configure delivery charges per zone</p>
+              <p className="text-[var(--text-subtle)]">Configure delivery charges per zone</p>
             </div>
           </div>
           <Button variant="outline" size="sm" onClick={() => setShowZones(!showZones)}>

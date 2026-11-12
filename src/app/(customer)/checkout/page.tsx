@@ -123,7 +123,7 @@ export default function CheckoutPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-[var(--text-muted)] mb-6"
+            className="text-[var(--text-subtle)] mb-6"
           >
             Please sign in to complete your purchase.
           </motion.p>

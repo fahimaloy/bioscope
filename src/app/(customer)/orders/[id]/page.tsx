@@ -229,7 +229,7 @@ export default function OrderDetailPage() {
     <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
       <DoodleBackground shapeCount={3} />
       <div className="max-w-5xl mx-auto">
-        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-primary mb-4">
+        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[var(--text-subtle)] hover:text-primary mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to orders
         </Link>
 
@@ -275,7 +275,7 @@ export default function OrderDetailPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-[var(--ink)] truncate group-hover:text-primary transition-colors">{item.productName}</p>
-                      <p className="text-sm text-[var(--text-muted)]">
+                      <p className="text-sm text-[var(--text-subtle)]">
                         {item.width} × {item.height} cm · Qty {item.quantity} × {formatCurrency(Number(item.unitPrice))}
                       </p>
                     </div>
@@ -344,7 +344,7 @@ export default function OrderDetailPage() {
                               )}
                             </div>
                             {entry.note && (
-                              <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
+                              <p className="text-sm text-[var(--text-subtle)]">{entry.note}</p>
                             )}
                             {entry.updatedBy && (
                               <p className="text-xs text-[var(--text-subtle)] mt-1">Updated by {entry.updatedBy}</p>
@@ -365,15 +365,15 @@ export default function OrderDetailPage() {
               <h2 className="font-display text-lg text-primary mb-4">Summary</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[var(--text-muted)]">Subtotal</span>
+                  <span className="text-[var(--text-subtle)]">Subtotal</span>
                   <span>{formatCurrency(Number(order.subtotal))}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--text-muted)]">Tax</span>
+                  <span className="text-[var(--text-subtle)]">Tax</span>
                   <span>{formatCurrency(Number(order.taxAmount))}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--text-muted)]">Delivery</span>
+                  <span className="text-[var(--text-subtle)]">Delivery</span>
                   <span>{formatCurrency(Number(order.deliveryCharge))}</span>
                 </div>
                 {Number(order.discountAmount) > 0 && (
@@ -396,11 +396,11 @@ export default function OrderDetailPage() {
                 <MapPin className="w-4 h-4" /> Shipping
               </h2>
               <p className="text-sm text-[var(--ink)]">{order.shippingName} · {order.shippingPhone}</p>
-              <p className="text-sm text-[var(--text-muted)]">
+              <p className="text-sm text-[var(--text-subtle)]">
                 {order.shippingAddress}, {order.shippingCity}, {order.shippingDivision} {order.shippingPostalCode}
               </p>
               {order.trackingNumber && (
-                <p className="text-sm text-[var(--text-muted)] mt-2 flex items-center gap-1">
+                <p className="text-sm text-[var(--text-subtle)] mt-2 flex items-center gap-1">
                   <Truck className="w-4 h-4" /> {order.trackingNumber}
                 </p>
               )}

@@ -52,7 +52,7 @@ export default function CartPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-[var(--text-muted)] mb-8 text-lg"
+            className="text-[var(--text-subtle)] mb-8 text-lg"
           >
             Looks like you haven't added any stickers yet.
           </motion.p>
@@ -83,7 +83,7 @@ export default function CartPage() {
         >
           <div>
             <h1 className="font-display text-3xl md:text-4xl text-primary">Shopping Cart</h1>
-            <p className="text-[var(--text-muted)]">{items.length} item{items.length !== 1 ? 's' : ''} in your cart</p>
+            <p className="text-[var(--text-subtle)]">{items.length} item{items.length !== 1 ? 's' : ''} in your cart</p>
           </div>
           {items.length > 0 && (
             <Button variant="ghost" onClick={clearCart} className="text-red-500 hover:bg-red-50">

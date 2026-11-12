@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Analytics</h1>
-            <p className="text-[var(--text-muted)]">Track your store performance with detailed insights</p>
+            <p className="text-[var(--text-subtle)]">Track your store performance with detailed insights</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">Live Data</Badge>
@@ -289,7 +289,7 @@ export default function AnalyticsPage() {
               </ResponsiveContainer>
             </div>
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--light)]">
-              <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
+              <div className="flex items-center gap-4 text-sm text-[var(--text-subtle)]">
                 <span className="flex items-center gap-1">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--secondary)' }} />
                   Orders

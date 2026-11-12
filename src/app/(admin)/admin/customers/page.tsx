@@ -110,7 +110,7 @@ const columns = [
     header: 'Joined', 
     width: '140px',
     accessor: (row: any) => (
-      <span className="text-sm text-[var(--text-muted)]">{formatDate(row.createdAt)}</span>
+      <span className="text-sm text-[var(--text-subtle)]">{formatDate(row.createdAt)}</span>
     ), 
     sortable: true 
   },
@@ -162,7 +162,7 @@ export default function CustomersPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Customers</h1>
-            <p className="text-[var(--text-muted)]">Manage and analyze your customer base</p>
+            <p className="text-[var(--text-subtle)]">Manage and analyze your customer base</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">{pager.total} Total</Badge>

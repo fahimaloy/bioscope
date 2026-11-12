@@ -148,7 +148,7 @@ export default function ProductsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Products</h1>
-            <p className="text-[var(--text-muted)]">Manage your product catalog</p>
+            <p className="text-[var(--text-subtle)]">Manage your product catalog</p>
           </div>
           <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
             <Plus className="w-4 h-4 mr-2" />

@@ -389,7 +389,7 @@ function CutLinePreview({ cutType }: { cutType: CutType }) {
             <>
               {/* Custom shape */}
               <div className="absolute inset-0 border-3 border-dashed border-accent rounded-[20px]" />
-              <div className="absolute inset-0 flex items-center justify-center text-accent font-display text-xs">
+              <div className="absolute inset-0 flex items-center justify-center text-[var(--text-subtle)] font-display text-xs">
                 ✨ Custom Shape
               </div>
             </>

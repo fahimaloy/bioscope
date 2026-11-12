@@ -129,15 +129,15 @@ export function CartSummary({
 
         {/* Trust Badges */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[var(--light)]">
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-muted)]">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-subtle)]">
             <Package className="w-5 h-5 text-primary" />
             <span>Free delivery over {formatCurrency(freeDeliveryThreshold, currency)}</span>
           </div>
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-muted)]">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-subtle)]">
             <Tag className="w-5 h-5 text-primary" />
             <span>Easy returns</span>
           </div>
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-muted)]">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-subtle)]">
             <Shield className="w-5 h-5 text-primary" />
             <span>Secure payment</span>
           </div>

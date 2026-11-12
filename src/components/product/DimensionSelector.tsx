@@ -112,7 +112,7 @@ export function DimensionSelector({
               disabled={disabled}
             >
               <span className="block font-display">{dim.label}</span>
-              <div className="text-sm text-[var(--text-muted)]">
+              <div className="text-sm text-[var(--text-subtle)]">
                 {dim.width} × {dim.height} cm
               </div>
               {dim.priceMultiplier !== 1 && (

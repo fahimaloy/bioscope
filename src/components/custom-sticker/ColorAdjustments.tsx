@@ -216,7 +216,7 @@ function ColorBalanceChannel({
             `bg-gradient-to-r from-${color}-500 via-transparent to-${color}-500`
           )}
         />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-full text-xs font-medium text-[var(--text-muted)]">
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-full text-xs font-medium text-[var(--text-subtle)]">
           {value > 0 ? '+' : ''}{value}
         </div>
       </div>

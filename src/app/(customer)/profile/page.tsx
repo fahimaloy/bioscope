@@ -209,7 +209,7 @@ function AddressCard({
               </Badge>
             </div>
             <p className="text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{address.phone}</p>
-            <p className="text-[var(--text-muted)] mt-1">
+            <p className="text-[var(--text-subtle)] mt-1">
               {address.addressLine1}
               {address.addressLine2 && `, ${address.addressLine2}`}
               <br />
@@ -675,7 +675,7 @@ function AccountTab({ user }: { user: typeof mockUser }) {
             </div>
             <div>
               <h2 className="font-display text-2xl text-[var(--ink)]">{user?.name || 'User'}</h2>
-              <p className="text-[var(--text-muted)]">{user?.email}</p>
+              <p className="text-[var(--text-subtle)]">{user?.email}</p>
               <Badge variant="outline" size="sm" className="mt-2 inline-block">
                 {user?.role === 'ADMIN' ? 'Admin' : 'Customer'}
               </Badge>
@@ -892,7 +892,7 @@ export default function ProfilePage() {
           className="mb-8"
         >
           <h1 className="font-display text-3xl text-primary mb-2">My Profile</h1>
-          <p className="text-[var(--text-muted)]">Manage your account settings</p>
+          <p className="text-[var(--text-subtle)]">Manage your account settings</p>
         </motion.div>
 
         <Tabs defaultValue={activeTab} onChange={setActiveTab} variant="pills">

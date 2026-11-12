@@ -70,7 +70,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
             </div>
             <div>
               <h3 className="font-display text-xl text-primary">Global Tax Settings</h3>
-              <p className="text-[var(--text-muted)]">Configure default tax behavior for all products</p>
+              <p className="text-[var(--text-subtle)]">Configure default tax behavior for all products</p>
             </div>
           </div>
         </div>
@@ -245,7 +245,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
           <Calculator className="w-6 h-6 text-accent" />
           <div>
             <h4 className="font-medium text-body text-[var(--ink)]">Product-Specific Tax</h4>
-            <p className="text-sm text-[var(--text-muted)]">
+            <p className="text-sm text-[var(--text-subtle)]">
               Individual products can override global tax settings. When editing a product,
               you can set a specific tax percentage and additional charge that applies only to that product.
             </p>

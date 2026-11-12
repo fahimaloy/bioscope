@@ -121,7 +121,7 @@ export function DimensionControls({
               step={0.1}
               className="flex-1"
             />
-            <div className="flex items-center gap-1 text-sm text-[var(--text-muted)]">
+            <div className="flex items-center gap-1 text-sm text-[var(--text-subtle)]">
               <span>Min:</span>
               <span className="font-medium">{minWidth}</span>
               <span>Max:</span>
@@ -149,7 +149,7 @@ export function DimensionControls({
               step={0.1}
               className="flex-1"
             />
-            <div className="flex items-center gap-1 text-sm text-[var(--text-muted)]">
+            <div className="flex items-center gap-1 text-sm text-[var(--text-subtle)]">
               <span>Min:</span>
               <span className="font-medium">{minHeight}</span>
               <span>Max:</span>
@@ -232,7 +232,7 @@ export function DimensionControls({
                 )}
               >
                 <span className="font-display">{preset.label}</span>
-                <div className="text-xs text-[var(--text-muted)] mt-1">
+                <div className="text-xs text-[var(--text-subtle)] mt-1">
                   {preset.width} × {preset.height} cm
                 </div>
               </button>
@@ -246,19 +246,19 @@ export function DimensionControls({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{area}</div>
-            <div className="text-xs text-[var(--text-muted)]">Area (cm²)</div>
+            <div className="text-xs text-[var(--text-subtle)]">Area (cm²)</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{pixelsWidth.toLocaleString()}</div>
-            <div className="text-xs text-[var(--text-muted)]">Width (px @ {dpi} DPI)</div>
+            <div className="text-xs text-[var(--text-subtle)]">Width (px @ {dpi} DPI)</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{pixelsHeight.toLocaleString()}</div>
-            <div className="text-xs text-[var(--text-muted)]">Height (px @ {dpi} DPI)</div>
+            <div className="text-xs text-[var(--text-subtle)]">Height (px @ {dpi} DPI)</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-display text-primary">{megapixels}</div>
-            <div className="text-xs text-[var(--text-muted)]">Megapixels</div>
+            <div className="text-xs text-[var(--text-subtle)]">Megapixels</div>
           </div>
         </div>
 
@@ -347,7 +347,7 @@ export function CompactDimensionControls({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs text-[var(--text-muted)] mb-1">Width (cm)</label>
+          <label className="block text-xs text-[var(--text-subtle)] mb-1">Width (cm)</label>
           <Input
             type="number"
             value={width}
@@ -359,7 +359,7 @@ export function CompactDimensionControls({
           />
         </div>
         <div>
-          <label className="block text-xs text-[var(--text-muted)] mb-1">Height (cm)</label>
+          <label className="block text-xs text-[var(--text-subtle)] mb-1">Height (cm)</label>
           <Input
             type="number"
             value={height}

@@ -114,7 +114,7 @@ export default function AdminDashboardPage() {
       >
         <div>
           <h1 className="font-display text-3xl text-primary">Dashboard</h1>
-          <p className="text-[var(--text-muted)]">Welcome back! Here&apos;s what&apos;s happening with your store.</p>
+          <p className="text-[var(--text-subtle)]">Welcome back! Here&apos;s what&apos;s happening with your store.</p>
         </div>
         <div className="flex flex-wrap gap-3">
           {quickActions.map((action) => (
@@ -251,7 +251,7 @@ function QuickLinkCard({ title, desc, icon: Icon, href, color }: {
           </div>
         </div>
         <h3 className="font-display text-lg text-[var(--ink)] mb-1">{title}</h3>
-        <p className="text-sm text-[var(--text-muted)] mb-4">{desc}</p>
+        <p className="text-sm text-[var(--text-subtle)] mb-4">{desc}</p>
         <span className="inline-flex items-center gap-1 text-sm font-medium text-primary group-hover:underline transition-colors">
           View →
         </span>

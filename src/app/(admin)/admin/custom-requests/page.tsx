@@ -284,7 +284,7 @@ export default function CustomRequestsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Custom Requests</h1>
-            <p className="text-[var(--text-muted)]">Review and manage custom sticker requests</p>
+            <p className="text-[var(--text-subtle)]">Review and manage custom sticker requests</p>
           </div>
         </div>
 
@@ -348,7 +348,7 @@ export default function CustomRequestsPage() {
             alt={imageModalAlt}
             className="max-w-full max-h-[70vh] mx-auto rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]"
           />
-          <p className="mt-4 text-body text-[var(--text-muted)]">{imageModalAlt}</p>
+          <p className="mt-4 text-body text-[var(--text-subtle)]">{imageModalAlt}</p>
         </div>
       </Modal>
 

@@ -80,7 +80,7 @@ export function NotificationList({
           </div>
           <div>
             <h3 className="font-display text-xl text-primary">Notifications</h3>
-            <p className="text-sm text-[var(--text-muted)]">
+            <p className="text-sm text-[var(--text-subtle)]">
               {notifications.length} total • {unreadCount} unread
             </p>
           </div>
@@ -133,7 +133,7 @@ export function NotificationList({
         {filteredNotifications.length === 0 ? (
           <div className="text-center py-12">
             <Bell className="w-16 h-16 mx-auto mb-4 text-[var(--text-subtle)]" />
-            <p className="text-body text-[var(--text-muted)]">
+            <p className="text-body text-[var(--text-subtle)]">
               {filter === 'unread' ? 'No unread notifications' :
                filter === 'read' ? 'No read notifications' :
                'No notifications yet'}
@@ -181,7 +181,7 @@ export function NotificationList({
                     {notification.message}
                   </p>
                   {isExpanded && notification.data && (
-                    <div className="mt-2 p-2 bg-[var(--light)] rounded-input text-xs text-[var(--text-muted)] font-mono">
+                    <div className="mt-2 p-2 bg-[var(--light)] rounded-input text-xs text-[var(--text-subtle)] font-mono">
                       <pre>{JSON.stringify(notification.data, null, 2)}</pre>
                     </div>
                   )}

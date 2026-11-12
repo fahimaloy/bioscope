@@ -31,7 +31,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-display text-xl text-primary">Live Preview</h3>
-          <p className="text-[var(--text-muted)]">See how your product will appear to customers</p>
+          <p className="text-[var(--text-subtle)]">See how your product will appear to customers</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant={product.isActive ? 'success' : 'error'} size="sm">
@@ -102,7 +102,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
 
             {/* Tax Info */}
             {(product.taxPercent || 0) > 0 && (
-              <p className="text-sm text-[var(--text-muted)] flex items-center gap-1">
+              <p className="text-sm text-[var(--text-subtle)] flex items-center gap-1">
                 <Settings className="w-4 h-4" />
                 {(product as any).isTaxInclusive ? 'Price includes' : 'Plus'} {(product as any).taxPercent}% tax
               </p>
@@ -156,7 +156,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                 <div className="space-y-2">
                   {product.customizationOptions.materials?.length && (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-[var(--text-muted)]">Materials:</span>
+                      <span className="text-sm text-[var(--text-subtle)]">Materials:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.materials.map((m: string) => (
                           <Badge key={m} variant="outline" size="sm">{m}</Badge>
@@ -166,7 +166,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                   )}
                   {product.customizationOptions.finishes?.length && (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-[var(--text-muted)]">Finishes:</span>
+                      <span className="text-sm text-[var(--text-subtle)]">Finishes:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.finishes.map((f: string) => (
                           <Badge key={f} variant="outline" size="sm">{f}</Badge>
@@ -176,7 +176,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                   )}
                   {product.customizationOptions.cutTypes?.length && (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-[var(--text-muted)]">Cut Types:</span>
+                      <span className="text-sm text-[var(--text-subtle)]">Cut Types:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.cutTypes.map((c: string) => (
                           <Badge key={c} variant="outline" size="sm">{c}</Badge>
@@ -193,7 +193,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
               <div className="pt-4 border-t border-[color-mix(in_srgb,var(--ink)_20%,transparent)] flex items-center justify-between">
                 <div>
                   <p className="font-medium text-body text-[var(--ink)]">Inventory</p>
-                  <p className="text-sm text-[var(--text-muted)]">
+                  <p className="text-sm text-[var(--text-subtle)]">
                     {product.stock || 0} in stock {product.lowStockThreshold && `(low at ${product.lowStockThreshold})`}
                   </p>
                 </div>

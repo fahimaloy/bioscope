@@ -98,7 +98,7 @@ export function CheckoutCartItem({ item }: { item: CartItem }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm text-[var(--ink)] truncate">{item.productName}</p>
-        <p className="text-xs text-[var(--text-muted)]">{item.width} × {item.height} cm</p>
+        <p className="text-xs text-[var(--text-subtle)]">{item.width} × {item.height} cm</p>
       </div>
       <div className="text-right">
         <p className="font-medium text-sm text-[var(--ink)]">{item.quantity} × {formatCurrency(item.unitPrice)}</p>

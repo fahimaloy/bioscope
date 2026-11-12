@@ -236,7 +236,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Tax Info */}
           {product.taxPercent > 0 && (
-            <p className="text-sm text-[var(--text-muted)]">
+            <p className="text-sm text-[var(--text-subtle)]">
               Price includes {product.isTaxInclusive ? '' : 'excludes '}tax ({product.taxPercent}%)
             </p>
           )}
@@ -319,7 +319,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   </Button>
                 </div>
                 {matchingQtyConfig && (
-                  <span className="text-sm text-[var(--text-muted)]">{matchingQtyConfig.label}</span>
+                  <span className="text-sm text-[var(--text-subtle)]">{matchingQtyConfig.label}</span>
                 )}
               </div>
             </fieldset>
@@ -457,7 +457,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </TabsList>
 
         <TabsContent value="description" className="prose prose-dark max-w-none">
-          {product.description || <p className="text-[var(--text-muted)]">No description available.</p>}
+          {product.description || <p className="text-[var(--text-subtle)]">No description available.</p>}
         </TabsContent>
 
         <TabsContent value="specifications" className="space-y-4">
@@ -493,7 +493,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
         <TabsContent value="reviews">
           <div className="text-center py-12">
-            <p className="text-[var(--text-muted)]">Reviews coming soon...</p>
+            <p className="text-[var(--text-subtle)]">Reviews coming soon...</p>
           </div>
         </TabsContent>
       </Tabs>

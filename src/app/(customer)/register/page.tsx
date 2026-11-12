@@ -127,7 +127,7 @@ function RegisterForm() {
 
         <div className="text-center mb-8 relative z-10">
           <h1 className="font-display text-3xl md:text-4xl text-primary">Create Account</h1>
-          <p className="text-[var(--text-muted)] mt-2 text-body">Join us and start creating custom stickers</p>
+          <p className="text-[var(--text-subtle)] mt-2 text-body">Join us and start creating custom stickers</p>
         </div>
 
         {/* Error alert with doodle styling - shake on appear, slide out on dismiss */}
@@ -136,12 +136,12 @@ function RegisterForm() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
-            className="mb-6 p-4 bg-[color-mix(in_srgb,var(--error)_10%,transparent)] border-2 border-[var(--error)] rounded-input text-[var(--error)] text-sm flex items-start justify-between gap-4 animate-shake"
+            className="mb-6 p-4 bg-[color-mix(in_srgb,var(--error)_10%,transparent)] border-2 border-[var(--error)] rounded-input text-[var(--text)] text-sm flex items-start justify-between gap-4 animate-shake"
             role="alert"
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-start gap-3 flex-1">
-              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <svg className="w-5 h-5 mt-0.5 flex-shrink-0 text-[var(--error)]" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               <p>{error}</p>
@@ -149,7 +149,7 @@ function RegisterForm() {
             <button
               type="button"
               onClick={dismissError}
-              className="flex-shrink-0 p-1 text-[var(--text-muted)] hover:text-[var(--error)] transition-colors rounded-full hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
+              className="flex-shrink-0 p-1 text-[var(--text-subtle)] hover:text-[var(--error)] transition-colors rounded-full hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
               aria-label="Dismiss error"
             >
               <X className="w-4 h-4" />
@@ -276,7 +276,7 @@ function RegisterForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-[var(--text-muted)]">
+          <p className="text-[var(--text-subtle)]">
             Already have an account?{' '}
             <Link href="/login" className="text-primary font-medium">
               <SketchUnderline>Sign in</SketchUnderline>

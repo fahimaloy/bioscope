@@ -266,7 +266,7 @@ export function ReviewHelpfulButton({
         onClick={() => handleVote('helpful')}
         className={cn(
           'flex items-center gap-1 text-sm transition-colors',
-          voted === 'helpful' ? 'text-primary' : 'text-[var(--text-muted)] hover:text-primary'
+          voted === 'helpful' ? 'text-primary' : 'text-[var(--text-subtle)] hover:text-primary'
         )}
       >
         <svg className={cn('w-5 h-5', voted === 'helpful' && 'fill-current')} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} fill="none">
@@ -278,7 +278,7 @@ export function ReviewHelpfulButton({
         onClick={() => handleVote('not-helpful')}
         className={cn(
           'flex items-center gap-1 text-sm transition-colors',
-          voted === 'not-helpful' ? 'text-red-500' : 'text-[var(--text-muted)] hover:text-red-500'
+          voted === 'not-helpful' ? 'text-red-500' : 'text-[var(--text-subtle)] hover:text-red-500'
         )}
       >
         <svg className={cn('w-5 h-5', voted === 'not-helpful' && 'fill-current')} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} fill="none">

@@ -202,7 +202,7 @@ function ExpandedRowContent({
                 </div>
                 <div className="text-right">
                   <p className="font-display text-primary">{formatCurrency(Number(item.unitPrice))}</p>
-                  <p className="text-sm text-[var(--text-muted)]">{formatCurrency(Number(item.totalPrice))} total</p>
+                  <p className="text-sm text-[var(--text-subtle)]">{formatCurrency(Number(item.totalPrice))} total</p>
                 </div>
               </div>
             ))}
@@ -256,7 +256,7 @@ function ExpandedRowContent({
                       </time>
                     </div>
                     {entry.note && (
-                      <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
+                      <p className="text-sm text-[var(--text-subtle)]">{entry.note}</p>
                     )}
                   </div>
                 </div>
@@ -274,19 +274,19 @@ function ExpandedRowContent({
               <div className="space-y-2 text-sm">
                 {order.trackingNumber && (
                   <div className="flex justify-between">
-                    <span className="text-[var(--text-muted)]">Tracking Number</span>
+                    <span className="text-[var(--text-subtle)]">Tracking Number</span>
                     <span className="font-mono font-medium text-[var(--ink)]">{order.trackingNumber}</span>
                   </div>
                 )}
                 {order.shippedAt && (
                   <div className="flex justify-between">
-                    <span className="text-[var(--text-muted)]">Shipped</span>
+                    <span className="text-[var(--text-subtle)]">Shipped</span>
                     <span className="text-[var(--ink)]">{formatDateTime(order.shippedAt)}</span>
                   </div>
                 )}
                 {order.deliveredAt && (
                   <div className="flex justify-between">
-                    <span className="text-[var(--text-muted)]">Delivered</span>
+                    <span className="text-[var(--text-subtle)]">Delivered</span>
                     <span className="text-[var(--ink)]">{formatDateTime(order.deliveredAt)}</span>
                   </div>
                 )}
@@ -557,7 +557,7 @@ export default function AdminOrdersPage() {
       key: 'createdAt',
       header: 'Date',
       accessor: (row: Order) => (
-        <span className="text-sm text-[var(--text-muted)] whitespace-nowrap">{formatDate(row.createdAt)}</span>
+        <span className="text-sm text-[var(--text-subtle)] whitespace-nowrap">{formatDate(row.createdAt)}</span>
       ),
       sortable: true,
       width: '140px',
@@ -592,7 +592,7 @@ export default function AdminOrdersPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Orders</h1>
-            <p className="text-[var(--text-muted)]">Manage and track all orders</p>
+            <p className="text-[var(--text-subtle)]">Manage and track all orders</p>
           </div>
         </div>
 

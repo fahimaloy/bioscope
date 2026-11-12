@@ -177,7 +177,7 @@ export function OrderStatusTimeline({
                 </time>
               </div>
               {entry.note && (
-                <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
+                <p className="text-sm text-[var(--text-subtle)]">{entry.note}</p>
               )}
               {entry.updatedBy && (
                 <p className="text-xs text-[var(--text-subtle)]">Updated by {entry.updatedBy}</p>
