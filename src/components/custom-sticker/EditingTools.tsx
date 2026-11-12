@@ -62,7 +62,7 @@ export function EditingTools({
 
   if (!selectedLayer) {
     return (
-      <div className={cn('p-4 text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]', className)}>
+      <div className={cn('p-4 text-center text-[var(--text-subtle)]', className)}>
         <p className="text-body">Select a layer to edit</p>
       </div>
     )

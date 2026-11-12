@@ -157,7 +157,7 @@ export default function HomePage() {
             Featured Stickers
           </motion.h2>
           <motion.p
-            className="font-[var(--font-hand)] text-lg text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2"
+            className="font-[var(--font-hand)] text-lg text-[var(--text-muted)] mt-2"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -222,7 +222,7 @@ export default function HomePage() {
             <motion.h2 className="font-[var(--font-display)] text-4xl md:text-5xl text-[var(--ink)]">
               How It Works
             </motion.h2>
-            <motion.p className="font-[var(--font-hand)] text-lg text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-3">
+            <motion.p className="font-[var(--font-hand)] text-lg text-[var(--text-muted)] mt-3">
               Three simple steps to sticky happiness
             </motion.p>
           </motion.div>
@@ -243,7 +243,7 @@ export default function HomePage() {
                   
                   {/* Step number with Bangers */}
                   <div className="mb-4">
-                    <span className="font-[var(--font-display)] text-7xl md:text-8xl text-[color-mix(in_srgb,var(--accent)_30%,transparent)] group-hover:text-[color-mix(in_srgb,var(--accent)_60%,transparent)] transition-colors duration-500">
+                    <span className="font-[var(--font-display)] text-7xl md:text-8xl text-[var(--text-subtle)] group-hover:text-[var(--text)] transition-colors duration-500">
                       {step.num}
                     </span>
                   </div>

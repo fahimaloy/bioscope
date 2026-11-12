@@ -91,7 +91,7 @@ function LoginForm() {
         
         <div className="text-center mb-8 relative z-10">
           <h1 className="font-display text-3xl md:text-4xl text-primary">Welcome Back</h1>
-          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2 text-body">Sign in to your account</p>
+          <p className="text-[var(--text-muted)] mt-2 text-body">Sign in to your account</p>
         </div>
 
         {/* Error alert with doodle styling - shake on appear, slide out on dismiss */}
@@ -113,7 +113,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={dismissError}
-              className="flex-shrink-0 p-1 text-[color-mix(in_srgb,var(--error)_70%,transparent)] hover:text-[var(--error)] transition-colors rounded-full hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
+              className="flex-shrink-0 p-1 text-[var(--text-muted)] hover:text-[var(--error)] transition-colors rounded-full hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
               aria-label="Dismiss error"
             >
               <X className="w-4 h-4" />
@@ -171,7 +171,7 @@ function LoginForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+          <p className="text-[var(--text-muted)]">
             Don't have an account?{' '}
             <Link href="/register" className="text-primary font-medium">
               <SketchUnderline>Sign up</SketchUnderline>

@@ -101,7 +101,7 @@ export function CartSummary({
               style={{ transformOrigin: 'top' }}
               className="space-y-2"
             >
-              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] text-center">
+              <p className="text-sm text-[var(--text-subtle)] text-center">
                 Add <span className="font-medium text-primary">{formatCurrency(deliveryRemaining, currency)}</span> more for free delivery!
               </p>
               <div className="w-full h-3 bg-[var(--light)] rounded-full overflow-hidden">
@@ -113,7 +113,7 @@ export function CartSummary({
                   style={{ transformOrigin: 'left' }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">
+              <div className="flex justify-between text-xs text-[var(--text-subtle)]">
                 <span>0</span>
                 <span>{formatCurrency(freeDeliveryThreshold, currency)}</span>
               </div>
@@ -129,15 +129,15 @@ export function CartSummary({
 
         {/* Trust Badges */}
         <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[var(--light)]">
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-muted)]">
             <Package className="w-5 h-5 text-primary" />
             <span>Free delivery over {formatCurrency(freeDeliveryThreshold, currency)}</span>
           </div>
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-muted)]">
             <Tag className="w-5 h-5 text-primary" />
             <span>Easy returns</span>
           </div>
-          <div className="flex flex-col items-center gap-1 text-center text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+          <div className="flex flex-col items-center gap-1 text-center text-sm text-[var(--text-muted)]">
             <Shield className="w-5 h-5 text-primary" />
             <span>Secure payment</span>
           </div>
@@ -159,7 +159,7 @@ export function CartSummary({
         </Button>
 
         {total > 0 && (
-          <p className="text-xs text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+          <p className="text-xs text-center text-[var(--text-subtle)]">
             Delivery calculated at checkout. Tax included where applicable.
           </p>
         )}

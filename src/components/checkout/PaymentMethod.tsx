@@ -92,7 +92,7 @@ export function PaymentMethod({ selectedMethod, onChange, className, readOnly = 
                       <Badge variant="primary" size="sm">{method.badge}</Badge>
                     )}
                   </div>
-                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-2">{method.description}</p>
+                  <p className="text-sm text-[var(--text-muted)] mb-2">{method.description}</p>
                   {method.fee > 0 && (
                     <p className="text-xs text-orange-600">Processing fee: {method.fee} BDT</p>
                   )}

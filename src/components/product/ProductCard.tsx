@@ -68,7 +68,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
               sizes="64px"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
+            <div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">
               <Tag className="w-12 h-12" />
             </div>
           )}
@@ -78,7 +78,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
           <div className="flex items-center gap-2 mt-1">
             <span className="text-lg font-display text-primary">{basePrice.toLocaleString()} BDT</span>
             {hasDiscount && (
-              <span className="text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+              <span className="text-sm text-[var(--text-subtle)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
             )}
           </div>
         </div>
@@ -106,7 +106,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
               />
             </Link>
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
+            <div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">
               <Tag className="w-12 h-12" />
             </div>
           )}
@@ -132,7 +132,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
 
           {/* Wishlist */}
           <button
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-red-500 hover:bg-red-50 transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 transition-colors"
             aria-label="Add to wishlist"
           >
             <Heart className="w-4 h-4" />
@@ -146,13 +146,13 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
           </Link>
 
           {product.description && (
-            <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-3 line-clamp-2 flex-1 min-h-0">{product.description}</p>
+            <p className="text-body text-[var(--text-muted)] mb-3 line-clamp-2 flex-1 min-h-0">{product.description}</p>
           )}
 
           {/* Dimensions */}
           {product.allowedDimensions.length > 1 && (
             <div className="mb-3">
-              <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mb-1">Available sizes:</p>
+              <p className="text-xs text-[var(--text-subtle)] mb-1">Available sizes:</p>
               <div className="flex flex-wrap gap-1">
                 {product.allowedDimensions.slice(0, 4).map((dim) => (
                   <span
@@ -163,7 +163,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
                   </span>
                 ))}
                 {product.allowedDimensions.length > 4 && (
-                  <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] rounded-full">
+                  <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--text-subtle)] rounded-full">
                     +{product.allowedDimensions.length - 4} more
                   </span>
                 )}
@@ -176,7 +176,7 @@ export function ProductCard({ product, variant = 'default', showActions = true, 
             <div>
               <span className="text-2xl font-display text-primary">{basePrice.toLocaleString()} BDT</span>
               {hasDiscount && (
-                <span className="ml-2 text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+                <span className="ml-2 text-sm text-[var(--text-subtle)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
               )}
             </div>
 
@@ -259,8 +259,8 @@ export function ProductGrid({ products, variant = 'default', className, emptyMes
   if (products.length === 0) {
     return (
       <div className="text-center py-16">
-        <Tag className="w-16 h-16 text-[color-mix(in_srgb,var(--ink)_20%,transparent)] mx-auto mb-4" />
-        <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{emptyMessage}</p>
+        <Tag className="w-16 h-16 text-[var(--text-subtle)] mx-auto mb-4" />
+        <p className="text-body text-[var(--text-muted)]">{emptyMessage}</p>
       </div>
     )
   }
@@ -310,7 +310,7 @@ export function FeaturedProduct({ product }: { product: Product }) {
         <div className="flex items-center gap-4 mb-6">
           <span className="text-3xl font-display text-primary">{product.basePrice.toLocaleString()} BDT</span>
           {product.compareAtPrice && product.compareAtPrice > product.basePrice && (
-            <span className="text-xl text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice.toLocaleString()} BDT</span>
+            <span className="text-xl text-[var(--text-subtle)] line-through">{product.compareAtPrice.toLocaleString()} BDT</span>
           )}
         </div>
 

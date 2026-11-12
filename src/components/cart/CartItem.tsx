@@ -50,7 +50,7 @@ export function CartItem({ item, onUpdate, onRemove, onEdit, showEdit = false, c
 
         {/* Price Breakdown: base × qty = line total */}
         <div className="text-right w-full">
-          <div className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] font-body">
+          <div className="text-xs text-[var(--text-subtle)] font-body">
             {formatCurrency(item.unitPrice)} × {item.quantity}
           </div>
           <div className="font-display text-lg text-primary">
@@ -61,7 +61,7 @@ export function CartItem({ item, onUpdate, onRemove, onEdit, showEdit = false, c
         {/* Remove Button with hover shake */}
         <motion.button
           onClick={() => onRemove(itemId)}
-          className="p-2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)] hover:text-red-500 transition-colors flex-shrink-0"
+          className="p-2 text-[var(--text-subtle)] hover:text-red-500 transition-colors flex-shrink-0"
           aria-label="Remove item"
           whileHover={{ rotate: [-5, 5, -5, 0] }}
           transition={{ duration: 0.3 }}
@@ -98,7 +98,7 @@ export function CheckoutCartItem({ item }: { item: CartItem }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm text-[var(--ink)] truncate">{item.productName}</p>
-        <p className="text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{item.width} × {item.height} cm</p>
+        <p className="text-xs text-[var(--text-muted)]">{item.width} × {item.height} cm</p>
       </div>
       <div className="text-right">
         <p className="font-medium text-sm text-[var(--ink)]">{item.quantity} × {formatCurrency(item.unitPrice)}</p>

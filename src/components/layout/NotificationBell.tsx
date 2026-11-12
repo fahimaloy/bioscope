@@ -109,10 +109,10 @@ export function NotificationBell() {
           {/* List */}
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
-                <Bell className="w-12 h-12 mx-auto mb-3 text-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
+              <div className="p-8 text-center text-[var(--text-subtle)]">
+                <Bell className="w-12 h-12 mx-auto mb-3 text-[var(--text-subtle)]" />
                 <p className="text-body">No notifications yet</p>
-                <p className="text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] mt-1">You're all caught up!</p>
+                <p className="text-sm text-[var(--text-subtle)] mt-1">You're all caught up!</p>
               </div>
             ) : (
               <ul className="divide-y divide-light" role="list" aria-label="Notifications">
@@ -132,7 +132,7 @@ export function NotificationBell() {
                       <div
                         className={cn(
                           'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                          !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
+                          !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                         )}
                       >
                         {getIcon(notification.type)}
@@ -145,13 +145,13 @@ export function NotificationBell() {
                           )}>
                             {notification.title}
                           </h4>
-                          <time className="text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)] flex-shrink-0 whitespace-nowrap">
+                          <time className="text-xs text-[var(--text-subtle)] flex-shrink-0 whitespace-nowrap">
                             {formatDateTime(notification.createdAt)}
                           </time>
                         </div>
                         <p className={cn(
                           'text-sm mt-1 truncate',
-                          !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
+                          !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[var(--text-subtle)]'
                         )}>
                           {notification.message}
                         </p>

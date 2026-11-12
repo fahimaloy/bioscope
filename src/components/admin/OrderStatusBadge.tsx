@@ -108,7 +108,7 @@ export function OrderStatusFlow({ currentStatus }: { currentStatus: OrderStatus 
             <div className="relative">
               <div className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all',
-                isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-primary/10 text-primary border-2 border-primary' : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_40%,transparent)]'
+                isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-primary/10 text-primary border-2 border-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
               )}>
                 {isCompleted ? '✓' : isCurrent ? (index + 1) : ''}
               </div>
@@ -120,7 +120,7 @@ export function OrderStatusFlow({ currentStatus }: { currentStatus: OrderStatus 
             </div>
             <div className={cn(
               'text-center min-w-[80px]',
-              isActive ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_40%,transparent)]'
+              isActive ? 'text-[var(--ink)]' : 'text-[var(--text-subtle)]'
             )}>
               <p className="text-xs font-medium truncate">{statusConfig[status]?.label || status}</p>
             </div>
@@ -172,15 +172,15 @@ export function OrderStatusTimeline({
                 <Badge variant={config.variant} size="sm">
                   {config.label}
                 </Badge>
-                <time className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+                <time className="text-sm text-[var(--text-subtle)]">
                   {new Date(entry.timestamp).toLocaleString()}
                 </time>
               </div>
               {entry.note && (
-                <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{entry.note}</p>
+                <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
               )}
               {entry.updatedBy && (
-                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">Updated by {entry.updatedBy}</p>
+                <p className="text-xs text-[var(--text-subtle)]">Updated by {entry.updatedBy}</p>
               )}
             </div>
           </div>

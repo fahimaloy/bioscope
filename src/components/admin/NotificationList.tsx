@@ -80,7 +80,7 @@ export function NotificationList({
           </div>
           <div>
             <h3 className="font-display text-xl text-primary">Notifications</h3>
-            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+            <p className="text-sm text-[var(--text-muted)]">
               {notifications.length} total • {unreadCount} unread
             </p>
           </div>
@@ -132,8 +132,8 @@ export function NotificationList({
       <div className="space-y-2 max-h-[600px] overflow-y-auto">
         {filteredNotifications.length === 0 ? (
           <div className="text-center py-12">
-            <Bell className="w-16 h-16 mx-auto mb-4 text-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
-            <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+            <Bell className="w-16 h-16 mx-auto mb-4 text-[var(--text-subtle)]" />
+            <p className="text-body text-[var(--text-muted)]">
               {filter === 'unread' ? 'No unread notifications' :
                filter === 'read' ? 'No read notifications' :
                'No notifications yet'}
@@ -157,7 +157,7 @@ export function NotificationList({
                 <div
                   className={cn(
                     'w-10 h-10 rounded-input flex items-center justify-center flex-shrink-0',
-                    !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
+                    !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                   )}
                 >
                   {Icon}
@@ -170,18 +170,18 @@ export function NotificationList({
                     )}>
                       {notification.title}
                     </h4>
-                    <time className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] whitespace-nowrap">
+                    <time className="text-xs text-[var(--text-subtle)] whitespace-nowrap">
                       {formatDateTime(notification.createdAt)}
                     </time>
                   </div>
                   <p className={cn(
                     'text-sm truncate',
-                    !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]'
+                    !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[var(--text-subtle)]'
                   )}>
                     {notification.message}
                   </p>
                   {isExpanded && notification.data && (
-                    <div className="mt-2 p-2 bg-[var(--light)] rounded-input text-xs text-[color-mix(in_srgb,var(--ink)_60%,transparent)] font-mono">
+                    <div className="mt-2 p-2 bg-[var(--light)] rounded-input text-xs text-[var(--text-muted)] font-mono">
                       <pre>{JSON.stringify(notification.data, null, 2)}</pre>
                     </div>
                   )}
@@ -289,8 +289,8 @@ export function NotificationBellDropdown({
 
           <div className="max-h-96 overflow-y-auto">
             {recentNotifications.length === 0 ? (
-              <div className="p-8 text-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
-                <Bell className="w-12 h-12 mx-auto mb-3 text-[color-mix(in_srgb,var(--ink)_20%,transparent)]" />
+              <div className="p-8 text-center text-[var(--text-subtle)]">
+                <Bell className="w-12 h-12 mx-auto mb-3 text-[var(--text-subtle)]" />
                 <p className="text-body">No notifications yet</p>
               </div>
             ) : (
@@ -322,11 +322,11 @@ export function NotificationBellDropdown({
                         <h4 className={cn('font-medium text-sm truncate', !notification.isRead ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]')}>
                           {notification.title}
                         </h4>
-                        <time className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] whitespace-nowrap">
+                        <time className="text-xs text-[var(--text-subtle)] whitespace-nowrap">
                           {formatDateTime(notification.createdAt)}
                         </time>
                       </div>
-                      <p className={cn('text-xs truncate', !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[color-mix(in_srgb,var(--ink)_50%,transparent)]')}>
+                      <p className={cn('text-xs truncate', !notification.isRead ? 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)]' : 'text-[var(--text-subtle)]')}>
                         {notification.message}
                       </p>
                     </div>

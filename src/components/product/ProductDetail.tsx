@@ -225,7 +225,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <span className="font-display text-4xl text-primary">{finalPrice.toLocaleString()} BDT</span>
             {hasDiscount && (
               <>
-                <span className="text-xl text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
+                <span className="text-xl text-[var(--text-subtle)] line-through">{product.compareAtPrice!.toLocaleString()} BDT</span>
                 <Badge variant="error" size="md">-{discountPercent}%</Badge>
               </>
             )}
@@ -236,7 +236,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Tax Info */}
           {product.taxPercent > 0 && (
-            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+            <p className="text-sm text-[var(--text-muted)]">
               Price includes {product.isTaxInclusive ? '' : 'excludes '}tax ({product.taxPercent}%)
             </p>
           )}
@@ -319,7 +319,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   </Button>
                 </div>
                 {matchingQtyConfig && (
-                  <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{matchingQtyConfig.label}</span>
+                  <span className="text-sm text-[var(--text-muted)]">{matchingQtyConfig.label}</span>
                 )}
               </div>
             </fieldset>
@@ -427,21 +427,21 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <Truck className="w-6 h-6 text-primary flex-shrink-0" />
               <div>
                 <p className="font-medium text-sm text-[var(--ink)]">Free Delivery</p>
-                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">On orders over 2000 BDT</p>
+                <p className="text-xs text-[var(--text-subtle)]">On orders over 2000 BDT</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
               <RotateCcw className="w-6 h-6 text-primary flex-shrink-0" />
               <div>
                 <p className="font-medium text-sm text-[var(--ink)]">Easy Returns</p>
-                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">30-day return policy</p>
+                <p className="text-xs text-[var(--text-subtle)]">30-day return policy</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-white rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
               <Shield className="w-6 h-6 text-primary flex-shrink-0" />
               <div>
                 <p className="font-medium text-sm text-[var(--ink)]">Secure Payment</p>
-                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">COD & Bank Transfer</p>
+                <p className="text-xs text-[var(--text-subtle)]">COD & Bank Transfer</p>
               </div>
             </div>
           </div>
@@ -457,35 +457,35 @@ export function ProductDetail({ product }: ProductDetailProps) {
         </TabsList>
 
         <TabsContent value="description" className="prose prose-dark max-w-none">
-          {product.description || <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">No description available.</p>}
+          {product.description || <p className="text-[var(--text-muted)]">No description available.</p>}
         </TabsContent>
 
         <TabsContent value="specifications" className="space-y-4">
           <dl className="grid sm:grid-cols-2 gap-4">
             <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Base Price</dt>
+              <dt className="text-sm text-[var(--text-subtle)]">Base Price</dt>
               <dd className="font-display text-xl text-primary">{product.basePrice.toLocaleString()} BDT</dd>
             </div>
             <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Tax</dt>
+              <dt className="text-sm text-[var(--text-subtle)]">Tax</dt>
               <dd className="font-display text-xl text-primary">{product.taxPercent}%</dd>
             </div>
             <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Dimensions Available</dt>
+              <dt className="text-sm text-[var(--text-subtle)]">Dimensions Available</dt>
               <dd className="font-display text-xl text-primary">{product.allowedDimensions.length}</dd>
             </div>
             <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Quantity Tiers</dt>
+              <dt className="text-sm text-[var(--text-subtle)]">Quantity Tiers</dt>
               <dd className="font-display text-xl text-primary">{product.allowedQuantities.length}</dd>
             </div>
             <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Inventory</dt>
+              <dt className="text-sm text-[var(--text-subtle)]">Inventory</dt>
               <dd className="font-display text-xl text-primary">
                 {product.trackInventory ? product.stock : 'Not tracked'}
               </dd>
             </div>
             <div className="bg-white rounded-input p-4 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-              <dt className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Status</dt>
+              <dt className="text-sm text-[var(--text-subtle)]">Status</dt>
               <dd className="font-display text-xl text-primary">{product.isActive ? 'Active' : 'Inactive'}</dd>
             </div>
           </dl>
@@ -493,7 +493,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
         <TabsContent value="reviews">
           <div className="text-center py-12">
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Reviews coming soon...</p>
+            <p className="text-[var(--text-muted)]">Reviews coming soon...</p>
           </div>
         </TabsContent>
       </Tabs>

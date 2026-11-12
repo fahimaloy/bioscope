@@ -229,7 +229,7 @@ export default function OrderDetailPage() {
     <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
       <DoodleBackground shapeCount={3} />
       <div className="max-w-5xl mx-auto">
-        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-primary mb-4">
+        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-primary mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to orders
         </Link>
 
@@ -251,7 +251,7 @@ export default function OrderDetailPage() {
             <Card variant="doodle" padding="lg" className="relative">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-display text-lg text-primary">Items</h2>
-                <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{order.items.length} item(s)</span>
+                <span className="text-sm text-[var(--text-subtle)]">{order.items.length} item(s)</span>
               </div>
               <div className="space-y-3">
                 {order.items.map((item) => (
@@ -268,14 +268,14 @@ export default function OrderDetailPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
+                        <div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-[var(--ink)] truncate group-hover:text-primary transition-colors">{item.productName}</p>
-                      <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+                      <p className="text-sm text-[var(--text-muted)]">
                         {item.width} × {item.height} cm · Qty {item.quantity} × {formatCurrency(Number(item.unitPrice))}
                       </p>
                     </div>
@@ -330,7 +330,7 @@ export default function OrderDetailPage() {
                               <span className="font-medium text-body text-[var(--ink)]">
                                 {stepConfig?.label || ORDER_STATUS_LABELS[entry.status as keyof typeof ORDER_STATUS_LABELS] || entry.status}
                               </span>
-                              <time className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] whitespace-nowrap">
+                              <time className="text-sm text-[var(--text-subtle)] whitespace-nowrap">
                                 {new Date(entry.timestamp).toLocaleString()}
                               </time>
                               {isCurrent && !isCancelled && (
@@ -344,10 +344,10 @@ export default function OrderDetailPage() {
                               )}
                             </div>
                             {entry.note && (
-                              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{entry.note}</p>
+                              <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
                             )}
                             {entry.updatedBy && (
-                              <p className="text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)] mt-1">Updated by {entry.updatedBy}</p>
+                              <p className="text-xs text-[var(--text-subtle)] mt-1">Updated by {entry.updatedBy}</p>
                             )}
                           </div>
                         </div>
@@ -365,15 +365,15 @@ export default function OrderDetailPage() {
               <h2 className="font-display text-lg text-primary mb-4">Summary</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Subtotal</span>
+                  <span className="text-[var(--text-muted)]">Subtotal</span>
                   <span>{formatCurrency(Number(order.subtotal))}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Tax</span>
+                  <span className="text-[var(--text-muted)]">Tax</span>
                   <span>{formatCurrency(Number(order.taxAmount))}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Delivery</span>
+                  <span className="text-[var(--text-muted)]">Delivery</span>
                   <span>{formatCurrency(Number(order.deliveryCharge))}</span>
                 </div>
                 {Number(order.discountAmount) > 0 && (
@@ -387,7 +387,7 @@ export default function OrderDetailPage() {
                   <span>{formatCurrency(Number(order.total))}</span>
                 </div>
               </div>
-              <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-3">Placed {formatDateTime(order.createdAt)}</p>
+              <p className="text-xs text-[var(--text-subtle)] mt-3">Placed {formatDateTime(order.createdAt)}</p>
             </Card>
 
             {/* Shipping Card */}
@@ -396,11 +396,11 @@ export default function OrderDetailPage() {
                 <MapPin className="w-4 h-4" /> Shipping
               </h2>
               <p className="text-sm text-[var(--ink)]">{order.shippingName} · {order.shippingPhone}</p>
-              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+              <p className="text-sm text-[var(--text-muted)]">
                 {order.shippingAddress}, {order.shippingCity}, {order.shippingDivision} {order.shippingPostalCode}
               </p>
               {order.trackingNumber && (
-                <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2 flex items-center gap-1">
+                <p className="text-sm text-[var(--text-muted)] mt-2 flex items-center gap-1">
                   <Truck className="w-4 h-4" /> {order.trackingNumber}
                 </p>
               )}

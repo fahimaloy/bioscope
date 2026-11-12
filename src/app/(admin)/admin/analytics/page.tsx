@@ -149,7 +149,7 @@ export default function AnalyticsPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Analytics</h1>
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Track your store performance with detailed insights</p>
+            <p className="text-[var(--text-muted)]">Track your store performance with detailed insights</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">Live Data</Badge>
@@ -246,7 +246,7 @@ export default function AnalyticsPage() {
                     formatter={(value: number) => [formatNumber(value), 'Orders']}
                     labelFormatter={(date) => date}
                     itemStyle={{ color: 'var(--secondary)', fontWeight: 800, fontFamily: 'var(--font-display)' }}
-                    labelStyle={{ color: 'color-mix(in srgb, var(--ink) 60%, transparent)', fontSize: '12px' }}
+                    labelStyle={{ color: 'var(--text-muted)', fontSize: '12px' }}
                     wrapperStyle={{ outline: 'none' }}
                   />
                   <Area
@@ -289,7 +289,7 @@ export default function AnalyticsPage() {
               </ResponsiveContainer>
             </div>
             <div className="flex items-center justify-between mt-4 pt-4 border-t border-[var(--light)]">
-              <div className="flex items-center gap-4 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+              <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
                 <span className="flex items-center gap-1">
                   <span className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--secondary)' }} />
                   Orders
@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
                 <p className="font-display text-lg text-[var(--ink)]">
                   {formatNumber(monthly[monthly.length - 1]?.orders ?? 0)}
                 </p>
-                <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">This Month</p>
+                <p className="text-xs text-[var(--text-subtle)]">This Month</p>
               </div>
             </div>
           </Card>
@@ -314,7 +314,7 @@ export default function AnalyticsPage() {
               {topProducts.length === 0 ? (
                 <div className="text-center py-12">
                   <DoodleShape size="lg" color="primary" animation="float" className="mx-auto opacity-30 mb-4" />
-                  <p className="text-body text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">No order data yet.</p>
+                  <p className="text-body text-[var(--text-subtle)]">No order data yet.</p>
                 </div>
               ) : (
                 topProducts.map((product, index) => (
@@ -333,11 +333,11 @@ export default function AnalyticsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-body text-[var(--ink)] truncate">{product.name}</p>
-                      <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{formatNumber(product.sales)} units sold</p>
+                      <p className="text-sm text-[var(--text-subtle)]">{formatNumber(product.sales)} units sold</p>
                     </div>
                     <div className="text-right">
                       <p className="font-display text-primary">{formatCurrency(product.revenue)}</p>
-                      <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Revenue</p>
+                      <p className="text-xs text-[var(--text-subtle)]">Revenue</p>
                     </div>
                   </motion.div>
                 ))
@@ -389,7 +389,7 @@ export default function AnalyticsPage() {
                     }}
                     formatter={(value: number) => [formatCurrency(value), 'Revenue']}
                     itemStyle={{ color: 'var(--primary)', fontWeight: 800, fontFamily: 'var(--font-display)' }}
-                    labelStyle={{ color: 'color-mix(in srgb, var(--ink) 60%, transparent)', fontSize: '12px' }}
+                    labelStyle={{ color: 'var(--text-muted)', fontSize: '12px' }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -436,7 +436,7 @@ export default function AnalyticsPage() {
                       <td colSpan={5} className="px-4 py-16 text-center">
                         <div className="flex flex-col items-center gap-4">
                           <DoodleShape size="lg" color="primary" animation="float" className="opacity-30" />
-                          <p className="text-body text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">No customer data yet.</p>
+                          <p className="text-body text-[var(--text-subtle)]">No customer data yet.</p>
                         </div>
                       </td>
                     </tr>
@@ -457,7 +457,7 @@ export default function AnalyticsPage() {
                         <td className="px-4 py-3">
                           <div>
                             <p className="font-medium text-body text-[var(--ink)]">{customer.name}</p>
-                            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{customer.email}</p>
+                            <p className="text-sm text-[var(--text-subtle)]">{customer.email}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">

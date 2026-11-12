@@ -60,7 +60,7 @@ const columns = [
         </div>
         <div>
           <p className="font-medium text-body text-[var(--ink)]">{row.name ?? '—'}</p>
-          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] truncate max-w-xs">{row.email}</p>
+          <p className="text-sm text-[var(--text-subtle)] truncate max-w-xs">{row.email}</p>
         </div>
       </div>
     ), 
@@ -103,14 +103,14 @@ const columns = [
     key: 'status', 
     header: 'Latest Order', 
     width: '140px',
-    accessor: (row: any) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">—</span>,
+    accessor: (row: any) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[var(--text-subtle)]">—</span>,
   },
   { 
     key: 'joined', 
     header: 'Joined', 
     width: '140px',
     accessor: (row: any) => (
-      <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{formatDate(row.createdAt)}</span>
+      <span className="text-sm text-[var(--text-muted)]">{formatDate(row.createdAt)}</span>
     ), 
     sortable: true 
   },
@@ -162,7 +162,7 @@ export default function CustomersPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Customers</h1>
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Manage and analyze your customer base</p>
+            <p className="text-[var(--text-muted)]">Manage and analyze your customer base</p>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">{pager.total} Total</Badge>
@@ -220,7 +220,7 @@ export default function CustomersPage() {
             <StickerPeel />
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1 min-w-[250px] max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
                 <input
                   type="text"
                   placeholder="Search name, email, phone..."

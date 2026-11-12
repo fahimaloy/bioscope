@@ -63,7 +63,7 @@ export default function SettingsPage() {
         >
           <div>
             <h1 className="font-display text-3xl text-primary">Settings</h1>
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Configure your store settings</p>
+            <p className="text-[var(--text-muted)]">Configure your store settings</p>
           </div>
           <div className="flex items-center gap-3">
             {saved && (

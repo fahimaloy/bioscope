@@ -92,7 +92,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
       >
         <div>
           <h2 className="font-display text-2xl text-primary">Settings</h2>
-          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Configure your store settings</p>
+          <p className="text-[var(--text-muted)]">Configure your store settings</p>
         </div>
         <div className="flex gap-3">
           {saved && (

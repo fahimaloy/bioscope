@@ -193,16 +193,16 @@ function ExpandedRowContent({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[var(--ink)] truncate">{item.productName}</p>
-                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+                  <p className="text-sm text-[var(--text-subtle)]">
                     {item.width}″ × {item.height}″ • Qty: {item.quantity}
                   </p>
                   {item.customization && (
-                    <p className="text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)] mt-1">Custom: {JSON.stringify(item.customization).slice(0, 50)}...</p>
+                    <p className="text-xs text-[var(--text-subtle)] mt-1">Custom: {JSON.stringify(item.customization).slice(0, 50)}...</p>
                   )}
                 </div>
                 <div className="text-right">
                   <p className="font-display text-primary">{formatCurrency(Number(item.unitPrice))}</p>
-                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{formatCurrency(Number(item.totalPrice))} total</p>
+                  <p className="text-sm text-[var(--text-muted)]">{formatCurrency(Number(item.totalPrice))} total</p>
                 </div>
               </div>
             ))}
@@ -251,12 +251,12 @@ function ExpandedRowContent({
                       >
                         {ORDER_STATUS_LABELS[entry.status]}
                       </Badge>
-                      <time className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+                      <time className="text-sm text-[var(--text-subtle)]">
                         {formatDateTime(entry.timestamp)}
                       </time>
                     </div>
                     {entry.note && (
-                      <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{entry.note}</p>
+                      <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
                     )}
                   </div>
                 </div>
@@ -274,19 +274,19 @@ function ExpandedRowContent({
               <div className="space-y-2 text-sm">
                 {order.trackingNumber && (
                   <div className="flex justify-between">
-                    <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Tracking Number</span>
+                    <span className="text-[var(--text-muted)]">Tracking Number</span>
                     <span className="font-mono font-medium text-[var(--ink)]">{order.trackingNumber}</span>
                   </div>
                 )}
                 {order.shippedAt && (
                   <div className="flex justify-between">
-                    <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Shipped</span>
+                    <span className="text-[var(--text-muted)]">Shipped</span>
                     <span className="text-[var(--ink)]">{formatDateTime(order.shippedAt)}</span>
                   </div>
                 )}
                 {order.deliveredAt && (
                   <div className="flex justify-between">
-                    <span className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Delivered</span>
+                    <span className="text-[var(--text-muted)]">Delivered</span>
                     <span className="text-[var(--ink)]">{formatDateTime(order.deliveredAt)}</span>
                   </div>
                 )}
@@ -505,7 +505,7 @@ export default function AdminOrdersPage() {
         <div onClick={() => handleRowClick(row.id)} className="cursor-pointer">
           <span className="font-medium text-[var(--ink)]">{row.user?.name ?? 'Guest'}</span>
           <br />
-          <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{row.user?.email}</span>
+          <span className="text-sm text-[var(--text-subtle)]">{row.user?.email}</span>
         </div>
       ),
     },
@@ -557,7 +557,7 @@ export default function AdminOrdersPage() {
       key: 'createdAt',
       header: 'Date',
       accessor: (row: Order) => (
-        <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] whitespace-nowrap">{formatDate(row.createdAt)}</span>
+        <span className="text-sm text-[var(--text-muted)] whitespace-nowrap">{formatDate(row.createdAt)}</span>
       ),
       sortable: true,
       width: '140px',
@@ -574,7 +574,7 @@ export default function AdminOrdersPage() {
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleRowClick(row.id) }}
-              className="p-2 rounded-input text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary hover:bg-[var(--light)] transition-colors"
+              className="p-2 rounded-input text-[var(--text-subtle)] hover:text-primary hover:bg-[var(--light)] transition-colors"
               aria-label="Expand row"
             >
               {expandedRow === row.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -592,14 +592,14 @@ export default function AdminOrdersPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Orders</h1>
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Manage and track all orders</p>
+            <p className="text-[var(--text-muted)]">Manage and track all orders</p>
           </div>
         </div>
 
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
               <label htmlFor="order-search" className="sr-only">Search orders</label>
               <input
                 id="order-search"

@@ -127,7 +127,7 @@ export default function AboutPage() {
                       duration={2000}
                       className="text-4xl font-display text-primary mb-2"
                     >
-                      <p className="font-black text-uppercase text-sm mt-1 text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{stat.label}</p>
+                      <p className="font-black text-uppercase text-sm mt-1 text-[var(--text-muted)]">{stat.label}</p>
                     </CounterAnimation>
                   </Card>
                 </motion.div>
@@ -252,7 +252,7 @@ export default function AboutPage() {
               <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
                 Meet Our Team
               </span>
-              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2">The people behind the stickers</p>
+              <p className="text-[var(--text-muted)] mt-2">The people behind the stickers</p>
             </motion.div>
 
             <motion.div
@@ -272,7 +272,7 @@ export default function AboutPage() {
                     </div>
                     <h3 className="font-display text-lg text-[var(--ink)] mb-1">{member.name}</h3>
                     <p className="text-primary text-sm mb-2">{member.role}</p>
-                    <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] text-sm">{member.bio}</p>
+                    <p className="text-[var(--text-muted)] text-sm">{member.bio}</p>
                   </Card>
                 </motion.div>
               ))}
@@ -336,7 +336,7 @@ export default function AboutPage() {
             className="relative z-10"
           >
             <h2 className="font-display text-3xl md:text-4xl text-primary mb-6">Ready to Create?</h2>
-            <p className="text-xl text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-8 max-w-xl mx-auto">
+            <p className="text-xl text-[var(--text-muted)] mb-8 max-w-xl mx-auto">
               Join thousands of happy customers who trust us for their custom sticker needs.
             </p>
             <div className="flex flex-wrap justify-center gap-4">

@@ -31,7 +31,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-display text-xl text-primary">Live Preview</h3>
-          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">See how your product will appear to customers</p>
+          <p className="text-[var(--text-muted)]">See how your product will appear to customers</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant={product.isActive ? 'success' : 'error'} size="sm">
@@ -58,7 +58,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                   priority
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
+                <div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">
                   <ImageIcon className="w-20 h-20" />
                 </div>
               )}
@@ -94,7 +94,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
               </span>
               {product.compareAtPrice && product.compareAtPrice > ((product.basePrice ?? 0) || 0) && (
                 <>
-                  <span className="text-xl text-[color-mix(in_srgb,var(--ink)_40%,transparent)] line-through">{(product.compareAtPrice as number).toLocaleString()} BDT</span>
+                  <span className="text-xl text-[var(--text-subtle)] line-through">{(product.compareAtPrice as number).toLocaleString()} BDT</span>
                   <Badge variant="error" size="sm">-{Math.round(((product.compareAtPrice! - ((product.basePrice ?? 0) || 0)) / product.compareAtPrice!) * 100)}%</Badge>
                 </>
               )}
@@ -102,7 +102,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
 
             {/* Tax Info */}
             {(product.taxPercent || 0) > 0 && (
-              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] flex items-center gap-1">
+              <p className="text-sm text-[var(--text-muted)] flex items-center gap-1">
                 <Settings className="w-4 h-4" />
                 {(product as any).isTaxInclusive ? 'Price includes' : 'Plus'} {(product as any).taxPercent}% tax
               </p>
@@ -156,7 +156,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                 <div className="space-y-2">
                   {product.customizationOptions.materials?.length && (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Materials:</span>
+                      <span className="text-sm text-[var(--text-muted)]">Materials:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.materials.map((m: string) => (
                           <Badge key={m} variant="outline" size="sm">{m}</Badge>
@@ -166,7 +166,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                   )}
                   {product.customizationOptions.finishes?.length && (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Finishes:</span>
+                      <span className="text-sm text-[var(--text-muted)]">Finishes:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.finishes.map((f: string) => (
                           <Badge key={f} variant="outline" size="sm">{f}</Badge>
@@ -176,7 +176,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                   )}
                   {product.customizationOptions.cutTypes?.length && (
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Cut Types:</span>
+                      <span className="text-sm text-[var(--text-muted)]">Cut Types:</span>
                       <div className="flex flex-wrap gap-1">
                         {product.customizationOptions.cutTypes.map((c: string) => (
                           <Badge key={c} variant="outline" size="sm">{c}</Badge>
@@ -193,7 +193,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
               <div className="pt-4 border-t border-[color-mix(in_srgb,var(--ink)_20%,transparent)] flex items-center justify-between">
                 <div>
                   <p className="font-medium text-body text-[var(--ink)]">Inventory</p>
-                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+                  <p className="text-sm text-[var(--text-muted)]">
                     {product.stock || 0} in stock {product.lowStockThreshold && `(low at ${product.lowStockThreshold})`}
                   </p>
                 </div>
@@ -225,12 +225,12 @@ export function CompactProductPreview({ product }: { product: Partial<Product> }
         {product.images?.[0] ? (
           <Image src={product.images[0]} alt={product.name as string} fill className="object-cover" sizes="64px" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">🏷️</div>
+          <div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">🏷️</div>
         )}
       </div>
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-body text-[var(--ink)] truncate">{product.name || 'Unnamed Product'}</h4>
-        <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{(product as any).category?.name || 'No category'}</p>
+        <p className="text-sm text-[var(--text-subtle)]">{(product as any).category?.name || 'No category'}</p>
       </div>
       <div className="text-right">
         <p className="font-display text-primary">{((product.basePrice ?? 0) || 0).toLocaleString()} BDT</p>

@@ -206,11 +206,11 @@ export function UploadZone({
           </>
         ) : (
           <>
-            <Upload className="w-16 h-16 text-[color-mix(in_srgb,var(--ink)_30%,transparent)] mx-auto mb-4" />
-            <p className="text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-2">
+            <Upload className="w-16 h-16 text-[var(--text-subtle)] mx-auto mb-4" />
+            <p className="text-body text-[var(--text-muted)] mb-2">
               {multiple ? 'Drag & drop images here, or click to select' : 'Drag & drop an image here, or click to select'}
             </p>
-            <p className="text-sm text-[color-mix(in_srgb,var(--ink)_40%,transparent)] mb-4">
+            <p className="text-sm text-[var(--text-subtle)] mb-4">
               {multiple ? `Up to ${maxFiles} files` : 'Single file'} • Max {maxSize}MB • {acceptedTypes}
             </p>
             <Button variant="secondary" size="sm" disabled={disabled || uploading}>
@@ -230,10 +230,10 @@ export function UploadZone({
 
       {/* Paste Support */}
       <div className="mt-4 text-center">
-        <kbd className="px-2 py-1 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_60%,transparent)] rounded border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] font-mono">
+        <kbd className="px-2 py-1 text-xs bg-[var(--light)] text-[var(--text-muted)] rounded border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] font-mono">
           Ctrl + V
         </kbd>{' '}
-        <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">to paste image from clipboard</span>
+        <span className="text-sm text-[var(--text-subtle)]">to paste image from clipboard</span>
       </div>
     </div>
   )
@@ -322,7 +322,7 @@ export function CompactUploadZone({
             input.click()
           }}
         >
-          <span className="text-2xl text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">+</span>
+          <span className="text-2xl text-[var(--text-subtle)]">+</span>
         </div>
       )}
     </div>

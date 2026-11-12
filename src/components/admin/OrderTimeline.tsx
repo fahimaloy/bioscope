@@ -97,7 +97,7 @@ export function OrderTimeline({ order, className }: OrderTimelineProps) {
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-display text-xl text-primary">Order Timeline</h3>
-        <div className="flex items-center gap-2 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+        <div className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
           <span className="font-medium">Current Status:</span>
           <span className="font-display text-primary">{statusLabels[order.status] || order.status}</span>
         </div>
@@ -126,15 +126,15 @@ export function OrderTimeline({ order, className }: OrderTimelineProps) {
               <div className="flex-1 pt-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-medium text-body text-[var(--ink)]">{statusLabels[entry.status] || entry.status}</span>
-                  <time className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+                  <time className="text-sm text-[var(--text-subtle)]">
                     {new Date(entry.timestamp).toLocaleString()}
                   </time>
                 </div>
                 {entry.note && (
-                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{entry.note}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{entry.note}</p>
                 )}
                 {entry.updatedBy && (
-                  <p className="text-xs text-[color-mix(in_srgb,var(--ink)_40%,transparent)]">Updated by {entry.updatedBy}</p>
+                  <p className="text-xs text-[var(--text-subtle)]">Updated by {entry.updatedBy}</p>
                 )}
               </div>
             </div>
@@ -224,7 +224,7 @@ export function OrderStatusProgress({ currentStatus }: { currentStatus: string }
             <div className="relative">
               <div className={cn(
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all',
-                isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-primary/10 text-primary border-2 border-primary' : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_40%,transparent)]'
+                isCompleted ? 'bg-primary text-white' : isCurrent ? 'bg-primary/10 text-primary border-2 border-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
               )}>
                 {isCompleted ? '✓' : isCurrent ? (index + 1) : ''}
               </div>
@@ -236,7 +236,7 @@ export function OrderStatusProgress({ currentStatus }: { currentStatus: string }
             </div>
             <div className={cn(
               'text-center min-w-[70px]',
-              index <= currentIndex ? 'text-[var(--ink)]' : 'text-[color-mix(in_srgb,var(--ink)_40%,transparent)]'
+              index <= currentIndex ? 'text-[var(--ink)]' : 'text-[var(--text-subtle)]'
             )}>
               <p className="text-xs font-medium truncate">{step.label}</p>
             </div>

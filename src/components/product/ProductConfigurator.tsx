@@ -58,7 +58,7 @@ export function ProductConfigurator({
           <span className="text-3xl font-display text-primary">{totalPrice.toLocaleString()} BDT</span>
         </div>
         {product.taxPercent > 0 && (
-          <div className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2">
+          <div className="text-sm text-[var(--text-muted)] mt-2">
             Tax ({product.taxPercent}%): {(totalPrice * product.taxPercent / 100).toFixed(2)} BDT
           </div>
         )}
@@ -165,7 +165,7 @@ export function ProductConfigurator({
 
         {/* Price per unit indicator */}
         {product.allowedQuantities.length > 1 && (
-          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+          <p className="text-sm text-[var(--text-muted)]">
             Price per unit: <span className="font-medium text-primary">{unitPrice.toLocaleString()} BDT</span>
           </p>
         )}

@@ -141,8 +141,8 @@ export default function OrdersPage() {
           </div>
         ) : orders.length === 0 ? (
           <Card className="p-10 text-center">
-            <Package className="w-10 h-10 mx-auto text-[color-mix(in_srgb,var(--ink)_30%,transparent)] mb-3" />
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-4">No orders yet.</p>
+            <Package className="w-10 h-10 mx-auto text-[var(--text-subtle)] mb-3" />
+            <p className="text-[var(--text-muted)] mb-4">No orders yet.</p>
             <Link href="/shop">
               <Button variant="primary">Start Shopping</Button>
             </Link>
@@ -180,7 +180,7 @@ export default function OrdersPage() {
                               {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status}
                             </Badge>
                           </div>
-                          <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] mt-1">{formatDate(order.createdAt)}</p>
+                          <p className="text-sm text-[var(--text-subtle)] mt-1">{formatDate(order.createdAt)}</p>
                           <div className="mt-2 space-y-1">
                             {order.items.slice(0, 3).map((item, i) => (
                               <p key={i} className="text-sm text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
@@ -188,7 +188,7 @@ export default function OrdersPage() {
                               </p>
                             ))}
                             {order.items.length > 3 && (
-                              <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">+{order.items.length - 3} more items</p>
+                              <p className="text-sm text-[var(--text-subtle)]">+{order.items.length - 3} more items</p>
                             )}
                           </div>
                         </div>
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                               <span className="font-medium text-[var(--ink)]">Items ({order.items.length})</span>
                               <button
                                 onClick={(e) => { e.stopPropagation(); toggleExpand(order.id) }}
-                                className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] hover:text-primary flex items-center gap-1"
+                                className="text-sm text-[var(--text-muted)] hover:text-primary flex items-center gap-1"
                               >
                                 <ChevronUp className="w-4 h-4" /> Collapse
                               </button>
@@ -255,14 +255,14 @@ export default function OrdersPage() {
                                         className="w-full h-full object-cover"
                                       />
                                     ) : (
-                                      <div className="w-full h-full flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_30%,transparent)]">
+                                      <div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">
                                         <Package className="w-6 h-6" />
                                       </div>
                                     )}
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <p className="font-medium text-sm text-[var(--ink)] truncate">{item.productName}</p>
-                                    <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">
+                                    <p className="text-xs text-[var(--text-subtle)]">
                                       {item.width}×{item.height} cm × {item.quantity}
                                     </p>
                                   </div>
@@ -279,7 +279,7 @@ export default function OrdersPage() {
                       {/* Expand/Collapse trigger at bottom */}
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleExpand(order.id) }}
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-8 flex items-center justify-center text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-8 flex items-center justify-center text-[var(--text-subtle)] hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
                         aria-expanded={isExpanded}
                         aria-controls={`order-items-${order.id}`}
                       >

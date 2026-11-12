@@ -172,7 +172,7 @@ export default function CustomRequestsPage() {
         <div>
           <span className="font-medium text-[var(--ink)]">{row.user?.name ?? '—'}</span>
           <br />
-          <span className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{row.user?.email}</span>
+          <span className="text-sm text-[var(--text-subtle)]">{row.user?.email}</span>
         </div>
       ),
     },
@@ -219,7 +219,7 @@ export default function CustomRequestsPage() {
             size="sm"
             onClick={() => handleImageClick(row.imageUrl, row.originalName)}
             aria-label="View design"
-            className="text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary"
+            className="text-[var(--text-subtle)] hover:text-primary"
           >
             <Eye className="w-4 h-4" />
           </Button>
@@ -268,7 +268,7 @@ export default function CustomRequestsPage() {
               size="sm"
               onClick={() => handlePriceClick(row)}
               aria-label="Edit price"
-              className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:text-primary"
+              className="text-xs text-[var(--text-subtle)] hover:text-primary"
             >
               <Edit2 className="w-4 h-4" />
             </Button>
@@ -284,14 +284,14 @@ export default function CustomRequestsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Custom Requests</h1>
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Review and manage custom sticker requests</p>
+            <p className="text-[var(--text-muted)]">Review and manage custom sticker requests</p>
           </div>
         </div>
 
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
               <input
                 type="text"
                 placeholder="Search requests..."
@@ -348,7 +348,7 @@ export default function CustomRequestsPage() {
             alt={imageModalAlt}
             className="max-w-full max-h-[70vh] mx-auto rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]"
           />
-          <p className="mt-4 text-body text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{imageModalAlt}</p>
+          <p className="mt-4 text-body text-[var(--text-muted)]">{imageModalAlt}</p>
         </div>
       </Modal>
 

@@ -127,7 +127,7 @@ function RegisterForm() {
 
         <div className="text-center mb-8 relative z-10">
           <h1 className="font-display text-3xl md:text-4xl text-primary">Create Account</h1>
-          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2 text-body">Join us and start creating custom stickers</p>
+          <p className="text-[var(--text-muted)] mt-2 text-body">Join us and start creating custom stickers</p>
         </div>
 
         {/* Error alert with doodle styling - shake on appear, slide out on dismiss */}
@@ -149,7 +149,7 @@ function RegisterForm() {
             <button
               type="button"
               onClick={dismissError}
-              className="flex-shrink-0 p-1 text-[color-mix(in_srgb,var(--error)_70%,transparent)] hover:text-[var(--error)] transition-colors rounded-full hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
+              className="flex-shrink-0 p-1 text-[var(--text-muted)] hover:text-[var(--error)] transition-colors rounded-full hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
               aria-label="Dismiss error"
             >
               <X className="w-4 h-4" />
@@ -209,7 +209,7 @@ function RegisterForm() {
             {password && (
               <div className="space-y-1.5" role="progressbar" aria-valuenow={passwordStrength.score} aria-valuemin={0} aria-valuemax={5} aria-label="Password strength">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">Password strength</span>
+                  <span className="text-xs text-[var(--text-subtle)]">Password strength</span>
                   <span className="text-xs font-medium" style={{ color: `var(--${passwordStrength.color})` }}>
                     {passwordStrength.label}
                   </span>
@@ -276,7 +276,7 @@ function RegisterForm() {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+          <p className="text-[var(--text-muted)]">
             Already have an account?{' '}
             <Link href="/login" className="text-primary font-medium">
               <SketchUnderline>Sign in</SketchUnderline>

@@ -135,7 +135,7 @@ export default function ContactPage() {
           <h1 className="font-display text-4xl md:text-5xl text-primary mb-4 relative">
             <span className="sketch-underline">Contact Us</span>
           </h1>
-          <p className="text-xl text-[color-mix(in_srgb,var(--ink)_60%,transparent)] max-w-2xl mx-auto">
+          <p className="text-xl text-[var(--text-muted)] max-w-2xl mx-auto">
             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </motion.div>
@@ -166,7 +166,7 @@ export default function ContactPage() {
                   <a href={item.href} className="block text-[color-mix(in_srgb,var(--ink)_70%,transparent)] text-center font-medium mb-2 hover:text-primary transition-colors">
                     {item.value}
                   </a>
-                  <p className="text-sm text-[color-mix(in_srgb,var(--ink)_50%,transparent)] text-center">{item.desc}</p>
+                  <p className="text-sm text-[var(--text-subtle)] text-center">{item.desc}</p>
                 </Card>
               </motion.div>
             ))}
@@ -411,7 +411,7 @@ export default function ContactPage() {
               <span className="sketch-underline font-display text-3xl md:text-4xl text-primary">
                 Frequently Asked Questions
               </span>
-              <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mt-2">Quick answers to common questions</p>
+              <p className="text-[var(--text-muted)] mt-2">Quick answers to common questions</p>
             </div>
             <div className="max-w-3xl mx-auto space-y-4">
               {faqs.map((faq, index) => (

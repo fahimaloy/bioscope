@@ -37,7 +37,7 @@ export default function CartPage() {
             <DoodleShape size="lg" color="secondary" animation="float" className="absolute -top-10 -right-10 opacity-20" style={{ animationDelay: '1s' }} />
             <DoodleShape size="md" color="accent" animation="wobble" className="absolute -bottom-10 -left-10 opacity-20" style={{ animationDelay: '0.5s' }} />
             <div className="relative z-10 w-32 h-32 mx-auto mb-6 bg-[var(--light)] rounded-full flex items-center justify-center shadow-card">
-              <ShoppingCart className="w-16 h-16 text-[color-mix(in_srgb,var(--ink)_30%,transparent)]" />
+              <ShoppingCart className="w-16 h-16 text-[var(--text-subtle)]" />
             </div>
           </motion.div>
           <motion.h1
@@ -52,7 +52,7 @@ export default function CartPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-8 text-lg"
+            className="text-[var(--text-muted)] mb-8 text-lg"
           >
             Looks like you haven't added any stickers yet.
           </motion.p>
@@ -83,7 +83,7 @@ export default function CartPage() {
         >
           <div>
             <h1 className="font-display text-3xl md:text-4xl text-primary">Shopping Cart</h1>
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">{items.length} item{items.length !== 1 ? 's' : ''} in your cart</p>
+            <p className="text-[var(--text-muted)]">{items.length} item{items.length !== 1 ? 's' : ''} in your cart</p>
           </div>
           {items.length > 0 && (
             <Button variant="ghost" onClick={clearCart} className="text-red-500 hover:bg-red-50">

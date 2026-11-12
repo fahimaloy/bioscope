@@ -42,6 +42,15 @@ environment, so the contract lives here and every task brief references it.
 
 - `--on-brand` maps to `#FFFFFF` and is used **only** against `--pink-strong`.
 - Every `--on-<accent>` pair is asserted in `tests/unit/design-tokens.test.ts`.
+- **Text colour comes from the three text roles, never from an ad-hoc opacity.**
+  `--text` (`--ink`, 15.31:1 on `--paper`) for body, `--text-muted`
+  (`--ink-soft`, 9.73:1) for secondary, `--text-subtle` (`--ink-muted`, 4.72:1)
+  for tertiary. Ad-hoc `--ink` opacity is banned for text because the legacy
+  ladder renders below AA once it actually compiles: `/50` = 3.21:1 (108
+  sites), `/60` = 4.34:1 (133), `/40` = 2.44:1 (29), `/30` = 1.90:1 (16),
+  `/20` = 1.51:1 (10). Opacity is still valid for **borders and backgrounds**,
+  where AA text contrast does not apply — those use the `color-mix` form.
+  (Owner decision 2026-11-10; Task 1.7 fix round 2.)
 
 ## 3. Decor discipline
 

@@ -112,7 +112,7 @@ export function DimensionSelector({
               disabled={disabled}
             >
               <span className="block font-display">{dim.label}</span>
-              <div className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+              <div className="text-sm text-[var(--text-muted)]">
                 {dim.width} × {dim.height} cm
               </div>
               {dim.priceMultiplier !== 1 && (
@@ -173,7 +173,7 @@ export function DimensionSelector({
             size="md"
             className={cn(
               'px-4 py-3 rounded-input font-medium transition-all min-w-[110px]',
-              'border-dashed border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] hover:border-primary hover:bg-[var(--light)]'
+              'border-dashed border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--text-subtle)] hover:border-primary hover:bg-[var(--light)]'
             )}
             onClick={() => setExpanded(true)}
             disabled={disabled}
@@ -210,7 +210,7 @@ export function DimensionDisplay({
         </span>
       ))}
       {remaining > 0 && (
-        <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_50%,transparent)] rounded-full">
+        <span className="px-2 py-0.5 text-xs bg-[var(--light)] text-[var(--text-subtle)] rounded-full">
           +{remaining} more
         </span>
       )}

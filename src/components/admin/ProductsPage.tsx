@@ -148,7 +148,7 @@ export default function ProductsPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl text-primary">Products</h1>
-            <p className="text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">Manage your product catalog</p>
+            <p className="text-[var(--text-muted)]">Manage your product catalog</p>
           </div>
           <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
             <Plus className="w-4 h-4 mr-2" />
@@ -159,7 +159,7 @@ export default function ProductsPage() {
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--ink)_40%,transparent)]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
               <label htmlFor="product-search" className="sr-only">Search products</label>
               <input
                 id="product-search"

@@ -96,7 +96,7 @@ export function CheckoutOrderSummary({
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-[var(--ink)] truncate">{item.productName}</p>
-              <p className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)]">{item.width} × {item.height} cm • Qty: {item.quantity}</p>
+              <p className="text-xs text-[var(--text-subtle)]">{item.width} × {item.height} cm • Qty: {item.quantity}</p>
             </div>
             <span className="font-display text-primary whitespace-nowrap">{formatCurrency(item.unitPrice * item.quantity)}</span>
           </motion.div>
@@ -133,7 +133,7 @@ export function CheckoutOrderSummary({
             initial={{ opacity: 0, scaleY: 0 }}
             animate={{ opacity: 1, scaleY: 1 }}
             style={{ transformOrigin: 'top' }}
-            className="text-xs text-[color-mix(in_srgb,var(--ink)_50%,transparent)] text-center bg-[color-mix(in_srgb,var(--accent)_50%,transparent)] rounded-input p-2 border border-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
+            className="text-xs text-[var(--text-subtle)] text-center bg-[color-mix(in_srgb,var(--accent)_50%,transparent)] rounded-input p-2 border border-[color-mix(in_srgb,var(--accent)_30%,transparent)]"
           >
             Add {formatCurrency(deliveryRemaining)} more for free delivery!
           </motion.p>

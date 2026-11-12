@@ -127,7 +127,7 @@ export function QuantitySelector({
 
       {/* Price per unit display */}
       {selectedConfig && quantityConfigs.length > 1 && (
-        <span className="text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)]">
+        <span className="text-sm text-[var(--text-muted)]">
           {selectedConfig.pricePerUnit.toLocaleString()} BDT/unit
         </span>
       )}

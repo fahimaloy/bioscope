@@ -40,7 +40,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   return (
     <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <nav className="flex items-center gap-2 text-sm text-[color-mix(in_srgb,var(--ink)_60%,transparent)] mb-6">
+        <nav className="flex items-center gap-2 text-sm text-[var(--text-muted)] mb-6">
           <Link href="/" className="hover:text-primary">Home</Link>
           <span>/</span>
           <Link href="/shop" className="hover:text-primary">Shop</Link>
