@@ -177,11 +177,17 @@ export default function CheckoutPage() {
     )
   }
 
-  // Calculate totals
-  const taxAmount = settings?.globalTaxPercent ? (subtotal * settings.globalTaxPercent) / 100 : 0
-  const deliveryCharge = settings?.deliveryEnabled && subtotal < (settings?.freeDeliveryThreshold || 2000)
-    ? (settings?.insideDhakaCharge || 60)
-    : 0
+  // Calculate totals. `getSettings()` returns a flat map keyed by the database
+  // key (snake_case); `parseSettingValue` already returns numbers for NUMBER and
+  // booleans for BOOLEAN, so coerce defensively and keep the original defaults.
+  const taxPercent = Number(settings?.global_tax_percent) || 0
+  const taxAmount = taxPercent ? (subtotal * taxPercent) / 100 : 0
+  const freeDeliveryThreshold = Number(settings?.free_delivery_threshold) || 2000
+  const insideDhakaCharge = Number(settings?.delivery_inside_dhaka_charge) || 60
+  const deliveryCharge =
+    settings?.delivery_enabled === true && subtotal < freeDeliveryThreshold
+      ? insideDhakaCharge
+      : 0
   const total = subtotal + taxAmount + deliveryCharge
 
   const renderStep = () => {

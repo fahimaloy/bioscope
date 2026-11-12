@@ -205,12 +205,18 @@ function makeOrder(overrides: Partial<Order> = {}): Order {
   }
 }
 
-/** The settings the checkout page reads (`getSettings`). */
+/**
+ * The settings `getSettings()` actually returns: a flat map keyed by the
+ * database key (snake_case), with NUMBER values parsed to numbers and BOOLEAN
+ * values to booleans (`parseSettingValue`). Mocking the camelCase shape the
+ * page used to read would hide a regression to the wrong keys, so this must
+ * mirror the action's payload exactly.
+ */
 const SETTINGS = {
-  globalTaxPercent: 5,
-  deliveryEnabled: true,
-  freeDeliveryThreshold: 2000,
-  insideDhakaCharge: 60,
+  global_tax_percent: 5,
+  delivery_enabled: true,
+  free_delivery_threshold: 2000,
+  delivery_inside_dhaka_charge: 60,
 }
 
 /** An authenticated user with one saved address. */
@@ -342,21 +348,40 @@ describe('Checkout page', () => {
     )
   })
 
-  it('passes the settings-driven tax through to the summary', async () => {
+  it('computes tax and delivery from the snake_case settings getSettings returns', async () => {
     mockUseAuth.mockReturnValue(authenticatedUser())
-    mockGetSettings.mockResolvedValue({ ...SETTINGS, globalTaxPercent: 5 })
+    mockGetSettings.mockResolvedValue(SETTINGS)
     useCartStore
       .getState()
-      .setItems([makeCartItem(makeProduct('pskull', 'Skull Sticker', 200))])
+      .setItems([makeCartItem(makeProduct('pskull', 'Skull Sticker', 200), { quantity: 2 })])
 
     renderWithProviders(<CheckoutPage />)
 
-    // 5% of 200 = 10. The page must read `globalTaxPercent` from `getSettings`,
-    // not a hardcoded rate.
+    // Subtotal 400: 5% tax = 20; below the 2000 threshold, delivery = 60.
+    // A regression to the camelCase keys would render Tax 0 / Delivery Free.
     await waitFor(() => {
-      expect(summaryRowText('Tax')).toContain(formatCurrency(10))
+      expect(summaryRowText('Tax')).toContain(formatCurrency(20))
     })
-    expect(summaryRowText('Tax')).not.toContain(formatCurrency(20))
+    expect(summaryRowText('Tax')).not.toContain(formatCurrency(0))
+    expect(summaryRowText('Delivery')).toContain(formatCurrency(60))
+    expect(summaryRowText('Total')).toContain(formatCurrency(480))
+  })
+
+  it('renders Delivery Free at or above the free-delivery threshold', async () => {
+    mockUseAuth.mockReturnValue(authenticatedUser())
+    mockGetSettings.mockResolvedValue(SETTINGS)
+    useCartStore
+      .getState()
+      .setItems([makeCartItem(makeProduct('pskull', 'Skull Sticker', 200), { quantity: 10 })])
+
+    renderWithProviders(<CheckoutPage />)
+
+    // Subtotal 2000: 5% tax = 100; at the threshold, delivery is free.
+    await waitFor(() => {
+      expect(summaryRowText('Delivery')).toContain('Free')
+    })
+    expect(summaryRowText('Tax')).toContain(formatCurrency(100))
+    expect(summaryRowText('Total')).toContain(formatCurrency(2100))
   })
 
   it('links the sign-in card to /login?callbackUrl=/checkout', () => {
