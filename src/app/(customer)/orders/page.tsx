@@ -6,15 +6,13 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Badge, StatusBadge } from '@/components/ui/Badge'
+import { StatusBadge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, CUSTOMER_CANCELLABLE } from '@/lib/order-status'
-import { Eye, Package, Truck, ChevronDown, ChevronUp } from 'lucide-react'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
+import { Eye, Package, ChevronDown, ChevronUp } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { motionVariants } from '@/lib/motion'
 
 interface OrderListItem {
   id: string
@@ -34,31 +32,6 @@ interface OrderListItem {
 }
 
 const TABS = ['all', ...Object.keys(ORDER_STATUS_LABELS)] as const
-
-// Status to doodle variant mapping for badges
-const STATUS_DOT_COLOR: Record<string, string> = {
-  PENDING: 'var(--warning)',
-  CONFIRMED: 'var(--info)',
-  PROCESSING: 'var(--primary)',
-  PRINTING: 'var(--primary)',
-  READY_TO_SHIP: 'var(--secondary)',
-  SHIPPED: 'var(--secondary)',
-  DELIVERED: 'var(--success)',
-  CANCELLED: 'var(--error)',
-  REFUNDED: 'var(--error)',
-}
-
-const STATUS_BADGE_VARIANT: Record<string, 'accent' | 'primary' | 'secondary' | 'success' | 'error'> = {
-  PENDING: 'accent',
-  CONFIRMED: 'primary',
-  PROCESSING: 'primary',
-  PRINTING: 'primary',
-  READY_TO_SHIP: 'secondary',
-  SHIPPED: 'secondary',
-  DELIVERED: 'success',
-  CANCELLED: 'error',
-  REFUNDED: 'error',
-}
 
 export default function OrdersPage() {
   const router = useRouter()
@@ -111,10 +84,9 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      <DoodleBackground shapeCount={3} />
+    <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
       <div className="max-w-5xl mx-auto">
-        <h1 className="font-display text-3xl text-primary mb-6">My Orders</h1>
+        <h1 className="font-display text-3xl text-[var(--brand)] mb-6">My Orders</h1>
 
         <div className="flex flex-wrap gap-2 mb-6">
           {TABS.map((t) => (
@@ -122,10 +94,10 @@ export default function OrdersPage() {
               key={t}
               onClick={() => { setStatus(t); setPage(1) }}
               className={
-                'px-3 py-1.5 rounded-input text-sm font-medium transition-all border ' +
+                'rounded-[var(--radius-md)] border px-3 py-1.5 text-sm font-medium transition-all ' +
                 (status === t
-                  ? 'bg-primary text-white border-primary shadow-btn'
-                  : 'bg-white text-[color-mix(in_srgb,var(--ink)_70%,transparent)] border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:bg-[var(--light)]')
+                  ? 'bg-[var(--brand)] text-[var(--text)] border-[var(--brand)] shadow-ink-2'
+                  : 'bg-[var(--surface-raised)] text-[var(--text-muted)] border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:bg-[var(--paper-deep)]')
               }
             >
               {t === 'all' ? 'All' : ORDER_STATUS_LABELS[t as keyof typeof ORDER_STATUS_LABELS] ?? t}
@@ -136,7 +108,7 @@ export default function OrdersPage() {
         {loading ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-28 w-full rounded-card" />
+              <Skeleton key={i} className="h-28 w-full rounded-[var(--radius-lg)]" />
             ))}
           </div>
         ) : orders.length === 0 ? (
@@ -151,8 +123,6 @@ export default function OrdersPage() {
           <div className="space-y-4">
             {orders.map((order) => {
               const isExpanded = expandedOrderId === order.id
-              const badgeVariant = STATUS_BADGE_VARIANT[order.status] || 'default'
-              const dotColor = STATUS_DOT_COLOR[order.status] || 'var(--ink)'
 
               return (
                 <motion.div
@@ -176,14 +146,12 @@ export default function OrdersPage() {
                             <span className="font-display text-lg text-[var(--ink)]">
                               {order.orderNumber}
                             </span>
-                            <Badge variant={badgeVariant} size="sm" dot dotColor={dotColor}>
-                              {ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status}
-                            </Badge>
+                            <StatusBadge status={order.status} size="sm" />
                           </div>
                           <p className="text-sm text-[var(--text-subtle)] mt-1">{formatDate(order.createdAt)}</p>
                           <div className="mt-2 space-y-1">
                             {order.items.slice(0, 3).map((item, i) => (
-                              <p key={i} className="text-sm text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
+                              <p key={i} className="text-sm text-[var(--text-muted)]">
                                 {item.productName} — {item.width}×{item.height} cm × {item.quantity}
                               </p>
                             ))}
@@ -193,7 +161,7 @@ export default function OrdersPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-3 flex-wrap">
-                          <p className="font-display text-xl text-primary whitespace-nowrap">
+                          <p className="font-display text-xl text-[var(--brand)] whitespace-nowrap">
                             {formatCurrency(Number(order.total))}
                           </p>
                           <div className="flex items-center gap-2">
@@ -234,7 +202,7 @@ export default function OrdersPage() {
                               <span className="font-medium text-[var(--ink)]">Items ({order.items.length})</span>
                               <button
                                 onClick={(e) => { e.stopPropagation(); toggleExpand(order.id) }}
-                                className="text-sm text-[var(--text-subtle)] hover:text-primary flex items-center gap-1"
+                                className="text-sm text-[var(--text-subtle)] hover:text-[var(--brand)] flex items-center gap-1"
                               >
                                 <ChevronUp className="w-4 h-4" /> Collapse
                               </button>
@@ -245,9 +213,9 @@ export default function OrdersPage() {
                                   key={index}
                                   href={`/shop/${item.productSlug}`}
                                   onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center gap-3 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] rounded-input border border-[color-mix(in_srgb,var(--ink)_10%,transparent)] hover:border-primary/30 hover:bg-[var(--light)] transition-all"
+                                  className="flex items-center gap-3 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--ink)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--brand)_30%,transparent)] hover:bg-[var(--paper-deep)] transition-all"
                                 >
-                                  <div className="w-12 h-12 rounded-input overflow-hidden flex-shrink-0 bg-white">
+                                  <div className="w-12 h-12 rounded-[var(--radius-md)] overflow-hidden flex-shrink-0 bg-[var(--surface-raised)]">
                                     {item.productImage ? (
                                       <img
                                         src={item.productImage}
@@ -266,7 +234,7 @@ export default function OrdersPage() {
                                       {item.width}×{item.height} cm × {item.quantity}
                                     </p>
                                   </div>
-                                  <span className="font-display text-primary text-sm">
+                                  <span className="font-display text-[var(--brand)] text-sm">
                                     {formatCurrency(Number(item.unitPrice) * item.quantity)}
                                   </span>
                                 </Link>
@@ -279,7 +247,7 @@ export default function OrdersPage() {
                       {/* Expand/Collapse trigger at bottom */}
                       <button
                         onClick={(e) => { e.stopPropagation(); toggleExpand(order.id) }}
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-8 flex items-center justify-center text-[var(--text-subtle)] hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-8 flex items-center justify-center text-[var(--text-subtle)] hover:text-[var(--brand)] transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
                         aria-expanded={isExpanded}
                         aria-controls={`order-items-${order.id}`}
                       >

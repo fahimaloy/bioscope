@@ -6,15 +6,13 @@ import { useParams, useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { Badge, StatusBadge } from '@/components/ui/Badge'
+import { StatusBadge } from '@/components/ui/Badge'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, CUSTOMER_CANCELLABLE, type OrderStatus } from '@/lib/order-status'
-import { ArrowLeft, Truck, MapPin, CreditCard, RotateCcw, Download, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { motionVariants } from '@/lib/motion'
+import { ArrowLeft, Truck, MapPin, CreditCard, RotateCcw, Download, MessageCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 
 interface Order {
   id: string
@@ -53,37 +51,16 @@ interface Order {
 }
 
 const STATUS_STEPS = [
-  { key: 'PENDING', label: 'Order Placed', icon: 'Clock', description: 'Your order has been received' },
-  { key: 'CONFIRMED', label: 'Confirmed', icon: 'CheckCircle', description: 'Order confirmed by our team' },
-  { key: 'PROCESSING', label: 'Processing', icon: 'Loader2', description: 'Preparing your stickers for production' },
-  { key: 'PRINTING', label: 'Printing', icon: 'Package', description: 'Stickers are being printed' },
-  { key: 'READY_TO_SHIP', label: 'Ready to Ship', icon: 'Package', description: 'Printing complete, ready for dispatch' },
-  { key: 'SHIPPED', label: 'Shipped', icon: 'Truck', description: 'Order dispatched for delivery' },
-  { key: 'DELIVERED', label: 'Delivered', icon: 'CheckCircle', description: 'Order delivered to you' },
+  { key: 'PENDING', label: 'Order Placed', description: 'Your order has been received' },
+  { key: 'CONFIRMED', label: 'Confirmed', description: 'Order confirmed by our team' },
+  { key: 'PROCESSING', label: 'Processing', description: 'Preparing your stickers for production' },
+  { key: 'PRINTING', label: 'Printing', description: 'Stickers are being printed' },
+  { key: 'READY_TO_SHIP', label: 'Ready to Ship', description: 'Printing complete, ready for dispatch' },
+  { key: 'SHIPPED', label: 'Shipped', description: 'Order dispatched for delivery' },
+  { key: 'DELIVERED', label: 'Delivered', description: 'Order delivered to you' },
 ] as const
 
 const CANCELLED_STEPS = ['CANCELLED', 'REFUNDED']
-
-const STATUS_ICONS: Record<string, any> = {
-  PENDING: 'Clock',
-  CONFIRMED: 'CheckCircle',
-  PROCESSING: 'Loader2',
-  PRINTING: 'Package',
-  READY_TO_SHIP: 'Package',
-  SHIPPED: 'Truck',
-  DELIVERED: 'CheckCircle',
-  CANCELLED: 'AlertCircle',
-  REFUNDED: 'AlertCircle',
-}
-
-const ICON_COMPONENTS: Record<string, any> = {
-  Clock: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
-  CheckCircle: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
-  Loader2: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>,
-  Package: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
-  Truck: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="5" cy="18" r="2"/></svg>,
-  AlertCircle: (props: any) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-}
 
 export default function OrderDetailPage() {
   const params = useParams<{ id: string }>()
@@ -98,7 +75,10 @@ export default function OrderDetailPage() {
       if (res.status === 401) return router.push('/login?callbackUrl=/orders')
       if (res.status === 404) return router.push('/orders')
       const json = await res.json()
-      if (res.ok) setOrder(json.data)
+      // `GET /api/orders/[id]` answers `ok({ order })`, so the order is one
+      // level down. Reading `json.data` here set the wrapper object as the
+      // order and the page crashed on `order.items`.
+      if (res.ok) setOrder(json.data.order)
       else toast.error(json.error || 'Failed to load order')
     } finally {
       setLoading(false)
@@ -122,12 +102,11 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-        <DoodleBackground shapeCount={3} />
+      <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
         <div className="max-w-5xl mx-auto space-y-4">
           <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-48 w-full rounded-card" />
-          <Skeleton className="h-40 w-full rounded-card" />
+          <Skeleton className="h-48 w-full rounded-[var(--radius-lg)]" />
+          <Skeleton className="h-40 w-full rounded-[var(--radius-lg)]" />
         </div>
       </div>
     )
@@ -222,20 +201,18 @@ export default function OrderDetailPage() {
   }
 
   const history = buildHistory()
-  const currentStepIndex = STATUS_STEPS.findIndex(s => s.key === order.status)
   const isCancelled = CANCELLED_STEPS.includes(order.status)
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      <DoodleBackground shapeCount={3} />
+    <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
       <div className="max-w-5xl mx-auto">
-        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[var(--text-subtle)] hover:text-primary mb-4">
+        <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[var(--text-subtle)] hover:text-[var(--brand)] mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to orders
         </Link>
 
         <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
           <div className="flex items-center gap-3">
-            <h1 className="font-display text-3xl text-primary">{order.orderNumber}</h1>
+            <h1 className="font-display text-3xl text-[var(--brand)]">{order.orderNumber}</h1>
             <StatusBadge status={order.status as OrderStatus} size="md" />
           </div>
           {CUSTOMER_CANCELLABLE.includes(order.status as OrderStatus) && (
@@ -250,7 +227,7 @@ export default function OrderDetailPage() {
             {/* Items Card */}
             <Card variant="doodle" padding="lg" className="relative">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="font-display text-lg text-primary">Items</h2>
+                <h2 className="font-display text-lg text-[var(--brand)]">Items</h2>
                 <span className="text-sm text-[var(--text-subtle)]">{order.items.length} item(s)</span>
               </div>
               <div className="space-y-3">
@@ -258,9 +235,9 @@ export default function OrderDetailPage() {
                   <Link
                     key={item.id}
                     href={`/shop/${item.productSlug}`}
-                    className="flex items-center gap-4 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] rounded-input border border-[color-mix(in_srgb,var(--ink)_10%,transparent)] hover:border-primary/30 hover:bg-[var(--light)] transition-all group"
+                    className="flex items-center gap-4 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--ink)_10%,transparent)] hover:border-[color-mix(in_srgb,var(--brand)_30%,transparent)] hover:bg-[var(--paper-deep)] transition-all group"
                   >
-                    <div className="w-14 h-14 rounded-input overflow-hidden flex-shrink-0 bg-white">
+                    <div className="w-14 h-14 rounded-[var(--radius-md)] overflow-hidden flex-shrink-0 bg-[var(--surface-raised)]">
                       {item.productImage ? (
                         <img
                           src={item.productImage}
@@ -274,95 +251,77 @@ export default function OrderDetailPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-[var(--ink)] truncate group-hover:text-primary transition-colors">{item.productName}</p>
+                      <p className="font-medium text-[var(--ink)] truncate group-hover:text-[var(--brand)] transition-colors">{item.productName}</p>
                       <p className="text-sm text-[var(--text-subtle)]">
                         {item.width} × {item.height} cm · Qty {item.quantity} × {formatCurrency(Number(item.unitPrice))}
                       </p>
                     </div>
-                    <p className="font-display text-primary">{formatCurrency(Number(item.totalPrice))}</p>
+                    <p className="font-display text-[var(--brand)]">{formatCurrency(Number(item.totalPrice))}</p>
                   </Link>
                 ))}
               </div>
             </Card>
 
-            {/* Timeline Card */}
+            {/* Timeline Card — Ruling 6: a vertical dashed connector with ink dots.
+                The history array above is unchanged; only its presentation is. */}
             <Card variant="doodle" padding="lg" className="relative">
-              <h2 className="font-display text-lg text-primary mb-6">Timeline</h2>
-              
-              <div className="relative">
-                {/* Vertical connector line */}
-                <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-[var(--border)]" />
-                
-                <div className="space-y-6">
-                  {history.map((entry, index) => {
-                    const isLast = index === history.length - 1
-                    const isCurrent = entry.status === order.status
-                    const IconComponent = ICON_COMPONENTS[STATUS_ICONS[entry.status]] || ICON_COMPONENTS.Clock
-                    const stepConfig = STATUS_STEPS.find(s => s.key === entry.status)
-                    
-                    return (
-                      <motion.div
-                        key={entry.status}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <div className="relative flex gap-4 pl-12">
-                          {/* Timeline dot and connector */}
-                          <div className="relative flex-shrink-0">
-                            <div className={cn(
-                              'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium z-10 border-3 border-[var(--surface-raised)]',
-                              isCurrent
-                                ? 'bg-primary text-white shadow-[0_0_0_4px_var(--primary)]'
-                                : entry.status === 'DELIVERED'
-                                ? 'bg-success text-white'
-                                : CANCELLED_STEPS.includes(entry.status)
-                                ? 'bg-error text-white'
-                                : 'bg-primary text-white'
-                            )}>
-                              <IconComponent className="w-5 h-5" />
-                            </div>
-                          </div>
-                          
-                          {/* Timeline content */}
-                          <div className="flex-1 pt-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-body text-[var(--ink)]">
-                                {stepConfig?.label || ORDER_STATUS_LABELS[entry.status as keyof typeof ORDER_STATUS_LABELS] || entry.status}
-                              </span>
-                              <time className="text-sm text-[var(--text-subtle)] whitespace-nowrap">
-                                {new Date(entry.timestamp).toLocaleString()}
-                              </time>
-                              {isCurrent && !isCancelled && (
-                                <motion.span
-                                  className="ml-2 px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full"
-                                  animate={{ opacity: [1, 0.5, 1] }}
-                                  transition={{ duration: 2, repeat: Infinity }}
-                                >
-                                  Current
-                                </motion.span>
-                              )}
-                            </div>
-                            {entry.note && (
-                              <p className="text-sm text-[var(--text-subtle)]">{entry.note}</p>
-                            )}
-                            {entry.updatedBy && (
-                              <p className="text-xs text-[var(--text-subtle)] mt-1">Updated by {entry.updatedBy}</p>
-                            )}
-                          </div>
+              <h2 className="font-display text-lg text-[var(--brand)] mb-6">Timeline</h2>
+
+              <ol className="relative">
+                {history.map((entry, index) => {
+                  const isLast = index === history.length - 1
+                  const isCurrent = entry.status === order.status
+                  const stepConfig = STATUS_STEPS.find(s => s.key === entry.status)
+
+                  return (
+                    <motion.li
+                      key={entry.status}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="relative flex gap-4 pb-6 last:pb-0"
+                    >
+                      {!isLast && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute left-3 top-4 bottom-0 w-0 -translate-x-1/2 border-l-2 border-dashed border-[color-mix(in_srgb,var(--ink)_30%,transparent)]"
+                        />
+                      )}
+                      <div className="relative w-6 flex-shrink-0">
+                        <span className="absolute left-1/2 top-1 block h-3 w-3 -translate-x-1/2 rounded-full bg-[var(--ink)]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-[var(--text)]">
+                            {stepConfig?.label || ORDER_STATUS_LABELS[entry.status as keyof typeof ORDER_STATUS_LABELS] || entry.status}
+                          </span>
+                          <time className="text-sm text-[var(--text-subtle)] whitespace-nowrap">
+                            {new Date(entry.timestamp).toLocaleString()}
+                          </time>
+                          {isCurrent && !isCancelled && (
+                            <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-[color-mix(in_srgb,var(--brand)_10%,transparent)] text-[var(--brand)] rounded-full">
+                              Current
+                            </span>
+                          )}
                         </div>
-                      </motion.div>
-                    )
-                  })}
-                </div>
-              </div>
+                        {entry.note && (
+                          <p className="text-sm text-[var(--text-subtle)]">{entry.note}</p>
+                        )}
+                        {entry.updatedBy && (
+                          <p className="text-xs text-[var(--text-subtle)] mt-1">Updated by {entry.updatedBy}</p>
+                        )}
+                      </div>
+                    </motion.li>
+                  )
+                })}
+              </ol>
             </Card>
           </div>
 
           <div className="space-y-6">
             {/* Summary Card */}
             <Card variant="doodle" padding="lg">
-              <h2 className="font-display text-lg text-primary mb-4">Summary</h2>
+              <h2 className="font-display text-lg text-[var(--brand)] mb-4">Summary</h2>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-[var(--text-subtle)]">Subtotal</span>
@@ -377,12 +336,12 @@ export default function OrderDetailPage() {
                   <span>{formatCurrency(Number(order.deliveryCharge))}</span>
                 </div>
                 {Number(order.discountAmount) > 0 && (
-                  <div className="flex justify-between text-success">
+                  <div className="flex justify-between text-[var(--success)]">
                     <span>Discount</span>
                     <span>-{formatCurrency(Number(order.discountAmount))}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-display text-lg text-primary border-t border-[var(--border)] pt-2">
+                <div className="flex justify-between font-display text-lg text-[var(--brand)] border-t border-[var(--border)] pt-2">
                   <span>Total</span>
                   <span>{formatCurrency(Number(order.total))}</span>
                 </div>
@@ -392,7 +351,7 @@ export default function OrderDetailPage() {
 
             {/* Shipping Card */}
             <Card variant="doodle" padding="lg">
-              <h2 className="font-display text-lg text-primary mb-3 flex items-center gap-2">
+              <h2 className="font-display text-lg text-[var(--brand)] mb-3 flex items-center gap-2">
                 <MapPin className="w-4 h-4" /> Shipping
               </h2>
               <p className="text-sm text-[var(--ink)]">{order.shippingName} · {order.shippingPhone}</p>
@@ -408,7 +367,7 @@ export default function OrderDetailPage() {
 
             {/* Payment Card */}
             <Card variant="doodle" padding="lg">
-              <h2 className="font-display text-lg text-primary mb-3 flex items-center gap-2">
+              <h2 className="font-display text-lg text-[var(--brand)] mb-3 flex items-center gap-2">
                 <CreditCard className="w-4 h-4" /> Payment
               </h2>
               <p className="text-sm text-[var(--ink)]">{order.paymentMethod} · {order.paymentStatus}</p>
@@ -416,7 +375,7 @@ export default function OrderDetailPage() {
 
             {/* Actions Card */}
             <Card variant="doodle" padding="lg">
-              <h2 className="font-display text-lg text-primary mb-4">Actions</h2>
+              <h2 className="font-display text-lg text-[var(--brand)] mb-4">Actions</h2>
               <div className="space-y-3">
                 <Button
                   variant="primary"
