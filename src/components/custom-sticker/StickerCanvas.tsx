@@ -5,7 +5,9 @@ import { fabric } from 'fabric'
 import { cn } from '@/lib/utils'
 import type { StickerDesign, DesignLayer, MaterialType, FinishType, CutType } from '@/types'
 import { useStickerBuilderStore } from '@/lib/hooks/useStickerBuilder'
-import { StickerPeel } from '@/components/decorative/DoodleElements'
+import { StickerPeel } from '@/components/decorative'
+import { Home } from 'lucide-react'
+import { resolveHex, resolveCanvasFill } from './resolveHex'
 
 interface StickerCanvasProps {
   ref?: any
@@ -21,11 +23,73 @@ interface StickerCanvasProps {
   className?: string
 }
 
+/**
+ * The font picker offers semantic names; `next/font` registers the families
+ * under hashed names (`__Outfit_<hash>`). A canvas 2D context can resolve
+ * neither a CSS custom property nor a family that was never registered with
+ * the `FontFace` API, so every non-system option silently fell back — the
+ * default included. `resolveFontFamily` maps the semantic name through the
+ * `--font-*` custom properties to the family actually loaded.
+ */
+const FONT_TOKENS: Record<string, string> = {
+  Outfit: '--font-body',
+  Shrikhand: '--font-display',
+  Caveat: '--font-hand',
+}
+
+/** Resolved family → the semantic picker name it came from. */
+const RESOLVED_FONT_NAMES = new Map<string, string>()
+
+export function resolveFontFamily(name: string): string {
+  const token = FONT_TOKENS[name]
+  if (!token || typeof window === 'undefined') return name
+
+  const declared = window
+    .getComputedStyle(window.document.documentElement)
+    .getPropertyValue(token)
+    .trim()
+  if (!declared) return name
+
+  const families = declared
+    .split(',')
+    .map((family) => family.trim().replace(/^['"]|['"]$/g, ''))
+    .filter(Boolean)
+  if (families.length === 0) return name
+
+  // Prefer a family that is actually registered with the FontFace API: the
+  // `next/font` `@font-face` rule lands in `document.fonts` once parsed, and
+  // that is the only set a canvas 2D context can resolve.
+  const faceSet = (window.document as Document & { fonts?: FontFaceSet }).fonts
+  if (faceSet) {
+    const loaded = families.find((family) =>
+      Array.from(faceSet as unknown as Iterable<FontFace>).some((face) => face.family === family),
+    )
+    if (loaded) {
+      RESOLVED_FONT_NAMES.set(loaded, name)
+      return loaded
+    }
+  }
+
+  const [first] = families
+  RESOLVED_FONT_NAMES.set(first, name)
+  return first
+}
+
+/**
+ * The picker-facing name for a family string read back off a fabric object.
+ * Without this, `handleObjectModified` would write the resolved
+ * `__Outfit_<hash>` back into the layer and the picker would show the hash.
+ */
+export function semanticFontName(family: string | undefined): string | undefined {
+  if (!family) return family
+  return RESOLVED_FONT_NAMES.get(family) ?? family
+}
+
 export function StickerCanvas({
   ref: externalRef,
   width,
   height,
-  backgroundColor = '#FFFFFF',
+  backgroundColor = 'var(--die-cut)',
   grid = true,
   rulers = true,
   onSelectionChange,
@@ -45,6 +109,9 @@ export function StickerCanvas({
     selectLayer,
   } = useStickerBuilderStore()
 
+  // `backgroundColor` may be a token; fabric needs a real colour.
+  const resolvedBackgroundColor = resolveHex(backgroundColor) ?? backgroundColor
+
   // Initialize Fabric canvas
   useEffect(() => {
     if (!canvasRef.current || fabricRef.current) return
@@ -52,7 +119,7 @@ export function StickerCanvas({
     const canvas = new fabric.Canvas(canvasRef.current, {
       width: containerSize.width || width * 2,
       height: containerSize.height || height * 2,
-      backgroundColor,
+      backgroundColor: resolvedBackgroundColor,
       selection: true,
       preserveObjectStacking: true,
       renderOnAddRemove: true,
@@ -66,7 +133,7 @@ export function StickerCanvas({
         if (!ctx) return
 
         ctx.save()
-        ctx.strokeStyle = '#E0E0E0'
+        ctx.strokeStyle = 'color-mix(in srgb, var(--ink) 12%, transparent)'
         ctx.lineWidth = 0.5
 
         const cw = canvas.getWidth() ?? 0
@@ -142,7 +209,7 @@ export function StickerCanvas({
   const loadDesign = (canvas: fabric.Canvas) => {
     // Clear canvas
     canvas.clear()
-    canvas.backgroundColor = backgroundColor
+    canvas.backgroundColor = resolvedBackgroundColor
     canvas.renderAll()
 
     // Set canvas size based on design
@@ -199,10 +266,10 @@ export function StickerCanvas({
             left: layer.x,
             top: layer.y,
             fontSize: layer.fontSize || 40,
-            fontFamily: layer.fontFamily || 'Outfit',
+            fontFamily: resolveFontFamily(layer.fontFamily || 'Outfit'),
             fontWeight: layer.fontWeight || 'normal',
             fontStyle: (layer.fontStyle || 'normal') as any,
-            fill: layer.textColor || '#000000',
+            fill: resolveCanvasFill(layer.textColor, 'var(--ink)'),
             textAlign: layer.textAlign || 'left',
             lineHeight: layer.lineHeight || 1.2,
             charSpacing: layer.letterSpacing || 0,
@@ -274,7 +341,7 @@ export function StickerCanvas({
     if (obj.type === 'textbox' || obj.type === 'i-text') {
       updates.text = obj.text
       updates.fontSize = obj.fontSize
-      updates.fontFamily = obj.fontFamily
+      updates.fontFamily = semanticFontName(obj.fontFamily)
       updates.fontWeight = obj.fontWeight
       updates.fontStyle = obj.fontStyle as any
       updates.fill = obj.fill
@@ -295,14 +362,14 @@ export function StickerCanvas({
         return new fabric.Rect({
           width: size,
           height: size,
-          fill: fill || 'var(--primary)',
+          fill: resolveCanvasFill(fill, 'var(--brand)'),
           stroke: stroke || 'transparent',
           strokeWidth: strokeWidth || 0,
         })
       case 'circle':
         return new fabric.Circle({
           radius: size / 2,
-          fill: fill || 'var(--primary)',
+          fill: resolveCanvasFill(fill, 'var(--brand)'),
           stroke: stroke || 'transparent',
           strokeWidth: strokeWidth || 0,
         })
@@ -310,7 +377,7 @@ export function StickerCanvas({
         return new fabric.Triangle({
           width: size,
           height: size,
-          fill: fill || 'var(--primary)',
+          fill: resolveCanvasFill(fill, 'var(--brand)'),
           stroke: stroke || 'transparent',
           strokeWidth: strokeWidth || 0,
         })
@@ -323,12 +390,10 @@ export function StickerCanvas({
   const drawRulers = useCallback(() => {
     if (!fabricRef.current || !rulers) return
     const canvas = fabricRef.current
-    const ctx = canvas.getContext()
-    if (!ctx) return
-
     const cw = canvas.getWidth() ?? 0
     const ch = canvas.getHeight() ?? 0
     const rulerSize = 30
+    const rulerFont = `10px ${resolveFontFamily('Outfit')}`
 
     // Top ruler
     const topRulerCanvas = document.querySelector('.ruler-top canvas') as HTMLCanvasElement
@@ -336,9 +401,9 @@ export function StickerCanvas({
       const rctx = topRulerCanvas.getContext('2d')
       if (rctx) {
         rctx.clearRect(0, 0, topRulerCanvas.width, topRulerCanvas.height)
-        rctx.fillStyle = 'rgba(255,255,255,0.9)'
+        rctx.fillStyle = 'color-mix(in srgb, var(--die-cut) 90%, transparent)'
         rctx.fillRect(0, 0, topRulerCanvas.width, topRulerCanvas.height)
-        rctx.strokeStyle = 'rgba(51,38,26,0.2)'
+        rctx.strokeStyle = 'color-mix(in srgb, var(--ink) 20%, transparent)'
         rctx.lineWidth = 1
 
         // Draw cm marks
@@ -350,8 +415,8 @@ export function StickerCanvas({
           rctx.lineTo(x, rulerSize)
           rctx.stroke()
           if (cm % 1 === 0) {
-            rctx.font = '10px Outfit'
-            rctx.fillStyle = 'rgba(51,38,26,0.6)'
+            rctx.font = rulerFont
+            rctx.fillStyle = 'color-mix(in srgb, var(--ink) 60%, transparent)'
             rctx.textAlign = 'center'
             rctx.fillText(`${cm}`, x, rulerSize - 12)
           }
@@ -365,9 +430,9 @@ export function StickerCanvas({
       const rctx = leftRulerCanvas.getContext('2d')
       if (rctx) {
         rctx.clearRect(0, 0, leftRulerCanvas.width, leftRulerCanvas.height)
-        rctx.fillStyle = 'rgba(255,255,255,0.9)'
+        rctx.fillStyle = 'color-mix(in srgb, var(--die-cut) 90%, transparent)'
         rctx.fillRect(0, 0, leftRulerCanvas.width, leftRulerCanvas.height)
-        rctx.strokeStyle = 'rgba(51,38,26,0.2)'
+        rctx.strokeStyle = 'color-mix(in srgb, var(--ink) 20%, transparent)'
         rctx.lineWidth = 1
 
         const pxPerCm = ch / (height * 2)
@@ -378,8 +443,8 @@ export function StickerCanvas({
           rctx.lineTo(rulerSize, y)
           rctx.stroke()
           if (cm % 1 === 0) {
-            rctx.font = '10px Outfit'
-            rctx.fillStyle = 'rgba(51,38,26,0.6)'
+            rctx.font = rulerFont
+            rctx.fillStyle = 'color-mix(in srgb, var(--ink) 60%, transparent)'
             rctx.textAlign = 'right'
             rctx.fillText(`${cm}`, rulerSize - 12, y + 3)
           }
@@ -428,23 +493,23 @@ export function StickerCanvas({
   }, [])
 
   return (
-    <div className={cn('relative overflow-hidden bg-[var(--light)] rounded-card', className)}>
+    <div className={cn('relative overflow-hidden bg-[var(--paper-deep)] rounded-[var(--radius-lg)]', className)}>
       {/* Rulers */}
       {rulers && (
         <>
-          <div className="absolute top-0 left-8 w-full h-8 bg-white/90 backdrop-blur-sm border-b border-[color-mix(in_srgb,var(--ink)_20%,transparent)] overflow-hidden ruler-top z-10">
+          <div className="absolute top-0 left-8 w-full h-8 bg-[color-mix(in_srgb,var(--die-cut)_90%,transparent)] backdrop-blur-sm border-b border-[color-mix(in_srgb,var(--ink)_20%,transparent)] overflow-hidden ruler-top z-10">
             <canvas className="w-full h-full" width={width * 2} height={30} />
           </div>
-          <div className="absolute top-8 left-0 w-8 h-full bg-white/90 backdrop-blur-sm border-r border-[color-mix(in_srgb,var(--ink)_20%,transparent)] overflow-hidden ruler-left z-10">
+          <div className="absolute top-8 left-0 w-8 h-full bg-[color-mix(in_srgb,var(--die-cut)_90%,transparent)] backdrop-blur-sm border-r border-[color-mix(in_srgb,var(--ink)_20%,transparent)] overflow-hidden ruler-left z-10">
             <canvas className="w-full h-full" width={30} height={height * 2} />
           </div>
           {/* Corner */}
-          <div className="absolute top-0 left-0 w-8 h-8 bg-white/90 backdrop-blur-sm border-b border-r border-[color-mix(in_srgb,var(--ink)_20%,transparent)] z-20" />
+          <div className="absolute top-0 left-0 w-8 h-8 bg-[color-mix(in_srgb,var(--die-cut)_90%,transparent)] backdrop-blur-sm border-b border-r border-[color-mix(in_srgb,var(--ink)_20%,transparent)] z-20" />
         </>
       )}
 
       {/* Canvas with 3px ink border and StickerPeel corner */}
-      <div className="relative aspect-square border-3 border-[var(--ink)]">
+      <div className="relative aspect-square border-[3px] border-[var(--ink)]">
         <canvas
           ref={(el) => {
             canvasRef.current = el
@@ -458,15 +523,17 @@ export function StickerCanvas({
       </div>
 
       {/* Zoom Controls */}
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-input p-2 shadow-lg z-10">
-        <button onClick={zoomOut} className="p-2 text-[var(--ink)] hover:text-primary transition-colors" aria-label="Zoom out">−</button>
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-[color-mix(in_srgb,var(--die-cut)_90%,transparent)] backdrop-blur-sm rounded-[var(--radius-md)] p-2 shadow-[var(--shadow-ink-2)] z-10">
+        <button onClick={zoomOut} className="p-2 text-[var(--ink)] hover:text-[var(--brand)] transition-colors" aria-label="Zoom out">−</button>
         <span className="px-3 text-sm font-medium text-[var(--ink)]">{Math.round(zoom * 100)}%</span>
-        <button onClick={zoomIn} className="p-2 text-[var(--ink)] hover:text-primary transition-colors" aria-label="Zoom in">+</button>
-        <button onClick={resetZoom} className="p-2 text-[var(--ink)] hover:text-primary transition-colors" aria-label="Reset zoom">⌂</button>
+        <button onClick={zoomIn} className="p-2 text-[var(--ink)] hover:text-[var(--brand)] transition-colors" aria-label="Zoom in">+</button>
+        <button onClick={resetZoom} className="p-2 text-[var(--ink)] hover:text-[var(--brand)] transition-colors" aria-label="Reset zoom">
+          <Home className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Dimensions Display */}
-      <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-input px-3 py-1 text-sm font-medium text-[var(--ink)] z-10">
+      <div className="absolute bottom-4 left-4 bg-[color-mix(in_srgb,var(--die-cut)_90%,transparent)] backdrop-blur-sm rounded-[var(--radius-md)] px-3 py-1 text-sm font-medium text-[var(--ink)] z-10">
         {design.canvas.width} × {design.canvas.height} cm @ {design.canvas.dpi} DPI
       </div>
     </div>
@@ -493,7 +560,7 @@ export function StickerPreview({
     const canvas = new fabric.Canvas(canvasRef.current, {
       width,
       height,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: resolveHex('var(--die-cut)') ?? 'var(--die-cut)',
       selection: false,
       renderOnAddRemove: true,
     })
@@ -538,6 +605,6 @@ export function StickerPreview({
   }, [design])
 
   return (
-    <canvas ref={canvasRef} className={cn('rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]', className)} width={width} height={height} />
+    <canvas ref={canvasRef} className={cn('rounded-[var(--radius-md)] border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]', className)} width={width} height={height} />
   )
 }

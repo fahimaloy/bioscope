@@ -82,10 +82,10 @@ export function DimensionControls({
   const megapixels = (pixelsWidth * pixelsHeight / 1000000).toFixed(1)
 
   return (
-    <div className={cn('bg-white rounded-card border-3 border-[var(--ink)] shadow-card p-6 space-y-6', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-6 space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-xl text-primary">Canvas Dimensions</h3>
+        <h3 className="font-display text-xl text-[var(--brand)]">Canvas Dimensions</h3>
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -99,7 +99,7 @@ export function DimensionControls({
             variant="ghost"
             size="sm"
             onClick={() => onLockAspectRatio(!locked)}
-            className={locked ? 'text-primary' : ''}
+            className={locked ? 'text-[var(--brand)]' : ''}
             aria-label={locked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
           >
             {locked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
@@ -217,18 +217,18 @@ export function DimensionControls({
 
       {/* Preset Sizes */}
       {showPresets && (
-        <div className="border-t border-[var(--light)] pt-4">
-          <h4 className="font-medium text-body text-[var(--ink)] mb-3">Preset Sizes</h4>
+        <div className="border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)] pt-4">
+          <h4 className="font-medium text-[var(--text)] text-[var(--ink)] mb-3">Preset Sizes</h4>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {presetSizes.map((preset) => (
               <button
                 key={`${preset.width}x${preset.height}`}
                 onClick={() => handlePresetSelect(preset)}
                 className={cn(
-                  'p-3 rounded-input border-3 text-center text-sm transition-all',
+                  'p-3 rounded-[var(--radius-md)] border-[3px] text-center text-sm transition-all',
                   width === preset.width && height === preset.height
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
+                    ? 'border-[var(--brand)] bg-[color-mix(in_srgb,var(--brand)_10%,transparent)] text-[var(--brand)]'
+                    : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-[var(--brand)]'
                 )}
               >
                 <span className="font-display">{preset.label}</span>
@@ -242,22 +242,22 @@ export function DimensionControls({
       )}
 
       {/* Info Panel */}
-      <div className="bg-[var(--light)] rounded-input p-4 border-2 border-[var(--ink)]">
+      <div className="bg-[var(--paper-deep)] rounded-[var(--radius-md)] p-4 border-2 border-[var(--ink)]">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-display text-primary">{area}</div>
+            <div className="text-2xl font-display text-[var(--brand)]">{area}</div>
             <div className="text-xs text-[var(--text-subtle)]">Area (cm²)</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-display text-primary">{pixelsWidth.toLocaleString()}</div>
+            <div className="text-2xl font-display text-[var(--brand)]">{pixelsWidth.toLocaleString()}</div>
             <div className="text-xs text-[var(--text-subtle)]">Width (px @ {dpi} DPI)</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-display text-primary">{pixelsHeight.toLocaleString()}</div>
+            <div className="text-2xl font-display text-[var(--brand)]">{pixelsHeight.toLocaleString()}</div>
             <div className="text-xs text-[var(--text-subtle)]">Height (px @ {dpi} DPI)</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-display text-primary">{megapixels}</div>
+            <div className="text-2xl font-display text-[var(--brand)]">{megapixels}</div>
             <div className="text-xs text-[var(--text-subtle)]">Megapixels</div>
           </div>
         </div>
@@ -288,12 +288,12 @@ function getQualityIndicator(dpi: number, width: number, height: number) {
   if (minDimension >= 300) {
     return [
       { label: 'Excellent', variant: 'success' as const, color: 'var(--success)' },
-      { label: '300+ DPI', variant: 'secondary' as const, color: 'var(--secondary)' },
+      { label: '300+ DPI', variant: 'secondary' as const, color: 'var(--teal)' },
     ]
   } else if (minDimension >= 150) {
     return [
-      { label: 'Good', variant: 'primary' as const, color: 'var(--primary)' },
-      { label: '150+ DPI', variant: 'secondary' as const, color: 'var(--secondary)' },
+      { label: 'Good', variant: 'primary' as const, color: 'var(--brand)' },
+      { label: '150+ DPI', variant: 'secondary' as const, color: 'var(--teal)' },
     ]
   } else {
     return [
@@ -333,12 +333,12 @@ export function CompactDimensionControls({
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between">
-        <h4 className="font-medium text-body text-[var(--ink)]">Canvas Size</h4>
+        <h4 className="font-medium text-[var(--text)] text-[var(--ink)]">Canvas Size</h4>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onLockAspectRatio(!locked)}
-          className={locked ? 'text-primary' : ''}
+          className={locked ? 'text-[var(--brand)]' : ''}
           aria-label={locked ? 'Unlock aspect ratio' : 'Lock aspect ratio'}
         >
           {locked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}

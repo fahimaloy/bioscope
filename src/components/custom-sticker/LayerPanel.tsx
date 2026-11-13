@@ -39,10 +39,10 @@ export function LayerPanel({
   const [expanded, setExpanded] = useState(true)
 
   return (
-    <div className={cn('bg-white rounded-card border-3 border-[var(--ink)] shadow-card flex flex-col h-full', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] flex flex-col h-full', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-[var(--light)]">
-        <h3 className="font-display text-lg text-primary">Layers</h3>
+      <div className="flex items-center justify-between p-4 border-b border-[color-mix(in_srgb,var(--ink)_15%,transparent)]">
+        <h3 className="font-display text-lg text-[var(--brand)]">Layers</h3>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={() => onAddLayer('image')} aria-label="Add image layer">
             <ImageIcon className="w-4 h-4" />
@@ -61,11 +61,11 @@ export function LayerPanel({
         {layers.length === 0 ? (
           <div className="p-8 text-center text-[var(--text-subtle)]">
             <Layers className="w-12 h-12 mx-auto mb-3 text-[var(--text-subtle)]" />
-            <p className="text-body">No layers yet</p>
+            <p className="text-[var(--text)]">No layers yet</p>
             <p className="text-sm text-[var(--text-subtle)] mt-1">Click + to add your first layer</p>
           </div>
         ) : (
-          <ul className="divide-y divide-light/50" role="list" aria-label="Layers">
+          <ul className="divide-y divide-[color-mix(in_srgb,var(--ink)_15%,transparent)]" role="list" aria-label="Layers">
             {layers.slice().reverse().map((layer, reverseIndex) => {
               const index = layers.length - 1 - reverseIndex
               const isSelected = selectedLayerId === layer.id
@@ -75,14 +75,14 @@ export function LayerPanel({
                   key={layer.id}
                   className={cn(
                     'flex items-center gap-2 p-3 transition-colors',
-                    isSelected && 'bg-primary/5',
+                    isSelected && 'bg-[color-mix(in_srgb,var(--brand)_5%,transparent)]',
                     !layer.visible && 'opacity-50',
                     layer.locked && 'opacity-70'
                   )}
                 >
                   {/* Drag Handle */}
                   <button
-                    className="p-1 text-[var(--text-subtle)] hover:text-primary transition-colors"
+                    className="p-1 text-[var(--text-subtle)] hover:text-[var(--brand)] transition-colors"
                     aria-label="Drag to reorder"
                   >
                     <GripVertical className="w-4 h-4" />
@@ -90,14 +90,14 @@ export function LayerPanel({
 
                   {/* Layer Type Icon */}
                   <div className={cn(
-                    'w-8 h-8 rounded-input flex items-center justify-center flex-shrink-0',
-                    layer.type === 'image' && 'bg-primary/10',
-                    layer.type === 'text' && 'bg-secondary/10',
-                    layer.type === 'shape' && 'bg-accent/10'
+                    'w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center flex-shrink-0',
+                    layer.type === 'image' && 'bg-[color-mix(in_srgb,var(--brand)_10%,transparent)]',
+                    layer.type === 'text' && 'bg-[color-mix(in_srgb,var(--teal)_10%,transparent)]',
+                    layer.type === 'shape' && 'bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]'
                   )}>
-                    {layer.type === 'image' && <ImageIcon className="w-4 h-4 text-primary" />}
-                    {layer.type === 'text' && <Type className="w-4 h-4 text-secondary" />}
-                    {layer.type === 'shape' && <Square className="w-4 h-4 text-accent" />}
+                    {layer.type === 'image' && <ImageIcon className="w-4 h-4 text-[var(--brand)]" />}
+                    {layer.type === 'text' && <Type className="w-4 h-4 text-[var(--text-muted)]" />}
+                    {layer.type === 'shape' && <Square className="w-4 h-4 text-[var(--brand)]" />}
                   </div>
 
                   {/* Layer Info */}
@@ -135,7 +135,7 @@ export function LayerPanel({
                     onClick={() => onToggleLock(layer.id)}
                     className={cn(
                       'p-1 rounded transition-colors',
-                      layer.locked ? 'text-primary' : 'text-[var(--text-subtle)]'
+                      layer.locked ? 'text-[var(--brand)]' : 'text-[var(--text-subtle)]'
                     )}
                     aria-label={layer.locked ? 'Unlock layer' : 'Lock layer'}
                   >
@@ -144,7 +144,7 @@ export function LayerPanel({
 
                   {/* Actions Menu */}
                   <div className="relative">
-                    <button className="p-1 text-[var(--text-subtle)] hover:text-primary transition-colors" aria-label="More options">
+                    <button className="p-1 text-[var(--text-subtle)] hover:text-[var(--brand)] transition-colors" aria-label="More options">
                       <MoreVertical className="w-4 h-4" />
                     </button>
                     <LayerActionsMenu
@@ -160,15 +160,15 @@ export function LayerPanel({
         )}
 
         {/* Drop Zone for Reordering */}
-        <div className="h-4 border-t-2 border-dashed border-primary/50 -mx-4 mt-2" />
+        <div className="h-4 border-t-2 border-dashed border-[color-mix(in_srgb,var(--brand)_50%,transparent)] -mx-4 mt-2" />
       </div>
 
       {/* Collapsed View */}
       {!expanded && (
-        <div className="p-4 border-t border-[var(--light)] text-center text-[var(--text-subtle)]">
+        <div className="p-4 border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)] text-center text-[var(--text-subtle)]">
           <button
             onClick={() => setExpanded(true)}
-            className="text-primary hover:underline text-sm"
+            className="text-[var(--brand)] hover:underline text-sm"
           >
             Show {layers.length} layer{layers.length !== 1 ? 's' : ''}
           </button>
@@ -202,7 +202,7 @@ function LayerActionsMenu({
     <>
       <button
         onClick={(e) => { e.stopPropagation(); setOpen(!open) }}
-        className="p-1 text-[var(--text-subtle)] hover:text-primary transition-colors"
+        className="p-1 text-[var(--text-subtle)] hover:text-[var(--brand)] transition-colors"
         aria-label="Layer actions"
       >
         <MoreVertical className="w-4 h-4" />
@@ -211,12 +211,12 @@ function LayerActionsMenu({
       {open && (
         <div
           ref={menuRef}
-          className="absolute right-0 top-full mt-1 w-40 bg-white border-3 border-[var(--ink)] rounded-input shadow-lg animate-scale-in z-50"
+          className="absolute right-0 top-full mt-1 w-40 bg-[var(--surface-raised)] border-[3px] border-[var(--ink)] rounded-[var(--radius-md)] shadow-[var(--shadow-ink-2)] animate-scale-in z-50"
           role="menu"
         >
           <button
             onClick={() => { onDuplicate(); setOpen(false) }}
-            className="w-full px-3 py-2 text-left text-sm text-[var(--ink)] hover:bg-[var(--light)] flex items-center gap-2"
+            className="w-full px-3 py-2 text-left text-sm text-[var(--ink)] hover:bg-[var(--paper-deep)] flex items-center gap-2"
             role="menuitem"
           >
             <Copy className="w-4 h-4" />
@@ -224,7 +224,7 @@ function LayerActionsMenu({
           </button>
           <button
             onClick={() => { onDelete(); setOpen(false) }}
-            className="w-full px-3 py-2 text-left text-sm text-red-500 hover:bg-red-50 flex items-center gap-2"
+            className="w-full px-3 py-2 text-left text-sm text-[var(--error)] hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)] flex items-center gap-2"
             role="menuitem"
           >
             <Trash2 className="w-4 h-4" />

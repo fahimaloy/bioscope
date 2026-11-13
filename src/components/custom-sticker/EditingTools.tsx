@@ -8,6 +8,7 @@ import { ColorPicker } from '@/components/ui/ColorPicker'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { Badge } from '@/components/ui/Badge'
+import { resolveHex } from './resolveHex'
 import type { DesignLayer, ImageFilter } from '@/types'
 import {
   Crop,
@@ -63,7 +64,7 @@ export function EditingTools({
   if (!selectedLayer) {
     return (
       <div className={cn('p-4 text-center text-[var(--text-subtle)]', className)}>
-        <p className="text-body">Select a layer to edit</p>
+        <p className="text-[var(--text)]">Select a layer to edit</p>
       </div>
     )
   }
@@ -73,14 +74,14 @@ export function EditingTools({
   const isShape = selectedLayer.type === 'shape'
 
   return (
-    <div className={cn('bg-white rounded-card border-3 border-[var(--ink)] shadow-card p-4 space-y-4', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-4 space-y-4', className)}>
       {/* Layer Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Badge variant={isImage ? 'primary' : isText ? 'secondary' : 'accent'} size="sm">
             {selectedLayer.type}
           </Badge>
-          <span className="font-medium text-body text-[var(--ink)] truncate max-w-[200px]">
+          <span className="font-medium text-[var(--text)] text-[var(--ink)] truncate max-w-[200px]">
             {selectedLayer.type === 'text' ? selectedLayer.text?.substring(0, 30) : 'Layer'}
           </span>
         </div>
@@ -98,7 +99,7 @@ export function EditingTools({
             variant="ghost"
             size="sm"
             onClick={() => onLockLayer(selectedLayer.id)}
-            className={selectedLayer.locked ? 'text-primary' : ''}
+            className={selectedLayer.locked ? 'text-[var(--brand)]' : ''}
             aria-label={selectedLayer.locked ? 'Unlock layer' : 'Lock layer'}
           >
             {selectedLayer.locked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
@@ -106,7 +107,7 @@ export function EditingTools({
           <Button variant="ghost" size="sm" onClick={() => onDuplicateLayer(selectedLayer.id)} aria-label="Duplicate layer">
             <Copy className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onDeleteLayer(selectedLayer.id)} className="text-red-500 hover:bg-red-50" aria-label="Delete layer">
+          <Button variant="ghost" size="sm" onClick={() => onDeleteLayer(selectedLayer.id)} className="text-[var(--error)] hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]" aria-label="Delete layer">
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
@@ -114,7 +115,7 @@ export function EditingTools({
 
       {/* Tabs */}
       <Tabs defaultValue={activeTab} onChange={(v) => setActiveTab(v as typeof activeTab)}>
-        <TabsList className="grid w-full grid-cols-4 bg-[var(--light)] rounded-input p-1">
+        <TabsList className="grid w-full grid-cols-4 bg-[var(--paper-deep)] rounded-[var(--radius-md)] p-1">
           <TabsTrigger value="transform" disabled={selectedLayer.locked}>
             <Maximize className="w-4 h-4 mr-1" />
             Transform
@@ -334,7 +335,7 @@ export function EditingTools({
                 value={selectedLayer.text || ''}
                 onChange={(e) => onUpdateLayer(selectedLayer.id, { text: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body text-[var(--ink)] resize-y min-h-[80px]"
+                className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-[var(--radius-md)] focus:border-[var(--brand)] focus:shadow-[var(--shadow-ink-1)] text-[var(--text)] text-[var(--ink)] resize-y min-h-[80px]"
                 disabled={selectedLayer.locked}
               />
             </div>
@@ -403,7 +404,7 @@ export function EditingTools({
               <div>
                 <label className="block text-sm font-medium text-[var(--ink)] mb-2">Text Color</label>
                 <ColorPicker
-                  value={selectedLayer.textColor || '#000000'}
+                  value={resolveHex(selectedLayer.textColor || 'var(--ink)') ?? 'var(--ink)'}
                   onChange={(color) => onUpdateLayer(selectedLayer.id, { textColor: color })}
                   disabled={selectedLayer.locked}
                 />
@@ -459,10 +460,10 @@ export function EditingTools({
                     key={shape}
                     onClick={() => onUpdateLayer(selectedLayer.id, { shapeType: shape as any })}
                     className={cn(
-                      'p-3 rounded-input border-3 transition-all',
+                      'p-3 rounded-[var(--radius-md)] border-[3px] transition-all',
                       selectedLayer.shapeType === shape
-                        ? 'border-primary bg-primary/10'
-                        : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary'
+                        ? 'border-[var(--brand)] bg-[color-mix(in_srgb,var(--brand)_10%,transparent)]'
+                        : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-[var(--brand)]'
                     )}
                     disabled={selectedLayer.locked}
                   >
@@ -478,7 +479,7 @@ export function EditingTools({
               <div>
                 <label className="block text-sm font-medium text-[var(--ink)] mb-2">Fill Color</label>
                 <ColorPicker
-                  value={selectedLayer.fill || 'var(--primary)'}
+                  value={resolveHex(selectedLayer.fill || 'var(--brand)') ?? 'var(--brand)'}
                   onChange={(color) => onUpdateLayer(selectedLayer.id, { fill: color })}
                   disabled={selectedLayer.locked}
                 />

@@ -33,9 +33,9 @@ export function ColorAdjustments({ filter, onChange, className }: ColorAdjustmen
     advancedAdjustments.every((a) => filter[a.key] === a.default)
 
   return (
-    <div className={cn('bg-white rounded-card border-3 border-[var(--ink)] shadow-card p-6 space-y-6', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-6 space-y-6', className)}>
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-xl text-primary">Color Adjustments</h3>
+        <h3 className="font-display text-xl text-[var(--brand)]">Color Adjustments</h3>
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
@@ -74,8 +74,8 @@ export function ColorAdjustments({ filter, onChange, className }: ColorAdjustmen
       {/* Advanced Adjustments */}
       {showAdvanced && (
         <>
-          <div className="border-t border-[var(--light)] pt-6">
-            <h4 className="font-medium text-body text-[var(--ink)] mb-4">Advanced</h4>
+          <div className="border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)] pt-6">
+            <h4 className="font-medium text-[var(--text)] text-[var(--ink)] mb-4">Advanced</h4>
             <div className="space-y-6">
               {advancedAdjustments.map((adj) => (
                 <AdjustmentSlider
@@ -95,8 +95,8 @@ export function ColorAdjustments({ filter, onChange, className }: ColorAdjustmen
       )}
 
       {/* Color Balance */}
-      <div className="border-t border-[var(--light)] pt-6">
-        <h4 className="font-medium text-body text-[var(--ink)] mb-4">Color Balance</h4>
+      <div className="border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)] pt-6">
+        <h4 className="font-medium text-[var(--text)] text-[var(--ink)] mb-4">Color Balance</h4>
         <div className="grid grid-cols-3 gap-4">
           <ColorBalanceChannel label="Shadows" color="red" onChange={(c) => onChange({ shadows: c })} />
           <ColorBalanceChannel label="Midtones" color="green" onChange={(c) => onChange({ midtones: c })} />
@@ -105,8 +105,8 @@ export function ColorAdjustments({ filter, onChange, className }: ColorAdjustmen
       </div>
 
       {/* Presets */}
-      <div className="border-t border-[var(--light)] pt-6">
-        <h4 className="font-medium text-body text-[var(--ink)] mb-4">Quick Presets</h4>
+      <div className="border-t border-[color-mix(in_srgb,var(--ink)_15%,transparent)] pt-6">
+        <h4 className="font-medium text-[var(--text)] text-[var(--ink)] mb-4">Quick Presets</h4>
         <div className="flex flex-wrap gap-2">
           {[
             { label: 'Vivid', filter: { brightness: 110, contrast: 115, saturation: 120 } },
@@ -156,13 +156,13 @@ function AdjustmentSlider({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-2 font-medium text-body text-[var(--ink)]">
-          {Icon ? <Icon className="w-5 h-5 text-primary" /> : null}
+        <label className="flex items-center gap-2 font-medium text-[var(--text)] text-[var(--ink)]">
+          {Icon ? <Icon className="w-5 h-5 text-[var(--brand)]" /> : null}
           {label}
         </label>
         <span className={cn(
           'text-sm font-display',
-          isDefault ? 'text-[var(--text-subtle)]' : 'text-primary'
+          isDefault ? 'text-[var(--text-subtle)]' : 'text-[var(--brand)]'
         )}>
           {value > 0 ? '+' : ''}{value - defaultValue}%
         </span>
@@ -180,6 +180,18 @@ function AdjustmentSlider({
 }
 
 // Color Balance Channel
+/**
+ * The channel ramp is the one gradient the contract allows (a recorded
+ * carve-out for a colour control's affordance). It is an inline style, not a
+ * generated class: `from-${color}-500` is invisible to Tailwind's scanner and
+ * emitted no CSS at all. The ramp colours are the brand tokens.
+ */
+const RAMP_COLORS = {
+  red: 'var(--red)',
+  green: 'var(--green)',
+  blue: 'var(--blue)',
+} as const
+
 function ColorBalanceChannel({
   label,
   color,
@@ -189,12 +201,7 @@ function ColorBalanceChannel({
   color: 'red' | 'green' | 'blue'
   onChange: (value: number) => void
 }) {
-  const colorMap = {
-    red: { r: 255, g: 0, b: 0 },
-    green: { r: 0, g: 255, b: 0 },
-    blue: { r: 0, g: 0, b: 255 },
-  }
-
+  const ramp = RAMP_COLORS[color]
   const [value, setValue] = useState(0)
 
   useEffect(() => {
@@ -211,10 +218,10 @@ function ColorBalanceChannel({
           max="100"
           value={value}
           onChange={(e) => setValue(parseInt(e.target.value))}
-          className={cn(
-            'w-full h-2 appearance-none rounded-full',
-            `bg-gradient-to-r from-${color}-500 via-transparent to-${color}-500`
-          )}
+          className="w-full h-2 appearance-none rounded-full"
+          style={{
+            background: `linear-gradient(to right, ${ramp}, transparent, ${ramp})`,
+          }}
         />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 -translate-y-full text-xs font-medium text-[var(--text-subtle)]">
           {value > 0 ? '+' : ''}{value}

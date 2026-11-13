@@ -163,13 +163,13 @@ export function UploadZone({
       {/* Drop Zone */}
       <div
         className={cn(
-          'relative border-3 rounded-card transition-all duration-200',
+          'relative border-[3px] rounded-[var(--radius-lg)] transition-all duration-200',
           'flex flex-col items-center justify-center p-8',
           dragActive
-            ? 'border-primary bg-primary/5'
+            ? 'border-[var(--brand)] bg-[color-mix(in_srgb,var(--brand)_5%,transparent)]'
             : error
-            ? 'border-red-500'
-            : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary',
+            ? 'border-[var(--error)]'
+            : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-[var(--brand)]',
           disabled && 'opacity-60 cursor-not-allowed'
         )}
         onDragEnter={handleDrag}
@@ -180,15 +180,15 @@ export function UploadZone({
       >
         {displayImage ? (
           <>
-            <div className="relative w-full max-w-md aspect-square rounded-input overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] bg-[var(--light)]">
+            <div className="relative w-full max-w-md aspect-square rounded-[var(--radius-md)] overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] bg-[var(--paper-deep)]">
               <img
                 src={displayImage}
                 alt="Uploaded design preview"
                 className="w-full h-full object-cover"
               />
               {uploading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                  <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center bg-[color-mix(in_srgb,var(--die-cut)_80%,transparent)]">
+                  <Loader2 className="w-8 h-8 text-[var(--brand)] animate-spin" />
                 </div>
               )}
             </div>
@@ -197,7 +197,7 @@ export function UploadZone({
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); removeImage() }}
-                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-colors"
+                className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[var(--error)] text-[var(--on-error)] flex items-center justify-center hover:bg-[var(--error)] transition-colors"
                 aria-label="Remove image"
               >
                 <X className="w-4 h-4" />
@@ -207,7 +207,7 @@ export function UploadZone({
         ) : (
           <>
             <Upload className="w-16 h-16 text-[var(--text-subtle)] mx-auto mb-4" />
-            <p className="text-body text-[var(--text-subtle)] mb-2">
+            <p className="text-[var(--text)] text-[var(--text-subtle)] mb-2">
               {multiple ? 'Drag & drop images here, or click to select' : 'Drag & drop an image here, or click to select'}
             </p>
             <p className="text-sm text-[var(--text-subtle)] mb-4">
@@ -221,7 +221,7 @@ export function UploadZone({
         )}
 
         {error && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-input flex items-center gap-2 text-red-600 text-sm">
+          <div className="mt-4 p-3 bg-[color-mix(in_srgb,var(--error)_10%,transparent)] border border-[var(--error)] rounded-[var(--radius-md)] flex items-center gap-2 text-[var(--error)] text-sm">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -230,7 +230,7 @@ export function UploadZone({
 
       {/* Paste Support */}
       <div className="mt-4 text-center">
-        <kbd className="px-2 py-1 text-xs bg-[var(--light)] text-[var(--text-subtle)] rounded border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] font-mono">
+        <kbd className="px-2 py-1 text-xs bg-[var(--paper-deep)] text-[var(--text-subtle)] rounded border border-[color-mix(in_srgb,var(--ink)_20%,transparent)] font-mono">
           Ctrl + V
         </kbd>{' '}
         <span className="text-sm text-[var(--text-subtle)]">to paste image from clipboard</span>
@@ -279,7 +279,7 @@ export function CompactUploadZone({
   return (
     <div className={cn('flex flex-wrap gap-2', className)}>
       {files.map((file, index) => (
-        <div key={index} className="relative w-20 h-20 rounded-input overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+        <div key={index} className="relative w-20 h-20 rounded-[var(--radius-md)] overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
           <img src={URL.createObjectURL(file)} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
           <button
             type="button"
@@ -288,7 +288,7 @@ export function CompactUploadZone({
               setFiles(next)
               onUpload(next)
             }}
-            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center"
+            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[var(--error)] text-[var(--on-error)] flex items-center justify-center"
           >
             <X className="w-3 h-3" />
           </button>
@@ -298,8 +298,8 @@ export function CompactUploadZone({
       {files.length < maxFiles && (
         <div
           className={cn(
-            'w-20 h-20 rounded-input border-3 border-dashed flex items-center justify-center cursor-pointer transition-colors',
-            dragActive ? 'border-primary bg-primary/5' : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-primary',
+            'w-20 h-20 rounded-[var(--radius-md)] border-[3px] border-dashed flex items-center justify-center cursor-pointer transition-colors',
+            dragActive ? 'border-[var(--brand)] bg-[color-mix(in_srgb,var(--brand)_5%,transparent)]' : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] hover:border-[var(--brand)]',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
           onDragEnter={(e) => { e.preventDefault(); setDragActive(true) }}
