@@ -32,98 +32,64 @@ interface TopCustomer {
   orderCount: number
 }
 
+interface TopCategory {
+  name: string
+  sales: number
+  revenue: number
+}
+
+interface GeoDistrict {
+  district: string
+  orders: number
+  revenue: number
+}
+
 export default function AnalyticsPage() {
   const [stats, setStats] = useState<any>(null)
   const [monthly, setMonthly] = useState<MonthlyData[]>([])
   const [topProducts, setTopProducts] = useState<TopProduct[]>([])
   const [topCustomers, setTopCustomers] = useState<TopCustomer[]>([])
   const [distribution, setDistribution] = useState<Record<string, number>>({})
+  const [topCategories, setTopCategories] = useState<TopCategory[]>([])
+  const [topDistricts, setTopDistricts] = useState<GeoDistrict[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       setLoading(true)
       try {
-        const [ordersRes, productsRes, customersRes] = await Promise.all([
-          fetch('/api/orders?limit=500&sortBy=createdAt&sortOrder=desc').then((r) => r.json()),
+        const range = '12mo'
+        const [revRes, ordRes, topProductRes, topCustomerRes, categoriesRes, geoRes, productsRes, customersRes] = await Promise.all([
+          fetch(`/api/analytics/revenue?range=${range}`).then((r) => r.json()),
+          fetch(`/api/analytics/orders?range=${range}`).then((r) => r.json()),
+          fetch(`/api/analytics/top-products?limit=8&range=${range}`).then((r) => r.json()),
+          fetch(`/api/analytics/top-customers?limit=10&range=${range}`).then((r) => r.json()),
+          fetch(`/api/analytics/categories?range=${range}`).then((r) => r.json()),
+          fetch(`/api/analytics/geo?limit=10&range=${range}`).then((r) => r.json()),
           fetch('/api/products?limit=100').then((r) => r.json()),
-          fetch('/api/customers?limit=100').then((r) => r.json()),
+          fetch('/api/customers?limit=1').then((r) => r.json()),
         ])
-        const orders = ordersRes?.data?.data ?? []
-        const paid = orders.filter((o: any) => !['CANCELLED', 'REFUNDED'].includes(o.status))
-        const revenueTotal = paid.reduce((s: any, o: any) => s + Number(o.total), 0)
-
-        const dist: Record<string, number> = {}
-        for (const o of orders) dist[o.status] = (dist[o.status] ?? 0) + 1
-
-        // Monthly buckets, last 12 months
-        const months: MonthlyData[] = []
-        const now = new Date()
-        for (let i = 11; i >= 0; i--) {
-          const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
-          months.push({ date: d.toLocaleString('en', { month: 'short', year: '2-digit' }), revenue: 0, orders: 0 })
-        }
-        for (const o of paid) {
-          const d = new Date(o.createdAt)
-          const key = d.toLocaleString('en', { month: 'short', year: '2-digit' })
-          const targetMonth = months.find((m) => m.date === key)
-          if (targetMonth) {
-            targetMonth.revenue += Number(o.total)
-            targetMonth.orders += 1
-          }
-        }
-
-        // Top products by revenue from order items
-        const byProduct = new Map<string, { name: string; sales: number; revenue: number }>()
-        for (const o of orders) {
-          for (const item of o.items ?? []) {
-            const key = item.productId ?? item.productName
-            const cur = byProduct.get(key) ?? { name: item.productName, sales: 0, revenue: 0 }
-            cur.sales += Number(item.quantity)
-            cur.revenue += Number(item.totalPrice ?? item.unitPrice * item.quantity)
-            byProduct.set(key, cur)
-          }
-        }
-        const top = [...byProduct.values()].sort((a, b) => b.revenue - a.revenue).slice(0, 8)
-
-        // Top customers by spending
-        const byCustomer = new Map<string, { name: string; email: string; totalSpent: number; orderCount: number }>()
-        for (const o of paid) {
-          const customerKey = o.userId ?? o.shippingEmail
-          const cur = byCustomer.get(customerKey) ?? { 
-            name: o.user?.name ?? o.shippingName ?? 'Guest', 
-            email: o.user?.email ?? o.shippingEmail ?? '', 
-            totalSpent: 0, 
-            orderCount: 0 
-          }
-          cur.totalSpent += Number(o.total)
-          cur.orderCount += 1
-          byCustomer.set(customerKey, cur)
-        }
-        const topCust = [...byCustomer.values()]
-          .sort((a, b) => b.totalSpent - a.totalSpent)
-          .slice(0, 10)
-          .map((c, i) => ({ ...c, id: `cust-${i}` }))
-
+        setMonthly(revRes?.data?.monthly ?? [])
+        setTopProducts(topProductRes?.data?.items ?? [])
+        setTopCustomers((topCustomerRes?.data?.items ?? []).map((c: any) => ({ id: c.id, name: c.name, email: c.email, totalSpent: c.totalSpent, orderCount: c.orderCount })))
+        setTopCategories(categoriesRes?.data?.items ?? [])
+        setTopDistricts(geoRes?.data?.items ?? [])
+        setDistribution(ordRes?.data?.distribution ?? {})
         setStats({
-          totalOrders: ordersRes?.data?.pagination?.total ?? orders.length,
-          pendingOrders: orders.filter((o: any) => ['PENDING', 'CONFIRMED', 'PROCESSING'].includes(o.status)).length,
-          totalRevenue: revenueTotal,
-          totalProducts: productsRes?.data?.pagination?.total ?? 0,
+          totalOrders: ordRes?.data?.total ?? 0,
+          pendingOrders: ordRes?.data?.pending ?? 0,
+          totalRevenue: revRes?.data?.totalRevenue ?? 0,
+          totalProducts: productsRes?.data?.pagination?.total ?? (productsRes?.data?.data ?? []).length,
           totalCustomers: customersRes?.data?.pagination?.total ?? 0,
           lowStockProducts: (productsRes?.data?.data ?? []).filter((p: any) => Number(p.stock) <= 10).length,
           pendingCustomRequests: 0,
           conversionRate: 0,
-          averageOrderValue: paid.length ? Math.round(revenueTotal / paid.length) : 0,
+          averageOrderValue: revRes?.data?.averageOrderValue ?? 0,
           todayOrders: 0,
           todayRevenue: 0,
         })
-        setMonthly(months)
-        setTopProducts(top)
-        setTopCustomers(topCust)
-        setDistribution(dist)
-      } catch (e) {
-        console.error('analytics load failed', e)
+      } catch (error) {
+        console.error('Error loading analytics:', error)
       } finally {
         setLoading(false)
       }
@@ -406,6 +372,72 @@ export default function AnalyticsPage() {
 
           {/* Order Status Distribution */}
           <OrderStatusDistribution distribution={distribution} />
+        </motion.div>
+
+        {/* Revenue by Category + Top Districts */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, type: 'spring', stiffness: 100, damping: 15 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+        >
+          <Card variant="doodle" padding="lg" className="relative overflow-visible">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg text-primary">Revenue by Category</h3>
+              <Badge variant="outline" size="sm">Last 12 months</Badge>
+            </div>
+            {topCategories.length === 0 ? (
+              <p className="text-[var(--text-subtle)] text-sm py-8 text-center">No category sales yet.</p>
+            ) : (
+              <ul className="space-y-3">
+                {topCategories.map((c) => {
+                  const max = topCategories[0]?.revenue || 1
+                  return (
+                    <li key={c.name}>
+                      <div className="flex items-center justify-between gap-4 text-sm mb-1">
+                        <span className="font-medium text-[var(--ink)]">{c.name}</span>
+                        <span className="text-[var(--text-subtle)] whitespace-nowrap">{formatCurrency(c.revenue)} · {formatNumber(c.sales)} sold</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-[var(--light)] overflow-hidden">
+                        <div className="h-full rounded-full bg-[var(--primary)]" style={{ width: `${Math.max(3, Math.round((c.revenue / max) * 100))}%` }} />
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
+          </Card>
+
+          <Card variant="doodle" padding="lg" className="relative overflow-visible">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display text-lg text-primary">Top Districts</h3>
+              <Badge variant="outline" size="sm">Paid orders</Badge>
+            </div>
+            {topDistricts.length === 0 ? (
+              <p className="text-[var(--text-subtle)] text-sm py-8 text-center">No district data yet.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="text-left text-xs uppercase tracking-wider text-[var(--text-subtle)] border-b-2 border-[var(--light)]">
+                      <th className="py-2">District</th>
+                      <th className="py-2">Orders</th>
+                      <th className="py-2 text-right">Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--light)]">
+                    {topDistricts.map((d) => (
+                      <tr key={d.district}>
+                        <td className="py-2 font-medium text-[var(--ink)]">{d.district}</td>
+                        <td className="py-2 text-[var(--ink)]">{formatNumber(d.orders)}</td>
+                        <td className="py-2 text-right font-medium text-[var(--ink)]">{formatCurrency(d.revenue)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
         </motion.div>
 
         {/* Top Customers */}

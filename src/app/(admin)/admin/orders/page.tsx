@@ -142,27 +142,69 @@ function ExpandedRowContent({
 }: {
   order: Order
 }) {
-  const statusHistory: StatusHistoryEntry[] = useMemo(() => {
-    const history: StatusHistoryEntry[] = [
-      { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed' },
-    ]
-    if (order.status !== 'PENDING') {
-      // We'd normally fetch this from a status_history table
-      // For now, we'll create a mock timeline based on the current status
-      const statusIndex = STATUSES.indexOf(order.status)
-      for (let i = 1; i <= statusIndex; i++) {
-        history.push({
-          status: STATUSES[i],
-          timestamp: new Date(new Date(order.createdAt).getTime() + i * 24 * 60 * 60 * 1000).toISOString(),
-          note: `Status changed to ${ORDER_STATUS_LABELS[STATUSES[i]]}`,
-        })
-      }
+  const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([
+    { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed' },
+  ])
+  const [historyLoading, setHistoryLoading] = useState(true)
+  const [sendingEmail, setSendingEmail] = useState(false)
+
+  const sendEmail = async () => {
+    setSendingEmail(true)
+    try {
+      const res = await fetch(`/api/orders/${order.id}/send-email`, { method: 'POST' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error || 'Failed to send email')
+      toast.success(`Order email sent to ${json?.data?.to ?? 'customer'}`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to send email')
+    } finally {
+      setSendingEmail(false)
     }
-    return history
-  }, [order])
+  }
+
+  useEffect(() => {
+    let cancelled = false
+    setHistoryLoading(true)
+    fetch(`/api/orders/${order.id}/history`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        if (cancelled) return
+        const entries: StatusHistoryEntry[] = [
+          { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed' },
+        ]
+        const raw: Array<{ toStatus: OrderStatus; createdAt: string; note: string | null }> = Array.isArray(body?.data?.history)
+          ? body.data.history
+          : []
+        for (const entry of raw) {
+          entries.push({
+            status: entry.toStatus,
+            timestamp: entry.createdAt,
+            note: entry.note ?? `Status changed to ${ORDER_STATUS_LABELS[entry.toStatus] ?? entry.toStatus}`,
+          })
+        }
+        setStatusHistory(entries)
+      })
+      .catch(() => {
+        // Keep the baseline "Order placed" entry on fetch failure
+      })
+      .finally(() => {
+        if (!cancelled) setHistoryLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [order.id, order.status, order.createdAt])
 
   return (
     <div className="p-6 bg-[var(--surface-raised)] border-t-2 border-[var(--light)] animate-slide-down">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Button size="sm" variant="outline" onClick={sendEmail} disabled={sendingEmail}>
+          {sendingEmail ? 'Sending…' : 'Send Email'}
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => window.open(`/admin/orders/${order.id}/invoice`, '_blank')}>
+          Print Invoice
+        </Button>
+      </div>
       <div className="grid md:grid-cols-2 gap-8">
         {/* Order Items */}
         <div>
@@ -215,6 +257,7 @@ function ExpandedRowContent({
           <h4 className="font-display text-lg text-[var(--ink)] mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
             Status Timeline
+            {historyLoading && <span className="text-xs font-normal text-[var(--text-subtle)]">Loading latest…</span>}
           </h4>
           <div className="space-y-4">
             {statusHistory.slice().reverse().map((entry, index) => {

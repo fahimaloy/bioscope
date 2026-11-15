@@ -61,17 +61,19 @@ interface ProductFormData {
   metaDescription: string
 }
 
+const uid = () => crypto.randomUUID()
+
 const DEFAULT_DIMENSIONS: DimensionConfig[] = [
-  { id: '', width: 5, height: 5, label: 'Small (5×5 cm)', priceMultiplier: 1, isDefault: true, sortOrder: 1 },
-  { id: '', width: 7, height: 7, label: 'Medium (7×7 cm)', priceMultiplier: 1.5, sortOrder: 2 },
-  { id: '', width: 10, height: 10, label: 'Large (10×10 cm)', priceMultiplier: 2, sortOrder: 3 },
+  { id: uid(), width: 5, height: 5, label: 'Small (5×5 cm)', priceMultiplier: 1, isDefault: true, sortOrder: 1 },
+  { id: uid(), width: 7, height: 7, label: 'Medium (7×7 cm)', priceMultiplier: 1.5, sortOrder: 2 },
+  { id: uid(), width: 10, height: 10, label: 'Large (10×10 cm)', priceMultiplier: 2, sortOrder: 3 },
 ]
 
 const DEFAULT_QUANTITIES: QuantityConfig[] = [
-  { id: '', minQty: 1, maxQty: 10, pricePerUnit: 100, label: '1-10 pcs', sortOrder: 1 },
-  { id: '', minQty: 11, maxQty: 50, pricePerUnit: 80, label: '11-50 pcs', sortOrder: 2 },
-  { id: '', minQty: 51, maxQty: 100, pricePerUnit: 70, label: '51-100 pcs', sortOrder: 3 },
-  { id: '', minQty: 101, maxQty: null, pricePerUnit: 60, label: '100+ pcs', sortOrder: 4 },
+  { id: uid(), minQty: 1, maxQty: 10, pricePerUnit: 100, label: '1-10 pcs', sortOrder: 1 },
+  { id: uid(), minQty: 11, maxQty: 50, pricePerUnit: 80, label: '11-50 pcs', sortOrder: 2 },
+  { id: uid(), minQty: 51, maxQty: 100, pricePerUnit: 70, label: '51-100 pcs', sortOrder: 3 },
+  { id: uid(), minQty: 101, maxQty: null, pricePerUnit: 60, label: '100+ pcs', sortOrder: 4 },
 ]
 
 export function ProductForm({

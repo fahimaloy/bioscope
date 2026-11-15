@@ -7,8 +7,9 @@ import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { DataTable } from '@/components/ui/DataTable'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Users, User, DollarSign, ShoppingBag, TrendingUp, Filter, X } from 'lucide-react'
+import { Users, User, DollarSign, ShoppingBag, TrendingUp, Filter, X, Download } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
+import { CustomerDetailModal } from '@/components/admin/CustomerDetailModal'
 import { motion } from 'framer-motion'
 import { SketchUnderline, DoodleShape, DoodleStar, StickerPeel } from '@/components/decorative/DoodleElements'
 import { CounterAnimation } from '@/components/animations/CounterAnimation'
@@ -34,8 +35,9 @@ const spendTiers = [
   { min: 50000, max: Infinity, label: 'VIP', variant: 'primary' as const, icon: '💎' },
 ]
 
-function SpendBadge({ totalSpent }: { totalSpent: number }) {
-  const tier = spendTiers.find(t => totalSpent >= t.min && totalSpent < t.max) || spendTiers[0]
+function SpendBadge({ totalSpent, overrideTier }: { totalSpent: number; overrideTier?: string | null }) {
+  const override = overrideTier ? spendTiers.find(t => t.label === overrideTier) : undefined
+  const tier = override ?? (spendTiers.find(t => totalSpent >= t.min && totalSpent < t.max) || spendTiers[0])
   return (
     <Badge variant={tier.variant} size="sm" className="gap-1.5">
       <span>{tier.icon}</span>
@@ -98,7 +100,7 @@ const columns = [
     key: 'tier', 
     header: 'Tier', 
     width: '120px',
-    accessor: (row: any) => <SpendBadge totalSpent={Number(row.totalSpent)} />,
+    accessor: (row: any) => <SpendBadge totalSpent={Number(row.totalSpent)} overrideTier={row.spendTier} />,
   },
   { 
     key: 'status', 
@@ -125,6 +127,23 @@ export default function CustomersPage() {
   const [pager, setPager] = useState({ total: 0, pageSize: 20 })
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
+
+  const viewColumns = useMemo(
+    () => [
+      ...columns,
+      {
+        key: 'view',
+        header: '',
+        cell: (row: any) => (
+          <Button size="sm" variant="outline" onClick={() => setSelectedCustomerId(row.id)}>
+            View
+          </Button>
+        ),
+      },
+    ],
+    []
+  )
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -166,6 +185,16 @@ export default function CustomersPage() {
             <p className="text-[var(--text-subtle)]">Manage and analyze your customer base</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const qs = search ? `?search=${encodeURIComponent(search)}` : ''
+                window.location.href = `/api/customers/export${qs}`
+              }}
+            >
+              <Download className="w-4 h-4" /> Export CSV
+            </Button>
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">{pager.total} Total</Badge>
           </div>
         </motion.div>
@@ -280,7 +309,7 @@ export default function CustomersPage() {
           <Card variant="doodle" padding="none" className="relative overflow-visible">
             <StickerPeel />
             <DataTable
-              columns={columns}
+              columns={viewColumns}
               data={customers}
               keyExtractor={(row) => row.id}
               loading={loading}
@@ -299,6 +328,8 @@ export default function CustomersPage() {
             />
           </Card>
         </motion.div>
+
+        <CustomerDetailModal customerId={selectedCustomerId} onClose={() => setSelectedCustomerId(null)} onChanged={load} />
 
         {/* Decorative elements */}
         <DoodleShape size="xl" color="primary" animation="float" className="absolute bottom-10 right-10 opacity-5 pointer-events-none" style={{ zIndex: -1 }} />

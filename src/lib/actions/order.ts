@@ -216,7 +216,7 @@ export async function createOrder(data: any) {
 }
 
 export async function updateOrderStatus(id: string, data: any) {
-  await requireAdmin()
+  const admin = await requireAdmin()
   const validated = orderStatusUpdateSchema.parse(data)
   const newStatus = validated.status as OrderStatus
 
@@ -228,18 +228,29 @@ export async function updateOrderStatus(id: string, data: any) {
     throw new AppError(409, `Cannot move order from ${ORDER_STATUS_LABELS[order.status as OrderStatus]} to ${ORDER_STATUS_LABELS[newStatus]}`, 'INVALID_TRANSITION')
   }
 
-  const updatedOrder = await prisma.order.update({
-    where: { id },
-    data: {
-      status: newStatus,
-      adminNotes: validated.notes ?? order.adminNotes,
-      trackingNumber: validated.trackingNumber ?? order.trackingNumber,
-      shippedAt: newStatus === 'SHIPPED' ? new Date() : order.shippedAt,
-      deliveredAt: newStatus === 'DELIVERED' ? new Date() : order.deliveredAt,
-      paymentStatus: newStatus === 'DELIVERED' && order.paymentMethod === 'COD' ? 'PAID' : order.paymentStatus,
-    },
-    include: { user: true, items: true },
-  })
+  const [updatedOrder] = await prisma.$transaction([
+    prisma.order.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        adminNotes: validated.notes ?? order.adminNotes,
+        trackingNumber: validated.trackingNumber ?? order.trackingNumber,
+        shippedAt: newStatus === 'SHIPPED' ? new Date() : order.shippedAt,
+        deliveredAt: newStatus === 'DELIVERED' ? new Date() : order.deliveredAt,
+        paymentStatus: newStatus === 'DELIVERED' && order.paymentMethod === 'COD' ? 'PAID' : order.paymentStatus,
+      },
+      include: { user: true, items: true },
+    }),
+    prisma.orderStatusHistory.create({
+      data: {
+        orderId: id,
+        fromStatus: order.status as OrderStatus,
+        toStatus: newStatus,
+        changedBy: admin.id as string,
+        note: validated.notes ?? null,
+      },
+    }),
+  ])
 
   await emitOrderStatusChange(updatedOrder, order.status, newStatus)
 

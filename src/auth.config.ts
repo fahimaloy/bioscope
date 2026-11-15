@@ -3,6 +3,9 @@
 import type { NextAuthConfig } from 'next-auth'
 
 export const authConfig: NextAuthConfig = {
+  // @auth/core (next-auth v5 beta) reads only AUTH_SECRET*; fall back to the
+  // legacy NEXTAUTH_SECRET so local .env keeps working. AUTH_SECRET wins when set.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   providers: [], // node runtime adds the Credentials provider in src/lib/auth.ts
   session: {
     strategy: 'jwt',

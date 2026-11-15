@@ -19,6 +19,7 @@ import {
   LogOut,
   BarChart2,
   Tag,
+  Boxes,
   Truck,
   CreditCard,
   X,
@@ -43,6 +44,8 @@ import { signOut } from 'next-auth/react'
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, badge: null as string | null },
   { name: 'Products', href: '/admin/products', icon: Package, badge: 'pendingProducts' },
+  { name: 'Inventory', href: '/admin/inventory', icon: Boxes, badge: null },
+  { name: 'Categories', href: '/admin/categories', icon: Tag, badge: null },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingBag, badge: 'pendingOrders' },
   { name: 'Custom Requests', href: '/admin/custom-requests', icon: FileText, badge: 'pendingRequests' },
   { name: 'Customers', href: '/admin/customers', icon: Users, badge: null },

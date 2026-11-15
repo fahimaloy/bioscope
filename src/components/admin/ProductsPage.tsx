@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -12,7 +13,7 @@ import { ProductPreview } from '@/components/admin/ProductPreview'
 import { Select } from '@/components/ui'
 import { Modal } from '@/components/ui/Modal'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Tag, Edit, Trash2, Eye } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 import Image from 'next/image'
 
@@ -106,6 +107,19 @@ export default function ProductsPage() {
       body: JSON.stringify(data),
     })
     if (res.ok) {
+      // Audit stock changes made through the product editor
+      const newStock = Number(data?.stock)
+      if (editingProduct && Number.isFinite(newStock) && newStock !== Number(editingProduct.stock)) {
+        try {
+          await fetch(`/api/products/${editingProduct.id}/stock`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ stock: newStock, reason: 'MANUAL_ADJUSTMENT', note: 'Edited via product form' }),
+          })
+        } catch {
+          toast.warning('Stock saved, but the audit entry failed to record')
+        }
+      }
       toast.success(editingProduct ? 'Product updated' : 'Product created')
       setShowForm(false)
       setEditingProduct(null)
@@ -151,10 +165,18 @@ export default function ProductsPage() {
             <h1 className="font-display text-3xl text-primary">Products</h1>
             <p className="text-[var(--text-subtle)]">Manage your product catalog</p>
           </div>
-          <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link href="/admin/categories">
+              <Button variant="outline">
+                <Tag className="w-4 h-4 mr-2" />
+                Manage Categories
+              </Button>
+            </Link>
+            <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Product
+            </Button>
+          </div>
         </div>
 
         <Card className="p-4 mb-6">

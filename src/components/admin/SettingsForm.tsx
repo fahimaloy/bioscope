@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Input, Textarea, Select } from '@/components/ui/Input'
@@ -39,6 +40,16 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
     customRequestMaxDimension: initialSettings.custom_request_max_dimension_cm || 30,
   })
 
+  const [taxSettings, setTaxSettings] = useState({
+    global_tax_percent: initialSettings.global_tax_percent ?? 5,
+    tax_inclusive_pricing: initialSettings.tax_inclusive_pricing ?? false,
+    tax_categories: initialSettings.tax_categories ?? [],
+  })
+
+  const [deliverySettings, setDeliverySettings] = useState({
+    delivery_zones: initialSettings.delivery_zones ?? [],
+  })
+
   const [emailSettings, setEmailSettings] = useState({
     smtpHost: initialSettings.smtp_host || '',
     smtpPort: initialSettings.smtp_port || '587',
@@ -51,6 +62,43 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
     customRequestUpdate: initialSettings.custom_request_template || '',
     welcomeEmail: initialSettings.welcome_template || '',
   })
+
+  const [assetUpload, setAssetUpload] = useState<'logo' | 'favicon' | null>(null)
+
+  const handleAssetUpload = (kind: 'logo' | 'favicon') => (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please choose an image file')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be under 5MB')
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const dataUrl = String(reader.result || '')
+      setAssetUpload(kind)
+      try {
+        const res = await fetch(`/api/settings/logo?type=${kind}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataUrl }),
+        })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json?.error || 'Upload failed')
+        setAppearanceSettings((prev) => ({ ...prev, [kind]: json?.data?.url ?? '' }))
+        toast.success(kind === 'logo' ? 'Logo uploaded' : 'Favicon uploaded')
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Upload failed')
+      } finally {
+        setAssetUpload(null)
+      }
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
 
   const [appearanceSettings, setAppearanceSettings] = useState({
     primaryColor: initialSettings.primary_color || 'var(--primary)',
@@ -67,6 +115,8 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
 
     const allSettings = {
       ...generalSettings,
+      ...taxSettings,
+      ...deliverySettings,
       ...emailSettings,
       ...appearanceSettings,
     }
@@ -260,12 +310,12 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
 
         {/* Tax Settings */}
         <TabsContent value="tax" className="animate-fade-in">
-          <TaxConfig onChange={(patch) => setGeneralSettings((prev) => ({ ...prev, ...patch }))} initialSettings={generalSettings} />
+          <TaxConfig onChange={(patch) => setTaxSettings((prev) => ({ ...prev, ...patch }))} initialSettings={taxSettings} />
         </TabsContent>
 
         {/* Delivery Settings */}
         <TabsContent value="delivery" className="animate-fade-in">
-          <DeliveryConfig onChange={(patch) => setGeneralSettings((prev) => ({ ...prev, ...patch }))} initialSettings={generalSettings} />
+          <DeliveryConfig onChange={(patch) => setDeliverySettings((prev) => ({ ...prev, ...patch }))} initialSettings={deliverySettings} />
         </TabsContent>
 
         {/* Email Settings */}
@@ -400,10 +450,16 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                     <input
                       type="file"
                       accept="image/*"
+                      disabled={assetUpload !== null}
+                      onChange={handleAssetUpload('logo')}
                       className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
                     />
+                    {assetUpload === 'logo' && <p className="text-sm text-[var(--text-subtle)]">Uploading…</p>}
                     {appearanceSettings.logo && (
-                      <img src={appearanceSettings.logo} alt="Logo preview" className="mt-2 h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
+                      <span className="mt-2 inline-flex items-start gap-2">
+                        <img src={appearanceSettings.logo} alt="Logo preview" className="h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
+                        <button type="button" onClick={() => setAppearanceSettings((prev) => ({ ...prev, logo: '' }))} className="text-xs text-error underline underline-offset-2">Remove</button>
+                      </span>
                     )}
                   </div>
                 </div>
@@ -413,10 +469,16 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                     <input
                       type="file"
                       accept="image/*"
+                      disabled={assetUpload !== null}
+                      onChange={handleAssetUpload('favicon')}
                       className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
                     />
+                    {assetUpload === 'favicon' && <p className="text-sm text-[var(--text-subtle)]">Uploading…</p>}
                     {appearanceSettings.favicon && (
-                      <img src={appearanceSettings.favicon} alt="Favicon preview" className="mt-2 w-16 h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
+                      <span className="mt-2 inline-flex items-start gap-2">
+                        <img src={appearanceSettings.favicon} alt="Favicon preview" className="w-16 h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
+                        <button type="button" onClick={() => setAppearanceSettings((prev) => ({ ...prev, favicon: '' }))} className="text-xs text-error underline underline-offset-2">Remove</button>
+                      </span>
                     )}
                   </div>
                 </div>
