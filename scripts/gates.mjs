@@ -34,7 +34,7 @@ const gates = [
   {
     name: 'detect-changes',
     command: process.execPath,
-    args: ['.gitnexus/run.cjs', 'detect-changes', '--scope', 'all', '--repo', '.'],
+    args: ['.gitnexus/run.cjs', 'detect-changes', '--scope', 'all', '--repo', 'bioscope'],
   },
 ]
 
