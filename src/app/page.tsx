@@ -45,12 +45,6 @@ interface FeaturedResponse {
   data: { data: Product[]; pagination: unknown }
 }
 
-/**
- * The CTA link treatment. `Button` has no `href`/`asChild`, and an anchor
- * wrapping a `<button>` nests two interactives — so the CTAs are real anchors
- * carrying the Paper + Pop treatment (contract §6). Kept in sync with
- * `@/components/ui/Button`.
- */
 const CTA_LINK_CLASSES = [
   'inline-flex min-h-[56px] items-center justify-center gap-2 rounded-pill border-[3px] border-[var(--ink)]',
   'px-8 py-4 font-display text-xl tracking-wide',
@@ -189,7 +183,7 @@ export default function HomePage() {
             <div className="overflow-hidden rounded-[var(--radius-wobble-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] shadow-ink-4">
               <Image
                 src={HERO_IMAGE}
-                alt="bioscope sticker"
+                alt="BIOSCOPE sticker"
                 width={640}
                 height={640}
                 priority

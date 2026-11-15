@@ -56,6 +56,14 @@
   --on-gold: var(--ink);
   --on-blue: var(--ink);
   --on-lime: var(--ink);
+  --letter-1: #F42A7A;
+  --letter-2: #EFA10B;
+  --letter-3: #0DA5DC;
+  --letter-4: #ED7E10;
+  --letter-5: #EC2D7B;
+  --letter-6: #F42A7A;
+  --letter-7: #EFA10B;
+  --letter-8: #0DA5DC;
   --text-xs: 12px;
   --text-sm: 14px;
   --text-base: 16px;

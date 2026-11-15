@@ -1,11 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { FOCUS_VISIBLE } from '@/components/ui/shared'
+import { Wordmark } from '@/components/brand/Wordmark'
 import {
   LayoutDashboard,
   Package,
@@ -129,16 +129,7 @@ export function AdminSidebar({
               className={cn('flex min-w-0 items-center gap-2', FOCUS_VISIBLE)}
               aria-label="Admin Dashboard"
             >
-              <span className="relative h-9 w-9 flex-shrink-0">
-                <Image
-                  src="/images/bioscope-logo.png"
-                  alt="Bioscope"
-                  fill
-                  className="object-contain"
-                  sizes="36px"
-                />
-              </span>
-              <span className="truncate font-display text-xl text-[var(--ink)]">bioscope</span>
+              <Wordmark variant="dark" size="md" text="BIOSCOPE" />
             </Link>
           )}
 

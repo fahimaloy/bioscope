@@ -20,7 +20,7 @@ import { FOCUS_VISIBLE } from '@/components/ui/shared'
  * Task 1.2 — the top bar (spec §5.8 / plan Task 1.2).
  *
  * Paper surface, 2px ink bottom border, hard offset ink shadow, the
- * `bioscope` lockup, four nav links as pills that fill on hover with the
+ * `BIOSCOPE` lockup, four nav links as pills that fill on hover with the
  * spring, and a cart control that opens the cart drawer. The mobile menu is a
  * full-width panel below the bar with a staggered link entrance.
  *
@@ -71,7 +71,7 @@ export function Navbar() {
           {/* Lockup */}
           <Link
             href="/"
-            aria-label="bioscope — home"
+            aria-label="BIOSCOPE — home"
             className={cn(
               'flex shrink-0 items-center rounded-pill px-2 py-1',
               FOCUS_VISIBLE

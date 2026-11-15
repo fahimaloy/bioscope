@@ -41,7 +41,7 @@ export const authConfig: NextAuthConfig = {
       const path = nextUrl.pathname
 
       const isAdminPath = path.startsWith('/admin')
-      const isAuthPath = path.startsWith('/login') || path.startsWith('/register')
+      const isAuthPath = path.startsWith('/login') || path.startsWith('/register') || path.startsWith('/admin/login')
       const isProtectedPath =
         path.startsWith('/checkout') ||
         path.startsWith('/profile') ||

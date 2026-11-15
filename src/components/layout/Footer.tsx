@@ -67,8 +67,8 @@ const FOOTER_COLUMNS = [
 const CONTACT = [
   {
     icon: Mail,
-    label: 'hello@bioscope.shop',
-    href: 'mailto:hello@bioscope.shop',
+    label: 'hello@BIOSCOPE.shop',
+    href: 'mailto:hello@BIOSCOPE.shop',
     note: 'Email us anytime',
   },
   { icon: Phone, label: '+880 1700 000000', href: 'tel:+8801700000000', note: 'Mon-Fri 9am-6pm' },
@@ -81,10 +81,10 @@ const CONTACT = [
 ] as const
 
 const SOCIAL = [
-  { label: 'Facebook', href: 'https://facebook.com/bioscope' },
-  { label: 'Instagram', href: 'https://instagram.com/bioscope' },
-  { label: 'Twitter', href: 'https://twitter.com/bioscope' },
-  { label: 'LinkedIn', href: 'https://linkedin.com/company/bioscope' },
+  { label: 'Facebook', href: 'https://facebook.com/BIOSCOPE' },
+  { label: 'Instagram', href: 'https://instagram.com/BIOSCOPE' },
+  { label: 'Twitter', href: 'https://twitter.com/BIOSCOPE' },
+  { label: 'LinkedIn', href: 'https://linkedin.com/company/BIOSCOPE' },
 ] as const
 
 /**
@@ -116,7 +116,7 @@ export function Footer() {
           >
             <Link
               href="/"
-              aria-label="bioscope — home"
+              aria-label="BIOSCOPE — home"
               className={`inline-flex items-center rounded-pill ${FOCUS_VISIBLE}`}
             >
               <Wordmark size="lg" variant="light" />
@@ -210,7 +210,7 @@ export function Footer() {
         {/* Bottom bar. */}
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t-2 border-[color-mix(in_srgb,var(--paper)_20%,transparent)] pt-8 sm:flex-row">
           <p className="text-sm text-[color-mix(in_srgb,var(--paper)_60%,transparent)]">
-            © {new Date().getFullYear()} bioscope. All rights reserved.
+            © {new Date().getFullYear()} BIOSCOPE. All rights reserved.
           </p>
           <p className="text-sm text-[color-mix(in_srgb,var(--paper)_60%,transparent)]">
             Made with care in Bangladesh

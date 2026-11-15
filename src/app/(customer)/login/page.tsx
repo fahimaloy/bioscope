@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, signOut } from 'next-auth/react'
 import { Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -15,6 +15,7 @@ import { Mail, Lock, X, Eye, EyeOff } from 'lucide-react'
 import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
 import { motion } from 'framer-motion'
+import { toast } from 'sonner'
 
 function LoginForm() {
   const router = useRouter()
@@ -59,7 +60,17 @@ function LoginForm() {
 
       if (result?.error) {
         setError(result.error)
-      } else {
+      } else if (result?.ok) {
+        // After successful signIn, fetch session to check user role
+        const sessionRes = await fetch('/api/auth/session')
+        const session = await sessionRes.json()
+        
+        if (session?.user?.role === 'ADMIN') {
+          // Sign out the admin user and redirect to admin login
+          await signOut({ callbackUrl: '/admin/login' })
+          toast.error('Admin users must sign in at /admin/login')
+          return
+        }
         router.push(callbackUrl)
         router.refresh()
       }

@@ -258,5 +258,45 @@
     "$type": "color",
     "$value": "{ink}",
     "$description": "Text on --lime (8.06:1)"
+  },
+  "letter-1": {
+    "$type": "color",
+    "$value": "#F42A7A",
+    "$description": "BIOSCOPE letter 1 (B) — per-letter palette from logo"
+  },
+  "letter-2": {
+    "$type": "color",
+    "$value": "#EFA10B",
+    "$description": "BIOSCOPE letter 2 (I) — per-letter palette from logo"
+  },
+  "letter-3": {
+    "$type": "color",
+    "$value": "#0DA5DC",
+    "$description": "BIOSCOPE letter 3 (O) — per-letter palette from logo"
+  },
+  "letter-4": {
+    "$type": "color",
+    "$value": "#ED7E10",
+    "$description": "BIOSCOPE letter 4 (S) — per-letter palette from logo"
+  },
+  "letter-5": {
+    "$type": "color",
+    "$value": "#EC2D7B",
+    "$description": "BIOSCOPE letter 5 (C) — per-letter palette from logo"
+  },
+  "letter-6": {
+    "$type": "color",
+    "$value": "#F42A7A",
+    "$description": "BIOSCOPE letter 6 (O) — per-letter palette from logo"
+  },
+  "letter-7": {
+    "$type": "color",
+    "$value": "#EFA10B",
+    "$description": "BIOSCOPE letter 7 (P) — per-letter palette from logo"
+  },
+  "letter-8": {
+    "$type": "color",
+    "$value": "#0DA5DC",
+    "$description": "BIOSCOPE letter 8 (E) — per-letter palette from logo"
   }
 }

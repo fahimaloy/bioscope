@@ -107,8 +107,8 @@ describe('Footer', () => {
     // The lockup: the mark image plus the accessible brand name on its link.
     // The old assertion passed on the sr-only text node alone; the link's
     // accessible name pins the lockup link itself.
-    expect(screen.getByRole('img', { name: 'bioscope' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'bioscope — home' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'BIOSCOPE' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'BIOSCOPE — home' })).toBeInTheDocument()
 
     for (const { href, label } of DESTINATIONS) {
       const link = screen.getByRole('link', { name: label })
@@ -155,9 +155,9 @@ describe('Footer', () => {
   it('renders a contact block with a mailto, a tel and a map link', () => {
     render(<Footer />)
 
-    expect(screen.getByRole('link', { name: /hello@bioscope\.shop/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /hello@BIOSCOPE.shop/ })).toHaveAttribute(
       'href',
-      'mailto:hello@bioscope.shop'
+      'mailto:hello@BIOSCOPE.shop'
     )
     expect(screen.getByRole('link', { name: /\+880/ })).toHaveAttribute(
       'href',
@@ -256,13 +256,13 @@ describe('Footer', () => {
   it('uses no folk accent as text on the ink surface — body text is paper (Ruling 6)', () => {
     const { container } = render(<Footer />)
 
-    // The wordmark's two "o" glyphs carry pink/violet as display type, which
+    // The wordmark's letters carry per-letter colors (letter-1 through letter-8) as display type,
     // contract §2 permits. Nothing else may use an accent as text on ink.
     const wordmarkRoot = container.querySelector('span.sr-only')?.parentElement
     expect(wordmarkRoot, 'the wordmark renders its sr-only label').not.toBeNull()
 
     const ACCENT_TEXT =
-      /text-\[var\(--(pink|pink-strong|violet|orange|lime|teal|blue|gold|red|green|green-strong)\)\]/
+      /text-\[var\(--(letter-[1-8]|pink|pink-strong|violet|orange|lime|teal|blue|gold|red|green|green-strong)\)\]/
     const accentTextElements = Array.from(container.querySelectorAll('[class]')).filter((el) =>
       ACCENT_TEXT.test(el.getAttribute('class') ?? '')
     )
