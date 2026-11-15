@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/lib/auth'
-import { handleRouteError, ok, created, parsePagination, buildPagination } from '@/lib/api-utils'
+import { handleRouteError, ok, created, parsePagination, buildPagination, requireAdmin } from '@/lib/api-utils'
 import { createCategorySchema } from '@/lib/validations/category'
 
 export const dynamic = 'force-dynamic'
@@ -37,6 +37,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    await requireAdmin()
     const body = await request.json()
     const validated = createCategorySchema.parse(body)
     const category = await prisma.category.create({ data: validated })

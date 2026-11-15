@@ -90,7 +90,7 @@ export const uploadImage = async (
 }
 
 // Generate signed upload parameters for client-side uploads
-const ALLOWED_UPLOAD_FOLDERS = ['stickers', 'products', 'custom-requests', 'reviews', 'avatars'] as const
+const ALLOWED_UPLOAD_FOLDERS = ['stickers', 'products', 'custom-requests', 'reviews', 'avatars', 'categories', 'branding'] as const
 
 export const getSignedUploadParams = (folder: string = 'stickers') => {
   if (!(ALLOWED_UPLOAD_FOLDERS as readonly string[]).includes(folder)) {
