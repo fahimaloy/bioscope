@@ -579,7 +579,16 @@ h1, h2, h3, .logo, .footer-logo {
   }
 }
 
-/* High Contrast */
+/* High Contrast
+ *
+ * These tokens are ONLY active when the user enables "High Contrast" mode
+ * in their OS/browser accessibility settings (prefers-contrast: high).
+ * They override the standard theme tokens to ensure WCAG AAA contrast ratios.
+ *
+ * IMPORTANT: These tokens (--primary, --secondary, --light, --dark, --bg-color,
+ * --purple) are INERT at normal contrast and must NOT be used in regular styles.
+ * The globals-tokens.test.ts scan will flag any usage outside this media query.
+ */
 @media (prefers-contrast: high) {
   :root {
     --primary: #CC0000;
