@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Textarea, Select } from '@/components/ui/Input'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { Badge } from '@/components/ui/Badge'
@@ -252,20 +253,18 @@ export function ProductForm({
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={formData.isActive}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, isActive: e.target.checked }))}
-                      className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                      onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isActive: checked === true }))}
+                      className="h-4 w-4"
                     />
                     <span className="text-sm text-[var(--ink)]">Active</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={formData.isFeatured}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, isFeatured: e.target.checked }))}
-                      className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                      onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isFeatured: checked === true }))}
+                      className="h-4 w-4"
                     />
                     <span className="text-sm text-[var(--ink)]">Featured</span>
                   </label>
@@ -460,20 +459,18 @@ export function ProductForm({
                   min={0}
                 />
                 <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={formData.isActive}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, isActive: e.target.checked }))}
-                    className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                    onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isActive: checked === true }))}
+                    className="h-4 w-4"
                   />
                   <span className="text-sm text-[var(--ink)]">Active</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={formData.isFeatured}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, isFeatured: e.target.checked }))}
-                    className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                    onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isFeatured: checked === true }))}
+                    className="h-4 w-4"
                   />
                   <span className="text-sm text-[var(--ink)]">Featured</span>
                 </label>
@@ -527,11 +524,10 @@ export function ProductForm({
                 step={0.01}
               />
               <label className="flex items-center gap-2 cursor-pointer mt-6 p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={formData.isTaxInclusive}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, isTaxInclusive: e.target.checked }))}
-                  className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isTaxInclusive: checked === true }))}
+                  className="h-4 w-4"
                 />
                 <span className="text-sm text-[var(--ink)]">Price includes tax</span>
               </label>
@@ -541,11 +537,10 @@ export function ProductForm({
           <Card className="p-6 space-y-6">
             <h4 className="font-medium text-body text-[var(--ink)]">Inventory</h4>
             <label className="flex items-center gap-2 cursor-pointer p-3 bg-[var(--light)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={formData.trackInventory}
-                onChange={(e) => setFormData((prev) => ({ ...prev, trackInventory: e.target.checked }))}
-                className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, trackInventory: checked === true }))}
+                className="h-4 w-4"
               />
               <span className="text-sm text-[var(--ink)]">Track inventory</span>
             </label>

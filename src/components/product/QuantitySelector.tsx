@@ -71,7 +71,7 @@ export function QuantitySelector({
     <div className={cn('flex items-center gap-4 flex-wrap', className)}>
       {/* Input with buttons */}
       <motion.div
-        className="flex items-center border-3 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input overflow-hidden"
+        className="flex items-center border-[3px] border-[var(--ink)] rounded-[var(--radius-md)] bg-[var(--surface-raised)] overflow-hidden"
         animate={shake ? { x: [-10, 10, -10, 10, 0] } : {}}
         transition={{ duration: 0.4 }}
       >

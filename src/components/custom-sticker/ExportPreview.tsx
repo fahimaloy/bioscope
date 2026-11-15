@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { StickerPreview } from './StickerCanvas'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Slider } from '@/components/ui/Slider'
 import type { StickerDesign, MaterialType, FinishType, CutType } from '@/types'
 import { Download, Eye, CheckCircle, XCircle, Settings, FileImage, FileText, Share2, Copy, RotateCcw } from 'lucide-react'
@@ -252,20 +253,18 @@ export function ExportPreview({
               <div className="space-y-4 border-t border-[var(--light)] pt-4">
                 <div className="grid grid-cols-2 gap-4">
                   <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={options.includeCutLine}
-                      onChange={(e) => setOptions((prev) => ({ ...prev, includeCutLine: e.target.checked }))}
-                      className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded"
+                      onCheckedChange={(checked) => setOptions((prev) => ({ ...prev, includeCutLine: checked === true }))}
+                      className="h-4 w-4"
                     />
                     <span className="text-sm text-[var(--ink)]">Include Cut Line</span>
                   </label>
                   <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={options.includeBleed}
-                      onChange={(e) => setOptions((prev) => ({ ...prev, includeBleed: e.target.checked }))}
-                      className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded"
+                      onCheckedChange={(checked) => setOptions((prev) => ({ ...prev, includeBleed: checked === true }))}
+                      className="h-4 w-4"
                     />
                     <span className="text-sm text-[var(--ink)]">Include Bleed</span>
                   </label>

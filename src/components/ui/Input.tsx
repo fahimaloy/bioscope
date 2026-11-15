@@ -31,7 +31,7 @@ const fieldClasses = (error?: string) =>
     'px-4 py-3 text-body text-[var(--text)]',
     'placeholder:text-[var(--text-subtle)]',
     'transition-[border-color,box-shadow] duration-fast ease-out',
-    'focus:outline-none focus:border-[var(--ink)]',
+    'focus:outline-none focus:border-[var(--ink)] focus:shadow-ink-1',
     FOCUS_VISIBLE,
     'disabled:cursor-not-allowed disabled:opacity-60',
     error ? 'border-[var(--error)] focus-visible:ring-[var(--error)]' : 'border-[var(--ink)]'
@@ -47,7 +47,7 @@ const labelClasses = (floated: boolean, error?: string) =>
     'pointer-events-none absolute left-3 px-1 transition-all duration-fast',
     'bg-[var(--surface-raised)] font-medium',
     floated
-      ? '-translate-y-1/2 scale-90 text-[var(--ink)]'
+      ? 'top-0 -translate-y-1/2 scale-90 text-[var(--ink)]'
       : 'top-1/2 -translate-y-1/2 text-[var(--text-subtle)]',
     error && 'text-[var(--error)]'
   );
@@ -73,7 +73,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const errorId = `${id}-error`;
     const hintId = `${id}-hint`;
 
-    const hasValue = Boolean(props.defaultValue) || Boolean(props.value);
+    const [isFocused, setIsFocused] = useState(false);
+    const [uncontrolledValue, setUncontrolledValue] = useState(props.defaultValue);
+    const liveValue = props.value !== undefined ? props.value : uncontrolledValue;
+    // Number 0 and "0" count as values; null/undefined/'' do not.
+    const hasLiveValue =
+      liveValue !== undefined && liveValue !== null && String(liveValue) !== '';
+    const floated = isFocused || hasLiveValue || Boolean(props.placeholder);
+
+    const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      props.onFocus?.(event);
+    };
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      props.onBlur?.(event);
+    };
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setUncontrolledValue(event.target.value);
+      props.onChange?.(event);
+    };
 
     const isPasswordType = type === 'password';
     const [showPassword, setShowPassword] = useState(false);
@@ -111,6 +130,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? errorId : hint ? hintId : undefined}
             {...props}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
           {icon && iconPosition === 'right' && !isPasswordType && (
             <div className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-[var(--text-subtle)]">
@@ -131,7 +153,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <label
               htmlFor={id}
               className={cn(
-                labelClasses(Boolean(hasValue || props.placeholder), error),
+                labelClasses(floated, error),
                 isPasswordType && 'right-12'
               )}
             >
@@ -181,7 +203,26 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const errorId = `${id}-error`;
     const hintId = `${id}-hint`;
 
-    const hasValue = Boolean(props.defaultValue) || Boolean(props.value);
+    const [isFocused, setIsFocused] = useState(false);
+    const [uncontrolledValue, setUncontrolledValue] = useState(props.defaultValue);
+    const liveValue = props.value !== undefined ? props.value : uncontrolledValue;
+    // Number 0 and "0" count as values; null/undefined/'' do not.
+    const hasLiveValue =
+      liveValue !== undefined && liveValue !== null && String(liveValue) !== '';
+    const floated = isFocused || hasLiveValue || Boolean(props.placeholder);
+
+    const handleFocus = (event: React.FocusEvent<HTMLTextAreaElement>) => {
+      setIsFocused(true);
+      props.onFocus?.(event);
+    };
+    const handleBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
+      setIsFocused(false);
+      props.onBlur?.(event);
+    };
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setUncontrolledValue(event.target.value);
+      props.onChange?.(event);
+    };
 
     return (
       <div className="w-full">
@@ -197,11 +238,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             aria-invalid={error ? 'true' : 'false'}
             aria-describedby={error ? errorId : hint ? hintId : undefined}
             {...props}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
           />
           {label && (
             <label
               htmlFor={id}
-              className={cn(labelClasses(Boolean(hasValue || props.placeholder), error), 'top-3')}
+              className={cn(labelClasses(floated, error))}
             >
               {label}
               {props.required && <span className="ml-1 text-[var(--error)]">*</span>}
@@ -251,7 +295,14 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const errorId = `${id}-error`;
     const hintId = `${id}-hint`;
 
-    const hasValue = Boolean(props.defaultValue) || Boolean(props.value);
+    // Floating-label decision for Select: floated when the select's current
+    // value is truthy or a placeholder option exists, and forced floated when
+    // no placeholder prop is passed (a selected option always occupies the
+    // field). In practice this means Select labels float unconditionally,
+    // since the field always shows either the placeholder or an option.
+    const selValue = props.value !== undefined ? props.value : props.defaultValue;
+    const hasSelValue = selValue !== undefined && selValue !== null && String(selValue) !== '';
+    const floated = hasSelValue || Boolean(placeholder) || placeholder === undefined;
 
     return (
       <div className="w-full">
@@ -294,7 +345,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           {label && (
             <label
               htmlFor={id}
-              className={cn(labelClasses(Boolean(hasValue || placeholder), error))}
+              className={cn(labelClasses(floated, error))}
             >
               {label}
               {props.required && <span className="ml-1 text-[var(--error)]">*</span>}

@@ -12,7 +12,8 @@ import {
   Tooltip,
 } from '@/components/ui'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils'
-import { Search, ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
+import { ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
+import { SearchInput } from '@/components/ui/SearchInput'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TRANSITIONS, type OrderStatus } from '@/lib/order-status'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -599,15 +600,12 @@ export default function AdminOrdersPage() {
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-              <label htmlFor="order-search" className="sr-only">Search orders</label>
-              <input
+              <SearchInput
                 id="order-search"
-                type="text"
                 placeholder="Search order #, customer..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
+                aria-label="Search orders"
               />
             </div>
             <Dropdown

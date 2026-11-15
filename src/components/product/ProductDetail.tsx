@@ -327,7 +327,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <fieldset>
               <legend className="font-medium text-[var(--text)] mb-3">Quantity</legend>
               <div className="flex items-center gap-4 flex-wrap">
-                <div className="flex items-center border-[3px] border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-[var(--radius-md)] overflow-hidden">
+                <div className="flex items-center border-[3px] border-[var(--ink)] rounded-[var(--radius-md)] bg-[var(--surface-raised)] overflow-hidden">
                   <Button
                     variant="outline"
                     size="sm"

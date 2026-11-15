@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Select } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -238,11 +239,10 @@ export function AddressForm({
               </div>
 
               <label className="flex items-center gap-3 cursor-pointer p-3 rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--ink)_40%,transparent)] transition-colors">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={formData.isDefault}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))}
-                  className="w-5 h-5 text-[var(--brand)] border-2 border-[var(--ink)] rounded-sm focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 focus:ring-offset-[var(--surface-raised)] appearance-none cursor-pointer"
+                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isDefault: checked === true }))}
+                  className="h-5 w-5"
                 />
                 <span className="text-sm font-medium text-[var(--text)]">Set as default address</span>
               </label>

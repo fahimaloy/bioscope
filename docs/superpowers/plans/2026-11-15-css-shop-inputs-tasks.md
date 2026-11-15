@@ -7,6 +7,18 @@ Legend: [ ] todo · [~] in progress · [x] done+verified. Blocking dependency:
 **A-01** (owner token-mapping decision) → C-02. B and C are independent of
 each other but both land after A.
 
+**Execution status (2026-11-15):** ALL THREE PHASES DONE+committed —
+`841a7ae` (Phase A) and `a9ee2f9` (Phases B/C). Gates: tsc/lint/255 tests/build
+all green; detect-changes exception owner-approved for a9ee2f9 (unmappable
+dead-import/file-deletion diffs). Screenshots of the fixed build captured at
+/tmp/opencode/{shop,login,register}-after.png — visual QA not yet performed
+(modlens vision unusable). Known open issues for owner: (1) dead admin
+filter UI decision (customers Spend Tier/Min Orders/Date From, SettingsForm
+logo/favicon upload) — see Known issues #0; (2) promote globals-tokens.test.ts
+to failing gate? needs tests/** freeze sign-off; (3) Dropdown nested-button
+pattern flagged to design lane; (4) modlens claude CLI model config repair
+unblocks screenshot-based visual review.
+
 ## Phase 0 — Owner decisions (RESOLVED 2026-11-15)
 - [x] P0-1 Alias mappings confirmed: `--primary→pink-strong`,
   `--secondary→teal`, `--light→paper-deep`, `--dark→ink`,
@@ -98,11 +110,15 @@ each other but both land after A.
   toolbars (square/no-focus) → profile (invisible toggle) → product/quantity
   steppers → login/register/contact → custom-sticker builder. Every raw
   `<input>`/`<select>`/`<textarea>` replaced with the primitive where covered.
-- [ ] C-06 Regression gates (adopted from audit): promote
-  `tests/unit/globals-tokens.test.ts` from informational to FAILING; add a
-  test that fails when any `className` references a color/radius/fontSize key
-  absent from `tailwind.config.ts` (seeded by the audit's tailwind-output
-  grep — e.g. `text-primary`, `rounded-input`, `text-body`, `border-3`).
+- [ ] C-06 Regression gates: contract §7 freezes `tests/**` beyond visual
+  baselines, so *promoting* `globals-tokens.test.ts` is NOT done without owner
+  sign-off. Instead a new additive gate exists and passes:
+  `tests/unit/dead-utilities.test.ts` (forbids `/NN` alpha on var()-based
+  palette colors — that class of utility is silently dropped at build; and
+  asserts the six legacy aliases exist at :root in the token region).
+  `pnpm exec vitest run tests/unit/dead-utilities.test.ts` → 2 passed.
+  (If the owner approves, also promote globals-tokens.test.ts to fail on the
+  media-only set.)
 - [ ] C-07 Verification: `pnpm type-check && pnpm lint && pnpm test:run`;
   screenshots login/register/profile/checkout/custom-sticker/admin surfaces;
   manual pass — tab order, visible focus ring, error states, reduced-motion;
@@ -117,6 +133,14 @@ each other but both land after A.
   computed-style/curl checks stand in until a vision provider works.
 
 ## Known issues carried forward
+0. **Dead admin filter UI (owner decision needed)**: customers page "Show
+   Filters" panel — Spend Tier `<select>`, Min Orders `<input type="number">`,
+   Date From (no value/onChange — inert; the `/api/customers` route only
+   accepts `search`+`page`). SettingsForm logo/favicon `<input type="file">`
+   (no onChange/upload — inert). Properly wiring these needs server query
+   params (frozen `src/lib/actions` / `app/api` per contract §7) or upload
+   behavior (uploadthing folder whitelist); both are feature work, not
+   repair. Decision for owner: wire them as a follow-up or remove them.
 1. Screenshot review blocked: modlens providers fail on this machine (local
    claude CLI rejects model `poolside/laguna-s-2.1:free`; opencode-cli reuse
    fails opaquely). User to repair claude CLI model config or add a provider

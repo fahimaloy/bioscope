@@ -150,7 +150,7 @@ function LoginForm() {
               <input
                 type="checkbox"
                 {...register('rememberMe')}
-                className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                className="h-4 w-4 accent-[var(--ink)] border-2 border-[var(--ink)] rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               />
               <span className="text-sm text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">Remember me</span>
             </label>

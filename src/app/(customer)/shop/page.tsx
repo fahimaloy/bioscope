@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { SkeletonProductCard } from '@/components/ui/Skeleton'
-import { Select } from '@/components/ui/Select'
 import { DoodleScatter, DoodleSparkle } from '@/components/decorative'
 import { FOCUS_VISIBLE_INK } from '@/components/ui/shared'
+import { Search } from 'lucide-react'
+import { Input, Select } from '@/components/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -55,19 +56,33 @@ const CTA_LINK_CLASSES = [
 export default function ShopPage() {
   const variants = useMotionVariants()
   const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesError, setCategoriesError] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [sortBy, setSortBy] = useState<(typeof sortOptions)[number]['value']>('featured')
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
   const [products, setProducts] = useState<any[]>([])
   const [pager, setPager] = useState({ total: 0, totalPages: 1 })
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const loadCategories = useCallback(() => {
+    setCategoriesError(false)
     fetch('/api/categories?limit=100')
       .then((r) => r.json())
       .then((j) => { if (j.success) setCategories(j.data.data) })
-      .catch(() => {})
+      .catch(() => setCategoriesError(true))
   }, [])
+
+  useEffect(() => {
+    loadCategories()
+  }, [loadCategories])
+
+  // Debounce the search box so we don't refetch on every keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => { setSearch(searchInput.trim()); setPage(1) }, 250)
+    return () => clearTimeout(t)
+  }, [searchInput])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -80,6 +95,7 @@ export default function ShopPage() {
         sortOrder: opt.sortOrder,
       })
       if (selectedCategory !== 'all') params.set('categoryId', selectedCategory)
+      if (search) params.set('search', search)
       const res = await fetch(`/api/products?${params.toString()}`)
       const json = await res.json()
       if (res.ok) {
@@ -89,7 +105,7 @@ export default function ShopPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, sortBy, selectedCategory])
+  }, [page, sortBy, selectedCategory, search])
 
   useEffect(() => {
     load()
@@ -101,7 +117,7 @@ export default function ShopPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[var(--paper)]">
+    <div className="bg-[var(--paper)] pt-24">
       {/* Hero — one decor accent: a single DoodleScatter (contract §3). */}
       <section className="relative overflow-hidden py-20 px-4 sm:px-6 lg:px-8">
         <DoodleScatter count={6} seed="shop-hero" />
@@ -124,22 +140,42 @@ export default function ShopPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium text-[var(--text-subtle)]">Categories:</span>
-              <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Product categories">
-                {categoryPills.map((cat) => (
-                  <Button
-                    key={cat.id}
-                    variant={selectedCategory === cat.id ? 'primary' : 'outline'}
-                    size="sm"
-                    aria-pressed={selectedCategory === cat.id}
-                    onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
-                  >
-                    {cat.name}
-                  </Button>
-                ))}
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Product categories">
+                  {categoryPills.map((cat) => (
+                    <Button
+                      key={cat.id}
+                      variant={selectedCategory === cat.id ? 'primary' : 'outline'}
+                      size="sm"
+                      aria-pressed={selectedCategory === cat.id}
+                      onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
+                    >
+                      {cat.name}
+                    </Button>
+                  ))}
+                </div>
+                {categoriesError && (
+                  <p role="alert" className="text-sm text-[var(--error)] flex items-center gap-2">
+                    Couldn&apos;t load categories.
+                    <button type="button" onClick={loadCategories} className="underline font-medium hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded">
+                      Retry
+                    </button>
+                  </p>
+                )}
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
+              <div className="w-full sm:w-64">
+                <Input
+                  aria-label="Search stickers"
+                  placeholder="Search stickers…"
+                  icon={<Search size={18} />}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="min-h-[44px]"
+                />
+              </div>
               <div className="flex items-center gap-2">
                 <label htmlFor="shop-sort" className="text-sm font-medium text-[var(--text-subtle)]">
                   Sort by:
@@ -196,7 +232,7 @@ export default function ShopPage() {
               <DoodleSparkle size={64} color="gold" animation="float" className="mx-auto mb-6" />
               <h2 className="font-display text-2xl text-[var(--text)] mb-2">No products found</h2>
               <p className="text-[var(--text-muted)] mb-6">Try adjusting your filters or browse all categories</p>
-              <Button variant="primary" size="lg" onClick={() => { setSelectedCategory('all'); setPage(1) }}>
+              <Button variant="primary" size="lg" onClick={() => { setSelectedCategory('all'); setSearchInput(''); setPage(1) }}>
                 Clear Filters
               </Button>
             </div>

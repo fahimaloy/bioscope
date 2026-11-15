@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { Badge } from '@/components/ui/Badge'
 import type { Product, DimensionConfig, QuantityConfig } from '@/types'
@@ -111,7 +112,7 @@ export function ProductConfigurator({
 
         <div className="flex items-center gap-4 flex-wrap">
           {/* Visual quantity selector */}
-          <div className="flex items-center border-3 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input overflow-hidden">
+          <div className="flex items-center border-[3px] border-[var(--ink)] rounded-[var(--radius-md)] bg-[var(--surface-raised)] overflow-hidden">
             <Button
               variant="doodle-outline"
               size="sm"
@@ -331,11 +332,10 @@ function CustomField({
     case 'boolean':
       return (
         <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={value}
-            onChange={(e) => onChange?.(e.target.checked)}
-            className="w-5 h-5 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+            onCheckedChange={(checked) => onChange?.(checked === true)}
+            className="h-5 w-5"
           />
           <span className="text-body text-[var(--ink)]">{field.label}</span>
         </label>

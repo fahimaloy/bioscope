@@ -7,7 +7,8 @@ import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { DataTable } from '@/components/ui/DataTable'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Search, Users, User, DollarSign, ShoppingBag, TrendingUp, Filter, X } from 'lucide-react'
+import { Users, User, DollarSign, ShoppingBag, TrendingUp, Filter, X } from 'lucide-react'
+import { SearchInput } from '@/components/ui/SearchInput'
 import { motion } from 'framer-motion'
 import { SketchUnderline, DoodleShape, DoodleStar, StickerPeel } from '@/components/decorative/DoodleElements'
 import { CounterAnimation } from '@/components/animations/CounterAnimation'
@@ -220,13 +221,11 @@ export default function CustomersPage() {
             <StickerPeel />
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1 min-w-[250px] max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-                <input
-                  type="text"
+                <SearchInput
                   placeholder="Search name, email, phone..."
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
+                  aria-label="Search customers"
                 />
               </div>
               <Button

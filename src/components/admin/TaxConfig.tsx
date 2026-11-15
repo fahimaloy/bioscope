@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Select } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Plus, Minus, Trash2, Settings, Percent, Calculator } from 'lucide-react'
@@ -113,14 +114,13 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
 
           <div className="flex items-end">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={taxInclusive}
-                onChange={(e) => {
-                  setTaxInclusive(e.target.checked)
+                onCheckedChange={(checked) => {
+                  setTaxInclusive(checked === true)
                   handleGlobalChange()
                 }}
-                className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                className="h-4 w-4"
               />
               <span className="text-sm text-[var(--ink)]">Display prices with tax included</span>
             </label>

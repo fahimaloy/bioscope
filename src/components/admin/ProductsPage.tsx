@@ -9,10 +9,11 @@ import { DataTable, type Column } from '@/components/ui/DataTable'
 import { Card } from '@/components/ui/Card'
 import { ProductForm } from '@/components/admin/ProductForm'
 import { ProductPreview } from '@/components/admin/ProductPreview'
-import { Select } from '@/components/ui/Select'
+import { Select } from '@/components/ui'
 import { Modal } from '@/components/ui/Modal'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye } from 'lucide-react'
+import { SearchInput } from '@/components/ui/SearchInput'
 import Image from 'next/image'
 
 const COLUMNS: Column<any>[] = [
@@ -159,15 +160,12 @@ export default function ProductsPage() {
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-              <label htmlFor="product-search" className="sr-only">Search products</label>
-              <input
+              <SearchInput
                 id="product-search"
-                type="text"
                 placeholder="Search products..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
+                aria-label="Search products"
               />
             </div>
             <Select
