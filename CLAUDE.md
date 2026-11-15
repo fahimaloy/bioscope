@@ -43,3 +43,6 @@ This project is indexed by GitNexus as **bioscope** (3708 symbols, 7140 relation
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+
+## Verification
+See `AGENTS.md` § "Verification (agent contract)" and `.agent/README.md` — tiers `pnpm verify:fast|mid|full`, policy in `.agent/rules/verification-policy.md`. Focused tests ≠ release verification; never claim checks that did not run.

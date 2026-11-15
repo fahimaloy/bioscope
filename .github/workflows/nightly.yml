@@ -1,0 +1,40 @@
+name: nightly
+
+on:
+  schedule:
+    - cron: '0 18 * * *'   # 00:00 Dhaka
+  workflow_dispatch: {}
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bioscope
+      NEXTAUTH_SECRET: nightly-secret
+      NEXTAUTH_URL: http://localhost:3000
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: bioscope
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npx prisma generate
+      - run: npx prisma db push --skip-generate
+      - run: pnpm verify:full
