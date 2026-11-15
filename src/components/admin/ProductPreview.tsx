@@ -220,7 +220,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
 // Compact preview for lists
 export function CompactProductPreview({ product }: { product: Partial<Product> }) {
   return (
-    <div className="flex items-center gap-4 p-3 bg-white rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-primary/50 transition-colors">
+    <div className="flex items-center gap-4 p-3 bg-white rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
       <div className="relative w-16 h-16 flex-shrink-0 rounded-input overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] bg-[var(--light)]">
         {product.images?.[0] ? (
           <Image src={product.images[0]} alt={product.name as string} fill className="object-cover" sizes="64px" />

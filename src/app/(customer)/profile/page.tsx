@@ -399,19 +399,19 @@ function SecurityTips() {
       <h3 className="font-display text-lg text-primary mb-4">Security Tips</h3>
       <ul className="space-y-3 text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
         <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm">1</span>
+          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">1</span>
           Use a unique, strong password
         </li>
         <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm">2</span>
+          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">2</span>
           Enable 2FA when available
         </li>
         <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm">3</span>
+          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">3</span>
           Never share your password
         </li>
         <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm">4</span>
+          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">4</span>
           Log out from shared devices
         </li>
       </ul>
@@ -659,11 +659,11 @@ function AccountTab({ user }: { user: typeof mockUser }) {
               {avatar ? (
                 <img src={avatar} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-3 border-[var(--ink)]" />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center border-3 border-[var(--ink)]">
+                <div className="w-24 h-24 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center border-3 border-[var(--ink)]">
                   <span className="text-3xl font-display text-primary">{getInitials(user?.name || 'User')}</span>
                 </div>
               )}
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors border-3 border-[var(--surface-raised)] shadow-btn">
+              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-[color-mix(in_srgb,var(--primary)_90%,transparent)] transition-colors border-3 border-[var(--surface-raised)] shadow-btn">
                 <Camera className="w-4 h-4" />
                 <input
                   type="file"

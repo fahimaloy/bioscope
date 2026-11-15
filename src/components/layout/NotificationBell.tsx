@@ -124,7 +124,7 @@ export function NotificationBell() {
                         'w-full p-4 flex items-start gap-3 transition-colors',
                         'hover:bg-[var(--light)]',
                         'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-                        !notification.isRead && 'bg-primary/5'
+                        !notification.isRead && 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)]'
                       )}
                       role="button"
                       tabIndex={0}
@@ -132,7 +132,7 @@ export function NotificationBell() {
                       <div
                         className={cn(
                           'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                          !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
+                          !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                         )}
                       >
                         {getIcon(notification.type)}

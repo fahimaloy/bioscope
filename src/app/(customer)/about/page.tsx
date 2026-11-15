@@ -218,7 +218,7 @@ export default function AboutPage() {
               ].map((material, index) => (
                 <Card key={index} variant="doodle" padding="lg" className="text-center relative">
                   <StickerPeel />
-                  <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-input flex items-center justify-center">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] rounded-input flex items-center justify-center">
                     <material.icon className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="font-display text-xl text-primary mb-2">{material.name}</h3>
@@ -264,7 +264,7 @@ export default function AboutPage() {
                   <Card variant="doodle" padding="lg" className="text-center relative group">
                     <StickerPeel />
                     <div className="relative mb-4">
-                      <div className="w-28 h-28 mx-auto bg-primary/10 rounded-full flex items-center justify-center border-3 border-[var(--primary)] relative overflow-hidden">
+                      <div className="w-28 h-28 mx-auto bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] rounded-full flex items-center justify-center border-3 border-[var(--primary)] relative overflow-hidden">
                         <span className="text-3xl font-display text-primary relative z-10">{member.avatar}</span>
                         {/* Peel effect on avatar */}
                         <div className="absolute top-[-4px] right-[-4px] w-5 h-5 bg-[var(--accent)] border-2 border-[var(--ink)] rounded-tr-full shadow-[2px_2px_0_var(--ink)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -311,7 +311,7 @@ export default function AboutPage() {
               {values.map((value, index) => (
                 <Card key={index} variant="doodle" padding="lg" className="text-center relative bg-[var(--dark)] border-primary">
                   <StickerPeel />
-                  <div className="w-14 h-14 mx-auto mb-4 bg-primary/20 rounded-input flex items-center justify-center border-2 border-[var(--primary)]">
+                  <div className="w-14 h-14 mx-auto mb-4 bg-[color-mix(in_srgb,var(--primary)_20%,transparent)] rounded-input flex items-center justify-center border-2 border-[var(--primary)]">
                     <value.icon className="w-7 h-7 text-accent" />
                   </div>
                   <h3 className="font-display text-xl text-white mb-2">{value.title}</h3>

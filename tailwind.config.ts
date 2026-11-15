@@ -29,6 +29,15 @@ const config: Config = {
         'green-strong': 'var(--green-strong)',
         brand: 'var(--brand)',
         'on-brand': 'var(--on-brand)',
+        // Legacy aliases consumed by pre-token JSX. Aliases live in tokens
+        // (owner-confirmed 2026-11-15); /NN opacity is not derivable from a
+        // plain var() — those sites use color-mix arbitrary values instead.
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+        light: 'var(--light)',
+        dark: 'var(--dark)',
+        'bg-color': 'var(--bg-color)',
+        purple: 'var(--purple)',
         accent: 'var(--accent)',
         info: 'var(--info)',
         success: 'var(--success)',
@@ -71,6 +80,11 @@ const config: Config = {
         'wobble-sm': 'var(--radius-wobble-sm)',
         'wobble-md': 'var(--radius-wobble-md)',
         'wobble-lg': 'var(--radius-wobble-lg)',
+        card: 'var(--radius-lg)',
+        input: 'var(--radius-md)',
+      },
+      borderWidth: {
+        3: '3px',
       },
       boxShadow: {
         'ink-1': 'var(--shadow-ink-1)',
@@ -168,6 +182,7 @@ const config: Config = {
         '128': '32rem',
       },
       fontSize: {
+        body: ['var(--text-base)', { lineHeight: '1.6' }],
         xs: ['var(--text-xs)', { lineHeight: '1.5' }],
         sm: ['var(--text-sm)', { lineHeight: '1.5' }],
         base: ['var(--text-base)', { lineHeight: '1.6' }],
@@ -178,6 +193,8 @@ const config: Config = {
         '4xl': ['var(--text-4xl)', { lineHeight: '1.15' }],
         '5xl': ['var(--text-5xl)', { lineHeight: '1.1' }],
         '6xl': ['var(--text-6xl)', { lineHeight: '1.05' }],
+        '7xl': ['var(--text-7xl)', { lineHeight: '1.05' }],
+        '8xl': ['var(--text-8xl)', { lineHeight: '1' }],
       },
       zIndex: {
         dropdown: 'var(--z-dropdown)',

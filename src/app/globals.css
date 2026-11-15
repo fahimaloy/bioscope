@@ -39,6 +39,12 @@
   --border: var(--ink);
   --ring: var(--gold);
   --overlay: color-mix(in srgb, var(--ink) 55%, transparent);
+  --purple: var(--violet);
+  --primary: var(--pink-strong);
+  --secondary: var(--teal);
+  --light: var(--paper-deep);
+  --dark: var(--ink);
+  --bg-color: var(--paper);
   --on-pink: var(--ink);
   --on-pink-strong: #FFFFFF;
   --on-violet: #FFFFFF;
@@ -60,6 +66,8 @@
   --text-4xl: 36px;
   --text-5xl: 48px;
   --text-6xl: 64px;
+  --text-7xl: 72px;
+  --text-8xl: 96px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;

@@ -75,7 +75,7 @@ export function NotificationList({
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-input bg-primary/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-input bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center">
             <Bell className="w-5 h-5 text-primary" />
           </div>
           <div>
@@ -150,14 +150,14 @@ export function NotificationList({
                 key={notification.id}
                 className={cn(
                   'flex items-start gap-3 p-4 rounded-input border-2 transition-all',
-                  !notification.isRead ? 'bg-primary/5 border-primary/20' : 'bg-white border-[var(--light)]',
-                  isExpanded && 'ring-2 ring-primary/20'
+                  !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)] border-[color-mix(in_srgb,var(--primary)_20%,transparent)]' : 'bg-white border-[var(--light)]',
+                  isExpanded && 'ring-2 ring-[color-mix(in_srgb,var(--primary)_20%,transparent)]'
                 )}
               >
                 <div
                   className={cn(
                     'w-10 h-10 rounded-input flex items-center justify-center flex-shrink-0',
-                    !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
+                    !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                   )}
                 >
                   {Icon}
@@ -186,7 +186,7 @@ export function NotificationList({
                     </div>
                   )}
                   {!isExpanded && notification.data && (
-                    <p className="text-xs text-primary/80 mt-1">Click to expand</p>
+                    <p className="text-xs text-[var(--text-subtle)] mt-1">Click to expand</p>
                   )}
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
@@ -309,7 +309,7 @@ export function NotificationBellDropdown({
                     className={cn(
                       'w-full p-4 flex items-start gap-3 transition-colors',
                       'hover:bg-[var(--light)]',
-                      !notification.isRead && 'bg-primary/5',
+                      !notification.isRead && 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)]',
                       'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                     )}
                     role="menuitem"

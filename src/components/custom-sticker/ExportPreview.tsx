@@ -88,7 +88,7 @@ export function ExportPreview({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--light)]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-input bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-input bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center">
               <FileImage className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -157,7 +157,7 @@ export function ExportPreview({
                     className={cn(
                       'p-3 rounded-input border-3 text-center transition-all',
                       options.format === format
-                        ? 'border-primary bg-primary/10 text-primary'
+                        ? 'border-primary bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary'
                         : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                     )}
                   >
@@ -223,7 +223,7 @@ export function ExportPreview({
                     className={cn(
                       'p-3 rounded-input border-3 text-center transition-all',
                       options.background === bg
-                        ? 'border-primary bg-primary/10 text-primary'
+                        ? 'border-primary bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary'
                         : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
                     )}
                   >

@@ -174,6 +174,36 @@
     "$value": "color-mix(in srgb, var(--ink) 55%, transparent)",
     "$description": "Modal/scrim overlay"
   },
+  "purple": {
+    "$type": "color",
+    "$value": "{violet}",
+    "$description": "Legacy alias — kept for pre-token JSX usages"
+  },
+  "primary": {
+    "$type": "color",
+    "$value": "{pink-strong}",
+    "$description": "Legacy alias — brand action (owner-confirmed mapping)"
+  },
+  "secondary": {
+    "$type": "color",
+    "$value": "{teal}",
+    "$description": "Legacy alias — secondary action"
+  },
+  "light": {
+    "$type": "color",
+    "$value": "{paper-deep}",
+    "$description": "Legacy alias — light neutral surface"
+  },
+  "dark": {
+    "$type": "color",
+    "$value": "{ink}",
+    "$description": "Legacy alias — dark neutral"
+  },
+  "bg-color": {
+    "$type": "color",
+    "$value": "{paper}",
+    "$description": "Legacy alias — app background"
+  },
   "on-pink": {
     "$type": "color",
     "$value": "{ink}",

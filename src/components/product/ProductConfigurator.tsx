@@ -96,7 +96,7 @@ export function ProductConfigurator({
             >
               <span className="block font-display">{dim.label}</span>
               {dim.priceMultiplier !== 1 && (
-                <span className="absolute top-1 right-1 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                <span className="absolute top-1 right-1 text-xs bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary px-1.5 py-0.5 rounded">
                   {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
                 </span>
               )}

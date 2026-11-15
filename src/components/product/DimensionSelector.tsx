@@ -68,7 +68,7 @@ export function DimensionSelector({
               className={cn(
                 'flex items-center gap-2 px-4 py-3 rounded-input border-3 cursor-pointer transition-all',
                 selectedDimension?.id === dim.id
-                  ? 'border-primary bg-primary/10 text-primary'
+                  ? 'border-primary bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary'
                   : 'border-[color-mix(in_srgb,var(--ink)_30%,transparent)] text-[var(--ink)] hover:border-primary'
               )}
             >
@@ -83,7 +83,7 @@ export function DimensionSelector({
               />
               <span className="font-medium">{dim.label}</span>
               {dim.priceMultiplier !== 1 && (
-                <span className="text-sm text-primary/80">
+                <span className="text-sm text-primary">
                   {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
                 </span>
               )}
@@ -116,7 +116,7 @@ export function DimensionSelector({
                 {dim.width} × {dim.height} cm
               </div>
               {dim.priceMultiplier !== 1 && (
-                <div className="text-xs text-primary/80 mt-1">
+                <div className="text-xs text-primary mt-1">
                   {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
                 </div>
               )}
@@ -161,7 +161,7 @@ export function DimensionSelector({
           >
             <span className="block font-display">{dim.label}</span>
             {dim.priceMultiplier !== 1 && (
-              <span className="absolute top-1 right-1 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+              <span className="absolute top-1 right-1 text-xs bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary px-1.5 py-0.5 rounded">
                 {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
               </span>
             )}
@@ -244,7 +244,7 @@ export function DimensionComparisonTable({
               key={dim.id}
               className={cn(
                 'border-b border-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] transition-colors',
-                selectedDimension?.id === dim.id && 'bg-primary/5'
+                selectedDimension?.id === dim.id && 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)]'
               )}
             >
               <td className="p-2 font-medium">{dim.label}</td>
@@ -254,7 +254,7 @@ export function DimensionComparisonTable({
               <td className="p-2">
                 <span className={cn(
                   'px-2 py-0.5 rounded-full text-xs',
-                  dim.priceMultiplier === 1 ? 'bg-[var(--light)] text-[var(--ink)]' : 'bg-primary/10 text-primary'
+                  dim.priceMultiplier === 1 ? 'bg-[var(--light)] text-[var(--ink)]' : 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary'
                 )}>
                   {dim.priceMultiplier}x
                 </span>

@@ -65,7 +65,7 @@ export function DeliveryConfig({ onChange, initialSettings = {} }: DeliveryConfi
       <div className="bg-white rounded-card border-3 border-[var(--ink)] p-6 shadow-card">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-input bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-input bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center">
               <Truck className="w-5 h-5 text-primary" />
             </div>
             <div>

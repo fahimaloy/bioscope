@@ -224,7 +224,7 @@ function ExpandedRowContent({
                   <div className="relative flex-shrink-0">
                     <div className={`
                       w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
-                      ${isCurrent ? 'bg-primary text-white' : 'bg-primary/10 text-primary border-2 border-primary'}
+                      ${isCurrent ? 'bg-primary text-white' : 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary border-2 border-primary'}
                     `}>
                       {isCurrent ? (
                         <Clock className="w-5 h-5 animate-pulse" />
