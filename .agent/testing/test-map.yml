@@ -52,3 +52,7 @@ modules:
   customers:
     source: [src/lib/customers.ts, src/app/api/customers/**, src/app/(admin)/admin/customers/page.tsx]
     unit: [tests/unit/customers-api.test.ts]
+  secrets:
+    source: [src/lib/crypto.ts, src/lib/secret-settings.ts]
+    unit: [tests/unit/crypto.test.ts, tests/unit/secret-settings.test.ts]
+    shared_footprint: true
