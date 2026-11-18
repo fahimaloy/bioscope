@@ -75,3 +75,6 @@ modules:
   realtime:
     source: [src/lib/hooks/useAdminRealtime.ts, src/lib/socket.ts]
     unit: [tests/unit/spend-tiers.test.ts]
+  admin-bootstrap:
+    source: [instrumentation.ts, next.config.js, src/lib/admin-bootstrap.ts]
+    unit: [tests/unit/admin-bootstrap.test.ts]
