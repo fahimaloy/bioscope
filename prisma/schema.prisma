@@ -396,6 +396,23 @@ model WebhookDelivery {
   @@map("webhook_deliveries")
 }
 
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String
+  prefix     String // leading characters, so an admin can recognise the key
+  keyHash    String    @unique // SHA-256 of the full key; the plaintext is shown once
+  scopes     String[]
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  createdBy  String // admin user id
+  createdAt  DateTime  @default(now())
+
+  @@index([keyHash])
+  @@index([revokedAt])
+  @@map("api_keys")
+}
+
 enum UserRole {
   CUSTOMER
   ADMIN

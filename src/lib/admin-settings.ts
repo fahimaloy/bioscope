@@ -12,6 +12,7 @@ export const SETTINGS_TABS = [
   'email',
   'appearance',
   'webhooks',
+  'api-keys',
 ] as const
 
 export type SettingsTab = (typeof SETTINGS_TABS)[number]
@@ -30,4 +31,5 @@ export const SETTINGS_TAB_LABELS: Record<SettingsTab, string> = {
   email: 'Email',
   appearance: 'Appearance',
   webhooks: 'Webhooks',
+  'api-keys': 'API Keys',
 }

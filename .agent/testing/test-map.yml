@@ -59,3 +59,6 @@ modules:
   webhooks:
     source: [src/lib/server/webhooks.ts, src/lib/validations/webhook.ts, src/app/api/webhooks/**]
     unit: [tests/unit/webhooks.test.ts]
+  api-keys:
+    source: [src/lib/server/api-keys.ts, src/lib/validations/api-key.ts, src/app/api/api-keys/**, src/app/api/headless/**]
+    unit: [tests/unit/api-keys.test.ts]

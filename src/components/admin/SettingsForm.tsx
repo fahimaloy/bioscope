@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/Badge'
 import { TaxConfig } from './TaxConfig'
 import { DeliveryConfig } from './DeliveryConfig'
 import { WebhookSettings } from './WebhookSettings'
-import { Settings, Tag, Truck, Mail, Globe, Palette, Save, Loader2, Image as ImageIcon, FileText, Wrench, CreditCard, ShieldCheck, Webhook } from 'lucide-react'
+import { ApiKeySettings } from './ApiKeySettings'
+import { Settings, Tag, Truck, Mail, Globe, Palette, Save, Loader2, Image as ImageIcon, FileText, Wrench, CreditCard, ShieldCheck, Webhook, KeyRound } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { SketchUnderline, StickerPeel } from '@/components/decorative/DoodleElements'
@@ -242,6 +243,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
           <TabsTrigger value="email"><Mail className="w-4 h-4 mr-1" /> Email</TabsTrigger>
           <TabsTrigger value="appearance"><Palette className="w-4 h-4 mr-1" /> Appearance</TabsTrigger>
           <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-1" /> Webhooks</TabsTrigger>
+          <TabsTrigger value="api-keys"><KeyRound className="w-4 h-4 mr-1" /> API Keys</TabsTrigger>
         </TabsList>
 
         {/* General Settings */}
@@ -528,6 +530,11 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
         {/* Webhook Endpoints */}
         <TabsContent value="webhooks" className="animate-fade-in">
           <WebhookSettings />
+        </TabsContent>
+
+        {/* Headless API Keys */}
+        <TabsContent value="api-keys" className="animate-fade-in">
+          <ApiKeySettings />
         </TabsContent>
 
         {/* Appearance Settings */}
