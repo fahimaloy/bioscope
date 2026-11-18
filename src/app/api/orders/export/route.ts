@@ -1,6 +1,7 @@
 import { handleRouteError, requireAdmin } from '@/lib/api-utils'
 import { prisma } from '@/lib/prisma'
 import { escapeCsvCell } from '@/lib/csv'
+import { orderExportFiltersSchema } from '@/lib/validations/order'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,24 +14,33 @@ export async function GET(request: Request) {
   try {
     await requireAdmin()
     const sp = new URL(request.url).searchParams
-    const status = sp.get('status') ?? undefined
-    const search = sp.get('search') ?? undefined
-    const dateFrom = sp.get('dateFrom') ?? undefined
-    const dateTo = sp.get('dateTo') ?? undefined
+    // Validate at the edge: an unknown status or malformed date is a 400,
+    // not a Prisma runtime error deep in the query.
+    const filters = orderExportFiltersSchema.parse({
+      status: sp.get('status') || undefined,
+      search: sp.get('search') || undefined,
+      dateFrom: sp.get('dateFrom') || undefined,
+      dateTo: sp.get('dateTo') || undefined,
+    })
 
     const where = {
-      ...(status ? { status: status as never } : {}),
-      ...(search
+      ...(filters.status ? { status: filters.status } : {}),
+      ...(filters.search
         ? {
             OR: [
-              { orderNumber: { contains: search, mode: 'insensitive' as const } },
-              { shippingName: { contains: search, mode: 'insensitive' as const } },
-              { user: { email: { contains: search, mode: 'insensitive' as const } } },
+              { orderNumber: { contains: filters.search, mode: 'insensitive' as const } },
+              { shippingName: { contains: filters.search, mode: 'insensitive' as const } },
+              { user: { email: { contains: filters.search, mode: 'insensitive' as const } } },
             ],
           }
         : {}),
-      ...(dateFrom || dateTo
-        ? { createdAt: { ...(dateFrom ? { gte: new Date(dateFrom) } : {}), ...(dateTo ? { lte: new Date(dateTo) } : {}) } }
+      ...(filters.dateFrom || filters.dateTo
+        ? {
+            createdAt: {
+              ...(filters.dateFrom ? { gte: filters.dateFrom } : {}),
+              ...(filters.dateTo ? { lte: filters.dateTo } : {}),
+            },
+          }
         : {}),
     }
 

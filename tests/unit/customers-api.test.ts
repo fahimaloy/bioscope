@@ -87,28 +87,59 @@ describe('GET /api/customers filters', () => {
     expect(where.createdAt).toEqual({ gte: new Date('2026-01-01') })
   })
 
-  it('resolves the spend tier from lifetime spend before paging', async () => {
+  it('resolves the spend tier from database-aggregated lifetime spend', async () => {
     mocks.auth.mockResolvedValue(ADMIN_SESSION)
     mocks.user.findMany
-      .mockResolvedValueOnce([{ id: 'u1', spendTier: null, orders: [{ total: 25000 }] }])
+      .mockResolvedValueOnce([{ id: 'u1', spendTier: null }])
       .mockResolvedValueOnce([USER_ROW])
+    mocks.order.groupBy.mockResolvedValue([{ userId: 'u1', _sum: { total: '25000.00' } }])
 
     const res = await GET(req('?spendTier=Gold'))
     expect(res.status).toBe(200)
 
+    // Spend is aggregated by Postgres (one grouped row per customer), never
+    // by loading every order row into memory.
+    expect(mocks.order.groupBy).toHaveBeenCalledWith({ by: ['userId'], _sum: { total: true } })
     const filterCall = mocks.user.findMany.mock.calls[0][0]
     expect(filterCall.where).toEqual({ role: 'CUSTOMER' })
-    expect(filterCall.select.orders).toEqual({ select: { total: true } })
+    expect(filterCall.select).toEqual({ id: true, spendTier: true })
 
     const pageWhere = mocks.user.findMany.mock.calls[1][0].where
     expect(pageWhere.id).toEqual({ in: ['u1'] })
   })
 
+  it('lets a stored tier override win over the spend band', async () => {
+    mocks.auth.mockResolvedValue(ADMIN_SESSION)
+    mocks.user.findMany
+      .mockResolvedValueOnce([{ id: 'u1', spendTier: 'VIP' }])
+      .mockResolvedValueOnce([USER_ROW])
+    mocks.order.groupBy.mockResolvedValue([{ userId: 'u1', _sum: { total: '10.00' } }])
+
+    const res = await GET(req('?spendTier=VIP'))
+    expect(res.status).toBe(200)
+    const pageWhere = mocks.user.findMany.mock.calls[1][0].where
+    expect(pageWhere.id).toEqual({ in: ['u1'] })
+  })
+
+  it('treats a customer with no orders as zero spend (New tier)', async () => {
+    mocks.auth.mockResolvedValue(ADMIN_SESSION)
+    mocks.user.findMany
+      .mockResolvedValueOnce([{ id: 'u2', spendTier: null }])
+      .mockResolvedValueOnce([USER_ROW])
+    mocks.order.groupBy.mockResolvedValue([])
+
+    const res = await GET(req('?spendTier=New'))
+    expect(res.status).toBe(200)
+    const pageWhere = mocks.user.findMany.mock.calls[1][0].where
+    expect(pageWhere.id).toEqual({ in: ['u2'] })
+  })
+
   it('constrains to an empty id list when no customer is in the tier', async () => {
     mocks.auth.mockResolvedValue(ADMIN_SESSION)
     mocks.user.findMany
-      .mockResolvedValueOnce([{ id: 'u1', spendTier: null, orders: [{ total: 10 }] }])
+      .mockResolvedValueOnce([{ id: 'u1', spendTier: null }])
       .mockResolvedValueOnce([])
+    mocks.order.groupBy.mockResolvedValue([{ userId: 'u1', _sum: { total: '10.00' } }])
 
     const res = await GET(req('?spendTier=VIP'))
     expect(res.status).toBe(200)

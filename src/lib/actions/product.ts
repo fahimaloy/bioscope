@@ -171,6 +171,24 @@ function nestedConfigPayload(data: CreateProductInput) {
   }
 }
 
+/** Bound the work one import can do: each row is several queries. */
+const MAX_IMPORT_ROWS = 500
+
+/** Replace a product's scalar fields and nested configs in one atomic write. */
+async function updateImportedProduct(id: string, data: CreateProductInput) {
+  const nested = nestedConfigPayload(data)
+  await prisma.product.update({
+    where: { id },
+    data: {
+      ...productDataPayload(data),
+      // deleteMany + create inside a single nested write is one Prisma
+      // transaction — the product never exists without its configs.
+      allowedDimensions: { deleteMany: {}, ...nested.allowedDimensions },
+      allowedQuantities: { deleteMany: {}, ...nested.allowedQuantities },
+    },
+  })
+}
+
 /** Import a product CSV, matching rows to existing products by slug. */
 export async function importProductsFromCsv(csv: string): Promise<ProductImportResult> {
   await requireAdmin()
@@ -178,9 +196,14 @@ export async function importProductsFromCsv(csv: string): Promise<ProductImportR
   const { rows, errors } = parseProductsCsv(csv)
   const result: ProductImportResult = { created: 0, updated: 0, errors }
   if (rows.length === 0) return result
+  if (rows.length > MAX_IMPORT_ROWS) {
+    result.errors.push({ row: 0, reason: `too many rows (max ${MAX_IMPORT_ROWS})` })
+    return result
+  }
 
   const categories = await prisma.category.findMany({ select: { id: true, slug: true } })
   const categoryIdBySlug = new Map(categories.map((category) => [category.slug, category.id]))
+  const seenSlugs = new Set<string>()
 
   for (const row of rows) {
     const categoryId = categoryIdBySlug.get(row.categorySlug)
@@ -224,21 +247,46 @@ export async function importProductsFromCsv(csv: string): Promise<ProductImportR
     }
 
     const data = validated.data
-    const existing = await prisma.product.findUnique({ where: { slug: data.slug }, select: { id: true } })
 
-    if (existing) {
-      await prisma.product.update({
-        where: { id: existing.id },
-        data: {
-          ...productDataPayload(data),
-          allowedDimensions: { deleteMany: {}, ...nestedConfigPayload(data).allowedDimensions },
-          allowedQuantities: { deleteMany: {}, ...nestedConfigPayload(data).allowedQuantities },
-        },
+    // Two rows with the same slug in one file would silently overwrite each
+    // other; report the duplicate instead.
+    if (seenSlugs.has(data.slug)) {
+      result.errors.push({ row: row.row, reason: `duplicate slug "${data.slug}" in this file` })
+      continue
+    }
+    seenSlugs.add(data.slug)
+
+    // One bad row must not abort the rest of the file: every write is guarded
+    // and reported per row.
+    try {
+      const existing = await prisma.product.findUnique({ where: { slug: data.slug }, select: { id: true } })
+      if (existing) {
+        await updateImportedProduct(existing.id, data)
+        result.updated += 1
+      } else {
+        try {
+          await createProduct(data)
+          result.created += 1
+        } catch (err) {
+          if ((err as { code?: string })?.code === 'P2002') {
+            // Lost the create race: a concurrent import created the same slug
+            // between our check and write. Converge by updating the winner.
+            const winner = await prisma.product.findUnique({ where: { slug: data.slug }, select: { id: true } })
+            if (!winner) throw err
+            await updateImportedProduct(winner.id, data)
+            result.updated += 1
+          } else {
+            throw err
+          }
+        }
+      }
+    } catch (err) {
+      const code = (err as { code?: string })?.code
+      console.error('[product-import] row failed', { row: row.row, code })
+      result.errors.push({
+        row: row.row,
+        reason: code === 'P2025' ? 'product changed during import' : 'database error while saving row',
       })
-      result.updated += 1
-    } else {
-      await createProduct(data)
-      result.created += 1
     }
   }
 

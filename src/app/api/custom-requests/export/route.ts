@@ -1,6 +1,7 @@
 import { handleRouteError, requireAdmin } from '@/lib/api-utils'
 import { prisma } from '@/lib/prisma'
 import { escapeCsvCell } from '@/lib/csv'
+import { customRequestExportFiltersSchema } from '@/lib/validations/custom-request'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,18 +14,21 @@ export async function GET(request: Request) {
   try {
     await requireAdmin()
     const sp = new URL(request.url).searchParams
-    const status = sp.get('status') ?? undefined
-    const search = sp.get('search') ?? undefined
+    // Validate at the edge: an unknown status is a 400, not a Prisma error.
+    const filters = customRequestExportFiltersSchema.parse({
+      status: sp.get('status') || undefined,
+      search: sp.get('search') || undefined,
+    })
 
     const where = {
-      ...(status ? { status: status as never } : {}),
-      ...(search
+      ...(filters.status ? { status: filters.status } : {}),
+      ...(filters.search
         ? {
             OR: [
-              { id: { contains: search, mode: 'insensitive' as const } },
-              { notes: { contains: search, mode: 'insensitive' as const } },
-              { user: { email: { contains: search, mode: 'insensitive' as const } } },
-              { user: { name: { contains: search, mode: 'insensitive' as const } } },
+              { id: { contains: filters.search, mode: 'insensitive' as const } },
+              { notes: { contains: filters.search, mode: 'insensitive' as const } },
+              { user: { email: { contains: filters.search, mode: 'insensitive' as const } } },
+              { user: { name: { contains: filters.search, mode: 'insensitive' as const } } },
             ],
           }
         : {}),

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
-import { checkoutSchema, orderStatusUpdateSchema, cartItemSchema } from '@/lib/validations/order'
+import { checkoutSchema, orderStatusUpdateSchema, cartItemSchema, orderFilterSchema } from '@/lib/validations/order'
 import { generateOrderNumber } from '@/lib/utils'
 import { computeOrderTotals, computeDiscount, priceLine, type PricedLine, type PricingSettings } from '@/lib/pricing'
 import { canTransition, CUSTOMER_CANCELLABLE, ORDER_STATUS_LABELS, type OrderStatus } from '@/lib/order-status'
@@ -18,8 +18,6 @@ import { getPricingSettings } from './settings'
 const checkoutWithItemsSchema = checkoutSchema.extend({
   items: z.array(cartItemSchema).min(1, 'Cart is empty').max(50).optional(),
 })
-
-const ORDER_SORT_FIELDS = ['createdAt', 'total', 'status', 'orderNumber'] as const
 
 async function notifyAdmins(title: string, message: string, data: Record<string, unknown>) {
   const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } })
@@ -435,33 +433,32 @@ export async function cancelOrder(id: string, reason?: string) {
 export async function getOrders(filters: OrderFilters = {}) {
   const sessionUser = await requireUser()
 
+  // Validate at the edge of the action: unknown statuses, malformed dates and
+  // non-numeric amounts are 400s, not Prisma runtime errors.
+  const f = orderFilterSchema.parse(filters)
+
   const where: Prisma.OrderWhereInput = {}
   if (sessionUser.role !== 'ADMIN') {
     where.userId = sessionUser.id
-  } else if (filters.userId) {
-    where.userId = filters.userId
+  } else if (f.userId) {
+    where.userId = f.userId
   }
-  if (filters.status) where.status = filters.status as OrderStatus
+  if (f.status) where.status = f.status
   const dateFilter: Prisma.DateTimeFilter = {}
-  if (filters.startDate) dateFilter.gte = new Date(filters.startDate)
+  if (f.startDate) dateFilter.gte = f.startDate
   const totalFilter: Prisma.DecimalFilter = {}
-  if (filters.endDate) dateFilter.lte = new Date(filters.endDate)
-  if (filters.startDate || filters.endDate) where.createdAt = dateFilter
-  if (filters.minAmount) totalFilter.gte = new Prisma.Decimal(Number(filters.minAmount))
-  if (filters.maxAmount) totalFilter.lte = new Prisma.Decimal(Number(filters.maxAmount))
-  if (filters.minAmount || filters.maxAmount) where.total = totalFilter
-  if (filters.search) {
+  if (f.endDate) dateFilter.lte = f.endDate
+  if (f.startDate || f.endDate) where.createdAt = dateFilter
+  if (f.minAmount !== undefined) totalFilter.gte = new Prisma.Decimal(f.minAmount)
+  if (f.maxAmount !== undefined) totalFilter.lte = new Prisma.Decimal(f.maxAmount)
+  if (f.minAmount !== undefined || f.maxAmount !== undefined) where.total = totalFilter
+  if (f.search) {
     where.OR = [
-      { orderNumber: { contains: filters.search, mode: 'insensitive' } },
-      { shippingName: { contains: filters.search, mode: 'insensitive' } },
-      { shippingPhone: { contains: filters.search, mode: 'insensitive' } },
+      { orderNumber: { contains: f.search, mode: 'insensitive' } },
+      { shippingName: { contains: f.search, mode: 'insensitive' } },
+      { shippingPhone: { contains: f.search, mode: 'insensitive' } },
     ]
   }
-
-  const page = Math.max(1, Number(filters.page) || 1)
-  const limit = Math.min(100, Math.max(1, Number(filters.limit) || 20))
-  const sortBy = (ORDER_SORT_FIELDS as readonly string[]).includes(filters.sortBy ?? '') ? (filters.sortBy as 'orderNumber' | 'status' | 'total' | 'createdAt') : 'createdAt'
-  const sortOrder = filters.sortOrder === 'asc' ? 'asc' : 'desc'
 
   const [orders, total] = await Promise.all([
     prisma.order.findMany({
@@ -471,14 +468,14 @@ export async function getOrders(filters: OrderFilters = {}) {
         items: true,
         address: true,
       },
-      orderBy: { [sortBy]: sortOrder },
-      skip: (page - 1) * limit,
-      take: limit,
+      orderBy: { [f.sortBy]: f.sortOrder },
+      skip: (f.page - 1) * f.limit,
+      take: f.limit,
     }),
     prisma.order.count({ where }),
   ])
 
-  return { data: orders, pagination: buildPagination(page, limit, total) }
+  return { data: orders, pagination: buildPagination(f.page, f.limit, total) }
 }
 
 export async function getOrderById(id: string) {

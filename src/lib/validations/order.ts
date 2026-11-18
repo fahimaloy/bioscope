@@ -65,16 +65,36 @@ export const orderFilterSchema = z.object({
     'REFUNDED',
   ]).optional(),
   userId: z.string().optional(),
-  startDate: z.string().datetime({ message: 'Invalid date format' }).optional(),
-  endDate: z.string().datetime({ message: 'Invalid date format' }).optional(),
-  minAmount: z.number().positive({ message: 'Minimum amount must be positive' }).optional(),
-  maxAmount: z.number().positive({ message: 'Maximum amount must be positive' }).optional(),
-  search: z.string().optional(),
+  startDate: z.coerce.date({ message: 'Invalid date format' }).optional(),
+  endDate: z.coerce.date({ message: 'Invalid date format' }).optional(),
+  minAmount: z.coerce.number().min(0, { message: 'Minimum amount cannot be negative' }).optional(),
+  maxAmount: z.coerce.number().min(0, { message: 'Maximum amount cannot be negative' }).optional(),
+  search: z.string().trim().max(200, { message: 'Search is too long' }).optional(),
   sortBy: z.enum(['createdAt', 'total', 'status', 'orderNumber'], { message: 'Invalid sort field' }).default('createdAt'),
   sortOrder: z.enum(['asc', 'desc'], { message: 'Invalid sort order' }).default('desc'),
-  page: z.number().int().positive({ message: 'Page must be positive' }).default(1),
-  limit: z.number().int().positive({ message: 'Limit must be positive' }).max(100, { message: 'Limit cannot exceed 100' }).default(20),
+  page: z.coerce.number().int().positive({ message: 'Page must be positive' }).default(1),
+  limit: z.coerce.number().int().positive({ message: 'Limit must be positive' }).max(100, { message: 'Limit cannot exceed 100' }).default(20),
 })
+
+/** Query-string filters for the admin order CSV export. */
+export const orderExportFiltersSchema = z.object({
+  status: z.enum([
+    'PENDING',
+    'CONFIRMED',
+    'PROCESSING',
+    'PRINTING',
+    'READY_TO_SHIP',
+    'SHIPPED',
+    'DELIVERED',
+    'CANCELLED',
+    'REFUNDED',
+  ]).optional(),
+  search: z.string().trim().max(200, { message: 'Search is too long' }).optional(),
+  dateFrom: z.coerce.date({ message: 'Invalid date format' }).optional(),
+  dateTo: z.coerce.date({ message: 'Invalid date format' }).optional(),
+})
+
+export type OrderExportFilters = z.infer<typeof orderExportFiltersSchema>
 
 export type AddressInput = z.infer<typeof addressSchema>
 export type CartItemInput = z.infer<typeof cartItemSchema>

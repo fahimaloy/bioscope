@@ -31,6 +31,14 @@ export const updateCustomRequestStatusSchema = z.object({
   quotedPrice: z.number().positive({ message: 'Quoted price must be positive' }).optional(),
 })
 
+/** Query-string filters for the admin custom-request CSV export. */
+export const customRequestExportFiltersSchema = z.object({
+  status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'PRICED', 'REVISION_REQUESTED', 'ORDERED']).optional(),
+  search: z.string().trim().max(200, { message: 'Search is too long' }).optional(),
+})
+
+export type CustomRequestExportFilters = z.infer<typeof customRequestExportFiltersSchema>
+
 export const createOrderFromRequestSchema = z.object({
   productId: z.string().min(1, { message: 'Please choose the product this request becomes' }),
   addressId: z.string().min(1, { message: 'Please choose a shipping address' }),
