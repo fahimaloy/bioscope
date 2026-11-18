@@ -223,9 +223,11 @@ export default function HomePage() {
         </motion.div>
 
         {query.isLoading ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-wrap justify-center gap-6">
             {Array.from({ length: 3 }).map((_, index) => (
-              <SkeletonProductCard key={index} />
+              <div key={index} className="w-full max-w-sm sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
+                <SkeletonProductCard />
+              </div>
             ))}
           </div>
         ) : (
@@ -234,10 +236,10 @@ export default function HomePage() {
             whileInView="animate"
             viewport={{ once: true, margin: '-100px' }}
             variants={variants.staggerContainer}
-            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            className="flex flex-wrap justify-center gap-6"
           >
             {products.map((product) => (
-              <motion.div key={product.id} variants={variants.staggerItem} className="h-full">
+              <motion.div key={product.id} variants={variants.staggerItem} className="h-full w-full max-w-sm sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]">
                 <ProductCard product={product} variant="featured" showActions />
               </motion.div>
             ))}

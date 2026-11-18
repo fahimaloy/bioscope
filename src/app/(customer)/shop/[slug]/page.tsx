@@ -83,7 +83,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   for (const r of reviews) ratingDistribution[r.rating] = (ratingDistribution[r.rating] ?? 0) + 1
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-7xl mx-auto">
         <nav className="flex items-center gap-2 text-sm text-[var(--text-subtle)] mb-6">
           <Link href="/" className="text-[var(--brand)] hover:underline">

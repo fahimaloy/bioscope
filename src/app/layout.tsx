@@ -8,6 +8,7 @@ import { Toaster } from 'sonner'
 import { Footer } from '@/components/layout/Footer'
 import { Navbar } from '@/components/layout/Navbar'
 import { CartDrawer } from '@/components/cart/CartDrawer'
+import { FloatingIcons } from '@/components/decorative/FloatingIcons'
 
 /**
  * Self-hosted via next/font (spec §5.3): Shrikhand for display, Outfit for
@@ -76,7 +77,8 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://utfs.io" />
       </head>
-      <body className="min-h-screen bg-paper font-body antialiased flex flex-col">
+      <body className="min-h-screen font-body antialiased flex flex-col">
+        <FloatingIcons />
         <MotionConfig reducedMotion="user">
           <Providers>
             {/* Ruling 3: the navbar is mounted once, here, so the admin layout's

@@ -199,7 +199,7 @@ export default function CustomStickerPage() {
   }, [submitting, fabricCanvas, design.canvas.width, design.canvas.height, quantity, material, finish, cutType, router])
 
   return (
-    <div className="min-h-screen bg-[var(--paper)]">
+  <div className="min-h-screen">
       {/* Mobile Tab Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--paper-deep)] border-t-[3px] border-[var(--ink)] shadow-[0_-6px_0_var(--ink)]">
         <div className="grid grid-cols-3">

@@ -101,7 +101,7 @@ export default function OrderDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
+   <div className="min-h-screen pt-24 pb-12 px-4">
         <div className="max-w-5xl mx-auto space-y-4">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-48 w-full rounded-[var(--radius-lg)]" />
@@ -203,7 +203,7 @@ export default function OrderDetailPage() {
   const isCancelled = CANCELLED_STEPS.includes(order.status)
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-5xl mx-auto">
         <Link href="/orders" className="inline-flex items-center gap-2 text-sm text-[var(--text-subtle)] hover:text-[var(--brand)] mb-4">
           <ArrowLeft className="w-4 h-4" /> Back to orders

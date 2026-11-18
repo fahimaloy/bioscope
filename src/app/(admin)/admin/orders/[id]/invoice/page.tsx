@@ -69,7 +69,7 @@ export default function AdminOrderInvoicePage() {
   const statusLabel = ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       {/* Print rules: show only the invoice sheet */}
       <style>{`@media print {
         body * { visibility: hidden !important; }

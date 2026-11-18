@@ -85,7 +85,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-5xl mx-auto">
         <h1 className="font-display text-3xl text-[var(--brand)] mb-6">My Orders</h1>
 

@@ -56,7 +56,7 @@ const sectionItemVariants = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4 relative overflow-hidden">
+  <div className="min-h-screen pt-24 pb-12 px-4 relative overflow-hidden">
       {/* Global Doodle Background */}
       <DoodleBackground shapeCount={12} />
       

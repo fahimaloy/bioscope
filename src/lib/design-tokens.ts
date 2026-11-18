@@ -40,6 +40,7 @@ export const designTokens = {
   "light": 'var(--light)',
   "dark": 'var(--dark)',
   "bg-color": 'var(--bg-color)',
+  "bg-gradient": 'var(--bg-gradient)',
   "on-pink": 'var(--on-pink)',
   "on-pink-strong": 'var(--on-pink-strong)',
   "on-violet": 'var(--on-violet)',

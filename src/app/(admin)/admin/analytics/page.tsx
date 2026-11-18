@@ -129,7 +129,7 @@ export default function AnalyticsPage() {
   const chartColors = ['var(--primary)', 'var(--secondary)', 'var(--accent)', 'var(--purple)', 'var(--pink)', 'var(--orange)', '#06b6d4', 'var(--warning)']
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-full mx-auto space-y-8">
         {/* Header */}
         <motion.div

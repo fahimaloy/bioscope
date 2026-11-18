@@ -18,7 +18,7 @@ interface PageWrapperProps {
 /**
  * Task 1.5 — the customer page wrapper.
  *
- * `default` is the paper page with the fixed grain overlay (spec §5.4);
+ * `default` is the cream gradient page with the fixed grain overlay (spec §5.4);
  * `grid` adds the graph-paper backdrop for the custom builder; `none` leaves
  * the surface to the page. The bottom padding clears the fixed `MobileNav`
  * bar (`pb-20` = 80px against the bar's 72px, an 8px margin) and relaxes to
@@ -29,7 +29,6 @@ export function PageWrapper({ children, background = 'default', className }: Pag
     <div
       className={cn(
         'relative min-h-screen',
-        background !== 'none' && 'bg-[var(--paper)]',
         className
       )}
     >

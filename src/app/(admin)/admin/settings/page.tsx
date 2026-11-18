@@ -54,7 +54,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-5xl mx-auto">
         {initialSettings === null ? (
           <p className="text-[var(--text-muted)]">Loading settings…</p>

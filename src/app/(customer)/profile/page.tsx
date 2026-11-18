@@ -880,7 +880,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<string>('account')
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <DoodleBackground shapeCount={3} />
       <div className="max-w-4xl mx-auto">
         <motion.div
