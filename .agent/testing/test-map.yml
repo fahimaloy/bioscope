@@ -72,3 +72,6 @@ modules:
   custom-requests:
     source: [src/lib/actions/customRequest.ts, src/lib/validations/custom-request.ts, src/app/api/custom-requests/**]
     unit: [tests/unit/custom-request-workflow.test.ts, tests/unit/webhooks.test.ts]
+  realtime:
+    source: [src/lib/hooks/useAdminRealtime.ts, src/lib/socket.ts]
+    unit: [tests/unit/spend-tiers.test.ts]

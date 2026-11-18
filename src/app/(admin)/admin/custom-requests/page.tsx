@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { useAdminRealtime, type AdminLiveEvent } from '@/lib/hooks'
 import {
   Button,
   Badge,
@@ -111,6 +112,22 @@ export default function CustomRequestsPage() {
   useEffect(() => {
     load()
   }, [load])
+
+  // Realtime: a customer submitting or an admin pricing a request refreshes
+  // the list so the queue never shows stale numbers.
+  const handleLiveEvent = useCallback(
+    (event: AdminLiveEvent) => {
+      if (event.kind === 'custom_request.submitted') {
+        toast.info(`New custom request from ${event.data.customerName}`)
+        load()
+      } else if (event.kind === 'custom_request.priced') {
+        load()
+      }
+    },
+    [load]
+  )
+
+  useAdminRealtime(handleLiveEvent)
 
   const handleImageClick = (src: string, alt: string) => {
     setImageModalSrc(src)

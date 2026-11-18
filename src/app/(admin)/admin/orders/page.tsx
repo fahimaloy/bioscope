@@ -15,6 +15,7 @@ import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils'
 import { ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle, Download } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TRANSITIONS, type OrderStatus } from '@/lib/order-status'
+import { useAdminRealtime, type AdminLiveEvent } from '@/lib/hooks'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STATUSES: OrderStatus[] = [
@@ -443,6 +444,25 @@ export default function AdminOrdersPage() {
   useEffect(() => {
     load()
   }, [load])
+
+  // Realtime: a status change made elsewhere (another admin, a server action)
+  // repaints the row in place; a brand-new order reloads the list.
+  const handleLiveEvent = useCallback(
+    (event: AdminLiveEvent) => {
+      if (event.kind === 'order.status_changed') {
+        const nextStatus = event.data.newStatus as OrderStatus
+        setOrders((prev) => prev.map((row) => (row.id === event.data.orderId ? { ...row, status: nextStatus } : row)))
+        return
+      }
+      if (event.kind === 'order.created') {
+        toast.info(`New order ${event.data.orderNumber}`)
+        load()
+      }
+    },
+    [load]
+  )
+
+  useAdminRealtime(handleLiveEvent)
 
   const handleStatusChange = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     setUpdatingStatus(orderId)
