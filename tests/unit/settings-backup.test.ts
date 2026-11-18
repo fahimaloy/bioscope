@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 // settings-backup imports the shared api-utils, which pulls in next-auth; stub
 // the auth module so the unit environment can resolve the import graph.
-vi.mock('@/lib/auth', () => ({ auth: vi.fn() }))
-
 const mocks = vi.hoisted(() => ({
+  auth: vi.fn(),
   setting: { findUnique: vi.fn(), upsert: vi.fn() },
   $transaction: vi.fn(async (ops: Array<Promise<unknown>>) => Promise.all(ops)),
 }))
+vi.mock('@/lib/auth', () => ({ auth: mocks.auth }))
 vi.mock('@/lib/prisma', () => ({
   prisma: { setting: mocks.setting, $transaction: mocks.$transaction },
 }))
@@ -145,5 +145,26 @@ describe('importSettings envelope validation', () => {
     const upsert = mocks.setting.upsert.mock.calls[0][0]
     expect(isEncryptedPayload(upsert.create.value)).toBe(true)
     expect(upsert.create.value).not.toContain('a-real-password')
+  })
+})
+
+describe('POST /api/settings/backup response envelope', () => {
+  it('returns applied/skipped at data.* — the shape BackupSettings reads', async () => {
+    mocks.auth.mockResolvedValue({ user: { id: 'u-admin', email: 'admin@example.com', role: 'ADMIN' } })
+    const { POST } = await import('@/app/api/settings/backup/route')
+    const res = await POST(
+      new Request('http://localhost/api/settings/backup', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ version: 1, settings: { site_name: 'BIOSCOPE' } }),
+      })
+    )
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    // The UI does json.data.applied and json.data.skipped.length — a double
+    // envelope (data.data) crashes the restore panel with a TypeError.
+    expect(json.success).toBe(true)
+    expect(json.data.applied).toBe(1)
+    expect(Array.isArray(json.data.skipped)).toBe(true)
   })
 })

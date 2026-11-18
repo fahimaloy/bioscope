@@ -39,7 +39,8 @@ export async function POST(request: Request) {
       throw new AppError(400, 'Invalid backup: not valid JSON', 'INVALID_BACKUP')
     }
     const result = await importSettings(body)
-    return ok({ data: result })
+    // Single envelope: the UI reads json.data.applied / json.data.skipped.
+    return ok(result)
   } catch (error) {
     return handleRouteError(error)
   }
