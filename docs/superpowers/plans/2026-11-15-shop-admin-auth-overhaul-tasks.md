@@ -416,4 +416,44 @@ Verified with that credential against the running dev server:
   returns the request to `PENDING` with the quote cleared, resubmit refused 409
   when no revision is pending.
 
+### Follow-up 2026-11-19 (code review of 18–19 Nov commits)
+
+Reviewed `dc7a526^..54cbe72` (239 files) against the `code-reviewer` rule packs
+and AGENTS.md. Three of seven review sub-agents died on provider 429s, so those
+groups were covered by a direct pass instead.
+
+Root cause behind three credential bugs: `maskSecretSettings` keys on the
+*setting key*, and three call sites passed a throwaway key (`'v'`, `'value'`),
+so masking silently no-opped — leaking plaintext in the backup export and in
+`getSetting`, and defeating the "unchanged" detection that protects credentials
+on save.
+
+Fixed in `6dbd3ba` (secrets) and `dc3b396` (security hardening):
+- `maskSecretsForDisplay` decrypts-then-masks under the real key; read paths use
+  it; `updateSetting` shares the mask/unchanged/clear semantics and refuses
+  `isPublic` on credentials; `getPublicSettings` excludes credential keys.
+- Backup export masks with `maskSecret`; import encrypts via
+  `protectSecretSettings` and recognises a mask even on a fresh DB.
+- SMTP port 465 implies TLS unless explicitly disabled.
+- Bootstrap: no PII in logs, guarded body, P2002-tolerant create, lowercased
+  email; registration reserves `ADMIN_EMAIL` so it cannot be claimed and then
+  promoted.
+- Webhook signing and the endpoint query are guarded so dispatch cannot 500 the
+  triggering mutation.
+- `requireApiKey` demands every requested scope (`hasAllScopes`).
+- Shared `escapeCsvCell` neutralises spreadsheet formula injection in all three
+  exporters; product import returns 400 on empty and caps at 1 MB.
+
+Verified live (7/7): credential stored encrypted, bulk read masked, echoed-mask
+save preserves the ciphertext byte-for-byte, `getSetting` masked, registration
+of `ADMIN_EMAIL` refused 409 `EMAIL_RESERVED`.
+Gate: `verify:mid` green — type-check, lint, 41 files / 367 tests.
+GitNexus `detect-changes` reports risk **critical**, expected: the diff touches
+auth and credential paths by design.
+
+Still open from the review (not fixed): tier filter loads all customers+orders
+into memory; product import slug upsert is racy and its dimension replacement is
+not transactional; `WebhookDelivery` retains full order payloads (PII) with no
+pruning; backup import has no Zod schema; several export filters are unvalidated.
+
 
