@@ -18,13 +18,6 @@ interface StatusConfig {
   variant: BadgeProps['variant']
   label: string
   dotColor?: string
-  /**
-   * `SHIPPED` is the one status the plan maps to `--teal`, and `Badge` has no
-   * `teal` variant (the primitive is not extended for this). The override is
-   * applied at the `Badge` call site: `cn`/`twMerge` keeps the later class.
-   * `--ink` on `--teal` is 4.60:1 (contract §2), so the pair is AA-safe.
-   */
-  className?: string
 }
 
 // Ruling 2: PENDING warning · PROCESSING info · SHIPPED teal · DELIVERED
@@ -36,12 +29,7 @@ const statusConfig: Record<OrderStatus, StatusConfig> = {
   PROCESSING: { variant: 'info', label: 'Processing', dotColor: 'var(--info)' },
   PRINTING: { variant: 'primary', label: 'Printing', dotColor: 'var(--pink-strong)' },
   READY_TO_SHIP: { variant: 'secondary', label: 'Ready to Ship', dotColor: 'var(--violet)' },
-  SHIPPED: {
-    variant: 'secondary',
-    label: 'Shipped',
-    dotColor: 'var(--teal)',
-    className: 'bg-[var(--teal)] text-[var(--ink)]',
-  },
+  SHIPPED: { variant: 'teal', label: 'Shipped', dotColor: 'var(--teal)' },
   DELIVERED: { variant: 'success', label: 'Delivered', dotColor: 'var(--green-strong)' },
   CANCELLED: { variant: 'error', label: 'Cancelled', dotColor: 'var(--error)' },
   REFUNDED: { variant: 'error', label: 'Refunded', dotColor: 'var(--error)' },
@@ -56,7 +44,7 @@ export function OrderStatusBadge({ status, size = 'md', className }: { status: O
       size={size}
       dot
       dotColor={config.dotColor}
-      className={cn(config.className, className)}
+      className={className}
     >
       {config.label}
     </Badge>
@@ -121,7 +109,6 @@ export function OrderStatusFlow({ currentStatus }: { currentStatus: OrderStatus 
   return (
     <div className="flex items-center gap-2 overflow-x-auto pb-2">
       {statuses.map((status, index) => {
-        const config = statusConfig[status]
         const isActive = statuses.indexOf(currentStatus) >= index
         const isCurrent = currentStatus === status
         const isCompleted = statuses.indexOf(currentStatus) > index

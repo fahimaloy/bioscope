@@ -9,22 +9,18 @@ import { Dropdown } from '@/components/ui/Dropdown'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { Badge } from '@/components/ui/Badge'
 import { resolveHex } from './resolveHex'
-import type { DesignLayer, ImageFilter } from '@/types'
+import type { DesignLayer } from '@/types'
 import {
   Crop,
   RotateCcw,
   FlipHorizontal,
   FlipVertical,
   Sun,
-  Contrast,
   Circle,
   Square,
   Triangle,
   Star,
   Type,
-  Image as ImageIcon,
-  Undo,
-  Redo,
   Copy,
   Trash2,
   Lock,
@@ -32,7 +28,6 @@ import {
   Eye,
   EyeOff,
   Maximize,
-  Minimize,
 } from 'lucide-react'
 
 interface EditingToolsProps {
@@ -54,7 +49,6 @@ export function EditingTools({
   onDuplicateLayer,
   onLockLayer,
   onToggleVisibility,
-  onCropLayer,
   onResetTransform,
   className,
 }: EditingToolsProps) {
@@ -419,7 +413,7 @@ export function EditingTools({
                     { value: 'right', label: 'Right' },
                   ]}
                   value={selectedLayer.textAlign || 'left'}
-                  onChange={(v) => onUpdateLayer(selectedLayer.id, { textAlign: v as any })}
+                  onChange={(v) => onUpdateLayer(selectedLayer.id, { textAlign: v as 'left' | 'center' | 'right' })}
                   disabled={selectedLayer.locked}
                 />
               </div>
@@ -458,7 +452,7 @@ export function EditingTools({
                 {['rect', 'circle', 'triangle', 'star'].map((shape) => (
                   <button
                     key={shape}
-                    onClick={() => onUpdateLayer(selectedLayer.id, { shapeType: shape as any })}
+                    onClick={() => onUpdateLayer(selectedLayer.id, { shapeType: shape as 'rect' | 'circle' | 'triangle' | 'star' | 'polygon' })}
                     className={cn(
                       'p-3 rounded-[var(--radius-md)] border-[3px] transition-all',
                       selectedLayer.shapeType === shape

@@ -6,9 +6,9 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 
 let socket: Socket | null = null
 
-export const getSocket = (): Socket | null => socket
+export const getSocket = (): Socket<SocketEvents> | null => socket
 
-export const initializeSocket = (token: string): Socket => {
+export const initializeSocket = (token: string): Socket<SocketEvents> => {
   if (socket?.connected) {
     socket.auth = { token }
     return socket
@@ -25,7 +25,7 @@ export const initializeSocket = (token: string): Socket => {
     reconnectionDelayMax: 5000,
     timeout: 20000,
     autoConnect: true,
-  })
+  }) as Socket<SocketEvents>
 
   socket.on('connect', () => {
     console.log('🔌 Socket connected:', socket?.id)
@@ -70,7 +70,7 @@ export interface SocketEvents {
   'order:status_changed': (data: { orderId: string; orderNumber: string; oldStatus: string; newStatus: string; statusLabel: string; customerName?: string; updatedAt: string }) => void
   'custom_request:submitted': (data: { requestId: string; customerName: string; imageUrl: string; dimensions: string; quantity: number; material: string; finish: string; cutType: string; createdAt: string }) => void
   'custom_request:priced': (data: { requestId: string; quotedPrice: number; adminNotes?: string; quotedAt: string }) => void
-  'notification:new': (data: { id: string; type: string; title: string; message: string; data?: any; createdAt: string }) => void
+  'notification:new': (data: { id: string; type: string; title: string; message: string; data?: Record<string, unknown>; createdAt: string }) => void
   'product:low_stock': (data: { productId: string; productName: string; currentStock: number; threshold: number }) => void
 }
 
@@ -107,16 +107,28 @@ export function useSocket() {
     }
   }, [session?.user])
 
+  // With the socket bound to SocketEvents, user-event listeners are exactly
+  // SocketEvents[K]; generic K cannot flow through Emitter's own generics
+  // (TS#33014), so the correlation is erased at this one boundary.
+  type TypedEmitter = {
+    on: <Ev extends keyof SocketEvents>(ev: Ev, fn: SocketEvents[Ev]) => unknown
+    off: <Ev extends keyof SocketEvents>(ev?: Ev, fn?: SocketEvents[Ev]) => unknown
+  }
   const on = useCallback(<K extends keyof SocketEvents>(event: K, handler: SocketEvents[K]) => {
-    socketRef.current?.on(event, handler as any)
-    return () => socketRef.current?.off(event, handler as any)
+    const socket = socketRef.current as TypedEmitter | null
+    if (!socket) return () => undefined
+    socket.on(event, handler)
+    return () => {
+      socket.off(event, handler)
+    }
   }, [])
 
   const off = useCallback(<K extends keyof SocketEvents>(event: K, handler?: SocketEvents[K]) => {
-    socketRef.current?.off(event, handler as any)
+    if (!handler) return
+    ;(socketRef.current as TypedEmitter | null)?.off(event, handler)
   }, [])
 
-  const emit = useCallback((event: string, data: any) => {
+  const emit = useCallback((event: string, data: unknown) => {
     socketRef.current?.emit(event, data)
   }, [])
 
@@ -150,7 +162,7 @@ export function useSocket() {
 }
 
 export function useOrderSocket(orderId: string | null) {
-  const { subscribeToOrder, unsubscribeFromOrder, on, off } = useSocket()
+  const { subscribeToOrder, unsubscribeFromOrder, on } = useSocket()
 
   useEffect(() => {
     if (orderId) {

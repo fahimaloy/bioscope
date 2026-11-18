@@ -115,7 +115,10 @@ importers:
         version: 14.2.0(@babel/core@7.29.7)(@playwright/test@1.64.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next-auth:
         specifier: ^5.0.0-beta.18
-        version: 5.0.0-beta.32(next@14.2.0(@babel/core@7.29.7)(@playwright/test@1.64.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 5.0.0-beta.32(next@14.2.0(@babel/core@7.29.7)(@playwright/test@1.64.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@10.5.0)(react@18.3.1)
+      nodemailer:
+        specifier: ^10.5.0
+        version: 10.5.0
       react:
         specifier: ^18.3.0
         version: 18.3.1
@@ -169,7 +172,7 @@ importers:
         specifier: ^2.4.6
         version: 2.4.6
       '@types/fabric':
-        specifier: ^5.3.0
+        specifier: ^5.3.11
         version: 5.3.11
       '@types/jsonwebtoken':
         specifier: ^9.0.10
@@ -177,6 +180,9 @@ importers:
       '@types/node':
         specifier: ^20.12.0
         version: 20.19.43
+      '@types/nodemailer':
+        specifier: ^8.0.2
+        version: 8.0.2
       '@types/react':
         specifier: ^18.3.0
         version: 18.3.31
@@ -1910,6 +1916,9 @@ packages:
 
   '@types/node@20.19.43':
     resolution: {integrity: sha512-6oYBAi5ikg4Pl+kGsoYtawUMBT2zZMCvPNF7pVLnHZfd1zf38DRiWn/gT01RYCdUqkv7Fhr+C9ot4/tb+2sVvA==}
+
+  '@types/nodemailer@8.0.2':
+    resolution: {integrity: sha512-c7M5ox8p0nEOfbJ2E9Qcmt8/QCu/VzsiAhzBiZbvky2PhKZDHpKB3sQHBM5MEZNkCfBOaS6S9//AGPRTNB7IaA==}
 
   '@types/prop-types@15.7.15':
     resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
@@ -3830,6 +3839,10 @@ packages:
     resolution: {integrity: sha512-A0Eq+qVDQI97IbAD6g/HriIuv256el9N8EwF4+xqJ49pwrdRYpdCSmLk0sO4I3fnS6hpYE5v22B73Bk+WArEoQ==}
     engines: {node: '>=18'}
 
+  nodemailer@10.5.0:
+    resolution: {integrity: sha512-L/w/HH5MqpzMDuZD7fQdt/+KqymuvrpaApaIjAH2XA3ILePwlcvXCVVvP75xVrXCEt2ggK2marrrHHFB5Qu0kA==}
+    engines: {node: '>=20.0.0'}
+
   nopt@5.0.0:
     resolution: {integrity: sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ==}
     engines: {node: '>=6'}
@@ -5093,13 +5106,15 @@ snapshots:
       '@csstools/css-tokenizer': 3.0.4
       lru-cache: 10.4.3
 
-  '@auth/core@0.41.3':
+  '@auth/core@0.41.3(nodemailer@10.5.0)':
     dependencies:
       '@panva/hkdf': 1.2.1
       jose: 6.2.14
       oauth4webapi: 3.8.8
       preact: 10.24.3
       preact-render-to-string: 6.5.11(preact@10.24.3)
+    optionalDependencies:
+      nodemailer: 10.5.0
 
   '@axe-core/react@4.14.0':
     dependencies:
@@ -6658,6 +6673,10 @@ snapshots:
   '@types/node@20.19.43':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/nodemailer@8.0.2':
+    dependencies:
+      '@types/node': 20.19.43
 
   '@types/prop-types@15.7.15': {}
 
@@ -8849,11 +8868,13 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  next-auth@5.0.0-beta.32(next@14.2.0(@babel/core@7.29.7)(@playwright/test@1.64.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  next-auth@5.0.0-beta.32(next@14.2.0(@babel/core@7.29.7)(@playwright/test@1.64.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(nodemailer@10.5.0)(react@18.3.1):
     dependencies:
-      '@auth/core': 0.41.3
+      '@auth/core': 0.41.3(nodemailer@10.5.0)
       next: 14.2.0(@babel/core@7.29.7)(@playwright/test@1.64.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react: 18.3.1
+    optionalDependencies:
+      nodemailer: 10.5.0
 
   next@14.2.0(@babel/core@7.29.7)(@playwright/test@1.64.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -8894,6 +8915,8 @@ snapshots:
     optional: true
 
   node-releases@2.0.62: {}
+
+  nodemailer@10.5.0: {}
 
   nopt@5.0.0:
     dependencies:

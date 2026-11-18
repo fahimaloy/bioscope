@@ -1,11 +1,11 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { FOCUS_VISIBLE } from '@/components/ui/shared'
+import { Wordmark } from '@/components/brand/Wordmark'
 import {
   LayoutDashboard,
   Package,
@@ -19,6 +19,7 @@ import {
   LogOut,
   BarChart2,
   Tag,
+  Boxes,
   Truck,
   CreditCard,
   X,
@@ -43,6 +44,8 @@ import { signOut } from 'next-auth/react'
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard, badge: null as string | null },
   { name: 'Products', href: '/admin/products', icon: Package, badge: 'pendingProducts' },
+  { name: 'Inventory', href: '/admin/inventory', icon: Boxes, badge: null },
+  { name: 'Categories', href: '/admin/categories', icon: Tag, badge: null },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingBag, badge: 'pendingOrders' },
   { name: 'Custom Requests', href: '/admin/custom-requests', icon: FileText, badge: 'pendingRequests' },
   { name: 'Customers', href: '/admin/customers', icon: Users, badge: null },
@@ -129,16 +132,7 @@ export function AdminSidebar({
               className={cn('flex min-w-0 items-center gap-2', FOCUS_VISIBLE)}
               aria-label="Admin Dashboard"
             >
-              <span className="relative h-9 w-9 flex-shrink-0">
-                <Image
-                  src="/images/bioscope-logo.png"
-                  alt="Bioscope"
-                  fill
-                  className="object-contain"
-                  sizes="36px"
-                />
-              </span>
-              <span className="truncate font-display text-xl text-[var(--ink)]">bioscope</span>
+              <Wordmark variant="dark" size="md" text="BIOSCOPE" />
             </Link>
           )}
 

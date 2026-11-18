@@ -20,7 +20,7 @@ interface CartState {
   addItem: (item: CartItemInput) => void
   removeItem: (productId: string, width: number, height: number) => void
   updateQuantity: (productId: string, width: number, height: number, quantity: number) => void
-  updateCustomization: (productId: string, width: number, height: number, customization: Record<string, any>) => void
+  updateCustomization: (productId: string, width: number, height: number, customization: Record<string, unknown>) => void
   clearCart: () => void
   toggleCart: () => void
   openCart: () => void

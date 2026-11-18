@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Dropdown } from '@/components/ui/Dropdown'
-import { Badge } from '@/components/ui/Badge'
-import type { Product, DimensionConfig, QuantityConfig } from '@/types'
+import type { Product, DimensionConfig, CustomizationOptions } from '@/types'
 import { Minus, Plus, Maximize, Minimize } from 'lucide-react'
 
 interface ProductConfiguratorProps {
@@ -14,8 +14,8 @@ interface ProductConfiguratorProps {
   onDimensionChange: (dimension: DimensionConfig) => void
   selectedQuantity?: number
   onQuantityChange: (quantity: number) => void
-  customization?: Record<string, any>
-  onCustomizationChange?: (customization: Record<string, any>) => void
+  customization?: CustomizationOptions | null
+  onCustomizationChange?: (customization: CustomizationOptions | null) => void
   className?: string
 }
 
@@ -30,7 +30,6 @@ export function ProductConfigurator({
   className,
 }: ProductConfiguratorProps) {
   const [showAllDimensions, setShowAllDimensions] = useState(false)
-  const [expandedCustomization, setExpandedCustomization] = useState<string | null>(null)
 
   // Calculate price
   const dimensionMultiplier = selectedDimension?.priceMultiplier || 1
@@ -91,12 +90,12 @@ export function ProductConfigurator({
                 selectedDimension?.id === dim.id && 'animate-pulse-soft'
               )}
               onClick={() => onDimensionChange(dim)}
-              aria-pressed={selectedDimension?.id === dim.id}
               role="radio"
+              aria-checked={selectedDimension?.id === dim.id}
             >
               <span className="block font-display">{dim.label}</span>
               {dim.priceMultiplier !== 1 && (
-                <span className="absolute top-1 right-1 text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                <span className="absolute top-1 right-1 text-xs bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary px-1.5 py-0.5 rounded">
                   {dim.priceMultiplier > 1 ? '+' : ''}{(dim.priceMultiplier - 1) * 100}%
                 </span>
               )}
@@ -111,7 +110,7 @@ export function ProductConfigurator({
 
         <div className="flex items-center gap-4 flex-wrap">
           {/* Visual quantity selector */}
-          <div className="flex items-center border-3 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input overflow-hidden">
+          <div className="flex items-center border-[3px] border-[var(--ink)] rounded-[var(--radius-md)] bg-[var(--surface-raised)] overflow-hidden">
             <Button
               variant="doodle-outline"
               size="sm"
@@ -180,8 +179,8 @@ export function ProductConfigurator({
               <CustomizationGroup
                 label="Material"
                 options={product.customizationOptions.materials}
-                value={customization.material}
-                onChange={(v) => onCustomizationChange?.({ ...customization, material: v })}
+                value={customization?.materials?.[0] || ''}
+                onChange={(v) => onCustomizationChange?.({ ...(customization as Record<string, string | number | boolean | undefined>), materials: [v] })}
               />
             )}
 
@@ -189,8 +188,8 @@ export function ProductConfigurator({
               <CustomizationGroup
                 label="Finish"
                 options={product.customizationOptions.finishes}
-                value={customization.finish}
-                onChange={(v) => onCustomizationChange?.({ ...customization, finish: v })}
+                value={customization?.finishes?.[0] || ''}
+                onChange={(v) => onCustomizationChange?.({ ...(customization as Record<string, string | number | boolean | undefined>), finishes: [v] })}
               />
             )}
 
@@ -198,8 +197,8 @@ export function ProductConfigurator({
               <CustomizationGroup
                 label="Cut Type"
                 options={product.customizationOptions.cutTypes}
-                value={customization.cutType}
-                onChange={(v) => onCustomizationChange?.({ ...customization, cutType: v })}
+                value={customization?.cutTypes?.[0] || ''}
+                onChange={(v) => onCustomizationChange?.({ ...(customization as Record<string, string | number | boolean | undefined>), cutTypes: [v] })}
                 renderOption={(opt) => opt.replace('_', ' ')}
               />
             )}
@@ -208,8 +207,8 @@ export function ProductConfigurator({
               <CustomizationGroup
                 label="Color"
                 options={product.customizationOptions.colors}
-                value={customization.color}
-                onChange={(v) => onCustomizationChange?.({ ...customization, color: v })}
+                value={customization?.colors?.[0] || ''}
+                onChange={(v) => onCustomizationChange?.({ ...(customization as Record<string, string | number | boolean | undefined>), colors: [v] })}
                 isColor={true}
               />
             )}
@@ -220,8 +219,8 @@ export function ProductConfigurator({
                   <CustomField
                     key={field.key}
                     field={field}
-                    value={customization[field.key]}
-                    onChange={(v) => onCustomizationChange?.({ ...customization, [field.key]: v })}
+                    value={String((customization as Record<string, string | string[]>)[field.key] ?? '')}
+                    onChange={(v) => onCustomizationChange?.({ ...(customization as Record<string, string | number | boolean | undefined>), [field.key]: v })}
                   />
                 ))}
               </div>
@@ -279,9 +278,14 @@ function CustomField({
   onChange,
 }: {
   field: { key: string; label: string; type: 'text' | 'select' | 'color' | 'boolean'; required?: boolean; options?: string[] }
-  value?: any
-  onChange?: (value: any) => void
+  value?: string | number | boolean
+  onChange?: (value: string | number | boolean) => void
 }) {
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => onChange?.(e.target.value)
+  const handleSelectChange = (val: string) => onChange?.(val)
+  const handleColorChange = (color: string) => onChange?.(color)
+  const handleBooleanChange = (checked: boolean) => onChange?.(checked)
+
   switch (field.type) {
     case 'text':
       return (
@@ -289,8 +293,8 @@ function CustomField({
           <label className="block text-sm font-medium text-[var(--ink)] mb-1">{field.label} {field.required && <span className="text-[var(--error)]">*</span>}</label>
           <input
             type="text"
-            value={value || ''}
-            onChange={(e) => onChange?.(e.target.value)}
+            value={value != null ? String(value) : ''}
+            onChange={handleTextChange}
             className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
             placeholder={field.label}
           />
@@ -301,10 +305,10 @@ function CustomField({
         <div>
           <label className="block text-sm font-medium text-[var(--ink)] mb-1">{field.label} {field.required && <span className="text-[var(--error)]">*</span>}</label>
           <Dropdown
-            trigger={<Button variant="outline" className="w-full justify-between">{value || 'Select...'}</Button>}
+            trigger={<Button variant="outline" className="w-full justify-between">{value != null ? String(value) : 'Select...'}</Button>}
             items={field.options?.map((opt) => ({ value: opt, label: opt })) || []}
-            value={value}
-            onChange={onChange}
+            value={value != null ? String(value) : ''}
+            onChange={handleSelectChange}
             placeholder="Select..."
           />
         </div>
@@ -317,12 +321,12 @@ function CustomField({
             {field.options?.map((color) => (
               <Button
                 key={color}
-                variant={value === color ? 'doodle' : 'doodle-outline'}
+                variant={value != null && String(value) === color ? 'doodle' : 'doodle-outline'}
                 size="sm"
                 className="w-10 h-10 rounded-full p-0"
-                onClick={() => onChange?.(color)}
+                onClick={() => handleColorChange(color)}
                 style={{ backgroundColor: color }}
-                aria-pressed={value === color}
+                aria-pressed={value != null && String(value) === color}
               />
             ))}
           </div>
@@ -331,11 +335,10 @@ function CustomField({
     case 'boolean':
       return (
         <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={value}
-            onChange={(e) => onChange?.(e.target.checked)}
-            className="w-5 h-5 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+          <Checkbox
+            checked={Boolean(value)}
+            onCheckedChange={handleBooleanChange}
+            className="h-5 w-5"
           />
           <span className="text-body text-[var(--ink)]">{field.label}</span>
         </label>

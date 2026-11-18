@@ -1,5 +1,6 @@
 'use server'
 
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { createProductSchema, updateProductSchema } from '@/lib/validations/product'
@@ -188,13 +189,25 @@ export async function toggleProductFeatured(id: string, isFeatured: boolean) {
 
 const BULK_UPDATE_FIELDS = ['isActive', 'isFeatured', 'categoryId', 'sortOrder', 'stock', 'trackInventory'] as const
 
-export async function bulkUpdateProducts(ids: string[], updates: Partial<any>) {
+export async function bulkUpdateProducts(
+  ids: string[],
+  updates: Partial<Record<(typeof BULK_UPDATE_FIELDS)[number], unknown>>
+) {
   await requireAdmin()
 
   // Whitelist updatable fields — never pass raw client objects to updateMany.
-  const data: Record<string, any> = {}
+  const data: Prisma.ProductUncheckedUpdateManyInput = {}
+  const setters: { [K in (typeof BULK_UPDATE_FIELDS)[number]]?: (v: unknown) => void } = {
+    isActive: (v) => { data.isActive = v as boolean },
+    isFeatured: (v) => { data.isFeatured = v as boolean },
+    categoryId: (v) => { data.categoryId = v as string },
+    sortOrder: (v) => { data.sortOrder = v as number },
+    stock: (v) => { data.stock = v as number },
+    trackInventory: (v) => { data.trackInventory = v as boolean },
+  }
   for (const field of BULK_UPDATE_FIELDS) {
-    if (updates[field] !== undefined) data[field] = updates[field]
+    const value = updates[field]
+    if (value !== undefined && value !== null) setters[field]?.(value)
   }
   if (Object.keys(data).length === 0) throw new AppError(400, 'No valid fields to update', 'EMPTY_UPDATE')
 
@@ -207,8 +220,21 @@ export async function bulkUpdateProducts(ids: string[], updates: Partial<any>) {
   return { success: true, count: result.count }
 }
 
-export async function getProducts(filters: any = {}) {
-  const where: any = {}
+export interface ProductFilters {
+  categoryId?: string
+  isActive?: boolean
+  isFeatured?: boolean
+  search?: string
+  minPrice?: number | string
+  maxPrice?: number | string
+  sortBy?: (typeof PRODUCT_SORT_FIELDS)[number]
+  sortOrder?: 'asc' | 'desc'
+  page?: number | string
+  limit?: number | string
+}
+
+export async function getProducts(filters: ProductFilters = {}) {
+  const where: Prisma.ProductWhereInput = {}
 
   if (filters.categoryId) where.categoryId = filters.categoryId
   if (filters.isActive !== undefined) where.isActive = filters.isActive
@@ -223,7 +249,9 @@ export async function getProducts(filters: any = {}) {
 
   const page = Math.max(1, Number(filters.page) || 1)
   const limit = Math.min(100, Math.max(1, Number(filters.limit) || 12))
-  const sortBy = PRODUCT_SORT_FIELDS.includes(filters.sortBy) ? filters.sortBy : 'sortOrder'
+  const sortBy = (PRODUCT_SORT_FIELDS as readonly string[]).includes(filters.sortBy ?? '')
+    ? (filters.sortBy as (typeof PRODUCT_SORT_FIELDS)[number])
+    : 'sortOrder'
   const sortOrder = filters.sortOrder === 'desc' ? 'desc' : 'asc'
 
   const [products, total] = await Promise.all([

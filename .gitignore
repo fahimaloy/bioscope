@@ -20,6 +20,7 @@ dist
 
 # Agent workspace (superpowers plans/brainstorm — not repo content)
 .superpowers/
+.slim/deepwork/
 
 # Debug
 npm-debug.log*

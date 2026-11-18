@@ -158,7 +158,7 @@ export default function ContactPage() {
                 <Card variant="doodle" padding="lg" className="h-full relative group">
                   <StickerPeel />
                   <WashiTape rotation={-3} width={120} height={24} className="absolute -top-4 left-4 opacity-80" />
-                  <div className="w-12 h-12 mx-auto mb-4 bg-primary/10 rounded-input flex items-center justify-center border-3 border-[var(--primary)] relative">
+                  <div className="w-12 h-12 mx-auto mb-4 bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] rounded-input flex items-center justify-center border-3 border-[var(--primary)] relative">
                     <item.icon className="w-6 h-6 text-primary" />
                     <div className="absolute top-[-4px] right-[-4px] w-4 h-4 bg-[var(--accent)] border-2 border-[var(--ink)] rounded-tr-full shadow-[2px_2px_0_var(--ink)] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>

@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 'use server'
 
 import { prisma } from '@/lib/prisma'
@@ -6,7 +7,7 @@ import { auth } from '@/lib/auth'
 import { AppError, requireAdmin } from '@/lib/api-utils'
 import type { PricingSettings } from '@/lib/pricing'
 
-function parseSettingValue(setting: { value: string; type: string }): any {
+function parseSettingValue(setting: { value: string; type: string }): string | number | boolean {
   switch (setting.type) {
     case 'NUMBER':
       return parseFloat(setting.value)
@@ -24,7 +25,7 @@ function parseSettingValue(setting: { value: string; type: string }): any {
 }
 
 function toKeyValue(settings: { key: string; value: string; type: string }[]) {
-  const result: Record<string, any> = {}
+  const result: Record<string, string | number | boolean> = {}
   for (const setting of settings) result[setting.key] = parseSettingValue(setting)
   return result
 }
@@ -33,7 +34,7 @@ export async function getSettings(category?: string) {
   const session = await auth()
   if (!session?.user) throw new AppError(401, 'Authentication required', 'UNAUTHENTICATED')
 
-  const where: any = {}
+  const where: Prisma.SettingWhereInput = {}
   if (category) where.category = category
   if (session.user.role !== 'ADMIN') where.isPublic = true
 
@@ -107,7 +108,7 @@ export async function updateSetting(data: { key: string; value: string; type: st
   return { success: true, setting }
 }
 
-export async function updateSettings(settings: Record<string, any>) {
+export async function updateSettings(settings: Record<string, string | number | boolean>) {
   await requireAdmin()
 
   const updates = Object.entries(settings).map(([key, value]) => {
@@ -151,7 +152,7 @@ export async function getSettingByCategory(category: string) {
   const session = await auth()
   if (!session?.user) throw new AppError(401, 'Authentication required', 'UNAUTHENTICATED')
 
-  const where: any = { category }
+  const where: Prisma.SettingWhereInput = { category }
   if (session.user.role !== 'ADMIN') where.isPublic = true
 
   const settings = await prisma.setting.findMany({

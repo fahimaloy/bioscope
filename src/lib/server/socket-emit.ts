@@ -2,8 +2,11 @@
 // socket.io events through the standalone socket server over HTTP.
 // Never import this from client components.
 
+import { authSecret } from '@/lib/auth-secret'
+import type { EmitOrder, EmitCustomRequest, EmitProduct, EmitNotification } from '@/lib/socket-types'
+
 const SOCKET_SERVER_URL = process.env.SOCKET_SERVER_URL || 'http://localhost:3001'
-const EMIT_SECRET = () => process.env.SOCKET_EMIT_SECRET || process.env.NEXTAUTH_SECRET || ''
+const EMIT_SECRET = () => process.env.SOCKET_EMIT_SECRET || authSecret()
 
 type EmitTarget = { userId?: string; room?: string }
 
@@ -27,7 +30,7 @@ export const emitToUser = (userId: string, event: string, data: unknown) => emit
 export const emitToAdmins = (event: string, data: unknown) => emit(event, { room: 'admins' }, data)
 export const emitToOrder = (orderId: string, event: string, data: unknown) => emit(event, { room: `order:${orderId}` }, data)
 
-export const emitNewOrder = (order: any) =>
+export const emitNewOrder = (order: EmitOrder) =>
   emitToAdmins('order:created', {
     orderId: order.id,
     orderNumber: order.orderNumber,
@@ -37,7 +40,7 @@ export const emitNewOrder = (order: any) =>
     createdAt: order.createdAt,
   })
 
-export const emitOrderStatusChange = (order: any, oldStatus: string, newStatus: string) => {
+export const emitOrderStatusChange = (order: EmitOrder, oldStatus: string, newStatus: string) => {
   const payload = {
     orderId: order.id,
     orderNumber: order.orderNumber,
@@ -54,7 +57,7 @@ export const emitOrderStatusChange = (order: any, oldStatus: string, newStatus: 
   ])
 }
 
-export const emitCustomRequestSubmitted = (request: any) =>
+export const emitCustomRequestSubmitted = (request: EmitCustomRequest) =>
   emitToAdmins('custom_request:submitted', {
     requestId: request.id,
     customerName: request.user?.name || request.user?.email,
@@ -67,7 +70,7 @@ export const emitCustomRequestSubmitted = (request: any) =>
     createdAt: request.createdAt,
   })
 
-export const emitCustomRequestPriced = (request: any) =>
+export const emitCustomRequestPriced = (request: EmitCustomRequest) =>
   emitToUser(request.userId, 'custom_request:priced', {
     requestId: request.id,
     quotedPrice: request.quotedPrice,
@@ -75,7 +78,7 @@ export const emitCustomRequestPriced = (request: any) =>
     quotedAt: request.quotedAt,
   })
 
-export const emitLowStockAlert = (product: any) =>
+export const emitLowStockAlert = (product: EmitProduct) =>
   emitToAdmins('product:low_stock', {
     productId: product.id,
     productName: product.name,
@@ -83,5 +86,5 @@ export const emitLowStockAlert = (product: any) =>
     threshold: product.lowStockThreshold,
   })
 
-export const emitNotificationNew = (notification: any) =>
+export const emitNotificationNew = (notification: EmitNotification) =>
   emitToUser(notification.userId, 'notification:new', notification)

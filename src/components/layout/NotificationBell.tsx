@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils'
 import { Bell, X, CheckCircle, Clock, AlertCircle, Package, FileText, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useNotificationStore } from '@/lib/stores/notificationStore'
+import type { Notification } from '@/types'
 import { formatDateTime } from '@/lib/utils'
 
-const notificationIcons: Record<string, any> = {
+const notificationIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   NEW_ORDER: Package,
   ORDER_STATUS_CHANGED: Clock,
   CUSTOM_REQUEST: FileText,
@@ -28,7 +29,6 @@ export function NotificationBell() {
     unreadCount,
     markAsRead,
     markAllAsRead,
-    removeNotification,
   } = useNotificationStore()
 
   useEffect(() => {
@@ -48,13 +48,13 @@ export function NotificationBell() {
     return <Icon className="w-5 h-5 flex-shrink-0" />
   }
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: Notification) => {
     if (!notification.isRead) {
       markAsRead(notification.id)
     }
     // Navigate to relevant page based on notification data
-    if (notification.data?.url) {
-      window.location.href = notification.data.url
+    if (notification.data && typeof notification.data === 'object' && 'url' in notification.data) {
+      window.location.href = String(notification.data.url)
     }
     setIsOpen(false)
   }
@@ -124,7 +124,7 @@ export function NotificationBell() {
                         'w-full p-4 flex items-start gap-3 transition-colors',
                         'hover:bg-[var(--light)]',
                         'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-                        !notification.isRead && 'bg-primary/5'
+                        !notification.isRead && 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)]'
                       )}
                       role="button"
                       tabIndex={0}
@@ -132,7 +132,7 @@ export function NotificationBell() {
                       <div
                         className={cn(
                           'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                          !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
+                          !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                         )}
                       >
                         {getIcon(notification.type)}

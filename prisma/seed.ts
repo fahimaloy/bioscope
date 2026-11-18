@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, OrderStatus, DeliveryZone, PaymentMethod, PaymentStatus, CustomRequestStatus } from '@prisma/client'
+import { PrismaClient, UserRole, OrderStatus, DeliveryZone, PaymentMethod, PaymentStatus } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 
@@ -68,7 +68,7 @@ async function main() {
   console.log('🔑 Customer password (shown once):', customerPasswordPlain)
 
   // Create customer address
-  const address = await prisma.address.create({
+  await prisma.address.create({
     data: {
       userId: customer.id,
       name: 'Test Customer',

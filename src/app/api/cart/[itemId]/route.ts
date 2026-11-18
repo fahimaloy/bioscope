@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { AppError, handleRouteError, requireUser, ok } from '@/lib/api-utils'

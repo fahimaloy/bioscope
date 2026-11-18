@@ -11,6 +11,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, CUSTOMER_CANCELLABLE } from '@/lib/order-status'
+import type { OrderStatus } from '@/lib/order-status'
 import { Eye, Package, ChevronDown, ChevronUp } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -174,7 +175,7 @@ export default function OrdersPage() {
                                 <Eye className="w-4 h-4 mr-1" /> View
                               </Button>
                             </Link>
-                            {CUSTOMER_CANCELLABLE.includes(order.status as any) && (
+                            {CUSTOMER_CANCELLABLE.includes(order.status as OrderStatus) && (
                               <Button
                                 variant="destructive"
                                 size="sm"
@@ -217,6 +218,7 @@ export default function OrdersPage() {
                                 >
                                   <div className="w-12 h-12 rounded-[var(--radius-md)] overflow-hidden flex-shrink-0 bg-[var(--surface-raised)]">
                                     {item.productImage ? (
+                                      // eslint-disable-next-line @next/next/no-img-element
                                       <img
                                         src={item.productImage}
                                         alt={item.productName}

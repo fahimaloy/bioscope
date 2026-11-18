@@ -243,7 +243,6 @@ function SummaryCard({
 // Revenue Chart Card - Doodle styled with Recharts
 export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue: number; orders: number }> }) {
   // Calculate max revenue for nice Y-axis ticks
-  const maxRevenue = Math.max(...data.map(d => d.revenue), 1)
 
   return (
     <motion.div

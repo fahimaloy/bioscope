@@ -6,7 +6,7 @@ import colorTokens from '../../tokens/src/color.json'
 
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
-export const alt = 'bioscope'
+export const alt = 'BIOSCOPE'
 
 /**
  * The OG route runs in the Node runtime so it can read both brand assets from
@@ -57,7 +57,7 @@ export default async function OpengraphImage() {
       }}
     >
       <div style={{ display: 'flex', transform: `scale(${OG_LOCKUP_SCALE})` }}>
-        <Wordmark raw size="lg" logoSrc={logoSrc} />
+        <Wordmark raw size="lg" logoSrc={logoSrc} text="BIOSCOPE" />
       </div>
     </div>,
     { ...size, fonts: [font] }

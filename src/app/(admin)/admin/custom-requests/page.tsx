@@ -13,7 +13,8 @@ import {
   Textarea,
 } from '@/components/ui'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Search, Eye, DollarSign, CheckCircle, XCircle, Edit2 } from 'lucide-react'
+import { Eye, DollarSign, CheckCircle, XCircle, Edit2 } from 'lucide-react'
+import { SearchInput } from '@/components/ui/SearchInput'
 
 const statusColors: Record<string, 'warning' | 'success' | 'error' | 'accent' | 'primary' | 'default'> = {
   PENDING: 'warning',
@@ -154,6 +155,7 @@ export default function CustomRequestsPage() {
       width: '100px',
       cell: (row: CustomRequest) => (
         <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={row.imageUrl}
             alt={row.originalName}
@@ -291,13 +293,11 @@ export default function CustomRequestsPage() {
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-              <input
-                type="text"
+              <SearchInput
                 placeholder="Search requests..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
+                aria-label="Search custom requests"
               />
             </div>
             <select
@@ -343,6 +343,7 @@ export default function CustomRequestsPage() {
         closeOnEscape={true}
       >
         <div className="text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageModalSrc}
             alt={imageModalAlt}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Select } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -61,6 +62,7 @@ export function AddressForm({
     district: '',
     division: 'Dhaka',
     postalCode: '',
+    country: 'Bangladesh',
     isDefault: false,
     deliveryZone: 'INSIDE_DHAKA' as 'INSIDE_DHAKA' | 'OUTSIDE_DHAKA',
   })
@@ -73,7 +75,7 @@ export function AddressForm({
       if (editingAddress) {
         await onUpdateAddress?.(editingAddress.id, formData)
       } else {
-        await onAddAddress?.(formData as any)
+        await onAddAddress?.(formData)
       }
 
       setShowForm(false)
@@ -95,6 +97,7 @@ export function AddressForm({
       district: address.district,
       division: address.division,
       postalCode: address.postalCode || '',
+      country: address.country || 'Bangladesh',
       isDefault: address.isDefault,
       deliveryZone: address.deliveryZone,
     })
@@ -117,8 +120,9 @@ export function AddressForm({
       district: '',
       division: 'Dhaka',
       postalCode: '',
+      country: 'Bangladesh',
       isDefault: false,
-      deliveryZone: 'INSIDE_DHAKA',
+      deliveryZone: 'INSIDE_DHAKA' as 'INSIDE_DHAKA' | 'OUTSIDE_DHAKA',
     })
   }
 
@@ -228,7 +232,7 @@ export function AddressForm({
                 <Select
                   label="Delivery Zone"
                   value={formData.deliveryZone}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, deliveryZone: e.target.value as any }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, deliveryZone: e.target.value as 'INSIDE_DHAKA' | 'OUTSIDE_DHAKA' }))}
                   options={[
                     { value: 'INSIDE_DHAKA', label: 'Inside Dhaka (60 BDT)' },
                     { value: 'OUTSIDE_DHAKA', label: 'Outside Dhaka (120 BDT)' },
@@ -238,11 +242,10 @@ export function AddressForm({
               </div>
 
               <label className="flex items-center gap-3 cursor-pointer p-3 rounded-[var(--radius-md)] bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--ink)_40%,transparent)] transition-colors">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={formData.isDefault}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, isDefault: e.target.checked }))}
-                  className="w-5 h-5 text-[var(--brand)] border-2 border-[var(--ink)] rounded-sm focus:ring-2 focus:ring-[var(--brand)] focus:ring-offset-2 focus:ring-offset-[var(--surface-raised)] appearance-none cursor-pointer"
+                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isDefault: checked === true }))}
+                  className="h-5 w-5"
                 />
                 <span className="text-sm font-medium text-[var(--text)]">Set as default address</span>
               </label>

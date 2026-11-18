@@ -137,7 +137,7 @@ export interface CartItem {
   width: number
   height: number
   quantity: number
-  customization: Record<string, any> | null
+  customization: Record<string, unknown> | null
   createdAt: Date
   updatedAt: Date
 }
@@ -181,7 +181,7 @@ export interface OrderItem {
   totalPrice: number
   taxPercent: number
   taxAmount: number
-  customization: Record<string, any> | null
+  customization: Record<string, unknown> | null
 }
 
 export interface Order {
@@ -320,14 +320,14 @@ export interface Notification {
   type: string
   title: string
   message: string
-  data: Record<string, any> | null
+  data: Record<string, unknown> | null
   isRead: boolean
   readAt: Date | null
   createdAt: Date
 }
 
 // API Response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   error?: string
@@ -495,6 +495,6 @@ export interface SocketEvents {
   'order:status_changed': (data: { orderId: string; orderNumber: string; oldStatus: string; newStatus: string; statusLabel: string; customerName?: string; updatedAt: string }) => void
   'custom_request:submitted': (data: { requestId: string; customerName: string; imageUrl: string; dimensions: string; quantity: number; material: string; finish: string; cutType: string; createdAt: string }) => void
   'custom_request:priced': (data: { requestId: string; quotedPrice: number; adminNotes?: string; quotedAt: string }) => void
-  'notification:new': (data: { id: string; type: string; title: string; message: string; data?: any; createdAt: string }) => void
+  'notification:new': (data: { id: string; type: string; title: string; message: string; data?: Record<string, unknown>; createdAt: string }) => void
   'product:low_stock': (data: { productId: string; productName: string; currentStock: number; threshold: number }) => void
 }

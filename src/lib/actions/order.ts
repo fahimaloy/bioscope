@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 import { checkoutSchema, orderStatusUpdateSchema, cartItemSchema } from '@/lib/validations/order'
 import { generateOrderNumber } from '@/lib/utils'
 import { computeOrderTotals, computeDiscount, priceLine, type PricedLine, type PricingSettings } from '@/lib/pricing'
@@ -24,14 +25,36 @@ async function notifyAdmins(title: string, message: string, data: Record<string,
   const notifications = await Promise.all(
     admins.map((admin) =>
       prisma.notification.create({
-        data: { userId: admin.id, type: 'NEW_ORDER', title, message, data: data as any },
+        data: { userId: admin.id, type: 'NEW_ORDER', title, message, data: JSON.parse(JSON.stringify(data ?? {})) as Prisma.InputJsonValue },
       })
     )
   )
   await Promise.all(notifications.map((n) => emitNotificationNew(n)))
 }
 
-export async function createOrder(data: any) {
+// ---- request payload types (validated downstream by zod schemas) ----
+export type CreateOrderPayload = z.infer<typeof checkoutSchema> & {
+  items: { productId: string; width: number; height: number; quantity: number; customization?: Prisma.InputJsonValue }[]
+}
+export type OrderStatusPayload = { status: string; notes?: string; trackingNumber?: string }
+export type OrderUpdatePayload = Record<string, unknown>
+export type BulkOrderPayload = { ids: string[]; status: string }
+type OrderFilters = {
+  status?: string
+  userId?: string
+  page?: number
+  limit?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+  startDate?: string
+  endDate?: string
+  minAmount?: string | number
+  maxAmount?: string | number
+  paymentStatus?: string
+}
+
+export async function createOrder(data: CreateOrderPayload) {
   const sessionUser = await requireUser()
   const validated = checkoutWithItemsSchema.parse(data)
 
@@ -41,7 +64,7 @@ export async function createOrder(data: any) {
   if (!address) throw new AppError(404, 'Address not found', 'ADDRESS_NOT_FOUND')
 
   // Resolve cart lines: explicit payload wins, otherwise the persisted server cart.
-  let lines: { productId: string; width: number; height: number; quantity: number; customization?: any }[]
+  let lines: { productId: string; width: number; height: number; quantity: number; customization?: Prisma.InputJsonValue }[]
   if (validated.items && validated.items.length > 0) {
     lines = validated.items
   } else {
@@ -55,7 +78,7 @@ export async function createOrder(data: any) {
       width: i.width,
       height: i.height,
       quantity: i.quantity,
-      customization: i.customization,
+      customization: i.customization as Prisma.InputJsonValue,
     }))
   }
 
@@ -70,7 +93,7 @@ export async function createOrder(data: any) {
   const settings: PricingSettings = await getPricingSettings()
 
   // Validate + price every line server-side (never trust client prices)
-  const pricedLines: (PricedLine & { productId: string; product: any; line: (typeof lines)[number] })[] = []
+  const pricedLines: (PricedLine & { productId: string; product: Prisma.ProductGetPayload<Record<string, never>>; line: (typeof lines)[number] })[] = []
   for (const line of lines) {
     const product = productMap.get(line.productId)
     if (!product) throw new AppError(400, `Product not found: ${line.productId}`, 'PRODUCT_NOT_FOUND')
@@ -137,7 +160,7 @@ export async function createOrder(data: any) {
 
     let orderNumber = generateOrderNumber()
     let attempts = 0
-    let created: any
+    let created!: Prisma.OrderGetPayload<{ include: { items: true } }>
     while (attempts < 5) {
       try {
         created = await tx.order.create({
@@ -164,7 +187,7 @@ export async function createOrder(data: any) {
             notes: validated.notes || null,
             addressId: address.id,
             items: {
-              create: pricedLines.map(({ product, line, ...priced }) => ({
+              create: pricedLines.map(({ product, line, ...priced }): Prisma.OrderItemUncheckedCreateWithoutOrderInput => ({
                 productId: product.id,
                 productName: product.name,
                 productSlug: product.slug,
@@ -183,8 +206,8 @@ export async function createOrder(data: any) {
           include: { items: true },
         })
         break
-      } catch (err: any) {
-        if (err?.code === 'P2002') {
+      } catch (err) {
+        if ((err as { code?: string })?.code === 'P2002') {
           orderNumber = generateOrderNumber()
           attempts++
           continue
@@ -215,8 +238,8 @@ export async function createOrder(data: any) {
   return { success: true, order }
 }
 
-export async function updateOrderStatus(id: string, data: any) {
-  await requireAdmin()
+export async function updateOrderStatus(id: string, data: OrderStatusPayload) {
+  const admin = await requireAdmin()
   const validated = orderStatusUpdateSchema.parse(data)
   const newStatus = validated.status as OrderStatus
 
@@ -228,18 +251,29 @@ export async function updateOrderStatus(id: string, data: any) {
     throw new AppError(409, `Cannot move order from ${ORDER_STATUS_LABELS[order.status as OrderStatus]} to ${ORDER_STATUS_LABELS[newStatus]}`, 'INVALID_TRANSITION')
   }
 
-  const updatedOrder = await prisma.order.update({
-    where: { id },
-    data: {
-      status: newStatus,
-      adminNotes: validated.notes ?? order.adminNotes,
-      trackingNumber: validated.trackingNumber ?? order.trackingNumber,
-      shippedAt: newStatus === 'SHIPPED' ? new Date() : order.shippedAt,
-      deliveredAt: newStatus === 'DELIVERED' ? new Date() : order.deliveredAt,
-      paymentStatus: newStatus === 'DELIVERED' && order.paymentMethod === 'COD' ? 'PAID' : order.paymentStatus,
-    },
-    include: { user: true, items: true },
-  })
+  const [updatedOrder] = await prisma.$transaction([
+    prisma.order.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        adminNotes: validated.notes ?? order.adminNotes,
+        trackingNumber: validated.trackingNumber ?? order.trackingNumber,
+        shippedAt: newStatus === 'SHIPPED' ? new Date() : order.shippedAt,
+        deliveredAt: newStatus === 'DELIVERED' ? new Date() : order.deliveredAt,
+        paymentStatus: newStatus === 'DELIVERED' && order.paymentMethod === 'COD' ? 'PAID' : order.paymentStatus,
+      },
+      include: { user: true, items: true },
+    }),
+    prisma.orderStatusHistory.create({
+      data: {
+        orderId: id,
+        fromStatus: order.status as OrderStatus,
+        toStatus: newStatus,
+        changedBy: admin.id as string,
+        note: validated.notes ?? null,
+      },
+    }),
+  ])
 
   await emitOrderStatusChange(updatedOrder, order.status, newStatus)
 
@@ -268,7 +302,7 @@ const updateOrderSchema = z.object({
   paymentStatus: z.enum(['PENDING', 'PAID', 'FAILED', 'REFUNDED']).optional(),
 })
 
-export async function updateOrder(id: string, data: any) {
+export async function updateOrder(id: string, data: OrderUpdatePayload) {
   await requireAdmin()
   const validated = updateOrderSchema.parse(data)
 
@@ -298,7 +332,7 @@ const bulkUpdateSchema = z.object({
   adminNotes: z.string().max(1000).optional(),
 })
 
-export async function bulkUpdateOrders(data: any) {
+export async function bulkUpdateOrders(data: BulkOrderPayload) {
   await requireAdmin()
   const validated = bulkUpdateSchema.parse(data)
 
@@ -385,20 +419,24 @@ export async function cancelOrder(id: string, reason?: string) {
   return { success: true, order: updated }
 }
 
-export async function getOrders(filters: any = {}) {
+export async function getOrders(filters: OrderFilters = {}) {
   const sessionUser = await requireUser()
 
-  const where: any = {}
+  const where: Prisma.OrderWhereInput = {}
   if (sessionUser.role !== 'ADMIN') {
     where.userId = sessionUser.id
   } else if (filters.userId) {
     where.userId = filters.userId
   }
-  if (filters.status) where.status = filters.status
-  if (filters.startDate) where.createdAt = { gte: new Date(filters.startDate) }
-  if (filters.endDate) where.createdAt = { ...where.createdAt, lte: new Date(filters.endDate) }
-  if (filters.minAmount) where.total = { ...where.total, gte: Number(filters.minAmount) }
-  if (filters.maxAmount) where.total = { ...where.total, lte: Number(filters.maxAmount) }
+  if (filters.status) where.status = filters.status as OrderStatus
+  const dateFilter: Prisma.DateTimeFilter = {}
+  if (filters.startDate) dateFilter.gte = new Date(filters.startDate)
+  const totalFilter: Prisma.DecimalFilter = {}
+  if (filters.endDate) dateFilter.lte = new Date(filters.endDate)
+  if (filters.startDate || filters.endDate) where.createdAt = dateFilter
+  if (filters.minAmount) totalFilter.gte = new Prisma.Decimal(Number(filters.minAmount))
+  if (filters.maxAmount) totalFilter.lte = new Prisma.Decimal(Number(filters.maxAmount))
+  if (filters.minAmount || filters.maxAmount) where.total = totalFilter
   if (filters.search) {
     where.OR = [
       { orderNumber: { contains: filters.search, mode: 'insensitive' } },
@@ -409,7 +447,7 @@ export async function getOrders(filters: any = {}) {
 
   const page = Math.max(1, Number(filters.page) || 1)
   const limit = Math.min(100, Math.max(1, Number(filters.limit) || 20))
-  const sortBy = ORDER_SORT_FIELDS.includes(filters.sortBy) ? filters.sortBy : 'createdAt'
+  const sortBy = (ORDER_SORT_FIELDS as readonly string[]).includes(filters.sortBy ?? '') ? (filters.sortBy as 'orderNumber' | 'status' | 'total' | 'createdAt') : 'createdAt'
   const sortOrder = filters.sortOrder === 'asc' ? 'asc' : 'desc'
 
   const [orders, total] = await Promise.all([
@@ -432,8 +470,7 @@ export async function getOrders(filters: any = {}) {
 
 export async function getOrderById(id: string) {
   const sessionUser = await requireUser()
-
-  const where: any = { id }
+  const where = { id } as { id: string; userId?: string }
   if (sessionUser.role !== 'ADMIN') where.userId = sessionUser.id
 
   const order = await prisma.order.findUnique({
@@ -451,8 +488,7 @@ export async function getOrderById(id: string) {
 
 export async function getOrderByNumber(orderNumber: string) {
   const sessionUser = await requireUser()
-
-  const where: any = { orderNumber }
+  const where = { orderNumber } as { orderNumber: string; userId?: string }
   if (sessionUser.role !== 'ADMIN') where.userId = sessionUser.id
 
   const order = await prisma.order.findUnique({
@@ -476,7 +512,7 @@ export async function getOrderStats() {
     prisma.order.count({ where: { status: 'PENDING' } }),
     prisma.order.aggregate({
       _sum: { total: true },
-      where: { status: { in: activeStatuses as any } },
+      where: { status: { in: activeStatuses as OrderStatus[] } },
     }),
     prisma.order.groupBy({ by: ['status'], _count: true }),
   ])

@@ -5,6 +5,7 @@ import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './Button';
 import { Card } from './Card';
+import { Checkbox } from './Checkbox';
 import { FOCUS_VISIBLE, setRefs } from './shared';
 
 interface DropdownItem {
@@ -29,7 +30,6 @@ interface DropdownProps {
 
 export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropdown(
   {
-    trigger,
     items,
     value,
     onChange,
@@ -166,7 +166,6 @@ interface MultiSelectDropdownProps {
 export const MultiSelectDropdown = forwardRef<HTMLDivElement, MultiSelectDropdownProps>(
   function MultiSelectDropdown(
     {
-      trigger,
       items,
       values = [],
       onChange,
@@ -281,13 +280,13 @@ export const MultiSelectDropdown = forwardRef<HTMLDivElement, MultiSelectDropdow
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={isSelected}
                       disabled={Boolean(item.disabled || isLimitReached)}
-                      className="h-4 w-4 rounded-[var(--radius-sm)] border-2 border-[var(--ink)] accent-[var(--ink)]"
+                      className="h-4 w-4"
                       aria-hidden="true"
                       tabIndex={-1}
+                      onCheckedChange={() => {}}
                     />
                     {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
                     <span className="truncate">{item.label}</span>

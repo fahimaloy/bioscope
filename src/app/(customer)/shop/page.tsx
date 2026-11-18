@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { SkeletonProductCard } from '@/components/ui/Skeleton'
-import { Select } from '@/components/ui/Select'
 import { DoodleScatter, DoodleSparkle } from '@/components/decorative'
 import { FOCUS_VISIBLE_INK } from '@/components/ui/shared'
+import { Search, Truck, Shield, Sparkles, Package, LayoutGrid } from 'lucide-react'
+import { getCategoryIcon } from '@/lib/category-icons'
+import { Input, Select } from '@/components/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import type { Product } from '@/types'
 
 const sortOptions = [
   { value: 'featured', label: 'Featured', sortBy: 'sortOrder', sortOrder: 'asc' },
@@ -23,16 +26,72 @@ const sortOptions = [
   { value: 'name-desc', label: 'Name: Z-A', sortBy: 'name', sortOrder: 'desc' },
 ] as const
 
-type Category = { id: string; name: string; slug: string }
+type Category = { id: string; name: string; slug: string; image?: string | null; icon?: string | null }
 
-function normalize(p: any) {
+interface PrismaProduct {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  basePrice: { toNumber(): number } | number
+  compareAtPrice: { toNumber(): number } | number | null
+  images: string[]
+  categoryId: string
+  category: { name: string } | null
+  allowedDimensions: Array<{
+    id: string
+    width: number
+    height: number
+    label: string
+    priceMultiplier: { toNumber(): number } | number
+    isDefault: boolean
+    sortOrder: number
+  }>
+  allowedQuantities: Array<{
+    id: string
+    minQty: number
+    maxQty: number | null
+    pricePerUnit: { toNumber(): number } | number
+    label: string
+    sortOrder: number
+  }>
+  customizationOptions: unknown
+  taxPercent: { toNumber(): number } | number
+  additionalCharge: { toNumber(): number } | number
+  isTaxInclusive: boolean
+  trackInventory: boolean
+  stock: number
+  lowStockThreshold: number
+  isActive: boolean
+  isFeatured: boolean
+  sortOrder: number
+  metaTitle: string | null
+  metaDescription: string | null
+  createdAt: Date
+  updatedAt: Date
+  reviews?: Array<{
+    id: string
+    rating: number
+    title: string | null
+    content: string
+    userId: string
+    user: { name: string | null; email: string }
+    createdAt: Date
+  }>
+  _count?: {
+    reviews: number
+    orderItems: number
+  }
+}
+
+function normalize(p: PrismaProduct): Product {
   return {
     ...p,
     basePrice: Number(p.basePrice),
     compareAtPrice: p.compareAtPrice != null ? Number(p.compareAtPrice) : null,
     taxPercent: Number(p.taxPercent ?? 0),
     additionalCharge: Number(p.additionalCharge ?? 0),
-  }
+  } as Product
 }
 
 const selectOptions = sortOptions.map(opt => ({ value: opt.value, label: opt.label }))
@@ -55,19 +114,33 @@ const CTA_LINK_CLASSES = [
 export default function ShopPage() {
   const variants = useMotionVariants()
   const [categories, setCategories] = useState<Category[]>([])
+  const [categoriesError, setCategoriesError] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [sortBy, setSortBy] = useState<(typeof sortOptions)[number]['value']>('featured')
-  const [products, setProducts] = useState<any[]>([])
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const [products, setProducts] = useState<Product[]>([])
   const [pager, setPager] = useState({ total: 0, totalPages: 1 })
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const loadCategories = useCallback(() => {
+    setCategoriesError(false)
     fetch('/api/categories?limit=100')
       .then((r) => r.json())
       .then((j) => { if (j.success) setCategories(j.data.data) })
-      .catch(() => {})
+      .catch(() => setCategoriesError(true))
   }, [])
+
+  useEffect(() => {
+    loadCategories()
+  }, [loadCategories])
+
+  // Debounce the search box so we don't refetch on every keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => { setSearch(searchInput.trim()); setPage(1) }, 250)
+    return () => clearTimeout(t)
+  }, [searchInput])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -80,6 +153,7 @@ export default function ShopPage() {
         sortOrder: opt.sortOrder,
       })
       if (selectedCategory !== 'all') params.set('categoryId', selectedCategory)
+      if (search) params.set('search', search)
       const res = await fetch(`/api/products?${params.toString()}`)
       const json = await res.json()
       if (res.ok) {
@@ -89,21 +163,21 @@ export default function ShopPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, sortBy, selectedCategory])
+  }, [page, sortBy, selectedCategory, search])
 
   useEffect(() => {
     load()
   }, [load])
 
-  const categoryPills = [
-    { id: 'all', name: 'All Products' },
+  const categoryPills: Category[] = [
+    { id: 'all', name: 'All Products', slug: 'all', image: null },
     ...categories,
   ]
 
   return (
-    <div className="min-h-screen bg-[var(--paper)]">
+    <div className="bg-[var(--paper)] pt-24">
       {/* Hero — one decor accent: a single DoodleScatter (contract §3). */}
-      <section className="relative overflow-hidden py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
         <DoodleScatter count={6} seed="shop-hero" />
         <div className="relative max-w-7xl mx-auto text-center">
           <h1 className="font-display text-6xl md:text-8xl text-[var(--text)] mb-6">Our Stickers</h1>
@@ -111,9 +185,9 @@ export default function ShopPage() {
             Discover unique, high-quality stickers for every occasion
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Badge variant="primary" size="lg">Free Delivery over 2000 BDT</Badge>
-            <Badge variant="secondary" size="lg">Weatherproof Materials</Badge>
-            <Badge variant="accent" size="lg">Custom Designs Welcome</Badge>
+            <Badge variant="primary" size="lg"><Truck className="w-5 h-5 mr-2" aria-hidden="true" />Free Delivery over 2000 BDT</Badge>
+            <Badge variant="secondary" size="lg"><Shield className="w-5 h-5 mr-2" aria-hidden="true" />Weatherproof Materials</Badge>
+            <Badge variant="accent" size="lg"><Sparkles className="w-5 h-5 mr-2" aria-hidden="true" />Custom Designs Welcome</Badge>
           </div>
         </div>
       </section>
@@ -121,38 +195,71 @@ export default function ShopPage() {
       {/* Filters & Toolbar */}
       <div className="bg-[var(--surface-raised)] border-b border-[color-mix(in_srgb,var(--ink)_15%,transparent)] px-4 sm:px-6 lg:px-8 py-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-[var(--text-subtle)]">Categories:</span>
-              <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Product categories">
-                {categoryPills.map((cat) => (
-                  <Button
-                    key={cat.id}
-                    variant={selectedCategory === cat.id ? 'primary' : 'outline'}
-                    size="sm"
-                    aria-pressed={selectedCategory === cat.id}
-                    onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
-                  >
-                    {cat.name}
-                  </Button>
-                ))}
-              </div>
+          {/* Row 1 — search + sort */}
+          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+            <Input
+              aria-label="Search stickers"
+              placeholder="Search stickers…"
+              icon={<Search size={18} />}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="flex-1 min-w-0 min-h-[44px]"
+            />
+            <div className="flex items-center gap-2">
+              <label htmlFor="shop-sort" className="text-sm font-medium text-[var(--text-subtle)] whitespace-nowrap">
+                Sort by:
+              </label>
+              <Select
+                id="shop-sort"
+                options={selectOptions}
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value as typeof sortBy); setPage(1) }}
+                className="w-auto min-w-[180px]"
+              />
             </div>
+          </div>
 
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-2">
-                <label htmlFor="shop-sort" className="text-sm font-medium text-[var(--text-subtle)]">
-                  Sort by:
-                </label>
-                <Select
-                  id="shop-sort"
-                  options={selectOptions}
-                  value={sortBy}
-                  onChange={(e) => { setSortBy(e.target.value as typeof sortBy); setPage(1) }}
-                  className="min-w-[200px]"
-                />
-              </div>
+          {/* Row 2 — category grid */}
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-[var(--text-subtle)]">Categories:</span>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3" role="group" aria-label="Product categories">
+              {categoryPills.map((cat) => {
+                const selected = selectedCategory === cat.id
+                const Fallback = cat.id === 'all' ? LayoutGrid : getCategoryIcon(cat.icon) ?? Package
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => { setSelectedCategory(cat.id); setPage(1) }}
+                    className={cn(
+                      'border-2 rounded-[var(--radius-md)] bg-[var(--surface-raised)] p-3 text-center transition-colors hover:bg-[var(--paper-deep)]',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]',
+                      selected
+                        ? 'border-[var(--primary)] ring-2 ring-[var(--primary)] bg-[color-mix(in_srgb,var(--primary)_5%,transparent)]'
+                        : 'border-[var(--ink)]',
+                    )}
+                  >
+                    {cat.image ? (
+                      // Category images are Cloudinary-hosted (whitelisted in next.config); plain img keeps object-contain simple.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={cat.image} alt="" loading="lazy" className="w-12 h-12 mx-auto mb-2 object-contain" />
+                    ) : (
+                      <Fallback className="w-12 h-12 mx-auto mb-2 text-[var(--ink)]" strokeWidth={1.5} aria-hidden="true" />
+                    )}
+                    <span className="block text-sm font-medium text-[var(--text)] leading-tight">{cat.name}</span>
+                  </button>
+                )
+              })}
             </div>
+            {categoriesError && (
+              <p role="alert" className="text-sm text-[var(--error)] flex items-center gap-2">
+                Couldn&apos;t load categories.
+                <button type="button" onClick={loadCategories} className="underline font-medium hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded">
+                  Retry
+                </button>
+              </p>
+            )}
           </div>
 
           <p className="text-sm text-[var(--text-muted)]">
@@ -188,7 +295,7 @@ export default function ShopPage() {
                 viewport={{ once: true, margin: '-100px' }}
                 exit="exit"
               >
-                <ProductGrid products={products as any} variant="default" />
+                <ProductGrid products={(products as PrismaProduct[]).map(normalize)} variant="default" />
               </motion.div>
             </AnimatePresence>
           ) : (
@@ -196,7 +303,7 @@ export default function ShopPage() {
               <DoodleSparkle size={64} color="gold" animation="float" className="mx-auto mb-6" />
               <h2 className="font-display text-2xl text-[var(--text)] mb-2">No products found</h2>
               <p className="text-[var(--text-muted)] mb-6">Try adjusting your filters or browse all categories</p>
-              <Button variant="primary" size="lg" onClick={() => { setSelectedCategory('all'); setPage(1) }}>
+              <Button variant="primary" size="lg" onClick={() => { setSelectedCategory('all'); setSearchInput(''); setPage(1) }}>
                 Clear Filters
               </Button>
             </div>

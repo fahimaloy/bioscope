@@ -12,7 +12,8 @@ import {
   Tooltip,
 } from '@/components/ui'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils'
-import { Search, ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
+import { ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
+import { SearchInput } from '@/components/ui/SearchInput'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TRANSITIONS, type OrderStatus } from '@/lib/order-status'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -141,27 +142,69 @@ function ExpandedRowContent({
 }: {
   order: Order
 }) {
-  const statusHistory: StatusHistoryEntry[] = useMemo(() => {
-    const history: StatusHistoryEntry[] = [
-      { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed' },
-    ]
-    if (order.status !== 'PENDING') {
-      // We'd normally fetch this from a status_history table
-      // For now, we'll create a mock timeline based on the current status
-      const statusIndex = STATUSES.indexOf(order.status)
-      for (let i = 1; i <= statusIndex; i++) {
-        history.push({
-          status: STATUSES[i],
-          timestamp: new Date(new Date(order.createdAt).getTime() + i * 24 * 60 * 60 * 1000).toISOString(),
-          note: `Status changed to ${ORDER_STATUS_LABELS[STATUSES[i]]}`,
-        })
-      }
+  const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([
+    { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed' },
+  ])
+  const [historyLoading, setHistoryLoading] = useState(true)
+  const [sendingEmail, setSendingEmail] = useState(false)
+
+  const sendEmail = async () => {
+    setSendingEmail(true)
+    try {
+      const res = await fetch(`/api/orders/${order.id}/send-email`, { method: 'POST' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json?.error || 'Failed to send email')
+      toast.success(`Order email sent to ${json?.data?.to ?? 'customer'}`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to send email')
+    } finally {
+      setSendingEmail(false)
     }
-    return history
-  }, [order])
+  }
+
+  useEffect(() => {
+    let cancelled = false
+    setHistoryLoading(true)
+    fetch(`/api/orders/${order.id}/history`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((body) => {
+        if (cancelled) return
+        const entries: StatusHistoryEntry[] = [
+          { status: 'PENDING', timestamp: order.createdAt, note: 'Order placed' },
+        ]
+        const raw: Array<{ toStatus: OrderStatus; createdAt: string; note: string | null }> = Array.isArray(body?.data?.history)
+          ? body.data.history
+          : []
+        for (const entry of raw) {
+          entries.push({
+            status: entry.toStatus,
+            timestamp: entry.createdAt,
+            note: entry.note ?? `Status changed to ${ORDER_STATUS_LABELS[entry.toStatus] ?? entry.toStatus}`,
+          })
+        }
+        setStatusHistory(entries)
+      })
+      .catch(() => {
+        // Keep the baseline "Order placed" entry on fetch failure
+      })
+      .finally(() => {
+        if (!cancelled) setHistoryLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [order.id, order.status, order.createdAt])
 
   return (
     <div className="p-6 bg-[var(--surface-raised)] border-t-2 border-[var(--light)] animate-slide-down">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <Button size="sm" variant="outline" onClick={sendEmail} disabled={sendingEmail}>
+          {sendingEmail ? 'Sending…' : 'Send Email'}
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => window.open(`/admin/orders/${order.id}/invoice`, '_blank')}>
+          Print Invoice
+        </Button>
+      </div>
       <div className="grid md:grid-cols-2 gap-8">
         {/* Order Items */}
         <div>
@@ -174,16 +217,16 @@ function ExpandedRowContent({
               <div key={item.id} className="flex gap-4 p-4 bg-white border-2 border-[var(--light)] rounded-card">
                 <div className="w-20 h-20 flex-shrink-0 relative">
                   {item.productImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      // eslint-disable-next-line @next/next/no-img-element
                       src={item.productImage}
                       alt={item.productName}
                       className="w-full h-full object-cover rounded-input"
                     />
                   ) : (
                     <div className="w-full h-full bg-[var(--light)] rounded-input flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        // eslint-disable-next-line @next/next/no-img-element
                         src="/images/stickers/skull_sticker.png"
                         alt="Placeholder"
                         className="w-12 h-12 opacity-50"
@@ -214,6 +257,7 @@ function ExpandedRowContent({
           <h4 className="font-display text-lg text-[var(--ink)] mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
             Status Timeline
+            {historyLoading && <span className="text-xs font-normal text-[var(--text-subtle)]">Loading latest…</span>}
           </h4>
           <div className="space-y-4">
             {statusHistory.slice().reverse().map((entry, index) => {
@@ -224,7 +268,7 @@ function ExpandedRowContent({
                   <div className="relative flex-shrink-0">
                     <div className={`
                       w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
-                      ${isCurrent ? 'bg-primary text-white' : 'bg-primary/10 text-primary border-2 border-primary'}
+                      ${isCurrent ? 'bg-primary text-white' : 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary border-2 border-primary'}
                     `}>
                       {isCurrent ? (
                         <Clock className="w-5 h-5 animate-pulse" />
@@ -599,15 +643,12 @@ export default function AdminOrdersPage() {
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-              <label htmlFor="order-search" className="sr-only">Search orders</label>
-              <input
+              <SearchInput
                 id="order-search"
-                type="text"
                 placeholder="Search order #, customer..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
+                aria-label="Search orders"
               />
             </div>
             <Dropdown

@@ -3,13 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { formatDateTime } from '@/lib/utils'
 import type { Notification } from '@/types'
-import { Bell, CheckCircle, X, Eye, Trash2, Filter, MoreVertical, Clock, Package, FileText, AlertCircle, UserPlus, RefreshCw } from 'lucide-react'
+import { Bell, CheckCircle, X, Trash2, Filter, Clock, Package, FileText, AlertCircle, UserPlus } from 'lucide-react'
 
-const notificationIcons: Record<string, any> = {
+const notificationIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   NEW_ORDER: Package,
   ORDER_STATUS_CHANGED: Clock,
   CUSTOM_REQUEST: FileText,
@@ -57,25 +56,15 @@ export function NotificationList({
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
 
-  const getIcon = (type: string) => {
-    const Icon = notificationIcons[type] || notificationIcons.DEFAULT
-    return <Icon className="w-5 h-5" />
-  }
+  
 
-  const handleNotificationClick = (notification: Notification) => {
-    if (!notification.isRead) {
-      onMarkRead(notification.id)
-    }
-    if (notification.data?.url) {
-      window.location.href = notification.data.url
-    }
-  }
+  
 
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-input bg-primary/10 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-input bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center">
             <Bell className="w-5 h-5 text-primary" />
           </div>
           <div>
@@ -125,7 +114,7 @@ export function NotificationList({
             { value: 'oldest', label: 'Oldest First' },
           ]}
           value={sortBy}
-          onChange={(v) => setSortBy(v as any)}
+          onChange={(v) => setSortBy(v as 'newest' | 'oldest')}
         />
       </div>
 
@@ -141,26 +130,25 @@ export function NotificationList({
           </div>
         ) : (
           filteredNotifications.map((notification) => {
-            const Icon = notificationIcons[notification.type] || notificationIcons.DEFAULT
-            const color = notificationColors[notification.type] || notificationColors.DEFAULT
-            const isExpanded = expandedId === notification.id
+            const IconComponent = notificationIcons[notification.type] || notificationIcons.DEFAULT
+                      const isExpanded = expandedId === notification.id
 
             return (
               <div
                 key={notification.id}
                 className={cn(
                   'flex items-start gap-3 p-4 rounded-input border-2 transition-all',
-                  !notification.isRead ? 'bg-primary/5 border-primary/20' : 'bg-white border-[var(--light)]',
-                  isExpanded && 'ring-2 ring-primary/20'
+                  !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)] border-[color-mix(in_srgb,var(--primary)_20%,transparent)]' : 'bg-white border-[var(--light)]',
+                  isExpanded && 'ring-2 ring-[color-mix(in_srgb,var(--primary)_20%,transparent)]'
                 )}
               >
                 <div
                   className={cn(
                     'w-10 h-10 rounded-input flex items-center justify-center flex-shrink-0',
-                    !notification.isRead ? 'bg-primary/10 text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
+                    !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                   )}
                 >
-                  {Icon}
+                  <IconComponent className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0" onClick={() => setExpandedId(isExpanded ? null : notification.id)}>
                   <div className="flex items-start justify-between gap-2 mb-1">
@@ -186,7 +174,7 @@ export function NotificationList({
                     </div>
                   )}
                   {!isExpanded && notification.data && (
-                    <p className="text-xs text-primary/80 mt-1">Click to expand</p>
+                    <p className="text-xs text-[var(--text-subtle)] mt-1">Click to expand</p>
                   )}
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
@@ -227,7 +215,6 @@ export function NotificationBellDropdown({
   notifications,
   onMarkRead,
   onMarkAllRead,
-  onDelete,
 }: {
   notifications: Notification[]
   onMarkRead: (id: string) => void
@@ -303,13 +290,13 @@ export function NotificationBellDropdown({
                     key={notification.id}
                     onClick={() => {
                       if (!notification.isRead) onMarkRead(notification.id)
-                      if (notification.data?.url) window.location.href = notification.data.url
+                      if (notification.data && typeof notification.data === 'object' && 'url' in notification.data) window.location.href = String(notification.data.url)
                       setIsOpen(false)
                     }}
                     className={cn(
                       'w-full p-4 flex items-start gap-3 transition-colors',
                       'hover:bg-[var(--light)]',
-                      !notification.isRead && 'bg-primary/5',
+                      !notification.isRead && 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)]',
                       'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2'
                     )}
                     role="menuitem"

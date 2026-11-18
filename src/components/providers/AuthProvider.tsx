@@ -2,7 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react'
 import { ReactNode } from 'react'
-import { useAuthStore, useAuthActions } from '@/lib/stores/authStore'
+import { useAuthActions } from '@/lib/stores/authStore'
 import { useAuth } from '@/lib/hooks/useAuth'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -16,8 +16,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 // Client-side auth state initializer
 export function AuthInitializer({ children }: { children: ReactNode }) {
-  const { user, isLoading } = useAuth()
-  const { setUser, setLoading } = useAuthActions()
+  const { isLoading } = useAuth()
+  useAuthActions()
 
   // The useAuth hook already handles syncing
   // This component exists for any additional initialization

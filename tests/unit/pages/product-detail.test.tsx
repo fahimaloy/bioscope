@@ -37,11 +37,10 @@ vi.mock('next/link', () => ({
 
 vi.mock('next/image', () => ({
   default: ({
-    fill,
-    sizes,
     ...props
   }: React.ImgHTMLAttributes<HTMLImageElement> & { fill?: boolean; sizes?: string }) => (
-    <img {...props} />
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt="" {...props} />
   ),
 }))
 

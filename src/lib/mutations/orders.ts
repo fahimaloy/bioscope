@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { orderKeys } from '@/lib/queries/orders'
 import type { OrderStatusUpdateInput } from '@/lib/validations/order'
+import type { OrderUpdatePayload, BulkOrderPayload, CreateOrderPayload } from '@/lib/actions/order'
 
 export function useUpdateOrderStatus() {
   const queryClient = useQueryClient()
@@ -27,7 +28,7 @@ export function useUpdateOrder() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<any> }) => {
+    mutationFn: async ({ id, data }: { id: string; data: OrderUpdatePayload }) => {
       const res = await fetch(`/api/orders/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -48,7 +49,7 @@ export function useBulkUpdateOrders() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: { ids: string[]; updates: Partial<any> }) => {
+    mutationFn: async (data: BulkOrderPayload) => {
       const res = await fetch('/api/orders/bulk', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -68,7 +69,7 @@ export function useCreateOrder() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: CreateOrderPayload) => {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

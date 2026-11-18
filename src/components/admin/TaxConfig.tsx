@@ -1,22 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Select } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Plus, Minus, Trash2, Settings, Percent, Calculator } from 'lucide-react'
 
+interface TaxSettings {
+  global_tax_percent: number
+  tax_inclusive_pricing: boolean
+  tax_categories: Array<{ id: string; name: string; rate: number; description: string }>
+}
+
 interface TaxConfigProps {
-  onChange: (settings: any) => void
-  initialSettings?: any
+  onChange: (settings: Partial<TaxSettings>) => void
+  initialSettings?: Partial<TaxSettings>
 }
 
 export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
-  const [globalTax, setGlobalTax] = useState(initialSettings.global_tax_percent || 5)
-  const [taxInclusive, setTaxInclusive] = useState(initialSettings.tax_inclusive_pricing || false)
+  const [globalTax, setGlobalTax] = useState(initialSettings.global_tax_percent ?? 5)
+  const [taxInclusive, setTaxInclusive] = useState(initialSettings.tax_inclusive_pricing ?? false)
   const [taxCategories, setTaxCategories] = useState<Array<{ id: string; name: string; rate: number; description: string }>>(
-    initialSettings.tax_categories || [
+    initialSettings.tax_categories ?? [
       { id: 'standard', name: 'Standard Rate', rate: globalTax, description: 'Applies to most products' },
       { id: 'reduced', name: 'Reduced Rate', rate: 0, description: 'Essential items' },
       { id: 'zero', name: 'Zero Rate', rate: 0, description: 'Exempt items' },
@@ -65,7 +71,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
       <div className="bg-white rounded-card border-3 border-[var(--ink)] p-6 shadow-card">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-input bg-primary/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-input bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center">
               <Percent className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -113,14 +119,13 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
 
           <div className="flex items-end">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={taxInclusive}
-                onChange={(e) => {
-                  setTaxInclusive(e.target.checked)
+                onCheckedChange={(checked) => {
+                  setTaxInclusive(checked === true)
                   handleGlobalChange()
                 }}
-                className="w-4 h-4 text-primary border-2 border-[var(--ink)] rounded focus:ring-2 focus:ring-primary"
+                className="h-4 w-4"
               />
               <span className="text-sm text-[var(--ink)]">Display prices with tax included</span>
             </label>

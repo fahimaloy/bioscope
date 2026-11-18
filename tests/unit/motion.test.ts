@@ -26,11 +26,11 @@ const repoRoot = process.cwd()
 
 const motionTokens = JSON.parse(
   readFileSync(path.join(repoRoot, 'tokens/src/motion.json'), 'utf8'),
-) as Record<string, { $value: any }>
+) as Record<string, { $value: { stiffness?: number; damping?: number; [key: string]: unknown } }>
 
 /** The module's public surfaces as plain records so the assertions can walk them. */
-const variants = motionVariants as unknown as Record<string, Record<string, any>>
-const reduced = reducedMotionVariants as unknown as Record<string, Record<string, any>>
+const variants = motionVariants as unknown as Record<string, MotionVariant>
+const reduced = reducedMotionVariants as unknown as Record<string, MotionVariant>
 
 /** `grep -rho 'motionVariants\.[a-zA-Z]*' src | sort -u` today. */
 const CONSUMED_KEYS = [
@@ -57,6 +57,18 @@ const LEGACY_KEYS = [
   'pageEnter',
 ]
 
+// Type for motion variant objects
+interface MotionVariant {
+  initial?: Record<string, unknown>
+  animate?: Record<string, unknown>
+  transition?: Record<string, unknown>
+  whileHover?: Record<string, unknown>
+  whileTap?: Record<string, unknown>
+  whileFocus?: Record<string, unknown>
+  [key: string]: unknown
+}
+
+
 /**
  * The gesture keys are target-only maps — the object *is* the hover/tap/focus
  * target, passed straight to `whileHover={motionVariants.hoverLift}`. They
@@ -66,15 +78,15 @@ const LEGACY_KEYS = [
  */
 const GESTURE_KEYS = ['hoverLift', 'hoverScale', 'tapPress', 'focusRing']
 
-function isObject(value: unknown): value is Record<string, any> {
+function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
-function transitionOf(variant: Record<string, any>): Record<string, any> | undefined {
+function transitionOf(variant: Record<string, unknown>): Record<string, unknown> | undefined {
   return isObject(variant?.transition) ? variant.transition : undefined
 }
 
-function loopsForever(variant: Record<string, any>): boolean {
+function loopsForever(variant: Record<string, unknown>): boolean {
   return transitionOf(variant)?.repeat === Infinity
 }
 
@@ -132,9 +144,10 @@ describe('motion variants', () => {
   })
 
   it('staggerContainer staggers its children', () => {
-    const transition = variants.staggerContainer.animate.transition
-    expect(transition.staggerChildren).toBeGreaterThan(0)
-    expect(transition.delayChildren).toBeGreaterThanOrEqual(0)
+    const animate = variants.staggerContainer.animate as Record<string, unknown> | undefined
+    const transition = animate?.transition as Record<string, unknown> | undefined
+    expect(transition?.staggerChildren).toBeGreaterThan(0)
+    expect(transition?.delayChildren).toBeGreaterThanOrEqual(0)
   })
 
   it('gives every looping variant a reduced-motion fallback that stops the loop', () => {
@@ -144,7 +157,7 @@ describe('motion variants', () => {
     for (const [key] of looping) {
       expect(reduced[key], `${key} loops, so it needs a reduced-motion fallback`).toBeTruthy()
       expect(
-        reduced[key].transition?.repeat,
+        (reduced[key].transition as Record<string, unknown> | undefined)?.repeat,
         `${key} must not loop under reduced motion`,
       ).not.toBe(Infinity)
     }
@@ -169,18 +182,18 @@ describe('motion variants', () => {
 
   it('never leaves content at opacity 0 under reduced motion', () => {
     for (const [key, variant] of Object.entries(reduced)) {
-      if (variant.initial?.opacity !== 0) continue
-      expect(variant.animate?.opacity, `${key} reaches its final opacity`).toBe(1)
+      if ((variant.initial as Record<string, unknown> | undefined)?.opacity !== 0) continue
+      expect((variant.animate as Record<string, unknown> | undefined)?.opacity, `${key} reaches its final opacity`).toBe(1)
     }
   })
 
   it('uses the motion-token springs inside the contract ranges', () => {
     const press = motionTokens['spring-press'].$value as { stiffness: number; damping: number }
-    const springs: Array<Record<string, any>> = []
+    const springs: Array<Record<string, unknown>> = []
 
     for (const [key, variant] of Object.entries(variants)) {
       const transition = transitionOf(variant)
-      if (transition?.type === 'spring') springs.push({ key, ...transition })
+      if (transition?.type === 'spring') springs.push({ key, ...(transition as Record<string, unknown>) })
     }
 
     expect(springs.length, 'the module still uses springs').toBeGreaterThan(0)

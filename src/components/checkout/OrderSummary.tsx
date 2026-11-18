@@ -96,6 +96,7 @@ export function CheckoutOrderSummary({
             animate="animate"
             className="flex items-center gap-3 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] rounded-[var(--radius-md)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--ink)_40%,transparent)] transition-colors"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={item.productImage || '/images/sticker-placeholder.svg'}
               alt={item.productName}

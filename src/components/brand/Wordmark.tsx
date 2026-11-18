@@ -8,6 +8,15 @@ export type WordmarkSize = 'sm' | 'md' | 'lg'
 
 export interface WordmarkProps {
   /**
+   * The text to render. Default "BIOSCOPE".
+   */
+  text?: string
+  /**
+   * Array of color token names (e.g. 'letter-1', 'letter-2') for each letter.
+   * Defaults to the 8 letter-* tokens in order.
+   */
+  letterColors?: readonly string[]
+  /**
    * Wordmark colour. `light` is paper-coloured, for use on ink/dark surfaces;
    * `dark` is ink, for use on paper. The logo image itself never changes.
    * Default `dark`.
@@ -58,14 +67,19 @@ const VARIANT_COLORS: Record<WordmarkVariant, ColorSpec> = {
 }
 
 /**
- * Folk accent colours for the two "o" letters (spec §5.1). `--gold` is
- * deliberately not used: as text on paper it is ~1.3:1 and fails the "legible
- * at sm" requirement. Pink and violet are display/decoration accents.
+ * Default per-letter palette for "BIOSCOPE" (8 letters).
+ * These map to the letter-1 through letter-8 tokens from the color system.
  */
-const ACCENT_COLORS = {
-  pink: { className: 'text-[var(--pink)]', raw: colorTokens.pink.$value },
-  violet: { className: 'text-[var(--violet)]', raw: colorTokens.violet.$value },
-} as const
+const DEFAULT_LETTER_COLORS: readonly string[] = [
+  'letter-1',
+  'letter-2',
+  'letter-3',
+  'letter-4',
+  'letter-5',
+  'letter-6',
+  'letter-7',
+  'letter-8',
+]
 
 /**
  * Die-cut halo for the mark (spec §5.1: the primary mark is used "inside a
@@ -95,11 +109,13 @@ const DIE_CUT_FILTER = {
 } as const
 
 /**
- * The bioscope lockup: the folk-art mark beside the Shrikhand `bioscope`
- * wordmark. One source of truth, two render paths — `next/image` for the app,
+ * The bioscope lockup: the folk-art mark beside the Shrikhand wordmark.
+ * One source of truth, two render paths — `next/image` for the app,
  * a plain `<img>` for the OG image runtime.
  */
 export function Wordmark({
+  text = 'BIOSCOPE',
+  letterColors = DEFAULT_LETTER_COLORS,
   variant = 'dark',
   size = 'md',
   raw = false,
@@ -115,12 +131,39 @@ export function Wordmark({
     gap: spec.gap,
   }
 
-  const wordmarkStyle: CSSProperties = {
-    fontFamily: 'Shrikhand',
-    fontSize: spec.fontSize,
-    lineHeight: 1,
-    color: color.raw,
-  }
+  
+
+  // Build the colored letter spans
+  const letters = text.split('')
+  const coloredLetters = letters.map((letter, index) => {
+    const tokenName = letterColors[index] || letterColors[letterColors.length - 1]
+    const tokenValue = (colorTokens as Record<string, { $value: string }>)[tokenName]?.$value || color.raw
+
+    if (raw) {
+      return (
+        <span
+          key={index}
+          style={{
+            color: tokenValue,
+            fontFamily: 'Shrikhand',
+            fontSize: spec.fontSize,
+            lineHeight: 1,
+          }}
+        >
+          {letter}
+        </span>
+      )
+    }
+
+    return (
+      <span
+        key={index}
+        className={cn('font-display leading-none tracking-tight', spec.textClass, `text-[var(--${tokenName})]`)}
+      >
+        {letter}
+      </span>
+    )
+  })
 
   return (
     <span
@@ -133,7 +176,7 @@ export function Wordmark({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={logoSrc}
-          alt="bioscope"
+          alt="BIOSCOPE"
           width={spec.logo}
           height={spec.logo}
           style={{
@@ -146,41 +189,19 @@ export function Wordmark({
       ) : (
         <Image
           src={logoSrc}
-          alt="bioscope"
+          alt="BIOSCOPE"
           width={spec.logo}
           height={spec.logo}
           className={cn('shrink-0', DIE_CUT_FILTER.className)}
         />
       )}
-      <span
-        aria-hidden="true"
-        className={
-          raw
-            ? undefined
-            : cn('font-display leading-none tracking-tight', spec.textClass, color.className)
-        }
-        style={raw ? wordmarkStyle : undefined}
-      >
-        bi
-        <span
-          className={raw ? undefined : ACCENT_COLORS.pink.className}
-          style={raw ? { color: ACCENT_COLORS.pink.raw } : undefined}
-        >
-          o
-        </span>
-        sc
-        <span
-          className={raw ? undefined : ACCENT_COLORS.violet.className}
-          style={raw ? { color: ACCENT_COLORS.violet.raw } : undefined}
-        >
-          o
-        </span>
-        pe
+      <span aria-hidden="true" className={raw ? undefined : 'flex'}>
+        {coloredLetters}
       </span>
       {/* The split-letter wordmark above is hidden from assistive tech; this
           single text node carries the brand name. The OG render path omits it
           because satori ignores the `sr-only` utility and would draw it. */}
-      {!raw && <span className="sr-only">bioscope</span>}
+      {!raw && <span className="sr-only">{text}</span>}
     </span>
   )
 }

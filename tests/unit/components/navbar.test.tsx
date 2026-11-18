@@ -117,8 +117,8 @@ describe('Navbar', () => {
 
     // The lockup: the mark image and the accessible brand name (Wordmark
     // renders the split-letter wordmark as one visible text node).
-    expect(screen.getByRole('img', { name: 'bioscope' })).toBeInTheDocument()
-    expect(screen.getByText('bioscope')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'BIOSCOPE' })).toBeInTheDocument()
+    expect(screen.getByText('BIOSCOPE')).toBeInTheDocument()
 
     for (const { href, label } of NAV_LINKS) {
       const link = screen.getByRole('link', { name: label })

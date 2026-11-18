@@ -40,11 +40,10 @@ vi.mock('next/link', () => ({
 
 vi.mock('next/image', () => ({
   default: ({
-    fill,
-    sizes,
     ...props
   }: React.ImgHTMLAttributes<HTMLImageElement> & { fill?: boolean; sizes?: string }) => (
-    <img {...props} />
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt="" {...props} />
   ),
 }))
 
@@ -218,6 +217,27 @@ const DETAIL_ORDER: DetailOrder = {
   ],
 }
 
+/** CANCELLED order — timeline ends at CANCELLED, no "Current" badge on last step. */
+const CANCELLED_ORDER: DetailOrder = {
+  ...DETAIL_ORDER,
+  id: 'ord-cancelled',
+  orderNumber: 'BS-3001',
+  status: 'CANCELLED',
+  shippedAt: null,
+  notes: 'Customer requested cancellation',
+}
+
+/** REFUNDED order — timeline ends at REFUNDED. */
+const REFUNDED_ORDER: DetailOrder = {
+  ...DETAIL_ORDER,
+  id: 'ord-refunded',
+  orderNumber: 'BS-4001',
+  status: 'REFUNDED',
+  shippedAt: '2026-01-07T10:00:00.000Z',
+  deliveredAt: '2026-01-09T10:00:00.000Z',
+  notes: 'Refund processed after return',
+}
+
 /** Stubs `GET /api/orders?…` with the real `ok(result)` envelope. */
 function stubOrdersList(orders: ListOrder[]) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
@@ -325,7 +345,7 @@ describe('Orders list page', () => {
 })
 
 describe('Order detail page', () => {
-  it('renders the order number, its items and the timeline steps', async () => {
+  it('renders the order number, its items and the timeline steps for SHIPPED', async () => {
     stubOrderDetail(DETAIL_ORDER)
 
     const { container } = renderWithProviders(<OrderDetailPage />)
@@ -359,6 +379,53 @@ describe('Order detail page', () => {
     // The price breakdown is rendered, not stubbed out.
     const totalRow = screen.getByText('Total').closest('div')
     expect(totalRow?.textContent).toContain(formatCurrency(1260))
+  })
+
+  it('renders CANCELLED timeline without "Current" badge on final step', async () => {
+    stubOrderDetail(CANCELLED_ORDER)
+
+    const { container } = renderWithProviders(<OrderDetailPage />)
+
+    await waitFor(() => expect(within(container).getByText('BS-3001')).toBeInTheDocument())
+
+    const timelineCard = within(container).getByText('Timeline').closest('div')
+    expect(timelineCard).not.toBeNull()
+    const timeline = within(timelineCard as HTMLElement)
+
+    // Timeline includes PENDING → CONFIRMED → CANCELLED (short-circuited).
+    expect(timeline.getByText('Order Placed')).toBeInTheDocument()
+    expect(timeline.getByText('Confirmed')).toBeInTheDocument()
+    expect(timeline.getByText('Cancelled')).toBeInTheDocument()
+
+    // No "Current" badge on the CANCELLED step (isCancelled = true).
+    expect(timeline.queryByText('Current')).not.toBeInTheDocument()
+  })
+
+  it('renders REFUNDED timeline — page only shows steps up to current status', async () => {
+    stubOrderDetail(REFUNDED_ORDER)
+
+    const { container } = renderWithProviders(<OrderDetailPage />)
+
+    await waitFor(() => expect(within(container).getByText('BS-4001')).toBeInTheDocument())
+
+    const timelineCard = within(container).getByText('Timeline').closest('div')
+    expect(timelineCard).not.toBeNull()
+    const timeline = within(timelineCard as HTMLElement)
+
+    // buildHistory() only includes steps based on order.status.
+    // For REFUNDED it shows: PENDING → CONFIRMED → PROCESSING → REFUNDED
+    // (it does not retroactively add PRINTING/SHIPPED/DELIVERED steps).
+    for (const label of [
+      'Order Placed',
+      'Confirmed',
+      'Processing',
+      'Refunded',
+    ]) {
+      expect(timeline.getByText(label)).toBeInTheDocument()
+    }
+
+    // No "Current" badge on the REFUNDED step.
+    expect(timeline.queryByText('Current')).not.toBeInTheDocument()
   })
 })
 

@@ -25,7 +25,7 @@ export function useUpdateSettings() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (settings: Record<string, any>) => {
+    mutationFn: async (settings: Record<string, string | number | boolean>) => {
       const res = await fetch('/api/settings/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

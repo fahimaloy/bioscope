@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/Accordion'
 import { StickerCanvas } from '@/components/custom-sticker/StickerCanvas'
 import { UploadZone } from '@/components/custom-sticker/UploadZone'
@@ -17,23 +16,17 @@ import { DimensionControls } from '@/components/custom-sticker/DimensionControls
 import { ColorAdjustments } from '@/components/custom-sticker/ColorAdjustments'
 import { PreviewPanel } from '@/components/custom-sticker/PreviewPanel'
 import { LayerPanel } from '@/components/custom-sticker/LayerPanel'
-import { useStickerBuilderStore, useStickerBuilderActions, useStickerDesign } from '@/lib/hooks/useStickerBuilder'
+import { useStickerBuilderStore, useStickerBuilderActions, type StickerBuilderState } from '@/lib/hooks/useStickerBuilder'
 import { useMotionVariants } from '@/lib/motion'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { GridPaper, StickerPeel, WashiTape } from '@/components/decorative'
-import type { MaterialType, FinishType, CutType } from '@/types'
+import type { MaterialType, FinishType, CutType, StickerDesign, DesignLayer, FabricImage } from '@/types'
 import {
   Upload,
-  Download,
   RotateCcw,
-  Share2,
   Trash2,
   Eye,
-  EyeOff,
   Settings,
-  Image as ImageIcon,
-  Type,
-  Square,
   Layers,
   Palette,
   Ruler,
@@ -81,12 +74,11 @@ export default function CustomStickerPage() {
   const {
     design,
     selectedLayerId,
-    canvasRef,
     fabricCanvas,
   } = useStickerBuilderStore()
 
   const actions = useStickerBuilderActions()
-  const { setMaterial: syncMaterial, setFinish: syncFinish, setCutType: syncCutType } = actions
+  const { setMaterial: syncMaterial, setFinish: syncFinish, setCutType: syncCutType, setCanvasRef } = actions
 
   const [material, setMaterial] = useState<MaterialType>(design.material)
   const [finish, setFinish] = useState<FinishType>(design.finish)
@@ -128,7 +120,7 @@ export default function CustomStickerPage() {
     return () => clearTimeout(timer)
   }, [livePrice])
 
-  const handleUpload = useCallback((file: File, fabricImage: any) => {
+  const handleUpload = useCallback((file: File, fabricImage: FabricImage) => {
     actions.addLayer({
       type: 'image',
       imageUrl: fabricImage.url,
@@ -428,7 +420,7 @@ export default function CustomStickerPage() {
               <div className="absolute top-[-4px] right-[-4px] w-5 h-5 bg-[var(--brand)] border-[3px] border-[var(--ink)] rounded-tr-full shadow-[2px_2px_0_var(--ink)] z-10 pointer-events-none" />
 
               <StickerCanvas
-                ref={canvasRef}
+                ref={setCanvasRef}
                 width={design.canvas.width}
                 height={design.canvas.height}
                 backgroundColor="var(--die-cut)"
@@ -468,7 +460,7 @@ export default function CustomStickerPage() {
                   </div>
                   <div className="absolute top-[-4px] right-[-4px] w-5 h-5 bg-[var(--brand)] border-[3px] border-[var(--ink)] rounded-tr-full shadow-[2px_2px_0_var(--ink)] z-10 pointer-events-none" />
                   <StickerCanvas
-                    ref={canvasRef}
+                    ref={setCanvasRef}
                     width={design.canvas.width}
                     height={design.canvas.height}
                     backgroundColor="var(--die-cut)"
@@ -577,7 +569,7 @@ function ToolsPanel({
   actions,
   handleUpload,
 }: {
-  design: any
+  design: StickerDesign
   selectedLayerId: string | null
   material: MaterialType
   setMaterial: (v: MaterialType) => void
@@ -587,17 +579,11 @@ function ToolsPanel({
   setCutType: (v: CutType) => void
   quantity: number
   setQuantity: (v: number) => void
-  actions: any
-  handleUpload: (file: File, fabricImage: any) => void
+  actions: Pick<StickerBuilderState, 'addLayer' | 'updateLayer' | 'removeLayer' | 'duplicateLayer' | 'toggleLayerLock' | 'toggleLayerVisibility' | 'reorderLayer' | 'selectLayer' | 'setCanvasSize' | 'updateBackgroundFilter'>
+  handleUpload: (file: File, fabricImage: FabricImage) => void
 }) {
-  const selectedLayer = design.layers.find((l: any) => l.id === selectedLayerId) ?? null
-  const isImage = selectedLayer?.type === 'image'
-  const isText = selectedLayer?.type === 'text'
-  const isShape = selectedLayer?.type === 'shape'
+  const selectedLayer = design.layers.find((l: DesignLayer) => l.id === selectedLayerId) ?? null
 
-  const handleMaterialChange = (value: string) => setMaterial(value as MaterialType)
-  const handleFinishChange = (value: string) => setFinish(value as FinishType)
-  const handleCutTypeChange = (value: string) => setCutType(value as CutType)
 
   return (
     <div className="space-y-4">
@@ -737,7 +723,7 @@ function ToolsPanel({
               {selectedLayer ? (
                 <EditingTools
                   selectedLayer={selectedLayer}
-                  onUpdateLayer={(id: string, updates: any) => actions.updateLayer(id, updates)}
+                  onUpdateLayer={(id: string, updates: Partial<DesignLayer>) => actions.updateLayer(id, updates)}
                   onDeleteLayer={(id: string) => actions.removeLayer(id)}
                   onDuplicateLayer={(id: string) => actions.duplicateLayer(id)}
                   onLockLayer={(id: string) => actions.toggleLayerLock(id)}

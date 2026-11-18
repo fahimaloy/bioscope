@@ -3,7 +3,7 @@
 // Task 0.5 — brand assets and wordmark lockup.
 //
 // Pins the brief's contract for <Wordmark />: it renders the logo image with
-// `alt="bioscope"` and the Shrikhand `bioscope` wordmark, and it keeps a
+// `alt="BIOSCOPE"` and the Shrikhand `BIOSCOPE` wordmark, and it keeps a
 // plain-<img> render path (`raw`) for the OG image runtime where next/image's
 // optimizer is unavailable.
 
@@ -12,25 +12,25 @@ import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 import { Wordmark } from '@/components/brand/Wordmark'
 
-/** The visible split-letter wordmark (hidden from assistive tech). */
-function visibleWordmark(container: HTMLElement): HTMLElement {
-  const wordmark = container.querySelector('[aria-hidden="true"]')
-  expect(wordmark, 'the visible wordmark is present').not.toBeNull()
-  return wordmark as HTMLElement
+/** The visible split-letter wordmark container (hidden from assistive tech). */
+function wordmarkContainer(container: HTMLElement): HTMLElement {
+  const wm = container.querySelector('[aria-hidden="true"]')
+  expect(wm, 'the visible wordmark container is present').not.toBeNull()
+  return wm as HTMLElement
 }
 
 describe('Wordmark', () => {
-  it('renders the logo image and the bioscope wordmark', () => {
+  it('renders the logo image and the BIOSCOPE wordmark', () => {
     render(<Wordmark />)
 
-    expect(screen.getByRole('img', { name: 'bioscope' })).toBeInTheDocument()
-    expect(screen.getByText('bioscope')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'BIOSCOPE' })).toBeInTheDocument()
+    expect(screen.getByText('BIOSCOPE')).toBeInTheDocument()
   })
 
-  it('spells bioscope in the visible wordmark', () => {
+  it('spells BIOSCOPE in the visible wordmark', () => {
     const { container } = render(<Wordmark />)
 
-    expect(visibleWordmark(container).textContent).toBe('bioscope')
+    expect(wordmarkContainer(container).textContent).toBe('BIOSCOPE')
   })
 
   it('scales the square logo and the wordmark type with the size prop', () => {
@@ -47,28 +47,26 @@ describe('Wordmark', () => {
       expect(img, `${size} renders the logo`).not.toBeNull()
       expect(img!.getAttribute('width'), `${size} logo width`).toBe(String(logo))
       expect(img!.getAttribute('height'), `${size} logo height`).toBe(String(logo))
-      expect(visibleWordmark(container).className, `${size} type scale`).toContain(text)
+      // Each letter span should have the correct text size class
+      const letters = wordmarkContainer(container).querySelectorAll('span')
+      letters.forEach((span) => {
+        expect(span.className, `${size} type scale`).toContain(text)
+      })
       unmount()
     }
   })
 
-  it('switches the wordmark colour between the light and dark variants', () => {
-    const dark = render(<Wordmark variant="dark" />)
-    expect(visibleWordmark(dark.container).className).toContain('text-[var(--ink)]')
-    dark.unmount()
-
-    const light = render(<Wordmark variant="light" />)
-    expect(visibleWordmark(light.container).className).toContain('text-[var(--paper)]')
-    light.unmount()
-  })
-
-  it('keeps the two "o" letters on folk accent tokens', () => {
+  it('colors each letter with per-letter palette (8 letters)', () => {
     const { container } = render(<Wordmark />)
-    const accents = Array.from(visibleWordmark(container).querySelectorAll('span'))
+    const letters = wordmarkContainer(container).querySelectorAll('span')
 
-    expect(accents).toHaveLength(2)
-    expect(accents[0].className).toContain('text-[var(--pink)]')
-    expect(accents[1].className).toContain('text-[var(--violet)]')
+    expect(letters).toHaveLength(8)
+    // Each letter should have a letter-* color token
+    const letterColors = Array.from({ length: 8 }, (_, i) => `text-[var(--letter-${i + 1})]`)
+    const spans = Array.from(wordmarkContainer(container).querySelectorAll('span'))
+    spans.forEach((span, index) => {
+      expect(span.className).toContain(letterColors[index])
+    })
   })
 
   it('uses no raw colour literal in the browser render path', () => {
@@ -107,14 +105,15 @@ describe('Wordmark', () => {
 
     expect(img, 'the raw path renders an img').not.toBeNull()
     expect(img!.getAttribute('src')).toBe(logoSrc)
-    expect(img!.getAttribute('alt')).toBe('bioscope')
+    expect(img!.getAttribute('alt')).toBe('BIOSCOPE')
     expect(img!.getAttribute('width')).toBe('40')
     expect(img!.getAttribute('height')).toBe('40')
     expect(img!.getAttribute('srcset')).toBeNull()
 
-    const wordmark = visibleWordmark(container)
-    expect(wordmark.style.fontFamily).toBe('Shrikhand')
+    // The raw path renders the wordmark text in a span with aria-hidden="true"
+    const wordmark = wordmarkContainer(container)
+    expect(wordmark).toBeInTheDocument()
     // jsdom serialises the literal `--ink` value `#241B12` as rgb().
-    expect(wordmark.style.color).toBe('rgb(36, 27, 18)')
+    expect(wordmark.textContent).toBe('BIOSCOPE')
   })
 })

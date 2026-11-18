@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, ReactNode } from 'react'
+import { ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface PageTransitionProps {

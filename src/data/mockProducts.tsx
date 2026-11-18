@@ -92,13 +92,28 @@ export const CATEGORIES = [
   { id: 'custom-shapes', name: 'Custom Shapes' },
 ]
 
+/** Shape of a mock product row for DataTable. */
+interface MockProductRow {
+  id: string
+  name: string
+  slug: string
+  images: string[]
+  basePrice: number
+  category: { name: string } | null
+  stock: number
+  isActive: boolean
+  isFeatured: boolean
+  createdAt: string
+}
+
 export const COLUMNS = [
-  { key: 'image', header: 'Image', cell: (row: any) => <img src={row.images?.[0]} alt={row.name} className="w-12 h-12 rounded-input object-cover" /> },
-  { key: 'name', header: 'Product', accessor: (row: any) => row.name, sortable: true },
-  { key: 'category', header: 'Category', accessor: (row: any) => row.category?.name },
-  { key: 'price', header: 'Price', accessor: (row: any) => `${row.basePrice.toLocaleString()} BDT`, sortable: true },
-  { key: 'stock', header: 'Stock', accessor: (row: any) => row.stock, sortable: true },
-  { key: 'status', header: 'Status', cell: (row: any) => row.isActive ? 'Active' : 'Inactive' },
-  { key: 'featured', header: 'Featured', cell: (row: any) => row.isFeatured ? 'Yes' : 'No' },
-  { key: 'createdAt', header: 'Created', accessor: (row: any) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
+  // eslint-disable-next-line @next/next/no-img-element
+  { key: 'image', header: 'Image', cell: (row: MockProductRow) => <img src={row.images?.[0]} alt={row.name} className="w-12 h-12 rounded-input object-cover" /> },
+  { key: 'name', header: 'Product', accessor: (row: MockProductRow) => row.name, sortable: true },
+  { key: 'category', header: 'Category', accessor: (row: MockProductRow) => row.category?.name },
+  { key: 'price', header: 'Price', accessor: (row: MockProductRow) => `${row.basePrice.toLocaleString()} BDT`, sortable: true },
+  { key: 'stock', header: 'Stock', accessor: (row: MockProductRow) => row.stock, sortable: true },
+  { key: 'status', header: 'Status', cell: (row: MockProductRow) => row.isActive ? 'Active' : 'Inactive' },
+  { key: 'featured', header: 'Featured', cell: (row: MockProductRow) => row.isFeatured ? 'Yes' : 'No' },
+  { key: 'createdAt', header: 'Created', accessor: (row: MockProductRow) => new Date(row.createdAt).toLocaleDateString(), sortable: true },
 ]

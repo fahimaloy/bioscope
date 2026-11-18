@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
@@ -9,17 +10,37 @@ import { DataTable, type Column } from '@/components/ui/DataTable'
 import { Card } from '@/components/ui/Card'
 import { ProductForm } from '@/components/admin/ProductForm'
 import { ProductPreview } from '@/components/admin/ProductPreview'
-import { Select } from '@/components/ui/Select'
+import { Select } from '@/components/ui'
 import { Modal } from '@/components/ui/Modal'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Plus, Search, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Tag, Edit, Trash2, Eye } from 'lucide-react'
+import { SearchInput } from '@/components/ui/SearchInput'
 import Image from 'next/image'
+import type { Product } from '@/types'
+import type { ProductFormData } from '@/components/admin/ProductForm'
 
-const COLUMNS: Column<any>[] = [
+interface ProductRow {
+  id: string
+  name: string
+  slug: string
+  description?: string | null
+  images: string[]
+  basePrice: number
+  compareAtPrice?: number | null
+  categoryId: string
+  category?: { id: string; name: string } | null
+  stock: number
+  isActive: boolean
+  isFeatured: boolean
+  createdAt: string | Date
+  updatedAt?: string | Date
+}
+
+const COLUMNS: Column<ProductRow>[] = [
   { 
     key: 'image', 
     header: 'Image', 
-    cell: ({ row }: { row: any }) => (
+    cell: (row) => (
       <div className="relative w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
         {row.images?.[0] ? (
           <Image
@@ -42,18 +63,18 @@ const COLUMNS: Column<any>[] = [
     ),
     width: '60px'
   },
-  { key: 'name', header: 'Product', accessor: (row: any) => row.name, sortable: true },
-  { key: 'category', header: 'Category', accessor: (row: any) => row.category?.name ?? '—' },
-  { key: 'price', header: 'Price', accessor: (row: any) => formatCurrency(Number(row.basePrice)), sortable: true },
-  { key: 'stock', header: 'Stock', accessor: (row: any) => row.stock, sortable: true },
-  { key: 'status', header: 'Status', cell: ({ row }: { row: any }) => <Badge variant={row.isActive ? 'success' : 'error'} size="sm">{row.isActive ? 'Active' : 'Inactive'}</Badge> },
-  { key: 'featured', header: 'Featured', cell: ({ row }: { row: any }) => (row.isFeatured ? 'Yes' : 'No') },
-  { key: 'createdAt', header: 'Created', accessor: (row: any) => formatDate(row.createdAt), sortable: true },
+  { key: 'name', header: 'Product', accessor: (row) => row.name, sortable: true },
+  { key: 'category', header: 'Category', accessor: (row) => row.category?.name ?? '—' },
+  { key: 'price', header: 'Price', accessor: (row) => formatCurrency(Number(row.basePrice)), sortable: true },
+  { key: 'stock', header: 'Stock', accessor: (row) => row.stock, sortable: true },
+  { key: 'status', header: 'Status', cell: (row) => <Badge variant={row.isActive ? 'success' : 'error'} size="sm">{row.isActive ? 'Active' : 'Inactive'}</Badge> },
+  { key: 'featured', header: 'Featured', cell: (row) => (row.isFeatured ? 'Yes' : 'No') },
+  { key: 'createdAt', header: 'Created', accessor: (row) => formatDate(row.createdAt), sortable: true },
 ]
 
 export default function ProductsPage() {
   const router = useRouter()
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<ProductRow[]>([])
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('')
@@ -62,8 +83,8 @@ export default function ProductsPage() {
   const [pager, setPager] = useState({ total: 0, pageSize: 10 })
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<any>(null)
-  const [previewProduct, setPreviewProduct] = useState<any>(null)
+  const [editingProduct, setEditingProduct] = useState<ProductRow | null>(null)
+  const [previewProduct, setPreviewProduct] = useState<ProductRow | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -98,13 +119,26 @@ export default function ProductsPage() {
       .catch(() => {})
   }, [])
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: ProductFormData) => {
     const res = await fetch(editingProduct ? `/api/products/${editingProduct.id}` : '/api/products', {
       method: editingProduct ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
     if (res.ok) {
+      // Audit stock changes made through the product editor
+      const newStock = Number(data?.stock)
+      if (editingProduct && Number.isFinite(newStock) && newStock !== Number(editingProduct.stock)) {
+        try {
+          await fetch(`/api/products/${editingProduct.id}/stock`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ stock: newStock, reason: 'MANUAL_ADJUSTMENT', note: 'Edited via product form' }),
+          })
+        } catch {
+          toast.warning('Stock saved, but the audit entry failed to record')
+        }
+      }
       toast.success(editingProduct ? 'Product updated' : 'Product created')
       setShowForm(false)
       setEditingProduct(null)
@@ -127,12 +161,12 @@ export default function ProductsPage() {
     }
   }
 
-  const columns: Column<any>[] = [
+  const columns: Column<ProductRow>[] = [
     ...COLUMNS,
     {
       key: 'actions',
       header: 'Actions',
-      cell: ({ row }: { row: any }) => (
+      cell: (row) => (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={() => setPreviewProduct(row)} aria-label="Preview" className="hover:-translate-y-1 transition-transform"><Eye className="w-4 h-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => { setEditingProduct(row); setShowForm(true) }} aria-label="Edit" className="hover:-translate-y-1 transition-transform"><Edit className="w-4 h-4" /></Button>
@@ -150,24 +184,29 @@ export default function ProductsPage() {
             <h1 className="font-display text-3xl text-primary">Products</h1>
             <p className="text-[var(--text-subtle)]">Manage your product catalog</p>
           </div>
-          <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Product
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link href="/admin/categories">
+              <Button variant="outline">
+                <Tag className="w-4 h-4 mr-2" />
+                Manage Categories
+              </Button>
+            </Link>
+            <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Product
+            </Button>
+          </div>
         </div>
 
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-              <label htmlFor="product-search" className="sr-only">Search products</label>
-              <input
+              <SearchInput
                 id="product-search"
-                type="text"
                 placeholder="Search products..."
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                className="w-full pl-10 pr-4 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
+                aria-label="Search products"
               />
             </div>
             <Select
@@ -210,7 +249,7 @@ export default function ProductsPage() {
           size="full"
         >
           <ProductForm
-            initialData={editingProduct}
+            initialData={editingProduct as Partial<Product> | undefined}
             categories={categories}
             onSubmit={handleSubmit}
             onCancel={() => { setShowForm(false); setEditingProduct(null) }}
@@ -226,7 +265,7 @@ export default function ProductsPage() {
         >
           {previewProduct && (
             <>
-              <ProductPreview product={previewProduct} />
+              <ProductPreview product={previewProduct as Partial<Product>} />
               <div className="p-4 border-t border-[var(--light)] flex justify-end">
                 <Button variant="outline" onClick={() => setPreviewProduct(null)}>Close</Button>
               </div>

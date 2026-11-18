@@ -26,7 +26,6 @@ interface ReviewFormData {
 }
 
 export function ReviewForm({
-  productId,
   onSubmit,
   onCancel,
   initialRating = 0,
@@ -100,7 +99,7 @@ export function ReviewForm({
                 'p-2 rounded-input transition-colors',
                 rating >= star
                   ? 'text-primary'
-                  : 'text-[var(--text-subtle)] hover:text-primary/50'
+                  : 'text-[var(--text-subtle)] hover:text-primary'
               )}
               aria-label={`${star} star${star > 1 ? 's' : ''}`}
               aria-checked={rating >= star}
@@ -217,7 +216,7 @@ export function StarRating({
             <Star
               className={cn(
                 sizeClasses[size],
-                filled ? 'fill-primary text-primary' : partial ? 'fill-primary/50 text-primary/50' : 'text-[var(--text-subtle)]'
+                filled ? 'fill-primary text-primary' : partial ? 'fill-primary text-primary' : 'text-[var(--text-subtle)]'
               )}
             />
           </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, useState, useRef, useEffect, ReactNode } from 'react';
+import { forwardRef, useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from './Button';
 import { FOCUS_VISIBLE, setRefs } from './shared';

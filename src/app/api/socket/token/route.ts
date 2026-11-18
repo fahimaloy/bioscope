@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
-import { requireUser, handleRouteError } from '@/lib/api-utils'
+import { AppError, handleRouteError, ok, requireUser } from '@/lib/api-utils'
+import { authSecret } from '@/lib/auth-secret'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,14 +10,14 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     const user = await requireUser()
-    const secret = process.env.NEXTAUTH_SECRET
-    if (!secret) throw new Error('NEXTAUTH_SECRET is not configured')
+    const secret = authSecret()
+    if (!secret) throw new AppError(500, 'Auth secret is not configured', 'AUTH_NOT_CONFIGURED')
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       secret,
       { expiresIn: '1h' }
     )
-    return NextResponse.json({ success: true, token })
+    return ok({ token })
   } catch (error) {
     return handleRouteError(error)
   }

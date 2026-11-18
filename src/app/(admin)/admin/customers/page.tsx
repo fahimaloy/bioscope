@@ -7,22 +7,25 @@ import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { DataTable } from '@/components/ui/DataTable'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Search, Users, User, DollarSign, ShoppingBag, TrendingUp, Filter, X } from 'lucide-react'
+import { Users, User, DollarSign, ShoppingBag, Filter, Download } from 'lucide-react'
+import { SearchInput } from '@/components/ui/SearchInput'
+import { CustomerDetailModal } from '@/components/admin/CustomerDetailModal'
 import { motion } from 'framer-motion'
-import { SketchUnderline, DoodleShape, DoodleStar, StickerPeel } from '@/components/decorative/DoodleElements'
+import { SketchUnderline, DoodleShape, StickerPeel } from '@/components/decorative/DoodleElements'
 import { CounterAnimation } from '@/components/animations/CounterAnimation'
 import { cn, formatNumber } from '@/lib/utils'
 
-const statusColors: Record<string, 'default' | 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'outline' | 'info' | 'doodle'> = {
-  PENDING: 'warning',
-  CONFIRMED: 'info',
-  PROCESSING: 'primary',
-  PRINTING: 'primary',
-  READY_TO_SHIP: 'secondary',
-  SHIPPED: 'secondary',
-  DELIVERED: 'success',
-  CANCELLED: 'error',
-  REFUNDED: 'error',
+/** Shape of a customer row as returned by /api/customers (includes computed fields). */
+interface CustomerRow {
+  id: string
+  name: string | null
+  email: string
+  phone: string | null
+  orderCount: number
+  totalSpent: number | string
+  spendTier: string | null
+  latestOrderStatus: string | null
+  createdAt: string
 }
 
 const spendTiers = [
@@ -33,8 +36,9 @@ const spendTiers = [
   { min: 50000, max: Infinity, label: 'VIP', variant: 'primary' as const, icon: '💎' },
 ]
 
-function SpendBadge({ totalSpent }: { totalSpent: number }) {
-  const tier = spendTiers.find(t => totalSpent >= t.min && totalSpent < t.max) || spendTiers[0]
+function SpendBadge({ totalSpent, overrideTier }: { totalSpent: number; overrideTier?: string | null }) {
+  const override = overrideTier ? spendTiers.find(t => t.label === overrideTier) : undefined
+  const tier = override ?? (spendTiers.find(t => totalSpent >= t.min && totalSpent < t.max) || spendTiers[0])
   return (
     <Badge variant={tier.variant} size="sm" className="gap-1.5">
       <span>{tier.icon}</span>
@@ -44,7 +48,6 @@ function SpendBadge({ totalSpent }: { totalSpent: number }) {
 }
 
 function OrderStatusBadge({ status }: { status: string }) {
-  const config = statusColors[status] || 'default'
   return <StatusBadge status={status} size="sm" />
 }
 
@@ -53,7 +56,7 @@ const columns = [
     key: 'customer', 
     header: 'Customer', 
     width: '280px',
-    cell: (row: any) => (
+    cell: (row: CustomerRow) => (
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white flex items-center justify-center font-display text-sm">
           {row.name?.charAt(0)?.toUpperCase() || row.email?.charAt(0)?.toUpperCase() || '?'}
@@ -69,7 +72,7 @@ const columns = [
   { 
     key: 'phone', 
     header: 'Phone', 
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="text-sm text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{row.phone ?? '—'}</span>
     ),
     sortable: true,
@@ -79,7 +82,7 @@ const columns = [
     key: 'orders', 
     header: 'Orders', 
     width: '100px',
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="font-medium text-[var(--ink)]">{row.orderCount}</span>
     ), 
     sortable: true 
@@ -88,7 +91,7 @@ const columns = [
     key: 'spent', 
     header: 'Total Spent', 
     width: '160px',
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="font-display text-primary">{formatCurrency(row.totalSpent)}</span>
     ), 
     sortable: true 
@@ -97,19 +100,19 @@ const columns = [
     key: 'tier', 
     header: 'Tier', 
     width: '120px',
-    accessor: (row: any) => <SpendBadge totalSpent={Number(row.totalSpent)} />,
+    accessor: (row: CustomerRow) => <SpendBadge totalSpent={Number(row.totalSpent)} overrideTier={row.spendTier} />,
   },
   { 
     key: 'status', 
     header: 'Latest Order', 
     width: '140px',
-    accessor: (row: any) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[var(--text-subtle)]">—</span>,
+    accessor: (row: CustomerRow) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[var(--text-subtle)]">—</span>,
   },
   { 
     key: 'joined', 
     header: 'Joined', 
     width: '140px',
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="text-sm text-[var(--text-subtle)]">{formatDate(row.createdAt)}</span>
     ), 
     sortable: true 
@@ -118,12 +121,29 @@ const columns = [
 
 export default function CustomersPage() {
   const router = useRouter()
-  const [customers, setCustomers] = useState<any[]>([])
+  const [customers, setCustomers] = useState<Array<{ id: string; name: string | null; email: string; phone: string | null; orderCount: number; totalSpent: number; spendTier: string | null; latestOrderStatus: string | null; createdAt: string }>>([])
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [pager, setPager] = useState({ total: 0, pageSize: 20 })
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
+
+  const viewColumns = useMemo(
+    () => [
+      ...columns,
+      {
+        key: 'view',
+        header: '',
+        cell: (row: CustomerRow) => (
+          <Button size="sm" variant="outline" onClick={() => setSelectedCustomerId(row.id)}>
+            View
+          </Button>
+        ),
+      },
+    ],
+    []
+  )
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -165,6 +185,16 @@ export default function CustomersPage() {
             <p className="text-[var(--text-subtle)]">Manage and analyze your customer base</p>
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                const qs = search ? `?search=${encodeURIComponent(search)}` : ''
+                window.location.href = `/api/customers/export${qs}`
+              }}
+            >
+              <Download className="w-4 h-4" /> Export CSV
+            </Button>
             <Badge variant="doodle" size="sm" className="animate-pulse-soft">{pager.total} Total</Badge>
           </div>
         </motion.div>
@@ -220,13 +250,11 @@ export default function CustomersPage() {
             <StickerPeel />
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1 min-w-[250px] max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)]" />
-                <input
-                  type="text"
+                <SearchInput
                   placeholder="Search name, email, phone..."
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                  className="w-full pl-10 pr-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
+                  aria-label="Search customers"
                 />
               </div>
               <Button
@@ -281,7 +309,7 @@ export default function CustomersPage() {
           <Card variant="doodle" padding="none" className="relative overflow-visible">
             <StickerPeel />
             <DataTable
-              columns={columns}
+              columns={viewColumns}
               data={customers}
               keyExtractor={(row) => row.id}
               loading={loading}
@@ -301,6 +329,8 @@ export default function CustomersPage() {
           </Card>
         </motion.div>
 
+        <CustomerDetailModal customerId={selectedCustomerId} onClose={() => setSelectedCustomerId(null)} onChanged={load} />
+
         {/* Decorative elements */}
         <DoodleShape size="xl" color="primary" animation="float" className="absolute bottom-10 right-10 opacity-5 pointer-events-none" style={{ zIndex: -1 }} />
         <DoodleShape size="lg" color="accent" animation="wobble" className="absolute top-20 left-10 opacity-5 pointer-events-none" style={{ zIndex: -1 }} />
@@ -318,7 +348,7 @@ interface StatCardProps {
   index: number
 }
 
-function StatCard({ label, value, icon, color, iconBg, index }: StatCardProps) {
+function StatCard({ label, value, icon, color: _color, iconBg, index }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

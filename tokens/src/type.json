@@ -48,5 +48,15 @@
     "$type": "typography",
     "$value": { "fontSize": "64px", "lineHeight": "1.05" },
     "$description": "Hero display"
+  },
+  "text-7xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "72px", "lineHeight": "1.05" },
+    "$description": "Hero display"
+  },
+  "text-8xl": {
+    "$type": "typography",
+    "$value": { "fontSize": "96px", "lineHeight": "1" },
+    "$description": "Hero display"
   }
 }

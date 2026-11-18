@@ -3,12 +3,11 @@
 import { useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 import type { DesignLayer } from '@/types'
 import {
-  Eye, EyeOff, Lock, Unlock, Copy, Trash2, ChevronUp, ChevronDown,
+  Eye, EyeOff, Lock, Unlock, Copy, Trash2,
   GripVertical, Image as ImageIcon, Type, Square, Layers,
-  Plus, Minus, MoreVertical,
+  MoreVertical,
 } from 'lucide-react'
 
 interface LayerPanelProps {
@@ -27,8 +26,8 @@ interface LayerPanelProps {
 export function LayerPanel({
   layers,
   selectedLayerId,
-  onSelectLayer,
-  onReorderLayer,
+  onSelectLayer: _onSelectLayer,
+  onReorderLayer: _onReorderLayer,
   onToggleVisibility,
   onToggleLock,
   onDuplicateLayer,
@@ -44,13 +43,13 @@ export function LayerPanel({
       <div className="flex items-center justify-between p-4 border-b border-[color-mix(in_srgb,var(--ink)_15%,transparent)]">
         <h3 className="font-display text-lg text-[var(--brand)]">Layers</h3>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => onAddLayer('image')} aria-label="Add image layer">
+          <Button variant="ghost" size="sm" onClick={() => onAddLayer('image')} aria-label="Add image layer" data-testid="add-image-layer">
             <ImageIcon className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onAddLayer('text')} aria-label="Add text layer">
+          <Button variant="ghost" size="sm" onClick={() => onAddLayer('text')} aria-label="Add text layer" data-testid="add-text-layer">
             <Type className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onAddLayer('shape')} aria-label="Add shape layer">
+          <Button variant="ghost" size="sm" onClick={() => onAddLayer('shape')} aria-label="Add shape layer" data-testid="add-shape-layer">
             <Square className="w-4 h-4" />
           </Button>
         </div>
@@ -66,8 +65,7 @@ export function LayerPanel({
           </div>
         ) : (
           <ul className="divide-y divide-[color-mix(in_srgb,var(--ink)_15%,transparent)]" role="list" aria-label="Layers">
-            {layers.slice().reverse().map((layer, reverseIndex) => {
-              const index = layers.length - 1 - reverseIndex
+            {layers.slice().reverse().map((layer, _reverseIndex) => {
               const isSelected = selectedLayerId === layer.id
 
               return (
@@ -148,7 +146,7 @@ export function LayerPanel({
                       <MoreVertical className="w-4 h-4" />
                     </button>
                     <LayerActionsMenu
-                      layerId={layer.id}
+                      _layerId={layer.id}
                       onDuplicate={() => onDuplicateLayer(layer.id)}
                       onDelete={() => onDeleteLayer(layer.id)}
                     />
@@ -180,10 +178,10 @@ export function LayerPanel({
 
 // Layer Actions Menu
 function LayerActionsMenu({
-  layerId,
+  _layerId,
   onDuplicate,
   onDelete,
-}: { layerId: string; onDuplicate: () => void; onDelete: () => void }) {
+}: { _layerId: string; onDuplicate: () => void; onDelete: () => void }) {
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 

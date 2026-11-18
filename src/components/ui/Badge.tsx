@@ -14,6 +14,7 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
     | 'error'
     | 'outline'
     | 'info'
+    | 'teal'
     | 'doodle';
   size?: 'xs' | 'sm' | 'md' | 'lg';
   dot?: boolean;
@@ -23,6 +24,7 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 /**
  * Every filled variant pairs its accent with its AA-safe on-token (spec §5.2).
  * `default` is the inverted pairing: paper text on the ink fill.
+ * `teal` added for SHIPPED status — --ink on --teal is 4.60:1 (contract §2).
  */
 const variantStyles: Record<NonNullable<BadgeProps['variant']>, string> = {
   default: 'bg-[var(--ink)] text-[var(--paper-raised)]',
@@ -33,6 +35,7 @@ const variantStyles: Record<NonNullable<BadgeProps['variant']>, string> = {
   warning: 'bg-[var(--orange)] text-[var(--on-orange)]',
   error: 'bg-[var(--red)] text-[var(--on-red)]',
   info: 'bg-[var(--blue)] text-[var(--on-blue)]',
+  teal: 'bg-[var(--teal)] text-[var(--ink)]',
   outline: 'border-[var(--ink)] bg-transparent text-[var(--ink)]',
   doodle:
     '-rotate-2 border-[var(--ink)] bg-[var(--pink-strong)] text-[var(--on-pink-strong)] shadow-ink-1',
@@ -92,7 +95,7 @@ export const StatusBadge = ({
     PROCESSING: { variant: 'primary', label: 'Processing', dotColor: 'var(--pink-strong)' },
     PRINTING: { variant: 'primary', label: 'Printing', dotColor: 'var(--pink-strong)' },
     READY_TO_SHIP: { variant: 'secondary', label: 'Ready to Ship', dotColor: 'var(--violet)' },
-    SHIPPED: { variant: 'secondary', label: 'Shipped', dotColor: 'var(--violet)' },
+    SHIPPED: { variant: 'teal', label: 'Shipped', dotColor: 'var(--teal)' },
     DELIVERED: { variant: 'success', label: 'Delivered', dotColor: 'var(--green-strong)' },
     CANCELLED: { variant: 'error', label: 'Cancelled', dotColor: 'var(--error)' },
     REFUNDED: { variant: 'error', label: 'Refunded', dotColor: 'var(--error)' },

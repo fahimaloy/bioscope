@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { handleRouteError, requireUser, ok, parsePagination, buildPagination } from '@/lib/api-utils'
 
@@ -10,7 +11,7 @@ export async function GET(request: Request) {
     const { page, limit } = parsePagination(url, { limit: 20 })
     const unreadOnly = url.searchParams.get('unreadOnly') === 'true'
 
-    const where: any = { userId: user.id }
+    const where: Prisma.NotificationWhereInput = { userId: user.id }
     if (unreadOnly) where.isRead = false
 
     const [notifications, total, unreadCount] = await Promise.all([

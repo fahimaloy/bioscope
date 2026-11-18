@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { AppError, handleRouteError, requireUser, ok, created, parsePagination, buildPagination } from '@/lib/api-utils'
 import { createReviewSchema } from '@/lib/validations/review'
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     const productId = url.searchParams.get('productId')
     const { page, limit } = parsePagination(url)
 
-    const where: any = { isApproved: true }
+    const where: Prisma.ReviewWhereInput = { isApproved: true }
     if (productId) where.productId = productId
 
     const [reviews, total, agg] = await Promise.all([

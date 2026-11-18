@@ -1,5 +1,6 @@
 'use server'
 
+import { Prisma, type CustomRequestStatus } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { submitCustomRequestSchema, priceCustomRequestSchema, updateCustomRequestStatusSchema } from '@/lib/validations/custom-request'
@@ -8,14 +9,14 @@ import { emitCustomRequestSubmitted, emitCustomRequestPriced, emitNotificationNe
 
 const CR_SORT_FIELDS = ['createdAt', 'status', 'quantity', 'quotedPrice'] as const
 
-export async function submitCustomRequest(data: any) {
+export async function submitCustomRequest(data: unknown) {
   const sessionUser = await requireUser()
 
   const validated = submitCustomRequestSchema.parse(data)
 
   // Enforce public custom-request settings (enabled, min qty, max dimension)
   const publicSettings = await prisma.setting.findMany({ where: { isPublic: true } })
-  const kv: Record<string, any> = {}
+  const kv: Record<string, string | number | boolean> = {}
   for (const s of publicSettings) {
     if (s.type === 'NUMBER') kv[s.key] = parseFloat(s.value)
     else if (s.type === 'BOOLEAN') kv[s.key] = s.value === 'true'
@@ -73,7 +74,7 @@ export async function submitCustomRequest(data: any) {
   return { success: true, customRequest }
 }
 
-export async function updateCustomRequestStatus(id: string, data: any) {
+export async function updateCustomRequestStatus(id: string, data: unknown) {
   await requireAdmin()
 
   const validated = updateCustomRequestStatusSchema.parse(data)
@@ -84,7 +85,7 @@ export async function updateCustomRequestStatus(id: string, data: any) {
   })
   if (!customRequest) throw new AppError(404, 'Custom request not found', 'NOT_FOUND')
 
-  const updateData: any = {
+  const updateData: Prisma.CustomRequestUpdateInput = {
     status: validated.status,
     adminNotes: validated.adminNotes,
   }
@@ -123,7 +124,7 @@ export async function updateCustomRequestStatus(id: string, data: any) {
   return { success: true, customRequest: updatedRequest }
 }
 
-export async function priceCustomRequest(id: string, data: any) {
+export async function priceCustomRequest(id: string, data: unknown) {
   await requireAdmin()
 
   const validated = priceCustomRequestSchema.parse(data)
@@ -166,10 +167,22 @@ export async function priceCustomRequest(id: string, data: any) {
   return { success: true, customRequest: updatedRequest }
 }
 
-export async function getCustomRequests(filters: any = {}) {
+export interface CustomRequestFilters {
+  userId?: string
+  status?: CustomRequestStatus
+  startDate?: string
+  endDate?: string
+  search?: string
+  page?: number | string
+  limit?: number | string
+  sortBy?: (typeof CR_SORT_FIELDS)[number]
+  sortOrder?: 'asc' | 'desc'
+}
+
+export async function getCustomRequests(filters: CustomRequestFilters = {}) {
   const sessionUser = await requireUser()
 
-  const where: any = {}
+  const where: Prisma.CustomRequestWhereInput = {}
 
   if (sessionUser.role !== 'ADMIN') {
     where.userId = sessionUser.id
@@ -178,8 +191,10 @@ export async function getCustomRequests(filters: any = {}) {
   }
 
   if (filters.status) where.status = filters.status
-  if (filters.startDate) where.createdAt = { gte: new Date(filters.startDate) }
-  if (filters.endDate) where.createdAt = { ...where.createdAt, lte: new Date(filters.endDate) }
+  const dateFilter: Prisma.DateTimeFilter = {}
+  if (filters.startDate) dateFilter.gte = new Date(filters.startDate)
+  if (filters.endDate) dateFilter.lte = new Date(filters.endDate)
+  if (filters.startDate || filters.endDate) where.createdAt = dateFilter
   if (filters.search) {
     where.OR = [
       { originalName: { contains: filters.search, mode: 'insensitive' } },
@@ -190,7 +205,9 @@ export async function getCustomRequests(filters: any = {}) {
 
   const page = Math.max(1, Number(filters.page) || 1)
   const limit = Math.min(100, Math.max(1, Number(filters.limit) || 20))
-  const sortBy = CR_SORT_FIELDS.includes(filters.sortBy) ? filters.sortBy : 'createdAt'
+  const sortBy = (CR_SORT_FIELDS as readonly string[]).includes(filters.sortBy ?? '')
+    ? (filters.sortBy as (typeof CR_SORT_FIELDS)[number])
+    : 'createdAt'
   const sortOrder = filters.sortOrder === 'asc' ? 'asc' : 'desc'
 
   const [requests, total] = await Promise.all([
@@ -213,7 +230,7 @@ export async function getCustomRequests(filters: any = {}) {
 export async function getCustomRequestById(id: string) {
   const sessionUser = await requireUser()
 
-  const where: any = { id }
+  const where: Prisma.CustomRequestWhereUniqueInput = { id }
   if (sessionUser.role !== 'ADMIN') where.userId = sessionUser.id
 
   const request = await prisma.customRequest.findUnique({
