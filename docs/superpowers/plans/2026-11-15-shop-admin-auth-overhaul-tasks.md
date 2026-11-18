@@ -326,10 +326,77 @@ scope — `eng-backlog`, `visual-qa`, `e2e-rebaseline`, `dropdown-fix`,
 | 1.5 | Agentic Development Setup | 15 | 15 | 0 | verify:fast/mid/full + .agent/ + agent-harness.test.ts |
 | 2 | Shop Rework | 12 | 12 | 0 | shipped |
 | 3 | Admin Categories | 9 | 9 | 0 | shipped |
-| 4 | Admin Completeness | 25 | 10 | 15 | 4.1/4.2 shipped; 4.3/4.4 deferred (scope) |
+| 4 | Admin Completeness | 25 | 25 | 0 | 4.3/4.4 shipped in the 2026-11-18 addendum |
 | 5 | Polish + Gates | 8 | 7 | 1 | 5.1.3 shipped; 5.3 = owner QA |
-| **Total** | | **87** | **70** | **17** | |
+| **Total** | | **87** | **86** | **1** | |
 
 ---
 
 **Next Action:** Commit Pass 4 + Pass 5.1/5.2 work (single commit or split by theme: `feat(admin): pass 4 — audit log, inventory, customers, email, invoice`). Then: (1) rerun `pnpm verify` after the gitnexus bootstrap (`bunx gitnexus@latest analyze`; if the worktree still blocks `detect-changes`, run it in the main repo pre-merge — AGENTS.md §"No .gitnexus/run.cjs?" documents the bootstrap). (2) Owner actions: confirm/reset the dev-DB admin password to match `.env ADMIN_PASSWORD` (currently mismatched → all credentials logins 302→`/login?error=Configuration` despite the `AUTH_SECRET ?? NEXTAUTH_SECRET` code fallback landed in this pass); set `AUTH_SECRET` in Vercel/local envs; visual QA pass (5.3) on /shop, /admin/*; decide scope for Pass 4.3 (payments/SMTP/webhooks/API keys/backup) and 4.4 (realtime/revision loop/CSV import). Gates at report time: type-check ✓ lint ✓ test:run 262/262 ✓ build ✓ verify 4/5 (detect-changes blocked). Never claim a check that did not run.
+
+---
+
+## Addendum — Admin Panel Completeness (2026-11-18)
+
+Supersedes the 4.3/4.4 scope decision above: both were implemented on
+`feat/admin-panel-completeness` (branched from `main`) and merged `--no-ff`.
+Phase numbering below is the one used for that branch; it is not the Pass 1–5
+numbering above.
+
+### P0 — Secrets at rest, settings tabs (`893fc2c`)
+- `src/lib/crypto.ts` — AES-256-GCM, key derived with `scryptSync` from
+  `SETTINGS_ENCRYPTION_KEY`, payload `v1:iv:tag:data`. Losing that env var makes
+  stored secrets unrecoverable; there is no backdoor.
+- `src/lib/secret-settings.ts` — `SECRET_SETTING_KEYS` whitelist (SMTP password,
+  every payment provider credential). Reads return masked values, a submitted
+  mask means "unchanged" so ciphertext survives a round-trip, an empty field
+  clears.
+- `src/lib/admin-settings.ts` + `admin/settings/[tab]` — general/tax/delivery/
+  payments/email/appearance tabs with deep links and a URL-driven initial tab.
+- SMTP TLS toggle with DB-backed config (`server/email-config.ts`).
+
+### P1 — Webhooks, API keys, backup (`8c615a6`, `c389200` predecessors)
+- `WebhookEndpoint` / `WebhookDelivery` models, `/api/webhooks*` CRUD, HMAC-SHA256
+  signing, per-endpoint delivery log, test-event path. Dispatch never throws, so
+  a broken subscriber cannot fail the triggering mutation.
+- `ApiKey` model, `bsk_live_` prefix, SHA-256 hash stored (plaintext shown once),
+  scopes, expiry/revocation, `POST /api/headless/orders` as a headless consumer.
+- `/api/settings/backup` export/import with masked secrets and validated import.
+
+### P2 — Product + order tooling (`c389200`)
+- Product clone (starts inactive, zero stock, never inherits sold units).
+- Product CSV import/export (RFC4180, `;`-separated images, JSON nested records,
+  match-by-slug import). Round-trip smoke: 4 products exported → 4 parsed, 0 errors.
+- Order and custom-request CSV export honouring the current filters.
+
+### P4 — Custom-request workflow (`ecc5da3`)
+- `REVISION_REQUESTED` status end to end: admin sends a pending/approved/priced
+  request back (guarded by `REVISION_ALLOWED_FROM`), the customer sees a banner
+  with the admin's notes on the builder and re-submits the current canvas, which
+  clears the old quote and returns the request to `PENDING`.
+- `createOrderFromCustomRequest`: the admin picks the product, the customer's
+  address, size and quantity. Totals are recomputed server-side with
+  `priceLine`/`computeOrderTotals` — the request's quoted price is advisory and
+  the form's numbers are never trusted. Stock is decremented conditionally, the
+  request is marked `ORDERED` and linked, and order/custom-request events fire.
+
+### P3 — Realtime (`e527ecd`)
+- `useAdminRealtime` hook over the existing module-level socket
+  (`SocketEvents` maps names to handler signatures, so payloads are derived with
+  `Parameters<...>[0]`; the handler is read through a ref so a new callback
+  identity does not rebuild the subscription).
+- Dashboard: Live activity card + connection indicator, full refresh on any event.
+- Orders: `order:status_changed` repaints the row in place; `order.created` toasts
+  and reloads.
+- Custom requests: a new submission toasts and reloads; a price update reloads.
+
+### Gates
+type-check ✓ · lint ✓ · unit 37 files / 345 tests ✓ (per commit).
+Not run locally: `pnpm verify:full` (build + e2e) — policy keeps that to CI.
+
+### Still open (owner)
+- Product imagery is still the shared placeholder asset (content, not code).
+- P5-07 full order E2E + notification/socket record check.
+- `createOrderFromCustomRequest` is type-checked and shares the checkout pricing
+  primitives but has not been exercised end-to-end (needs admin credentials).
+

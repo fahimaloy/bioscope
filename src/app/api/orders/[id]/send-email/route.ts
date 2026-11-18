@@ -1,7 +1,8 @@
 import { AppError, handleRouteError, ok, requireAdmin } from '@/lib/api-utils'
 import { getOrderById } from '@/lib/actions/order'
 import { ORDER_STATUS_LABELS } from '@/lib/order-status'
-import { sendMail, escapeHtml, isEmailConfigured } from '@/lib/email'
+import { sendMail, escapeHtml } from '@/lib/email'
+import { isEmailConfigured } from '@/lib/server/email-config'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,8 +10,8 @@ export const dynamic = 'force-dynamic'
 export async function POST(_request: Request, { params }: { params: { id: string } }) {
   try {
     await requireAdmin()
-    if (!isEmailConfigured()) {
-      throw new AppError(501, 'Email is not configured on this server (missing SMTP_HOST).', 'EMAIL_NOT_CONFIGURED')
+    if (!(await isEmailConfigured())) {
+      throw new AppError(501, 'Email is not configured on this server (no SMTP host in settings or environment).', 'EMAIL_NOT_CONFIGURED')
     }
 
     const order = await getOrderById(params.id)

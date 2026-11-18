@@ -12,9 +12,10 @@ import {
   Tooltip,
 } from '@/components/ui'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils'
-import { ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
+import { ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle, Download } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TRANSITIONS, type OrderStatus } from '@/lib/order-status'
+import { useAdminRealtime, type AdminLiveEvent } from '@/lib/hooks'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STATUSES: OrderStatus[] = [
@@ -444,6 +445,25 @@ export default function AdminOrdersPage() {
     load()
   }, [load])
 
+  // Realtime: a status change made elsewhere (another admin, a server action)
+  // repaints the row in place; a brand-new order reloads the list.
+  const handleLiveEvent = useCallback(
+    (event: AdminLiveEvent) => {
+      if (event.kind === 'order.status_changed') {
+        const nextStatus = event.data.newStatus as OrderStatus
+        setOrders((prev) => prev.map((row) => (row.id === event.data.orderId ? { ...row, status: nextStatus } : row)))
+        return
+      }
+      if (event.kind === 'order.created') {
+        toast.info(`New order ${event.data.orderNumber}`)
+        load()
+      }
+    },
+    [load]
+  )
+
+  useAdminRealtime(handleLiveEvent)
+
   const handleStatusChange = useCallback(async (orderId: string, newStatus: OrderStatus) => {
     setUpdatingStatus(orderId)
     try {
@@ -638,6 +658,19 @@ export default function AdminOrdersPage() {
             <h1 className="font-display text-3xl text-primary">Orders</h1>
             <p className="text-[var(--text-subtle)]">Manage and track all orders</p>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => {
+              const params = new URLSearchParams()
+              if (search) params.set('search', search)
+              if (statusFilter) params.set('status', statusFilter)
+              const query = params.toString()
+              window.location.href = `/api/orders/export${query ? `?${query}` : ''}`
+            }}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
 
         <Card className="p-4 mb-6">

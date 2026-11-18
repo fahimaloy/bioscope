@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { AppError, requireAdmin } from '@/lib/api-utils'
+import { isMaskedSecretValue, isSecretSettingKey, maskSecretSettings, protectSecretSettings } from '@/lib/secret-settings'
 import type { PricingSettings } from '@/lib/pricing'
 
 function parseSettingValue(setting: { value: string; type: string }): string | number | boolean {
@@ -42,7 +43,9 @@ export async function getSettings(category?: string) {
     where,
     orderBy: { category: 'asc' },
   })
-  return toKeyValue(settings)
+  // Credentials come back masked; the admin form echoes the mask back to mean
+  // "unchanged", which updateSettings() recognises.
+  return maskSecretSettings(toKeyValue(settings))
 }
 
 export async function getSetting(key: string) {
@@ -59,7 +62,7 @@ export async function getSetting(key: string) {
 
   return {
     key: setting.key,
-    value: parseSettingValue(setting),
+    value: isSecretSettingKey(setting.key) ? maskSecretSettings({ value: parseSettingValue(setting) }).value : parseSettingValue(setting),
     type: setting.type,
     category: setting.category,
     description: setting.description,
@@ -87,17 +90,21 @@ export async function getPricingSettings(): Promise<PricingSettings> {
 export async function updateSetting(data: { key: string; value: string; type: string; category: string; description?: string; isPublic?: boolean }) {
   await requireAdmin()
 
+  // Route the value through the same secret whitelist the bulk path uses, so a
+  // credential can never be written in clear text through this endpoint.
+  const storedValue = protectSecretSettings({ [data.key]: data.value })[data.key] as string
+
   const setting = await prisma.setting.upsert({
     where: { key: data.key },
     update: {
-      value: data.value,
+      value: storedValue,
       type: data.type,
       category: data.category,
       description: data.description,
     },
     create: {
       key: data.key,
-      value: data.value,
+      value: storedValue,
       type: data.type,
       category: data.category,
       description: data.description,
@@ -111,7 +118,30 @@ export async function updateSetting(data: { key: string; value: string; type: st
 export async function updateSettings(settings: Record<string, string | number | boolean>) {
   await requireAdmin()
 
-  const updates = Object.entries(settings).map(([key, value]) => {
+  const payload: Record<string, string | number | boolean> = { ...settings }
+  const secretKeys = Object.keys(payload).filter(isSecretSettingKey)
+
+  // A submitted value equal to the mask we returned earlier means "unchanged":
+  // drop it so the stored ciphertext is preserved rather than overwritten with
+  // an encryption of the placeholder.
+  if (secretKeys.length) {
+    const rows = await prisma.setting.findMany({
+      where: { key: { in: secretKeys } },
+      select: { key: true, value: true },
+    })
+    const stored = new Map(rows.map((row) => [row.key, row.value]))
+    for (const key of secretKeys) {
+      const incoming = String(payload[key] ?? '')
+      // An empty field means "clear the credential"; a value equal to the mask
+      // we issued means "unchanged", so the ciphertext is preserved.
+      if (incoming !== '' && isMaskedSecretValue(stored.get(key), incoming)) delete payload[key]
+    }
+  }
+
+  // Anything left in a secret key is a newly typed value: encrypt at rest.
+  const protectedPayload = protectSecretSettings(payload)
+
+  const updates = Object.entries(protectedPayload).map(([key, value]) => {
     let type: string
     let stringValue: string
 
@@ -159,7 +189,7 @@ export async function getSettingByCategory(category: string) {
     where,
     orderBy: { key: 'asc' },
   })
-  return toKeyValue(settings)
+  return maskSecretSettings(toKeyValue(settings))
 }
 
 export async function initializeDefaultSettings() {
@@ -189,6 +219,7 @@ export async function initializeDefaultSettings() {
     // Email Settings
     { key: 'smtp_host', value: '', type: 'STRING', category: 'EMAIL', description: 'SMTP server host' },
     { key: 'smtp_port', value: '587', type: 'NUMBER', category: 'EMAIL', description: 'SMTP server port' },
+    { key: 'smtp_secure', value: 'false', type: 'BOOLEAN', category: 'EMAIL', description: 'Always use TLS for SMTP (port 465 implies TLS)' },
     { key: 'smtp_user', value: '', type: 'STRING', category: 'EMAIL', description: 'SMTP username' },
     { key: 'smtp_password', value: '', type: 'STRING', category: 'EMAIL', description: 'SMTP password' },
     { key: 'from_email', value: '', type: 'STRING', category: 'EMAIL', description: 'From email address' },

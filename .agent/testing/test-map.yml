@@ -52,3 +52,26 @@ modules:
   customers:
     source: [src/lib/customers.ts, src/app/api/customers/**, src/app/(admin)/admin/customers/page.tsx]
     unit: [tests/unit/customers-api.test.ts]
+  secrets:
+    source: [src/lib/crypto.ts, src/lib/secret-settings.ts]
+    unit: [tests/unit/crypto.test.ts, tests/unit/secret-settings.test.ts]
+    shared_footprint: true
+  webhooks:
+    source: [src/lib/server/webhooks.ts, src/lib/validations/webhook.ts, src/app/api/webhooks/**]
+    unit: [tests/unit/webhooks.test.ts]
+  api-keys:
+    source: [src/lib/server/api-keys.ts, src/lib/validations/api-key.ts, src/app/api/api-keys/**, src/app/api/headless/**]
+    unit: [tests/unit/api-keys.test.ts]
+  settings-backup:
+    source: [src/lib/server/settings-backup.ts, src/app/api/settings/backup/**]
+    unit: [tests/unit/settings-backup.test.ts]
+  products:
+    source: [src/lib/product-csv.ts, src/lib/actions/product.ts, src/app/api/products/**]
+    unit: [tests/unit/product-csv.test.ts, tests/unit/dead-utilities.test.ts]
+    shared_footprint: true
+  custom-requests:
+    source: [src/lib/actions/customRequest.ts, src/lib/validations/custom-request.ts, src/app/api/custom-requests/**]
+    unit: [tests/unit/custom-request-workflow.test.ts, tests/unit/webhooks.test.ts]
+  realtime:
+    source: [src/lib/hooks/useAdminRealtime.ts, src/lib/socket.ts]
+    unit: [tests/unit/spend-tiers.test.ts]

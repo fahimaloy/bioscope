@@ -1,10 +1,9 @@
-// Server-only SMTP mailer. Configured via SMTP_* environment variables.
+// Server-only SMTP mailer. Configuration comes from the database settings
+// (admin panel) with SMTP_* environment variables as a fallback — see
+// src/lib/server/email-config.ts.
 import nodemailer from 'nodemailer'
 import { AppError } from '@/lib/api-utils'
-
-export function isEmailConfigured(): boolean {
-  return Boolean(process.env.SMTP_HOST)
-}
+import { getSmtpConfig } from '@/lib/server/email-config'
 
 interface SendMailInput {
   to: string
@@ -13,24 +12,28 @@ interface SendMailInput {
 }
 
 export async function sendMail({ to, subject, html }: SendMailInput): Promise<void> {
-  const host = process.env.SMTP_HOST
-  if (!host) {
+  const config = await getSmtpConfig()
+  if (!config.host) {
     throw new AppError(
       501,
-      'Email is not configured on this server. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD and SMTP_FROM_EMAIL in the environment.',
+      'Email is not configured on this server. Set the SMTP host in Admin → Settings → Email or in the environment.',
       'EMAIL_NOT_CONFIGURED'
     )
   }
-  const port = Number(process.env.SMTP_PORT || 587)
-  const user = process.env.SMTP_USER
+
   const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: user ? { user, pass: process.env.SMTP_PASSWORD } : undefined,
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: config.user ? { user: config.user, pass: config.password } : undefined,
   })
-  const from = process.env.SMTP_FROM_EMAIL || user || 'no-reply@bioscope.com'
-  await transporter.sendMail({ from, to, subject, html })
+
+  await transporter.sendMail({
+    from: { name: config.fromName, address: config.from },
+    to,
+    subject,
+    html,
+  })
 }
 
 export function escapeHtml(value: unknown): string {

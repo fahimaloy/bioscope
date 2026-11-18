@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { DashboardSummary, RevenueChartCard, OrderStatusDistribution, ActivityFeed, StatsCards } from '@/components/admin/StatsCards'
 import { Card } from '@/components/ui/Card'
+import { useAdminRealtime, ADMIN_EVENT_LABELS, type AdminLiveEvent } from '@/lib/hooks'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
@@ -48,9 +49,11 @@ export default function AdminDashboardPage() {
   const [distribution, setDistribution] = useState<Record<string, number>>({})
   const [revenue, setRevenue] = useState<{ date: string; revenue: number; orders: number }[]>([])
   const [activity, setActivity] = useState<DashboardActivityItem[]>([])
+  const [liveTick, setLiveTick] = useState(0)
+  const [liveEvents, setLiveEvents] = useState<Array<{ kind: string; at: number; detail: string }>>([])
+  const [liveConnected, setLiveConnected] = useState(false)
 
-  useEffect(() => {
-    async function load() {
+  const load = useCallback(async () => {
       try {
         const [ordersRes, productsRes, customersRes, crRes, recentCrRes] = await Promise.all([
           fetch('/api/orders?limit=100&sortBy=createdAt&sortOrder=desc').then((r) => r.json()),
@@ -136,9 +139,33 @@ const products = (productsRes?.data?.data ?? []) as ProductSummary[]
       } catch (e) {
         console.error('dashboard load failed', e)
       }
-    }
-    load()
   }, [])
+
+  // Realtime: refresh the whole dashboard when anything happens, and keep a
+  // short live feed so activity is visible without a manual reload.
+  const handleLiveEvent = useCallback((event: AdminLiveEvent) => {
+    const detail =
+      event.kind === 'order.created'
+        ? `${event.data.orderNumber} · ${event.data.customerName}`
+        : event.kind === 'order.status_changed'
+          ? `${event.data.orderNumber} → ${event.data.statusLabel}`
+          : event.kind === 'custom_request.submitted'
+            ? `${event.data.customerName} · ${event.data.dimensions}`
+            : event.kind === 'custom_request.priced'
+              ? `${event.data.quotedPrice} BDT`
+              : `${event.data.productName} (${event.data.currentStock} left)`
+    setLiveEvents((prev) => [{ kind: event.kind, at: Date.now(), detail }, ...prev].slice(0, 8))
+    setLiveTick((tick) => tick + 1)
+  }, [])
+
+  const { isConnected } = useAdminRealtime(handleLiveEvent)
+  useEffect(() => {
+    setLiveConnected(isConnected)
+  }, [isConnected])
+
+  useEffect(() => {
+    load()
+  }, [load, liveTick])
 
   return (
     <div className="space-y-8">
@@ -226,6 +253,35 @@ const products = (productsRes?.data?.data ?? []) as ProductSummary[]
 
       {/* Order Status Distribution */}
       <OrderStatusDistribution distribution={distribution} />
+
+      {/* Live activity (socket.io) */}
+      <Card variant="doodle" padding="md" className="relative overflow-visible">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-display text-lg text-[var(--ink)] flex items-center gap-2">
+            <span className={cn('inline-block w-2 h-2 rounded-full', liveConnected ? 'bg-[var(--success)]' : 'bg-[var(--error)]')} />
+            Live activity
+          </h2>
+          <span className="text-xs text-[var(--text-subtle)]">
+            {liveConnected ? 'Connected' : 'Reconnecting…'}
+          </span>
+        </div>
+        {liveEvents.length === 0 ? (
+          <p className="text-sm text-[var(--text-subtle)]">
+            No live events yet — new orders, status changes and custom requests will appear here as they happen.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {liveEvents.map((event, index) => (
+              <li key={`${event.at}-${index}`} className="flex items-baseline gap-3 text-sm">
+                <span className="shrink-0 rounded-pill bg-[var(--light)] px-2 py-0.5 text-xs font-medium text-[var(--text-subtle)]">
+                  {ADMIN_EVENT_LABELS[event.kind as AdminLiveEvent['kind']] ?? event.kind}
+                </span>
+                <span className="text-[var(--ink)]">{event.detail}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
       {/* Activity Feed Timeline */}
       <ActivityFeed activities={activity} limit={6} />
