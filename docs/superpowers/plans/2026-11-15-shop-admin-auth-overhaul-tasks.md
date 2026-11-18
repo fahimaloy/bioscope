@@ -457,3 +457,31 @@ not transactional; `WebhookDelivery` retains full order payloads (PII) with no
 pruning; backup import has no Zod schema; several export filters are unvalidated.
 
 
+
+### Follow-up 2026-11-19 (stability pass — the five open review items are closed)
+
+The "Still open from the review" list above was implemented as Track A of
+`docs/superpowers/plans/2026-11-19-stability-and-completion.md` (commits
+`be53905`, `f5430aa`, `78d0d82`, `41fcaee`, `c6c5987`):
+
+- Tier filter + customer export aggregate spend in Postgres (groupBy), no
+  order rows in memory; customers export also gained the shared formula-
+  injection escape its local copy had missed.
+- Product import: per-row error isolation, P2002 create-race converges to an
+  update, duplicate in-file slugs rejected, 500-row cap; nested config
+  replacement is one atomic Prisma write.
+- WebhookDelivery log copies are PII-redacted (wire payload unchanged) and
+  rows older than 30 days are pruned (throttled, never-throws).
+- Backup import has a Zod envelope + version gate + size/count bounds; the
+  live smoke also caught and fixed a double response envelope that crashed
+  the restore panel (`c6c5987`).
+- Orders/custom-requests export filters and getOrders are Zod-validated
+  (400 at the edge, not Prisma 500s).
+
+Also closed from the rebuild ledger's tracked defects: DataTable money sort
++ no-op sort keys, the shadow-[var(--shadow-*)] no-box-shadow family (29
+sites), and the ?redirect= post-login gap (with an open-redirect guard).
+
+Gate: verify:mid green, 47 files / 416 tests; live smoke 14/14. Remaining
+work (profile mock data P0, rebuild tasks 2.9–5.1, hardening proposals) is
+tracked in the new plan.
