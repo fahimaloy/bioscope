@@ -1,10 +1,30 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 // settings-backup imports the shared api-utils, which pulls in next-auth; stub
 // the auth module so the unit environment can resolve the import graph.
 vi.mock('@/lib/auth', () => ({ auth: vi.fn() }))
 
-import { normaliseSettingEntry } from '@/lib/server/settings-backup'
+const mocks = vi.hoisted(() => ({
+  setting: { findUnique: vi.fn(), upsert: vi.fn() },
+  $transaction: vi.fn(async (ops: Array<Promise<unknown>>) => Promise.all(ops)),
+}))
+vi.mock('@/lib/prisma', () => ({
+  prisma: { setting: mocks.setting, $transaction: mocks.$transaction },
+}))
+
+import { normaliseSettingEntry, importSettings } from '@/lib/server/settings-backup'
+import { isEncryptedPayload } from '@/lib/crypto'
+
+beforeEach(() => {
+  vi.clearAllMocks()
+  process.env.SETTINGS_ENCRYPTION_KEY = 'unit-test-encryption-key-with-enough-entropy'
+  mocks.setting.findUnique.mockResolvedValue(null)
+  mocks.setting.upsert.mockResolvedValue({ key: 'k' })
+})
+
+afterEach(() => {
+  delete process.env.SETTINGS_ENCRYPTION_KEY
+})
 
 describe('normaliseSettingEntry', () => {
   it('accepts a plain scalar as a STRING setting', () => {
@@ -52,5 +72,78 @@ describe('normaliseSettingEntry', () => {
     expect(normaliseSettingEntry('k', { value: { nested: true } }).reason).toContain('must be a string')
     expect(normaliseSettingEntry('k', null).reason).toBe('unsupported entry')
     expect(normaliseSettingEntry('k', ['x']).reason).toBe('unsupported entry')
+  })
+
+  it('bounds value and description lengths', () => {
+    expect(normaliseSettingEntry('k', 'x'.repeat(10001)).reason).toBe('value too long')
+    expect(normaliseSettingEntry('k', { value: 'x', description: 'd'.repeat(501) }).reason).toBe(
+      'description too long'
+    )
+  })
+})
+
+describe('importSettings envelope validation', () => {
+  it('rejects a future backup version with UNSUPPORTED_BACKUP_VERSION', async () => {
+    await expect(
+      importSettings({ version: 99, settings: { site_name: 'X' } })
+    ).rejects.toMatchObject({ status: 400, code: 'UNSUPPORTED_BACKUP_VERSION' })
+    expect(mocks.setting.upsert).not.toHaveBeenCalled()
+  })
+
+  it('rejects a malformed envelope with INVALID_BACKUP', async () => {
+    await expect(importSettings(null)).rejects.toMatchObject({ status: 400, code: 'INVALID_BACKUP' })
+    await expect(importSettings({ version: 1 })).rejects.toMatchObject({ code: 'INVALID_BACKUP' })
+    await expect(
+      importSettings({ version: 1, settings: 'not-an-object' })
+    ).rejects.toMatchObject({ code: 'INVALID_BACKUP' })
+  })
+
+  it('rejects an oversized settings map', async () => {
+    const settings: Record<string, string> = {}
+    for (let i = 0; i < 501; i += 1) settings[`key_${i}`] = 'v'
+    await expect(importSettings({ version: 1, settings })).rejects.toMatchObject({
+      status: 400,
+      code: 'BACKUP_TOO_LARGE',
+    })
+  })
+
+  it('applies valid entries and skips bad ones with reasons', async () => {
+    const result = await importSettings({
+      version: 1,
+      exportedAt: '2026-11-19T00:00:00.000Z',
+      settings: {
+        site_name: 'BIOSCOPE',
+        global_tax_percent: { value: 5, type: 'NUMBER', category: 'TAX', isPublic: true },
+        'BAD KEY': 'x',
+        broken: { value: 'x', type: 'DATE' },
+      },
+    })
+    expect(result.applied).toBe(2)
+    expect(result.skipped).toEqual([
+      { key: 'BAD KEY', reason: 'invalid key' },
+      { key: 'broken', reason: 'unknown type "DATE"' },
+    ])
+    expect(mocks.$transaction).toHaveBeenCalledTimes(1)
+  })
+
+  it('never writes a masked secret, even into a fresh database', async () => {
+    const result = await importSettings({
+      version: 1,
+      settings: { smtp_password: 'Live••••••••et99' },
+    })
+    expect(result.applied).toBe(0)
+    expect(result.skipped[0].reason).toContain('masked')
+    expect(mocks.setting.upsert).not.toHaveBeenCalled()
+  })
+
+  it('encrypts a real credential before it touches the database', async () => {
+    const result = await importSettings({
+      version: 1,
+      settings: { smtp_password: 'a-real-password' },
+    })
+    expect(result.applied).toBe(1)
+    const upsert = mocks.setting.upsert.mock.calls[0][0]
+    expect(isEncryptedPayload(upsert.create.value)).toBe(true)
+    expect(upsert.create.value).not.toContain('a-real-password')
   })
 })

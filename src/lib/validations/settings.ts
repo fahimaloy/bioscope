@@ -57,3 +57,16 @@ export type DeliverySettingsInput = z.infer<typeof deliverySettingsSchema>
 export type GeneralSettingsInput = z.infer<typeof generalSettingsSchema>
 export type EmailTemplateInput = z.infer<typeof emailTemplateSchema>
 export type UpdateSettingInput = z.infer<typeof updateSettingSchema>
+
+/**
+ * Envelope for a settings backup restore. Individual entries are validated
+ * separately by the importer (a bad entry is skipped with a reason rather
+ * than aborting the whole restore), so the record values stay `unknown` here.
+ */
+export const settingsBackupEnvelopeSchema = z.object({
+  version: z.literal(1, { message: 'Unsupported backup version' }),
+  exportedAt: z.string().optional(),
+  settings: z.record(z.unknown()),
+})
+
+export type SettingsBackupEnvelope = z.infer<typeof settingsBackupEnvelopeSchema>

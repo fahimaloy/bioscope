@@ -12,12 +12,16 @@ import { prisma } from '@/lib/prisma'
 import { AppError } from '@/lib/api-utils'
 import { isMaskedSecretValue, isSecretSettingKey, protectSecretSettings } from '@/lib/secret-settings'
 import { decryptSecret, isEncryptedPayload, maskSecret } from '@/lib/crypto'
+import { settingsBackupEnvelopeSchema } from '@/lib/validations/settings'
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]{0,79}$/
 const SETTING_TYPES = ['STRING', 'NUMBER', 'BOOLEAN', 'JSON'] as const
 const SETTING_CATEGORIES = ['TAX', 'DELIVERY', 'GENERAL', 'EMAIL', 'PAYMENT', 'WEBHOOK'] as const
 
 const BACKUP_VERSION = 1
+const MAX_BACKUP_ENTRIES = 500
+const MAX_VALUE_LENGTH = 10000
+const MAX_DESCRIPTION_LENGTH = 500
 
 interface SettingRow {
   key: string
@@ -102,6 +106,7 @@ export function normaliseSettingEntry(
   raw: unknown
 ): { value?: NormalisedSetting; reason?: string } {
   if (typeof raw === 'string' || typeof raw === 'number' || typeof raw === 'boolean') {
+    if (String(raw).length > MAX_VALUE_LENGTH) return { reason: 'value too long' }
     const type =
       typeof raw === 'boolean' ? 'BOOLEAN' : typeof raw === 'number' ? 'NUMBER' : 'STRING'
     return { value: { key, value: String(raw), type, category: 'GENERAL', isPublic: false } }
@@ -116,6 +121,7 @@ export function normaliseSettingEntry(
     if (typeof rawValue !== 'string' && typeof rawValue !== 'number' && typeof rawValue !== 'boolean') {
       return { reason: 'value must be a string, number or boolean' }
     }
+    if (String(rawValue).length > MAX_VALUE_LENGTH) return { reason: 'value too long' }
     const type = entry.type === undefined ? 'STRING' : String(entry.type)
     if (!SETTING_TYPES.includes(type as (typeof SETTING_TYPES)[number])) {
       return { reason: `unknown type "${type}"` }
@@ -123,6 +129,9 @@ export function normaliseSettingEntry(
     const category = entry.category === undefined ? 'GENERAL' : String(entry.category)
     if (!SETTING_CATEGORIES.includes(category as (typeof SETTING_CATEGORIES)[number])) {
       return { reason: `unknown category "${category}"` }
+    }
+    if (entry.description !== undefined && String(entry.description).length > MAX_DESCRIPTION_LENGTH) {
+      return { reason: 'description too long' }
     }
     return {
       value: {
@@ -145,15 +154,37 @@ export function normaliseSettingEntry(
  * overwrite a stored credential.
  */
 export async function importSettings(payload: unknown): Promise<SettingsImportResult> {
-  const container = payload as { settings?: Record<string, unknown>; version?: number } | null
-  if (!container || typeof container !== 'object' || !container.settings || typeof container.settings !== 'object') {
-    throw new AppError(400, 'Invalid backup: expected { settings: { ... } }', 'INVALID_BACKUP')
+  // Version gate first: a future-format file must not be silently imported.
+  const container = payload as { version?: unknown } | null
+  if (
+    container &&
+    typeof container === 'object' &&
+    'version' in container &&
+    container.version !== BACKUP_VERSION
+  ) {
+    throw new AppError(
+      400,
+      `Unsupported backup version (expected ${BACKUP_VERSION})`,
+      'UNSUPPORTED_BACKUP_VERSION'
+    )
+  }
+
+  // Zod envelope at the edge; per-entry problems below are skipped with a
+  // reason rather than aborting the whole restore.
+  const parsed = settingsBackupEnvelopeSchema.safeParse(payload)
+  if (!parsed.success) {
+    throw new AppError(400, 'Invalid backup: expected { version: 1, settings: { ... } }', 'INVALID_BACKUP')
+  }
+
+  const entries = Object.entries(parsed.data.settings)
+  if (entries.length > MAX_BACKUP_ENTRIES) {
+    throw new AppError(400, `Backup has too many settings (max ${MAX_BACKUP_ENTRIES})`, 'BACKUP_TOO_LARGE')
   }
 
   const skipped: SettingsImportResult['skipped'] = []
   const normalised: NormalisedSetting[] = []
 
-  for (const [key, raw] of Object.entries(container.settings)) {
+  for (const [key, raw] of entries) {
     if (!KEY_PATTERN.test(key)) {
       skipped.push({ key, reason: 'invalid key' })
       continue

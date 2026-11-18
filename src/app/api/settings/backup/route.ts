@@ -1,4 +1,4 @@
-import { handleRouteError, ok, requireAdmin } from '@/lib/api-utils'
+import { handleRouteError, ok, requireAdmin, AppError } from '@/lib/api-utils'
 import { exportSettings, importSettings } from '@/lib/server/settings-backup'
 
 export const dynamic = 'force-dynamic'
@@ -27,7 +27,17 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await requireAdmin()
-    const body = await request.json()
+    // Bound the body before parsing: a restore file is a few KB of settings.
+    const text = await request.text()
+    if (text.length > 1_000_000) {
+      throw new AppError(413, 'The backup is too large (max 1 MB)', 'BACKUP_TOO_LARGE')
+    }
+    let body: unknown
+    try {
+      body = JSON.parse(text)
+    } catch {
+      throw new AppError(400, 'Invalid backup: not valid JSON', 'INVALID_BACKUP')
+    }
     const result = await importSettings(body)
     return ok({ data: result })
   } catch (error) {
