@@ -91,7 +91,7 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-[var(--paper)] px-4 pb-12 pt-24">
+   <div className="min-h-screen px-4 pb-12 pt-24">
         <div className="mx-auto max-w-2xl py-16 text-center">
           <motion.div
             variants={variants.fadeInUp}
@@ -145,7 +145,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] px-4 pb-12 pt-24">
+  <div className="min-h-screen px-4 pb-12 pt-24">
       <div className="mx-auto max-w-7xl">
         <motion.div
           variants={variants.fadeInUp}

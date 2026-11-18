@@ -406,14 +406,18 @@ describe('CartDrawer', () => {
 })
 
 describe('PageWrapper', () => {
-  it('applies the paper background and the paper grain by default', () => {
+  it('leaves the backdrop to the body gradient and renders the grain by default', () => {
     const { container } = render(
       <PageWrapper>
         <p>content</p>
       </PageWrapper>
     )
 
-    expect(container.firstElementChild?.className).toContain('bg-[var(--paper)]')
+    // Page-level paper fill removed deliberately: the body paints the
+    // --paper base and the --bg-gradient token; an opaque page background
+    // would hide both. Island surfaces keep their own fills.
+    expect(container.firstElementChild?.className).not.toContain('bg-[var(--paper)]')
+    expect(container.firstElementChild?.className).toContain('min-h-screen')
     // GrainOverlay is the fixed decor layer; GridPaper is the absolute one.
     const decor = Array.from(container.querySelectorAll('[aria-hidden="true"]'))
     expect(decor.some((el) => el.className.includes('fixed'))).toBe(true)

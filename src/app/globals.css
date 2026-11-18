@@ -45,6 +45,7 @@
   --light: var(--paper-deep);
   --dark: var(--ink);
   --bg-color: var(--paper);
+  --bg-gradient: linear-gradient(168deg, #FDF6E7 0%, #F5EADA 48%, #EDE0C2 100%);
   --on-pink: var(--ink);
   --on-pink-strong: #FFFFFF;
   --on-violet: #FFFFFF;
@@ -124,6 +125,7 @@ html {
 body {
   font-family: var(--font-body);
   background-color: var(--bg-color);
+  background-image: var(--bg-gradient);
   color: var(--ink);
   overflow-x: hidden;
   position: relative;
@@ -307,22 +309,25 @@ h1, h2, h3, .logo, .footer-logo {
   text-transform: uppercase;
 }
 
-/* Floating Emojis */
-.floating-emojis .emoji {
+/* Floating craft icons (decorative field mounted once in the root layout) */
+.floating-icon {
+  /* Defaults; each icon overrides these inline via the decor component. */
+  --float-rot: -6deg;
+  --float-dur: 11s;
+  --float-delay: 0s;
   position: absolute;
-  font-size: 3rem;
-  animation: bounce 3s infinite ease-in-out alternate;
-  z-index: 1;
+  animation: floating-drift var(--float-dur) ease-in-out var(--float-delay) infinite alternate;
+  will-change: transform;
 }
 
-.e1 { top: 20%; left: 15%; animation-delay: 0s; }
-.e2 { top: 30%; right: 15%; animation-delay: 0.5s; font-size: 4rem; }
-.e3 { bottom: 30%; left: 20%; animation-delay: 1s; }
-.e4 { bottom: 20%; right: 25%; animation-delay: 1.5s; }
+@keyframes floating-drift {
+  0%   { transform: translateY(0) rotate(var(--float-rot, -6deg)); }
+  50%  { transform: translateY(-26px) rotate(calc(var(--float-rot, -6deg) * -1)); }
+  100% { transform: translateY(12px) rotate(calc(var(--float-rot, -6deg) * 0.6)); }
+}
 
-@keyframes bounce {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(-30px) rotate(15deg); }
+@media (prefers-reduced-motion: reduce) {
+  .floating-icon { animation: none; }
 }
 
 /* Animations */
@@ -403,10 +408,6 @@ h1, h2, h3, .logo, .footer-logo {
   to { transform: scale(0.95); opacity: 0; }
 }
 
-@keyframes bounce {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(-30px) rotate(15deg); }
-}
 
 /* BounceIn animation for toast icons */
 @keyframes bounceIn {

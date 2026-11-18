@@ -2,17 +2,17 @@
   "paper": {
     "$type": "color",
     "$value": "#FAF3E3",
-    "$description": "App background"
+    "$description": "App background — warm cream, vintage paper feel"
   },
   "paper-deep": {
     "$type": "color",
     "$value": "#F3E7CE",
-    "$description": "Alt surface, sticky notes, table header"
+    "$description": "Alt surface, sticky notes, table header — kraft-tinted cream"
   },
   "paper-raised": {
     "$type": "color",
     "$value": "#FFFDF7",
-    "$description": "Cards, sheets"
+    "$description": "Cards, sheets — near-white craft stock"
   },
   "ink": {
     "$type": "color",
@@ -203,6 +203,11 @@
     "$type": "color",
     "$value": "{paper}",
     "$description": "Legacy alias — app background"
+  },
+  "bg-gradient": {
+    "$type": "gradient",
+    "$value": "linear-gradient(168deg, #FDF6E7 0%, #F5EADA 48%, #EDE0C2 100%)",
+    "$description": "Subtle warm cream page gradient — vintage paper backdrop"
   },
   "on-pink": {
     "$type": "color",

@@ -109,7 +109,7 @@ export default function CheckoutPage() {
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[var(--paper)] relative flex items-center justify-center px-4 pt-24">
+   <div className="min-h-screen relative flex items-center justify-center px-4 pt-24">
         <Card variant="doodle" padding="xl" className="w-full max-w-md text-center relative">
           <motion.h1
             variants={variants.fadeInUp}
@@ -151,7 +151,7 @@ export default function CheckoutPage() {
   // not a reason to leave it.
   if (items.length === 0 && step !== 'confirmation') {
     return (
-      <div className="min-h-screen bg-[var(--paper)] relative flex items-center justify-center px-4 pt-24">
+   <div className="min-h-screen relative flex items-center justify-center px-4 pt-24">
         <Card variant="doodle" padding="xl" className="w-full max-w-md text-center relative">
           <motion.h1
             variants={variants.fadeInUp}
@@ -270,7 +270,7 @@ export default function CheckoutPage() {
   const stepTitle = step.charAt(0).toUpperCase() + step.slice(1)
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] relative pt-24 pb-12 px-4">
+  <div className="min-h-screen relative pt-24 pb-12 px-4">
       {/* One decor accent per section (contract §3). */}
       <DoodleScatter count={6} seed="checkout" />
 

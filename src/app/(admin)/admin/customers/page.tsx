@@ -171,7 +171,7 @@ export default function CustomersPage() {
   const totalOrders = customers.reduce((s, c) => s + c.orderCount, 0)
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-full mx-auto space-y-8">
         {/* Header */}
         <motion.div

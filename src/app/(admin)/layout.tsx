@@ -53,7 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!isAdmin) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--surface)]">
+   <div className="flex min-h-screen items-center justify-center">
         Access Denied
       </div>
     )
@@ -71,7 +71,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     .filter((s) => s !== 'admin')
 
   return (
-    <div className="min-h-screen bg-[var(--surface)]">
+  <div className="min-h-screen">
       <AdminSidebar
         collapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
