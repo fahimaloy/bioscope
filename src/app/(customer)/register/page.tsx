@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { signIn } from 'next-auth/react'
 import { registerSchema, type RegisterInput } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -86,18 +87,20 @@ function RegisterForm() {
         return
       }
 
-      // Sign in automatically after registration
-      const signInResponse = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email, password: data.password }),
+      // Sign in automatically after registration (next-auth/react credentials flow —
+      // a raw fetch to /api/auth/signin cannot establish a session, and follows a
+      // MissingCSRF redirect to an HTML page, which previously reported success wrongly)
+      const signInResult = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
       })
 
-      if (signInResponse.ok) {
+      if (signInResult?.error) {
+        router.push('/login?registered=true')
+      } else {
         router.push('/')
         router.refresh()
-      } else {
-        router.push('/login?registered=true')
       }
     } catch (err) {
       setError('An unexpected error occurred')

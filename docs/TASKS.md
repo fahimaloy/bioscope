@@ -1,6 +1,11 @@
 # TASKS — progress tracker
 
-Legend: [x] done+verified · [~] in progress · [ ] todo. tsc: 334 → 180 errors after Phase 1 (2026-11-01). Tests: 37/37 green.
+> **Historical record.** This file tracks the original build (P0–P5, Wave 2).
+> The live tracker for the shop/admin overhaul is
+> `docs/superpowers/plans/2026-11-15-shop-admin-auth-overhaul-tasks.md`.
+
+Legend: [x] done+verified · [~] in progress · [ ] todo. Re-verified 2026-11-18:
+type-check 0 errors, full unit suite green.
 
 ## P0 — Tooling & pre-setup
 - [x] P0-01 git init (.env ignored, no commits)
@@ -28,11 +33,11 @@ Legend: [x] done+verified · [~] in progress · [ ] todo. tsc: 334 → 180 error
 - [x] P1-15 CSP/Permissions-Policy; metadataBase; Toaster fix; types React namespace; SessionUser+JWT phone
 - [x] P1-16 lib/index.ts barrel fixed; dead design-tokens.ts deleted
 
-## P2 — Customer flows (deleg_c022a9e8 running)
-- [~] P2-01 primitives/animations/hooks/stores fixes (sa-0)
-- [~] P2-02 cart store + /api/cart + checkout + add-to-cart (sa-1)
-- [~] P2-03 custom-sticker builder (sa-2)
-- [~] P2-04 customer pages + product/layout components (sa-4)
+## P2 — Customer flows (shipped — see docs/superpowers/plans/2026-11-15-shop-admin-auth-overhaul-tasks.md)
+- [x] P2-01 primitives/animations/hooks/stores fixes (sa-0)
+- [x] P2-02 cart store + /api/cart + checkout + add-to-cart (sa-1)
+- [x] P2-03 custom-sticker builder (sa-2)
+- [x] P2-04 customer pages + product/layout components (sa-4)
 
 ## P3 — Admin
 - [x] P3-01 /admin pages on real actions (settings wired to /api/settings + /api/settings/bulk; other admin pages already on real APIs)
@@ -45,7 +50,7 @@ Legend: [x] done+verified · [~] in progress · [ ] todo. tsc: 334 → 180 error
 
 ## P5 — Final verification gate
 - [x] P5-01 type-check → 0 · [x] P5-02 lint clean · [x] P5-03 tests green · [x] P5-04 build ok · [x] P5-05 e2e green (20/20)
-- [ ] P5-06 curl smoke incl. /admin redirect + login→cart→checkout→order
+- [x] P5-06 curl smoke (2026-11-18): public pages 200 · protected pages 307→/login · `/admin/login` 200 logged out · admin APIs 401 · register→session→add-to-cart→cart→checkout→orders verified with a throwaway account (deleted afterwards). Order creation not exercised — see P5-07.
 - [ ] P5-07 full order E2E; verify notification + socket records
 
 

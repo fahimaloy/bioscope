@@ -46,3 +46,9 @@ modules:
     unit: []
     e2e_hint: [e2e/smoke.spec.ts]
     shared_footprint: true
+  spend-tiers:
+    source: [src/lib/spend-tiers.ts]
+    unit: [tests/unit/spend-tiers.test.ts]
+  customers:
+    source: [src/lib/customers.ts, src/app/api/customers/**, src/app/(admin)/admin/customers/page.tsx]
+    unit: [tests/unit/customers-api.test.ts]

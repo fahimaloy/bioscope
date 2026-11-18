@@ -232,7 +232,7 @@
 ### 5.1 Additive Regression Gates
 - [x] 5.1.1 `tests/unit/dead-utilities.test.ts` already exists — ensure it passes
 - [x] 5.1.2 Add `tests/unit/admin-classes.test.ts`: scan `src/components/admin/**/*.tsx` for any class referencing non-existent Tailwind config keys (color/radius/fontSize) — fail if found
-- [~] 5.1.3 (deferred: needs route-handler test harness with vi.mock(next-auth); no API-route test infra exists in tests/unit) Add `tests/unit/category-api.test.ts`: test `requireAdmin` on POST, `HAS_PRODUCTS` guard on DELETE, icon/image fields
+- [x] 5.1.3 `tests/unit/category-api.test.ts` — route-handler harness (vi.hoisted mocks for `@/lib/auth` + `@/lib/prisma`, node env, Request/NextResponse): 401/403/400/201 matrix on POST incl. icon/image persistence; 401/404/409 HAS_PRODUCTS/200 matrix on DELETE. 8 tests, suite green (28 files, 270 tests)
 
 ### 5.2 Full Verification Pass
 - [x] 5.2.1 `pnpm type-check` → 0 errors
@@ -262,9 +262,59 @@
 | Admin bootstrap | instrumentation.ts at repo root | ☑ Resolved | Idempotent `instrumentation.ts` bootstrap shipped eda3d17 (ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_NAME) |
 | Admin panel scope (P1/P2 items) | Approve wiring dead filters, export, payment gateway, SMTP | ☐ Pending | Blocks Pass 4.2 export/gateway/SMTP lanes only |
 | Nightly CI minutes | GitHub Actions minutes for nightly full suite | ☐ Pending | Needed before merging 1.5.12 nightly.yml to main |
-| Dead admin filter UI (customers page, SettingsForm logo/favicon uploads) | Wire or remove | ☐ Pending | Pass 4.2/4.3 — owner scope decision |
-| Nested button in Dropdown component | Merge into single pressable | ☐ Pending | Pass 5.1 — additive fix, zero visual change intended |
+| Dead admin filter UI (customers page, SettingsForm logo/favicon uploads) | Wire or remove | ☑ Resolved | Wired 2026-11-18: SettingsForm logo/favicon already posted to `/api/settings/logo`; customers list + CSV export now accept spend tier / min orders / join date (owner chose "wire") |
+| Nested button in Dropdown component | Merge into single pressable | ☑ Resolved | Merged 2026-11-18: the option row is the single pressable; the check is a decorative indicator (zero visual change) |
 | modlens vision broken | Fix vs drop vision features | ☐ Pending | Tooling, outside app code |
+
+---
+
+## Pass 5 addendum (2026-11-18)
+
+Continued from the `wt/20261118-175207` session. The owner picked the remaining
+scope — `eng-backlog`, `visual-qa`, `e2e-rebaseline`, `dropdown-fix`,
+`dead-filters` (mode: **wire**) — engineering items first.
+
+**Shipped**
+- **5.1.3** — route-handler harness + `tests/unit/category-api.test.ts` (8 tests).
+- **Dead admin filters wired** — `GET /api/customers` and `/api/customers/export`
+  accept `spendTier`, `minOrders`, `dateFrom`; the customers page controls are
+  bound to state, reset the page, and feed the CSV export. Tier bands and the
+  override-vs-spend resolution are single-sourced in `src/lib/spend-tiers.ts`;
+  `src/lib/customers.ts` builds the where-clause for both routes. New tests:
+  `tests/unit/customers-api.test.ts` (10), `tests/unit/spend-tiers.test.ts` (4).
+- **Nested button merged** — `MultiSelectDropdown` option rows are the single
+  pressable; the check is a decorative span (zero visual change).
+- **Auth fixes**
+  - `/admin/login` was unreachable while logged out: the `/admin/:path*` guard ran
+    before the auth-path branch, so admins were bounced to the customer `/login`,
+    which then bounced them back. `authorized()` now lets the admin sign-in page
+    through when logged out. Found by the P5-06 smoke.
+  - Register auto sign-in uses `next-auth/react` `signIn('credentials')` instead of
+    a raw `POST /api/auth/signin`, which cannot establish a session and followed a
+    MissingCSRF redirect to an HTML page while reporting success.
+- **e2e visual baselines re-baselined** — all 48 viewports. `e2e/visual.spec.ts` now
+  scrolls through the page before the full-page capture: Playwright's `fullPage`
+  screenshot does not scroll, so `whileInView` sections were captured hidden. The
+  pre-overhaul baselines recorded blank bands where the featured grid and CTA band
+  now render (verified: 4 cards, last row centred).
+
+**Verification**
+- `pnpm verify:fast` → type-check ✓ · lint ✓ (no warnings or errors) · unit:all ✓
+  (30 files, 284 tests). Risk class HIGH (`src/auth.config.ts`), so `fast` already
+  selected the full unit suite — `pnpm verify:mid` adds no further scope.
+- `pnpm build` ✓ (clean `.next`, exit 0); `pnpm e2e:visual:update` → 48/48 passed.
+- P5-06 curl smoke — public pages 200 · protected pages 307→/login · `/admin/login`
+  200 logged out · `/api/customers[/export]` 401 · register→session→add-to-cart→
+  cart→checkout→orders verified with a throwaway account (deleted afterwards).
+  Order creation not exercised — P5-07.
+- Observation: the production server logs `[auth][error] UntrustedHost` for
+  `/api/auth/session`; the plan already tracks `AUTH_URL` / `AUTH_SECRET` as an
+  owner environment item.
+
+**Not done (owner)**
+- 5.3 visual QA pass on the running app.
+- P5-07 full order E2E + notification/socket record check.
+- Product imagery is still the shared placeholder asset (content, not code).
 
 ---
 
@@ -277,7 +327,7 @@
 | 2 | Shop Rework | 12 | 12 | 0 | shipped |
 | 3 | Admin Categories | 9 | 9 | 0 | shipped |
 | 4 | Admin Completeness | 25 | 10 | 15 | 4.1/4.2 shipped; 4.3/4.4 deferred (scope) |
-| 5 | Polish + Gates | 8 | 6 | 2 | 5.1.3 deferred; 5.2.5 partial; 5.3 = owner QA |
+| 5 | Polish + Gates | 8 | 7 | 1 | 5.1.3 shipped; 5.3 = owner QA |
 | **Total** | | **87** | **70** | **17** | |
 
 ---

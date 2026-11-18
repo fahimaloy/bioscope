@@ -46,12 +46,24 @@ export const authConfig: NextAuthConfig = {
       const path = nextUrl.pathname
 
       const isAdminPath = path.startsWith('/admin')
-      const isAuthPath = path.startsWith('/login') || path.startsWith('/register') || path.startsWith('/admin/login')
+      const isAdminLoginPath = path.startsWith('/admin/login')
+      const isAuthPath = path.startsWith('/login') || path.startsWith('/register') || isAdminLoginPath
       const isProtectedPath =
         path.startsWith('/checkout') ||
         path.startsWith('/profile') ||
         path.startsWith('/orders') ||
         path.startsWith('/custom-sticker')
+
+      if (isAdminLoginPath) {
+        // The admin sign-in page has to be reachable while logged out — it is
+        // where admins authenticate. Without this the `/admin/:path*` guard
+        // below bounces admins back to the customer login, and the customer
+        // login then bounces them here again.
+        if (!isLoggedIn) return true
+        return Response.redirect(
+          new URL(auth!.user!.role === 'ADMIN' ? '/admin/dashboard' : '/', nextUrl)
+        )
+      }
 
       if (isAdminPath) {
         // Returning false redirects page requests to the sign-in page.

@@ -1,5 +1,5 @@
 import { handleRouteError, requireAdmin } from '@/lib/api-utils'
-import { Prisma } from '@prisma/client'
+import { buildCustomerWhere } from '@/lib/customers'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -10,21 +10,12 @@ function csvEscape(value: unknown): string {
   return s
 }
 
-// Admin-only customer CSV export
+// Admin-only customer CSV export (honours the same filters as the list)
 export async function GET(request: Request) {
   try {
     await requireAdmin()
     const url = new URL(request.url)
-    const search = url.searchParams.get('search') || undefined
-
-    const where: Prisma.UserWhereInput = { role: 'CUSTOMER' }
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { phone: { contains: search, mode: 'insensitive' } },
-      ]
-    }
+    const where = await buildCustomerWhere(url)
 
     const users = await prisma.user.findMany({
       where,

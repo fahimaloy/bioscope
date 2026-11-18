@@ -7,6 +7,7 @@ import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { DataTable } from '@/components/ui/DataTable'
 import { formatCurrency, formatDate } from '@/lib/utils'
+import { SPEND_TIERS, resolveSpendTier, type SpendTierLabel } from '@/lib/spend-tiers'
 import { Users, User, DollarSign, ShoppingBag, Filter, Download } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { CustomerDetailModal } from '@/components/admin/CustomerDetailModal'
@@ -28,21 +29,27 @@ interface CustomerRow {
   createdAt: string
 }
 
-const spendTiers = [
-  { min: 0, max: 1000, label: 'New', variant: 'default' as const, icon: '🌱' },
-  { min: 1000, max: 5000, label: 'Bronze', variant: 'secondary' as const, icon: '🥉' },
-  { min: 5000, max: 20000, label: 'Silver', variant: 'accent' as const, icon: '🥈' },
-  { min: 20000, max: 50000, label: 'Gold', variant: 'warning' as const, icon: '🥇' },
-  { min: 50000, max: Infinity, label: 'VIP', variant: 'primary' as const, icon: '💎' },
-]
+/** Badge artwork per tier; the bands and labels live in `@/lib/spend-tiers`. */
+const tierStyles: Record<
+  SpendTierLabel,
+  { variant: 'default' | 'secondary' | 'accent' | 'warning' | 'primary'; icon: string }
+> = {
+  New: { variant: 'default', icon: '🌱' },
+  Bronze: { variant: 'secondary', icon: '🥉' },
+  Silver: { variant: 'accent', icon: '🥈' },
+  Gold: { variant: 'warning', icon: '🥇' },
+  VIP: { variant: 'primary', icon: '💎' },
+}
+
+const spendTiers = SPEND_TIERS.map((tier) => ({ ...tier, ...tierStyles[tier.label] }))
 
 function SpendBadge({ totalSpent, overrideTier }: { totalSpent: number; overrideTier?: string | null }) {
-  const override = overrideTier ? spendTiers.find(t => t.label === overrideTier) : undefined
-  const tier = override ?? (spendTiers.find(t => totalSpent >= t.min && totalSpent < t.max) || spendTiers[0])
+  const tier = resolveSpendTier(totalSpent, overrideTier)
+  const style = tierStyles[tier]
   return (
-    <Badge variant={tier.variant} size="sm" className="gap-1.5">
-      <span>{tier.icon}</span>
-      <span>{tier.label}</span>
+    <Badge variant={style.variant} size="sm" className="gap-1.5">
+      <span>{style.icon}</span>
+      <span>{tier}</span>
     </Badge>
   )
 }
@@ -123,6 +130,9 @@ export default function CustomersPage() {
   const router = useRouter()
   const [customers, setCustomers] = useState<Array<{ id: string; name: string | null; email: string; phone: string | null; orderCount: number; totalSpent: number; spendTier: string | null; latestOrderStatus: string | null; createdAt: string }>>([])
   const [search, setSearch] = useState('')
+  const [spendTier, setSpendTier] = useState('')
+  const [minOrders, setMinOrders] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
   const [page, setPage] = useState(1)
   const [pager, setPager] = useState({ total: 0, pageSize: 20 })
   const [loading, setLoading] = useState(true)
@@ -150,6 +160,9 @@ export default function CustomersPage() {
     try {
       const params = new URLSearchParams({ page: String(page), limit: '20' })
       if (search) params.set('search', search)
+      if (spendTier) params.set('spendTier', spendTier)
+      if (minOrders) params.set('minOrders', minOrders)
+      if (dateFrom) params.set('dateFrom', dateFrom)
       const res = await fetch(`/api/customers?${params.toString()}`)
       const json = await res.json()
       if (res.ok) {
@@ -161,11 +174,22 @@ export default function CustomersPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, search, router])
+  }, [page, search, spendTier, minOrders, dateFrom, router])
 
   useEffect(() => {
     load()
   }, [load])
+
+  /** Filter state lives in the query string so the CSV export can reuse it. */
+  const exportQuery = useMemo(() => {
+    const params = new URLSearchParams()
+    if (search) params.set('search', search)
+    if (spendTier) params.set('spendTier', spendTier)
+    if (minOrders) params.set('minOrders', minOrders)
+    if (dateFrom) params.set('dateFrom', dateFrom)
+    const qs = params.toString()
+    return qs ? `?${qs}` : ''
+  }, [search, spendTier, minOrders, dateFrom])
 
   const totalRevenue = customers.reduce((s, c) => s + Number(c.totalSpent), 0)
   const totalOrders = customers.reduce((s, c) => s + c.orderCount, 0)
@@ -189,8 +213,7 @@ export default function CustomersPage() {
               size="sm"
               variant="outline"
               onClick={() => {
-                const qs = search ? `?search=${encodeURIComponent(search)}` : ''
-                window.location.href = `/api/customers/export${qs}`
+                window.location.href = `/api/customers/export${exportQuery}`
               }}
             >
               <Download className="w-4 h-4" /> Export CSV
@@ -276,10 +299,15 @@ export default function CustomersPage() {
                 style={{ transformOrigin: 'top' }}
                 className="mt-4 pt-4 border-t border-[var(--light)]"
               >
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 items-center">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[var(--ink)]">Spend Tier:</span>
-                    <select className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none">
+                    <select
+                      value={spendTier}
+                      onChange={(e) => { setSpendTier(e.target.value); setPage(1) }}
+                      aria-label="Spend tier"
+                      className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none"
+                    >
                       <option value="">All Tiers</option>
                       {spendTiers.map(t => (
                         <option key={t.label} value={t.label}>{t.icon} {t.label}</option>
@@ -288,12 +316,34 @@ export default function CustomersPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[var(--ink)]">Min Orders:</span>
-                    <input type="number" min="0" className="w-24 px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none" />
+                    <input
+                      type="number"
+                      min="0"
+                      value={minOrders}
+                      onChange={(e) => { setMinOrders(e.target.value); setPage(1) }}
+                      aria-label="Minimum orders"
+                      className="w-24 px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none"
+                    />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-[var(--ink)]">Date From:</span>
-                    <input type="date" className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none" />
+                    <input
+                      type="date"
+                      value={dateFrom}
+                      onChange={(e) => { setDateFrom(e.target.value); setPage(1) }}
+                      aria-label="Joined from"
+                      className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none"
+                    />
                   </div>
+                  {(spendTier || minOrders || dateFrom) && (
+                    <button
+                      type="button"
+                      onClick={() => { setSpendTier(''); setMinOrders(''); setDateFrom(''); setPage(1) }}
+                      className="text-sm text-[var(--text-subtle)] underline underline-offset-2 hover:text-[var(--error)]"
+                    >
+                      Clear filters
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}
