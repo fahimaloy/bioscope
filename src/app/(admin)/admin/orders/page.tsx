@@ -12,7 +12,7 @@ import {
   Tooltip,
 } from '@/components/ui'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/utils'
-import { ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react'
+import { ChevronDown, ChevronUp, Truck, Package, Clock, CheckCircle2, XCircle, AlertTriangle, Download } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TRANSITIONS, type OrderStatus } from '@/lib/order-status'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -638,6 +638,19 @@ export default function AdminOrdersPage() {
             <h1 className="font-display text-3xl text-primary">Orders</h1>
             <p className="text-[var(--text-subtle)]">Manage and track all orders</p>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => {
+              const params = new URLSearchParams()
+              if (search) params.set('search', search)
+              if (statusFilter) params.set('status', statusFilter)
+              const query = params.toString()
+              window.location.href = `/api/orders/export${query ? `?${query}` : ''}`
+            }}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
 
         <Card className="p-4 mb-6">

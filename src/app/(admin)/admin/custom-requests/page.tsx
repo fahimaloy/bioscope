@@ -13,7 +13,7 @@ import {
   Textarea,
 } from '@/components/ui'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Eye, DollarSign, CheckCircle, XCircle, Edit2 } from 'lucide-react'
+import { Eye, DollarSign, CheckCircle, XCircle, Edit2, Download } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 
 const statusColors: Record<string, 'warning' | 'success' | 'error' | 'accent' | 'primary' | 'default'> = {
@@ -288,6 +288,19 @@ export default function CustomRequestsPage() {
             <h1 className="font-display text-3xl text-primary">Custom Requests</h1>
             <p className="text-[var(--text-subtle)]">Review and manage custom sticker requests</p>
           </div>
+          <Button
+            variant="outline"
+            onClick={() => {
+              const params = new URLSearchParams()
+              if (search) params.set('search', search)
+              if (statusFilter) params.set('status', statusFilter)
+              const query = params.toString()
+              window.location.href = `/api/custom-requests/export${query ? `?${query}` : ''}`
+            }}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
         </div>
 
         <Card className="p-4 mb-6">

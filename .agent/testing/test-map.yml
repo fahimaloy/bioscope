@@ -65,3 +65,7 @@ modules:
   settings-backup:
     source: [src/lib/server/settings-backup.ts, src/app/api/settings/backup/**]
     unit: [tests/unit/settings-backup.test.ts]
+  products:
+    source: [src/lib/product-csv.ts, src/lib/actions/product.ts, src/app/api/products/**]
+    unit: [tests/unit/product-csv.test.ts, tests/unit/dead-utilities.test.ts]
+    shared_footprint: true
