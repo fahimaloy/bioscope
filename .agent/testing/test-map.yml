@@ -62,3 +62,6 @@ modules:
   api-keys:
     source: [src/lib/server/api-keys.ts, src/lib/validations/api-key.ts, src/app/api/api-keys/**, src/app/api/headless/**]
     unit: [tests/unit/api-keys.test.ts]
+  settings-backup:
+    source: [src/lib/server/settings-backup.ts, src/app/api/settings/backup/**]
+    unit: [tests/unit/settings-backup.test.ts]
