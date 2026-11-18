@@ -363,11 +363,43 @@ model Notification {
   @@map("notifications")
 }
 
+model WebhookEndpoint {
+  id          String   @id @default(cuid())
+  url         String
+  description String?
+  events      String[]
+  secret      String?  // HMAC signing secret, encrypted at rest
+  isActive    Boolean  @default(true)
+  createdBy   String   // admin user id
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deliveries  WebhookDelivery[]
+
+  @@index([isActive])
+  @@map("webhook_endpoints")
+}
+
+model WebhookDelivery {
+  id           String          @id @default(cuid())
+  endpointId   String
+  endpoint     WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  event        String
+  status       String // delivered | failed
+  responseCode Int?
+  error        String?
+  payload      Json
+  durationMs   Int?
+  createdAt    DateTime @default(now())
+
+  @@index([endpointId, createdAt])
+  @@index([event])
+  @@map("webhook_deliveries")
+}
+
 enum UserRole {
   CUSTOMER
   ADMIN
 }
-
 enum OrderStatus {
   PENDING
   CONFIRMED

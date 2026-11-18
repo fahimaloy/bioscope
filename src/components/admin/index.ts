@@ -4,6 +4,7 @@ export { OrderStatusBadge, OrderStatusSelector, OrderStatusFlow, OrderStatusTime
 export { OrderTimeline, SimpleOrderStatusBadge, OrderStatusProgress } from './OrderTimeline'
 export { SettingsForm } from './SettingsForm'
 export { SettingsPage } from './SettingsPage'
+export { WebhookSettings } from './WebhookSettings'
 export { TaxConfig } from './TaxConfig'
 export { DeliveryConfig } from './DeliveryConfig'
 export { NotificationList, NotificationBellDropdown } from './NotificationList'

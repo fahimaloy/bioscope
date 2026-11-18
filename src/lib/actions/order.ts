@@ -10,6 +10,7 @@ import { computeOrderTotals, computeDiscount, priceLine, type PricedLine, type P
 import { canTransition, CUSTOMER_CANCELLABLE, ORDER_STATUS_LABELS, type OrderStatus } from '@/lib/order-status'
 import { AppError, requireUser, requireAdmin, buildPagination } from '@/lib/api-utils'
 import { emitNewOrder, emitOrderStatusChange, emitNotificationNew } from '@/lib/server/socket-emit'
+import { dispatchWebhook } from '@/lib/server/webhooks'
 import { getPricingSettings } from './settings'
 
 // Allow the client to send its cart explicitly (client-side cart is the source
@@ -225,6 +226,9 @@ export async function createOrder(data: CreateOrderPayload) {
   })
 
   await emitNewOrder(order)
+  // Fire-and-forget semantics: dispatchWebhook never throws, so a slow
+  // subscriber cannot fail the order creation.
+  await dispatchWebhook('order.created', order)
   await notifyAdmins(
     `New Order: ${order.orderNumber}`,
     `New order from ${address.name} for ${Number(order.total).toLocaleString()} BDT`,
@@ -276,6 +280,7 @@ export async function updateOrderStatus(id: string, data: OrderStatusPayload) {
   ])
 
   await emitOrderStatusChange(updatedOrder, order.status, newStatus)
+  await dispatchWebhook('order.status_changed', updatedOrder)
 
   const notification = await prisma.notification.create({
     data: {
@@ -322,6 +327,13 @@ export async function updateOrder(id: string, data: OrderUpdatePayload) {
 
   revalidatePath('/admin/orders')
   revalidatePath(`/orders/${id}`)
+
+  // A transition into PAID is the only "payment received" signal the shop has
+  // (there is no gateway callback yet).
+  if (validated.paymentStatus === 'PAID' && existing.paymentStatus !== 'PAID') {
+    await dispatchWebhook('payment.received', updated)
+  }
+
   return { success: true, order: updated }
 }
 
@@ -398,6 +410,7 @@ export async function cancelOrder(id: string, reason?: string) {
   })
 
   await emitOrderStatusChange(updated, order.status, 'CANCELLED')
+  await dispatchWebhook('order.status_changed', updated)
 
   if (isAdmin && order.userId !== sessionUser.id) {
     const notification = await prisma.notification.create({

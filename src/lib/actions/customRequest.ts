@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 import { submitCustomRequestSchema, priceCustomRequestSchema, updateCustomRequestStatusSchema } from '@/lib/validations/custom-request'
 import { AppError, requireUser, requireAdmin, buildPagination } from '@/lib/api-utils'
 import { emitCustomRequestSubmitted, emitCustomRequestPriced, emitNotificationNew } from '@/lib/server/socket-emit'
+import { dispatchWebhook } from '@/lib/server/webhooks'
 
 const CR_SORT_FIELDS = ['createdAt', 'status', 'quantity', 'quotedPrice'] as const
 
@@ -52,6 +53,7 @@ export async function submitCustomRequest(data: unknown) {
 
   // Emit real-time event
   await emitCustomRequestSubmitted(customRequest)
+  await dispatchWebhook('custom_request.submitted', customRequest)
 
   // Create notification for admins
   const admins = await prisma.user.findMany({ where: { role: 'ADMIN' } })
@@ -104,6 +106,7 @@ export async function updateCustomRequestStatus(id: string, data: unknown) {
   // Emit real-time event if priced
   if (validated.status === 'PRICED' && validated.quotedPrice) {
     await emitCustomRequestPriced(updatedRequest)
+    await dispatchWebhook('custom_request.priced', updatedRequest)
 
     // Notify customer
     const notification = await prisma.notification.create({
@@ -116,6 +119,8 @@ export async function updateCustomRequestStatus(id: string, data: unknown) {
       },
     })
     await emitNotificationNew(notification)
+  } else {
+    await dispatchWebhook('custom_request.updated', updatedRequest)
   }
 
   revalidatePath('/admin/custom-requests')
@@ -148,6 +153,7 @@ export async function priceCustomRequest(id: string, data: unknown) {
 
   // Emit real-time event
   await emitCustomRequestPriced(updatedRequest)
+  await dispatchWebhook('custom_request.priced', updatedRequest)
 
   // Notify customer
   const notification = await prisma.notification.create({

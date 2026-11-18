@@ -11,6 +11,7 @@ export const SETTINGS_TABS = [
   'payments',
   'email',
   'appearance',
+  'webhooks',
 ] as const
 
 export type SettingsTab = (typeof SETTINGS_TABS)[number]
@@ -28,4 +29,5 @@ export const SETTINGS_TAB_LABELS: Record<SettingsTab, string> = {
   payments: 'Payments',
   email: 'Email',
   appearance: 'Appearance',
+  webhooks: 'Webhooks',
 }
