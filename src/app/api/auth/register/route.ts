@@ -21,9 +21,20 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const validated = registerSchema.parse(body)
+    const email = validated.email.toLowerCase()
+
+    // The bootstrap admin email is reserved: self-registration must never be
+    // able to claim it, or the startup reconcile would promote that account.
+    const reservedAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase()
+    if (reservedAdminEmail && email === reservedAdminEmail) {
+      return NextResponse.json(
+        { success: false, error: 'This email address is not available for registration', code: 'EMAIL_RESERVED' },
+        { status: 409 }
+      )
+    }
 
     const existing = await prisma.user.findUnique({
-      where: { email: validated.email.toLowerCase() },
+      where: { email },
       select: { id: true },
     })
     if (existing) {

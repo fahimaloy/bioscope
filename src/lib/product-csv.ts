@@ -6,6 +6,7 @@
 // re-importing a file updates rather than duplicates.
 
 import type { CreateProductInput } from '@/lib/validations/product'
+import { escapeCsvCell } from '@/lib/csv'
 
 export const PRODUCT_CSV_HEADERS = [
   'name',
@@ -55,8 +56,7 @@ export interface ProductCsvRow {
 
 /** Quote a value when it contains a separator, a quote or a newline. */
 function escapeCsv(value: string): string {
-  if (/[",\n\r]/.test(value)) return `"${value.replace(/"/g, '""')}"`
-  return value
+  return escapeCsvCell(value)
 }
 
 export function toCsvRow(values: string[]): string {

@@ -148,12 +148,16 @@ async function deliver(endpoint: {
   }
 
   if (endpoint.secret) {
-    const signingSecret = isEncryptedPayload(endpoint.secret) ? decryptSecret(endpoint.secret) : endpoint.secret
-    headers['x-bioscope-signature'] = signWebhookPayload(signingSecret, body)
     headers['x-bioscope-event'] = event
   }
 
   try {
+    // Signing can throw (key rotated/removed, tampered payload). It must not
+    // escape into the caller's order/request mutation.
+    if (endpoint.secret) {
+      const signingSecret = isEncryptedPayload(endpoint.secret) ? decryptSecret(endpoint.secret) : endpoint.secret
+      headers['x-bioscope-signature'] = signWebhookPayload(signingSecret, body)
+    }
     const res = await fetch(endpoint.url, {
       method: 'POST',
       headers,
@@ -205,10 +209,17 @@ async function recordDelivery(result: DeliveryResult, event: WebhookEvent, paylo
  * Returns the per-endpoint results; never throws.
  */
 export async function dispatchWebhook(event: WebhookEvent, payload: unknown): Promise<DeliveryResult[]> {
-  const endpoints = await prisma.webhookEndpoint.findMany({
-    where: { isActive: true, events: { has: event } },
-    select: { id: true, url: true, secret: true },
-  })
+  let endpoints: Array<{ id: string; url: string; secret: string | null }>
+  try {
+    endpoints = await prisma.webhookEndpoint.findMany({
+      where: { isActive: true, events: { has: event } },
+      select: { id: true, url: true, secret: true },
+    })
+  } catch (error) {
+    // A DB hiccup must not fail the mutation that triggered this event.
+    console.error('[webhooks] failed to load endpoints:', error)
+    return []
+  }
 
   if (endpoints.length === 0) return []
 

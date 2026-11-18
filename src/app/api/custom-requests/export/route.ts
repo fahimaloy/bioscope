@@ -1,12 +1,11 @@
 import { handleRouteError, requireAdmin } from '@/lib/api-utils'
 import { prisma } from '@/lib/prisma'
+import { escapeCsvCell } from '@/lib/csv'
 
 export const dynamic = 'force-dynamic'
 
 function csvEscape(value: unknown): string {
-  const s = value === null || value === undefined ? '' : String(value)
-  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`
-  return s
+  return escapeCsvCell(value)
 }
 
 /** Admin-only custom-request CSV export. */

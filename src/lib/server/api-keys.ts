@@ -8,7 +8,7 @@
 import { createHash, randomBytes } from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { AppError } from '@/lib/api-utils'
-import { apiKeyCreateSchema, type ApiKeyScope } from '@/lib/validations/api-key'
+import { apiKeyCreateSchema, hasAllScopes, type ApiKeyScope } from '@/lib/validations/api-key'
 
 const KEY_PREFIX = 'bsk_live_'
 const PREFIX_DISPLAY_LENGTH = 16
@@ -126,12 +126,14 @@ export async function verifyApiKey(header: string | null): Promise<VerifiedKey |
   return { id: stored.id, name: stored.name, scopes: stored.scopes }
 }
 
+/** A key must hold EVERY requested scope, not merely one of them. */
+export { hasAllScopes } from '@/lib/validations/api-key'
+
 /** Throwing guard for route handlers that accept headless API-key callers. */
 export async function requireApiKey(scopes: ApiKeyScope[], request: Request): Promise<VerifiedKey> {
   const key = await verifyApiKey(request.headers.get('authorization'))
   if (!key) throw new AppError(401, 'A valid API key is required', 'UNAUTHENTICATED')
-  const allowed = key.scopes.filter((scope) => scopes.includes(scope))
-  if (allowed.length === 0) {
+  if (!hasAllScopes(key.scopes, scopes)) {
     throw new AppError(403, `This key does not have the ${scopes.join(', ')} scope`, 'FORBIDDEN')
   }
   return key

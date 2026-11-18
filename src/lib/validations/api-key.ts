@@ -13,6 +13,11 @@ export const API_KEY_SCOPES = [
 
 export type ApiKeyScope = (typeof API_KEY_SCOPES)[number]
 
+/** A key must hold EVERY requested scope, not merely one of them. */
+export function hasAllScopes(keyScopes: string[], required: ApiKeyScope[]): boolean {
+  return required.every((scope) => keyScopes.includes(scope))
+}
+
 export const apiKeyCreateSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }).max(80),
   scopes: z.array(z.enum(API_KEY_SCOPES)).min(1, { message: 'Select at least one scope' }),

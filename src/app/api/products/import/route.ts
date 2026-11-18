@@ -1,4 +1,4 @@
-import { handleRouteError, ok, requireAdmin } from '@/lib/api-utils'
+import { handleRouteError, ok, requireAdmin, AppError } from '@/lib/api-utils'
 import { importProductsFromCsv } from '@/lib/actions/product'
 
 export const dynamic = 'force-dynamic'
@@ -10,7 +10,11 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => null)
     const csv = typeof body?.csv === 'string' ? body.csv : ''
     if (!csv.trim()) {
-      return handleRouteError(new Error('EMPTY_CSV'))
+      throw new AppError(400, 'The CSV is empty', 'EMPTY_CSV')
+    }
+    // Bound the work: a huge upload must not be parsed into memory unbounded.
+    if (csv.length > 1_000_000) {
+      throw new AppError(413, 'The CSV is too large (max 1 MB)', 'CSV_TOO_LARGE')
     }
     const result = await importProductsFromCsv(csv)
     return ok({ data: result })
