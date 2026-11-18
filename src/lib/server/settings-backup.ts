@@ -10,8 +10,8 @@
 
 import { prisma } from '@/lib/prisma'
 import { AppError } from '@/lib/api-utils'
-import { isMaskedSecretValue, isSecretSettingKey, maskSecretSettings } from '@/lib/secret-settings'
-import { decryptSecret, isEncryptedPayload } from '@/lib/crypto'
+import { isMaskedSecretValue, isSecretSettingKey, protectSecretSettings } from '@/lib/secret-settings'
+import { decryptSecret, isEncryptedPayload, maskSecret } from '@/lib/crypto'
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]{0,79}$/
 const SETTING_TYPES = ['STRING', 'NUMBER', 'BOOLEAN', 'JSON'] as const
@@ -57,8 +57,17 @@ export async function exportSettings(options?: { includeEncryptedSecrets?: boole
 
     if (secret && !options?.includeEncryptedSecrets) {
       // Mask the plaintext so a default export never leaks a credential.
-      const plaintext = isEncryptedPayload(row.value) ? decryptSecret(row.value) : row.value
-      value = plaintext ? String(maskSecretSettings({ v: plaintext }).v) : ''
+      // maskSecret must be called directly: maskSecretSettings keys on the
+      // setting key, and a throwaway key like 'v' would leave it untouched.
+      let plaintext = row.value
+      if (isEncryptedPayload(plaintext)) {
+        try {
+          plaintext = decryptSecret(plaintext)
+        } catch {
+          plaintext = ''
+        }
+      }
+      value = plaintext ? maskSecret(plaintext) : ''
     }
 
     settings[row.key] = {
@@ -156,10 +165,14 @@ export async function importSettings(payload: unknown): Promise<SettingsImportRe
     }
     if (isSecretSettingKey(key)) {
       const existing = await prisma.setting.findUnique({ where: { key }, select: { value: true } })
-      if (isMaskedSecretValue(existing?.value, value.value) || value.value.includes('••')) {
+      // A masked incoming value is "unchanged" even when nothing is stored yet,
+      // so restoring a default export into a fresh DB cannot write a mask.
+      if (value.value.includes('••') || isMaskedSecretValue(existing?.value, value.value)) {
         skipped.push({ key, reason: 'masked value — left unchanged' })
         continue
       }
+      // Anything else is a real credential: encrypt before it touches the DB.
+      value.value = protectSecretSettings({ [key]: value.value })[key] as string
     }
     normalised.push(value)
   }

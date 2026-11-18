@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { auth } from '@/lib/auth'
 import { AppError, requireAdmin } from '@/lib/api-utils'
-import { isMaskedSecretValue, isSecretSettingKey, maskSecretSettings, protectSecretSettings } from '@/lib/secret-settings'
+import { isMaskedSecretValue, isSecretSettingKey, maskSecretsForDisplay, protectSecretSettings } from '@/lib/secret-settings'
 import type { PricingSettings } from '@/lib/pricing'
 
 function parseSettingValue(setting: { value: string; type: string }): string | number | boolean {
@@ -45,7 +45,7 @@ export async function getSettings(category?: string) {
   })
   // Credentials come back masked; the admin form echoes the mask back to mean
   // "unchanged", which updateSettings() recognises.
-  return maskSecretSettings(toKeyValue(settings))
+  return maskSecretsForDisplay(toKeyValue(settings))
 }
 
 export async function getSetting(key: string) {
@@ -62,7 +62,9 @@ export async function getSetting(key: string) {
 
   return {
     key: setting.key,
-    value: isSecretSettingKey(setting.key) ? maskSecretSettings({ value: parseSettingValue(setting) }).value : parseSettingValue(setting),
+    value: isSecretSettingKey(setting.key)
+      ? maskSecretsForDisplay({ [setting.key]: parseSettingValue(setting) })[setting.key]
+      : parseSettingValue(setting),
     type: setting.type,
     category: setting.category,
     description: setting.description,
@@ -90,9 +92,24 @@ export async function getPricingSettings(): Promise<PricingSettings> {
 export async function updateSetting(data: { key: string; value: string; type: string; category: string; description?: string; isPublic?: boolean }) {
   await requireAdmin()
 
+  const isSecret = isSecretSettingKey(data.key)
+  // A credential must never be servable unauthenticated, even if the caller
+  // asks for it to be public.
+  const isPublic = isSecret ? false : data.isPublic
+
+  const value = data.value
+  if (isSecret) {
+    const existing = await prisma.setting.findUnique({ where: { key: data.key } })
+    // An echoed mask means "unchanged": keep the stored ciphertext rather than
+    // encrypting the placeholder over the real credential.
+    if (value !== '' && isMaskedSecretValue(existing?.value, value)) {
+      return { success: true, setting: existing }
+    }
+  }
+
   // Route the value through the same secret whitelist the bulk path uses, so a
   // credential can never be written in clear text through this endpoint.
-  const storedValue = protectSecretSettings({ [data.key]: data.value })[data.key] as string
+  const storedValue = protectSecretSettings({ [data.key]: value })[data.key] as string
 
   const setting = await prisma.setting.upsert({
     where: { key: data.key },
@@ -101,6 +118,7 @@ export async function updateSetting(data: { key: string; value: string; type: st
       type: data.type,
       category: data.category,
       description: data.description,
+      ...(isPublic !== undefined ? { isPublic } : {}),
     },
     create: {
       key: data.key,
@@ -108,6 +126,7 @@ export async function updateSetting(data: { key: string; value: string; type: st
       type: data.type,
       category: data.category,
       description: data.description,
+      ...(isPublic !== undefined ? { isPublic } : {}),
     },
   })
 
@@ -175,7 +194,11 @@ export async function getPublicSettings() {
   const settings = await prisma.setting.findMany({
     where: { isPublic: true },
   })
-  return toKeyValue(settings)
+  // A credential must never be served unauthenticated, even if a row was
+  // flagged public by mistake.
+  return Object.fromEntries(
+    Object.entries(toKeyValue(settings)).filter(([key]) => !isSecretSettingKey(key))
+  )
 }
 
 export async function getSettingByCategory(category: string) {
@@ -189,7 +212,7 @@ export async function getSettingByCategory(category: string) {
     where,
     orderBy: { key: 'asc' },
   })
-  return maskSecretSettings(toKeyValue(settings))
+  return maskSecretsForDisplay(toKeyValue(settings))
 }
 
 export async function initializeDefaultSettings() {

@@ -48,7 +48,14 @@ export async function getSmtpConfig(): Promise<SmtpConfig> {
   const user = String(stored.smtp_user ?? '') || process.env.SMTP_USER || undefined
   const password = String(stored.smtp_password ?? '') || process.env.SMTP_PASSWORD || undefined
   const secure =
-    stored.smtp_secure === 'true' ? true : stored.smtp_secure === 'false' ? false : port === 465
+    // Port 465 implies TLS unless the operator explicitly turned it off.
+    port === 465 && stored.smtp_secure !== 'false'
+      ? true
+      : stored.smtp_secure === 'true'
+        ? true
+        : stored.smtp_secure === 'false'
+          ? false
+          : port === 465
   const from = String(stored.from_email ?? '') || process.env.SMTP_FROM_EMAIL || user || 'no-reply@bioscope.com'
   const fromName = String(stored.from_name ?? '') || process.env.SMTP_FROM_NAME || 'BIOSCOPE'
 
