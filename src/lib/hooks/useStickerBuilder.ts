@@ -5,13 +5,22 @@ import { immer } from 'zustand/middleware/immer'
 import type { StickerDesign, DesignLayer, MaterialType, FinishType, CutType, FabricImage, ImageFilter } from '@/types'
 import { v4 as uuidv4 } from 'uuid'
 
-interface StickerBuilderState {
+/** Minimal fabric.Canvas surface used by the store (fabric's own types are not a dependency). */
+interface FabricCanvasLike {
+  setZoom(level: number): void
+  renderAll(): void
+  toDataURL(options: { format: string; multiplier: number; quality?: number; margin?: number }): string
+}
+
+export interface StickerBuilderState {
   design: StickerDesign
   history: StickerDesign[]
   historyIndex: number
   selectedLayerId: string | null
   canvasRef: HTMLCanvasElement | null
-  fabricCanvas: any | null // fabric.Canvas
+  // Minimal fabric.Canvas contract (fabric's own types are not a dependency;
+  // this covers the surface this store touches).
+  fabricCanvas: FabricCanvasLike | null
   zoom: number
 
   // Actions
@@ -20,7 +29,7 @@ interface StickerBuilderState {
   zoomIn: () => void
   zoomOut: () => void
   resetZoom: () => void
-  setFabricCanvas: (canvas: any) => void
+  setFabricCanvas: (canvas: FabricCanvasLike | null) => void
 
   // Background
   setBackground: (image: FabricImage | null) => void
@@ -103,7 +112,7 @@ export const useStickerBuilderStore = create<StickerBuilderState>()(
         state.saveToHistory()
       }),
 
-    updateBackgroundFilter: (filter) =>
+    updateBackgroundFilter: (_filter) =>
       set((state) => {
         if (state.design.background) {
           state.design.background = {

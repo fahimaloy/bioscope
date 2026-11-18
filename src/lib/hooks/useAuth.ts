@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 
 export function useAuth() {
   const { data: session, status, update } = useSession()
-  const { user, isLoading, setUser, setLoading, logout } = useAuthStore()
+  const { user, isLoading, setLoading, logout } = useAuthStore()
   const { setUser: setAuthUser } = useAuthActions()
 
   // Sync NextAuth session with Zustand store

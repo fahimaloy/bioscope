@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { customRequestKeys } from '@/lib/queries/customRequests'
-import type { UpdateCustomRequestStatusInput, PriceCustomRequestInput } from '@/lib/validations/custom-request'
+import type { UpdateCustomRequestStatusInput, PriceCustomRequestInput, SubmitCustomRequestInput } from '@/lib/validations/custom-request'
 
 export function useSubmitCustomRequest() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: SubmitCustomRequestInput) => {
       const res = await fetch('/api/custom-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

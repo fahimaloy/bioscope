@@ -37,7 +37,7 @@ export function CartDrawer() {
   const isOpen = useCartIsOpen()
   const items = useCartItems()
   const subtotal = useCartStore((state) => state.subtotal)
-  const { closeCart, removeItem, updateQuantity, getItemQuantity } = useCartActions()
+  const { closeCart } = useCartActions()
   const asideRef = useRef<HTMLElement>(null)
   const restoreFocusRef = useRef<HTMLElement | null>(null)
   const isOpenRef = useRef(isOpen)

@@ -30,7 +30,6 @@ interface DropdownProps {
 
 export const Dropdown = forwardRef<HTMLDivElement, DropdownProps>(function Dropdown(
   {
-    trigger,
     items,
     value,
     onChange,
@@ -167,7 +166,6 @@ interface MultiSelectDropdownProps {
 export const MultiSelectDropdown = forwardRef<HTMLDivElement, MultiSelectDropdownProps>(
   function MultiSelectDropdown(
     {
-      trigger,
       items,
       values = [],
       onChange,

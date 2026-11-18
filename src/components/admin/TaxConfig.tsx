@@ -1,23 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Select } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import { Plus, Minus, Trash2, Settings, Percent, Calculator } from 'lucide-react'
 
+interface TaxSettings {
+  global_tax_percent: number
+  tax_inclusive_pricing: boolean
+  tax_categories: Array<{ id: string; name: string; rate: number; description: string }>
+}
+
 interface TaxConfigProps {
-  onChange: (settings: any) => void
-  initialSettings?: any
+  onChange: (settings: Partial<TaxSettings>) => void
+  initialSettings?: Partial<TaxSettings>
 }
 
 export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
-  const [globalTax, setGlobalTax] = useState(initialSettings.global_tax_percent || 5)
-  const [taxInclusive, setTaxInclusive] = useState(initialSettings.tax_inclusive_pricing || false)
+  const [globalTax, setGlobalTax] = useState(initialSettings.global_tax_percent ?? 5)
+  const [taxInclusive, setTaxInclusive] = useState(initialSettings.tax_inclusive_pricing ?? false)
   const [taxCategories, setTaxCategories] = useState<Array<{ id: string; name: string; rate: number; description: string }>>(
-    initialSettings.tax_categories || [
+    initialSettings.tax_categories ?? [
       { id: 'standard', name: 'Standard Rate', rate: globalTax, description: 'Applies to most products' },
       { id: 'reduced', name: 'Reduced Rate', rate: 0, description: 'Essential items' },
       { id: 'zero', name: 'Zero Rate', rate: 0, description: 'Exempt items' },

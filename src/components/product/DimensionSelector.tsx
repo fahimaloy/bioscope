@@ -156,8 +156,8 @@ export function DimensionSelector({
             )}
             onClick={() => !disabled && onChange(dim)}
             disabled={disabled}
-            aria-pressed={selectedDimension?.id === dim.id}
             role="radio"
+            aria-checked={selectedDimension?.id === dim.id}
           >
             <span className="block font-display">{dim.label}</span>
             {dim.priceMultiplier !== 1 && (

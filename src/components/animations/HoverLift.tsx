@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, HTMLMotionProps } from 'framer-motion'
-import { ReactNode, forwardRef } from 'react'
+import { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 interface HoverLiftProps extends HTMLMotionProps<'div'> {

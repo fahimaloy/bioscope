@@ -34,9 +34,8 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
       disabled = false,
       className,
       id: providedId,
-      ...props
+      ..._props
     },
-    ref
   ) => {
     const trackRef = useRef<HTMLDivElement>(null);
     const generatedId = providedId || `slider-${Math.random().toString(36).slice(2, 9)}`;
@@ -122,7 +121,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
             {showValue && (
               <span className="ml-2 font-display text-[var(--ink)]">
                 {values
-                  .map((v, i) => (formatValue ? formatValue(v) : v))
+                  .map((v) => (formatValue ? formatValue(v) : v))
                   .join(isRange ? ' - ' : '')}
               </span>
             )}

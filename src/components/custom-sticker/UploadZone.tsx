@@ -3,8 +3,7 @@
 import { useState, useCallback, DragEvent, ChangeEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
-import { ImageUpload } from '@/components/ui/ImageUpload'
-import { Upload, Image, X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
+import { Upload, X, AlertCircle, Loader2 } from 'lucide-react'
 import type { FabricImage } from '@/types'
 
 interface UploadZoneProps {
@@ -181,6 +180,7 @@ export function UploadZone({
         {displayImage ? (
           <>
             <div className="relative w-full max-w-md aspect-square rounded-[var(--radius-md)] overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] bg-[var(--paper-deep)]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={displayImage}
                 alt="Uploaded design preview"
@@ -280,6 +280,7 @@ export function CompactUploadZone({
     <div className={cn('flex flex-wrap gap-2', className)}>
       {files.map((file, index) => (
         <div key={index} className="relative w-20 h-20 rounded-[var(--radius-md)] overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={URL.createObjectURL(file)} alt={`Upload ${index + 1}`} className="w-full h-full object-cover" />
           <button
             type="button"

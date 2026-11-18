@@ -93,15 +93,15 @@ test.describe('Custom Sticker Builder - Canvas Font Rendering', () => {
 
     // Check the fabric canvas object for the resolved font family
     const fontFamilyOnCanvas = await page.evaluate(() => {
-      const fabric = (window as any).fabric
+      const fabric = (window as unknown as { fabric?: { Canvas?: { getAll?: () => unknown[] } } }).fabric
       if (!fabric) return 'NO_FABRIC'
 
-      const canvases = fabric.Canvas.getAll ? fabric.Canvas.getAll() : []
-      for (const c of canvases) {
+      const canvases = fabric.Canvas?.getAll ? fabric.Canvas.getAll() : []
+      for (const c of canvases as Array<{ getObjects: () => unknown[] }>) {
         const objects = c.getObjects()
-        const textObj = objects.find((obj: any) => obj.type === 'textbox' || obj.type === 'i-text')
+        const textObj = objects.find((obj: unknown): obj is { type?: string; fontFamily?: string } => { const o = obj as { type?: string }; return o.type === 'textbox' || o.type === 'i-text' })
         if (textObj) {
-          return textObj.fontFamily
+          return textObj.fontFamily ?? ''
         }
       }
       return 'NO_TEXT_OBJECT'

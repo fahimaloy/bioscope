@@ -5,25 +5,49 @@ import Link from 'next/link'
 import { DashboardSummary, RevenueChartCard, OrderStatusDistribution, ActivityFeed, StatsCards } from '@/components/admin/StatsCards'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import { Package, ShoppingBag, TrendingUp, Clock, AlertCircle, FileText, Plus, Settings, BarChart2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { SketchUnderline } from '@/components/decorative/DoodleElements'
 
 const quickActions = [
-  { name: 'Add Product', href: '/admin/products', icon: Plus, color: 'primary' },
-  { name: 'Custom Requests', href: '/admin/custom-requests', icon: FileText, color: 'accent' },
-  { name: 'Settings', href: '/admin/settings', icon: Settings, color: 'default' },
+  { name: 'Add Product', href: '/admin/products', icon: Plus, color: 'primary' as const },
+  { name: 'Custom Requests', href: '/admin/custom-requests', icon: FileText, color: 'accent' as const },
+  { name: 'Settings', href: '/admin/settings', icon: Settings, color: 'default' as const },
 ]
 
 const LOW_STOCK = 10
 
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState<any>(null)
+  interface DashboardStats {
+    totalOrders: number
+    pendingOrders: number
+    totalRevenue: number
+    totalProducts: number
+    totalCustomers: number
+    lowStockProducts: number
+    pendingCustomRequests: number
+    conversionRate: number
+    averageOrderValue: number
+    todayOrders: number
+    todayRevenue: number
+  }
+  // Use the ActivityItem type from StatsCards for ActivityFeed compatibility
+  interface DashboardActivityItem {
+    id: string
+    type: 'order' | 'custom' | 'product' | 'customer'
+    title: string
+    description: string
+    timestamp: Date | string
+    href?: string
+    icon?: React.ReactNode
+  }
+
+  const [stats, setStats] = useState<DashboardStats | null>(null)
   const [distribution, setDistribution] = useState<Record<string, number>>({})
   const [revenue, setRevenue] = useState<{ date: string; revenue: number; orders: number }[]>([])
-  const [activity, setActivity] = useState<any[]>([])
+  const [activity, setActivity] = useState<DashboardActivityItem[]>([])
 
   useEffect(() => {
     async function load() {
@@ -35,10 +59,23 @@ export default function AdminDashboardPage() {
           fetch('/api/custom-requests/stats').then((r) => r.json()),
           fetch('/api/custom-requests?limit=5&sortBy=createdAt&sortOrder=desc').then((r) => r.json()),
         ])
-        const orders = ordersRes?.data?.data ?? []
-        const products = productsRes?.data?.data ?? []
-        const paid = orders.filter((o: any) => !['CANCELLED', 'REFUNDED'].includes(o.status))
-        const revenueTotal = paid.reduce((s: any, o: any) => s + Number(o.total), 0)
+        interface OrderSummary {
+  id: string
+  orderNumber: string
+  status: string
+  total: number | string
+  createdAt: string
+  user?: { name: string | null } | null
+  shippingName?: string | null
+}
+interface ProductSummary {
+  id: string
+  stock: number
+}
+const orders = (ordersRes?.data?.data ?? []) as OrderSummary[]
+const products = (productsRes?.data?.data ?? []) as ProductSummary[]
+        const paid = orders.filter((o) => !['CANCELLED', 'REFUNDED'].includes(o.status))
+        const revenueTotal = paid.reduce((s, o) => s + Number(o.total), 0)
         const dist: Record<string, number> = {}
         for (const o of orders) dist[o.status] = (dist[o.status] ?? 0) + 1
 
@@ -60,33 +97,33 @@ export default function AdminDashboardPage() {
         }
 
         const recent = [
-          ...orders.slice(0, 4).map((o: any) => ({
+          ...orders.slice(0, 4).map((o) => ({
             id: `order-${o.id}`,
             type: 'order' as const,
             title: `Order ${o.orderNumber} — ${o.status}`,
-            desc: `${o.user?.name ?? o.shippingName} · ${formatCurrency(Number(o.total))}`,
-            time: formatDate(o.createdAt),
+            description: `${o.user?.name ?? o.shippingName} · ${formatCurrency(Number(o.total))}`,
+            timestamp: o.createdAt,
             href: `/orders/${o.id}`,
             icon: <ShoppingBag className="w-4 h-4" />,
           })),
-          ...(recentCrRes?.data?.data ?? []).slice(0, 3).map((c: any) => ({
+          ...(recentCrRes?.data?.data ?? []).slice(0, 3).map((c: { id: string; status: string; originalName: string; width: number; height: number; quantity: number; createdAt: string }) => ({
             id: `cr-${c.id}`,
             type: 'custom' as const,
             title: `Custom request ${c.status.toLowerCase()}`,
-            desc: `${c.originalName} · ${c.width}×${c.height}cm × ${c.quantity}`,
-            time: formatDate(c.createdAt),
+            description: `${c.originalName} · ${c.width}×${c.height}cm × ${c.quantity}`,
+            timestamp: c.createdAt,
             href: '/admin/custom-requests',
             icon: <span className="text-xl">✨</span>,
           })),
-        ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 6)
+        ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()).slice(0, 6)
 
         setStats({
           totalOrders: ordersRes?.data?.pagination?.total ?? orders.length,
-          pendingOrders: orders.filter((o: any) => ['PENDING', 'CONFIRMED', 'PROCESSING'].includes(o.status)).length,
+          pendingOrders: orders.filter((o) => ['PENDING', 'CONFIRMED', 'PROCESSING'].includes(o.status)).length,
           totalRevenue: revenueTotal,
           totalProducts: productsRes?.data?.pagination?.total ?? products.length,
           totalCustomers: customersRes?.data?.pagination?.total ?? 0,
-          lowStockProducts: products.filter((p: any) => Number(p.stock) <= LOW_STOCK).length,
+          lowStockProducts: products.filter((p) => Number(p.stock) <= LOW_STOCK).length,
           pendingCustomRequests: crRes?.data?.pending ?? 0,
           conversionRate: 0,
           averageOrderValue: paid.length ? Math.round(revenueTotal / paid.length) : 0,
@@ -119,7 +156,7 @@ export default function AdminDashboardPage() {
         <div className="flex flex-wrap gap-3">
           {quickActions.map((action) => (
             <Link key={action.name} href={action.href}>
-              <Button variant={action.color === 'default' ? 'outline' : (action.color as any)} size="sm">
+              <Button variant={action.color === 'default' ? 'outline' : action.color} size="sm">
                 <action.icon className="w-4 h-4 mr-2" />
                 {action.name}
               </Button>
@@ -212,7 +249,7 @@ export default function AdminDashboardPage() {
 function SecondaryStatCard({ label, value, icon: Icon, color, trend, trendUp }: {
   label: string
   value: string | number
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   color: string
   trend?: string
   trendUp?: boolean

@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import { handleRouteError, ok, created, parsePagination } from '@/lib/api-utils'
 import { getOrders, createOrder } from '@/lib/actions/order'
 

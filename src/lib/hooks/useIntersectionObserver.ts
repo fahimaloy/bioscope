@@ -11,7 +11,7 @@ interface IntersectionObserverOptions {
 
 export function useIntersectionObserver(
   options: IntersectionObserverOptions = {}
-): [React.RefObject<HTMLElement>, boolean] {
+): [(node: HTMLElement | null) => void, boolean] {
   const { threshold = 0, rootMargin = '0px', root = null, triggerOnce = true } = options
   const [isIntersecting, setIsIntersecting] = useState(false)
   const elementRef = useRef<HTMLElement | null>(null)
@@ -54,7 +54,7 @@ export function useIntersectionObserver(
     }
   }, [])
 
-  return [elementRef, isIntersecting]
+  return [setRef, isIntersecting]
 }
 
 export function useInView(

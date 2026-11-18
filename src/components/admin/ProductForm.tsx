@@ -1,19 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Textarea, Select } from '@/components/ui/Input'
 import { ImageUpload } from '@/components/ui/ImageUpload'
-import { Badge } from '@/components/ui/Badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { DimensionSelector } from '@/components/product/DimensionSelector'
 import { QuantitySelector } from '@/components/product/QuantitySelector'
-import { ProductPreview } from '@/components/admin/ProductPreview'
 import type { Product, DimensionConfig, QuantityConfig } from '@/types'
-import { Plus, Minus, Trash2, GripVertical, Eye, EyeOff, Copy, Settings, Tag, Package, DollarSign, Layers, Upload, X, Image as ImageIcon } from 'lucide-react'
-import { DoodleShape, DoodleScribble, StickerPeel, WashiTape } from '@/components/decorative/DoodleElements'
+import { Plus, Trash2, Settings, Tag, Package, Layers, Image as ImageIcon } from 'lucide-react'
+import { StickerPeel, WashiTape } from '@/components/decorative/DoodleElements'
 import { Card } from '@/components/ui/Card'
 
 interface ProductFormProps {
@@ -25,7 +23,7 @@ interface ProductFormProps {
   className?: string
 }
 
-interface ProductFormData {
+export interface ProductFormData {
   name: string
   slug: string
   description: string
@@ -61,21 +59,22 @@ interface ProductFormData {
   metaDescription: string
 }
 
+const uid = () => crypto.randomUUID()
+
 const DEFAULT_DIMENSIONS: DimensionConfig[] = [
-  { id: '', width: 5, height: 5, label: 'Small (5×5 cm)', priceMultiplier: 1, isDefault: true, sortOrder: 1 },
-  { id: '', width: 7, height: 7, label: 'Medium (7×7 cm)', priceMultiplier: 1.5, sortOrder: 2 },
-  { id: '', width: 10, height: 10, label: 'Large (10×10 cm)', priceMultiplier: 2, sortOrder: 3 },
+  { id: uid(), width: 5, height: 5, label: 'Small (5×5 cm)', priceMultiplier: 1, isDefault: true, sortOrder: 1 },
+  { id: uid(), width: 7, height: 7, label: 'Medium (7×7 cm)', priceMultiplier: 1.5, sortOrder: 2 },
+  { id: uid(), width: 10, height: 10, label: 'Large (10×10 cm)', priceMultiplier: 2, sortOrder: 3 },
 ]
 
 const DEFAULT_QUANTITIES: QuantityConfig[] = [
-  { id: '', minQty: 1, maxQty: 10, pricePerUnit: 100, label: '1-10 pcs', sortOrder: 1 },
-  { id: '', minQty: 11, maxQty: 50, pricePerUnit: 80, label: '11-50 pcs', sortOrder: 2 },
-  { id: '', minQty: 51, maxQty: 100, pricePerUnit: 70, label: '51-100 pcs', sortOrder: 3 },
-  { id: '', minQty: 101, maxQty: null, pricePerUnit: 60, label: '100+ pcs', sortOrder: 4 },
+  { id: uid(), minQty: 1, maxQty: 10, pricePerUnit: 100, label: '1-10 pcs', sortOrder: 1 },
+  { id: uid(), minQty: 11, maxQty: 50, pricePerUnit: 80, label: '11-50 pcs', sortOrder: 2 },
+  { id: uid(), minQty: 51, maxQty: 100, pricePerUnit: 70, label: '51-100 pcs', sortOrder: 3 },
+  { id: uid(), minQty: 101, maxQty: null, pricePerUnit: 60, label: '100+ pcs', sortOrder: 4 },
 ]
 
 export function ProductForm({
-  initialData,
   categories,
   onSubmit,
   onCancel,
@@ -165,13 +164,6 @@ export function ProductForm({
     setFormData((prev) => ({ ...prev, allowedDimensions: [...prev.allowedDimensions, newDim] }))
   }
 
-  const removeDimension = (id: string) => {
-    if (formData.allowedDimensions.length <= 1) return
-    setFormData((prev) => ({
-      ...prev,
-      allowedDimensions: prev.allowedDimensions.filter((d) => d.id !== id),
-    }))
-  }
 
   const addQuantity = () => {
     const lastQty = formData.allowedQuantities[formData.allowedQuantities.length - 1]

@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import { handleRouteError, ok } from '@/lib/api-utils'
 import { getOrderById, updateOrder } from '@/lib/actions/order'
 

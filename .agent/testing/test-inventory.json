@@ -1,0 +1,37 @@
+{
+  "generated_at": "2026-11-15",
+  "unit_test_files": [
+    "tests/unit/components/admin-sidebar.test.tsx",
+    "tests/unit/components/cart-drawer.test.tsx",
+    "tests/unit/components/decor.test.tsx",
+    "tests/unit/components/footer.test.tsx",
+    "tests/unit/components/navbar.test.tsx",
+    "tests/unit/components/primitives.test.tsx",
+    "tests/unit/components/product-card.test.tsx",
+    "tests/unit/components/providers.test.tsx",
+    "tests/unit/components/wordmark.test.tsx",
+    "tests/unit/dead-utilities.test.ts",
+    "tests/unit/design-tokens.test.ts",
+    "tests/unit/globals-tokens.test.ts",
+    "tests/unit/motion.test.ts",
+    "tests/unit/order-status.test.ts",
+    "tests/unit/pages/cart.test.tsx",
+    "tests/unit/pages/checkout.test.tsx",
+    "tests/unit/pages/custom-sticker.test.tsx",
+    "tests/unit/pages/orders.test.tsx",
+    "tests/unit/pages/product-detail.test.tsx",
+    "tests/unit/pages/shop.test.tsx",
+    "tests/unit/pricing.test.ts",
+    "tests/unit/tailwind-opacity.test.ts",
+    "tests/unit/text-contrast.test.ts",
+    "tests/unit/utils.test.ts",
+    "tests/unit/validations.test.ts"
+  ],
+  "e2e_spec_files": [
+    "e2e/font-resolution.spec.ts",
+    "e2e/smoke.spec.ts",
+    "e2e/visual.spec.ts"
+  ],
+  "unit_file_count": 25,
+  "e2e_spec_count": 3
+}

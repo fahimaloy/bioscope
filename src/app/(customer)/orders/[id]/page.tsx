@@ -12,7 +12,6 @@ import { formatCurrency, formatDateTime } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, CUSTOMER_CANCELLABLE, type OrderStatus } from '@/lib/order-status'
 import { ArrowLeft, Truck, MapPin, CreditCard, RotateCcw, Download, MessageCircle } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
 
 interface Order {
   id: string
@@ -239,6 +238,7 @@ export default function OrderDetailPage() {
                   >
                     <div className="w-14 h-14 rounded-[var(--radius-md)] overflow-hidden flex-shrink-0 bg-[var(--surface-raised)]">
                       {item.productImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={item.productImage}
                           alt={item.productName}

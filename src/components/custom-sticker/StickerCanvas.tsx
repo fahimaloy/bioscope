@@ -1,16 +1,31 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { fabric } from 'fabric'
 import { cn } from '@/lib/utils'
-import type { StickerDesign, DesignLayer, MaterialType, FinishType, CutType } from '@/types'
+import type { StickerDesign, DesignLayer } from '@/types'
 import { useStickerBuilderStore } from '@/lib/hooks/useStickerBuilder'
 import { StickerPeel } from '@/components/decorative'
 import { Home } from 'lucide-react'
 import { resolveHex, resolveCanvasFill } from './resolveHex'
 
+/** Extended fabric object with app-specific properties. */
+interface ExtendedFabricObject extends fabric.Object {
+  id?: string
+  text?: string
+  fontSize?: number
+  fontFamily?: string
+  fontWeight?: string | number
+  fontStyle?: string
+  fill?: string | fabric.Pattern | fabric.Gradient
+  textAlign?: string
+  lineHeight?: number
+  charSpacing?: number
+  layerData?: DesignLayer
+}
+
 interface StickerCanvasProps {
-  ref?: any
+  ref?: React.Ref<HTMLCanvasElement>
   width: number
   height: number
   backgroundColor?: string
@@ -103,7 +118,6 @@ export function StickerCanvas({
   const {
     design,
     selectedLayerId,
-    fabricCanvas: storeFabricCanvas,
     setFabricCanvas,
     updateLayer,
     selectLayer,
@@ -178,6 +192,7 @@ export function StickerCanvas({
       canvas.dispose()
       fabricRef.current = null
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once canvas init: handlers/refs are captured at mount by design
   }, [])
 
   // Handle container resize
@@ -204,6 +219,7 @@ export function StickerCanvas({
   useEffect(() => {
     if (!fabricRef.current) return
     loadDesign(fabricRef.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-sync only on design/selection changes; loadDesign closes over current props/state
   }, [design, selectedLayerId])
 
   const loadDesign = (canvas: fabric.Canvas) => {
@@ -213,14 +229,10 @@ export function StickerCanvas({
     canvas.renderAll()
 
     // Set canvas size based on design
-    const scale = Math.min(
-      (containerSize.width || width * 2) / (design.canvas.width * 2),
-      (containerSize.height || height * 2) / (design.canvas.height * 2)
-    ) * 0.9
 
     // Add background image if exists
     if (design.background) {
-      fabric.Image.fromURL(design.background.url, (img: any) => {
+      fabric.Image.fromURL(design.background.url, (img: fabric.Image) => {
         img.set({
           left: 0,
           top: 0,
@@ -236,13 +248,13 @@ export function StickerCanvas({
     }
 
     // Add layers
-    design.layers.forEach((layer, index) => {
-      let fabricObject: any
+    design.layers.forEach((layer) => {
+      let fabricObject: fabric.Object
 
       switch (layer.type) {
         case 'image':
           if (layer.imageUrl) {
-            fabric.Image.fromURL(layer.imageUrl, (img: any) => {
+            fabric.Image.fromURL(layer.imageUrl, (img: fabric.Image) => {
               img.set({
                 left: layer.x,
                 top: layer.y,
@@ -252,9 +264,9 @@ export function StickerCanvas({
                 opacity: layer.opacity,
                 selectable: layer.visible && !layer.locked,
                 evented: layer.visible && !layer.locked,
-                id: layer.id,
-                layerData: layer,
               })
+              ;(img as ExtendedFabricObject).id = layer.id
+              ;(img as ExtendedFabricObject).layerData = layer
               canvas.add(img)
               canvas.renderAll()
             }, { crossOrigin: 'anonymous' })
@@ -268,7 +280,7 @@ export function StickerCanvas({
             fontSize: layer.fontSize || 40,
             fontFamily: resolveFontFamily(layer.fontFamily || 'Outfit'),
             fontWeight: layer.fontWeight || 'normal',
-            fontStyle: (layer.fontStyle || 'normal') as any,
+            fontStyle: (layer.fontStyle as 'normal' | 'italic' | 'oblique') || 'normal',
             fill: resolveCanvasFill(layer.textColor, 'var(--ink)'),
             textAlign: layer.textAlign || 'left',
             lineHeight: layer.lineHeight || 1.2,
@@ -279,16 +291,16 @@ export function StickerCanvas({
             opacity: layer.opacity,
             selectable: layer.visible && !layer.locked,
             evented: layer.visible && !layer.locked,
-            id: layer.id,
-            layerData: layer,
-          } as any)
+          })
+          ;(fabricObject as ExtendedFabricObject).id = layer.id
+          ;(fabricObject as ExtendedFabricObject).layerData = layer
           canvas.add(fabricObject)
           break
 
-        case 'shape':
-          fabricObject = createShapeObject(layer)
-          if (fabricObject) {
-            fabricObject.set({
+        case 'shape': {
+          const shapeObj = createShapeObject(layer)
+          if (shapeObj) {
+            ;(shapeObj as fabric.Object).set({
               left: layer.x,
               top: layer.y,
               scaleX: layer.scaleX,
@@ -297,18 +309,19 @@ export function StickerCanvas({
               opacity: layer.opacity,
               selectable: layer.visible && !layer.locked,
               evented: layer.visible && !layer.locked,
-              id: layer.id,
-              layerData: layer,
             })
-            canvas.add(fabricObject)
+            ;(shapeObj as ExtendedFabricObject).id = layer.id
+            ;(shapeObj as ExtendedFabricObject).layerData = layer
+            canvas.add(shapeObj)
           }
           break
+        }
       }
     })
 
     // Set selection
     if (selectedLayerId) {
-      const obj = canvas.getObjects().find((o: any) => o.id === selectedLayerId)
+      const obj = canvas.getObjects().find((o: fabric.Object) => (o as fabric.Object & { id?: string }).id === selectedLayerId)
       if (obj) {
         canvas.setActiveObject(obj)
       }
@@ -317,16 +330,16 @@ export function StickerCanvas({
     canvas.renderAll()
   }
 
-  const handleSelection = (e: any) => {
-    const activeObject = e.selected?.[0] || e.target
+  const handleSelection = (e: fabric.IEvent) => {
+    const activeObject = (e.selected?.[0] || e.target) as ExtendedFabricObject | undefined
     if (activeObject?.id) {
       selectLayer(activeObject.id)
       onSelectionChange?.(design.layers.find((l) => l.id === activeObject.id) || null)
     }
   }
 
-  const handleObjectModified = (e: any) => {
-    const obj = e.target
+  const handleObjectModified = (e: fabric.IEvent) => {
+    const obj = e.target as ExtendedFabricObject | undefined
     if (!obj?.id) return
 
     const updates: Partial<DesignLayer> = {
@@ -342,10 +355,10 @@ export function StickerCanvas({
       updates.text = obj.text
       updates.fontSize = obj.fontSize
       updates.fontFamily = semanticFontName(obj.fontFamily)
-      updates.fontWeight = obj.fontWeight
-      updates.fontStyle = obj.fontStyle as any
-      updates.fill = obj.fill
-      updates.textAlign = obj.textAlign
+      updates.fontWeight = String(obj.fontWeight ?? '')
+      updates.fontStyle = obj.fontStyle
+      updates.fill = typeof obj.fill === 'string' ? obj.fill : undefined
+      updates.textAlign = (obj.textAlign as 'left' | 'center' | 'right') || undefined
       updates.lineHeight = obj.lineHeight
       updates.charSpacing = obj.charSpacing
     }
@@ -354,7 +367,7 @@ export function StickerCanvas({
   }
 
   const createShapeObject = (layer: DesignLayer) => {
-    const { shapeType, fill, stroke, strokeWidth, sides } = layer
+    const { shapeType, fill, stroke, strokeWidth } = layer
     const size = 100
 
     switch (shapeType) {
@@ -514,7 +527,7 @@ export function StickerCanvas({
           ref={(el) => {
             canvasRef.current = el
             if (typeof externalRef === 'function') externalRef(el)
-            else if (externalRef) (externalRef as React.MutableRefObject<HTMLCanvasElement | null>).current = el
+            else if (externalRef && 'current' in externalRef) (externalRef as React.MutableRefObject<HTMLCanvasElement | null>).current = el
           }}
           className="w-full h-full"
         />
@@ -567,7 +580,7 @@ export function StickerPreview({
 
     // Load design similar to main canvas
     if (design.background) {
-      fabric.Image.fromURL(design.background.url, (img: any) => {
+      fabric.Image.fromURL(design.background.url, (img: fabric.Image) => {
         img.set({
           left: 0,
           top: 0,
@@ -584,7 +597,7 @@ export function StickerPreview({
 
     design.layers.forEach((layer) => {
       if (layer.type === 'image' && layer.imageUrl) {
-        fabric.Image.fromURL(layer.imageUrl, (img: any) => {
+        fabric.Image.fromURL(layer.imageUrl, (img: fabric.Image) => {
           img.set({
             left: layer.x,
             top: layer.y,
@@ -602,6 +615,7 @@ export function StickerPreview({
     })
 
     return () => { canvas.dispose() }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-apply only on design changes; width/height read from props snapshot
   }, [design])
 
   return (

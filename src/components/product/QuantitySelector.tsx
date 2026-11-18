@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button'
 import type { QuantityConfig } from '@/types'
 import { Minus, Plus } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { motionVariants } from '@/lib/motion'
 
 interface QuantitySelectorProps {
   quantity: number

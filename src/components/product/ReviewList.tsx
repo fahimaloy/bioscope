@@ -6,7 +6,7 @@ import { cn, formatDate } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import type { Review } from '@/types'
-import { Star, Verified, Flag, ThumbsUp, ThumbsDown } from 'lucide-react'
+import { Star, Flag, ThumbsUp, ThumbsDown } from 'lucide-react'
 
 interface ReviewListProps {
   reviews: Review[]
@@ -151,7 +151,7 @@ export function ReviewList({
           <select
             id="review-sort"
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'highest' | 'lowest' | 'helpful')}
             className="px-3 py-1.5 text-sm border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-[var(--radius-md)] focus:border-[var(--brand)] focus:shadow-ink-2"
           >
             <option value="newest">Newest First</option>
@@ -180,7 +180,7 @@ export function ReviewList({
 }
 
 // Individual Review Card
-function ReviewCard({ review, productId }: { review: Review; productId: string }) {
+function ReviewCard({ review }: { review: Review; productId: string }) {
   const [showFull, setShowFull] = useState(false)
   const [helpful, setHelpful] = useState(false)
   const [notHelpful, setNotHelpful] = useState(false)

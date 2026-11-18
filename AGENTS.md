@@ -77,3 +77,25 @@ This project is indexed by GitNexus as **bioscope** (3708 symbols, 7140 relation
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+
+## Verification (agent contract)
+
+Tiers — pick the smallest tier that covers your change (details: `.agent/rules/verification-policy.md`):
+
+| Tier | Command | What it runs | When |
+| --- | --- | --- | --- |
+| Fast | `pnpm verify:fast` | type-check + lint + unit tests mapped to changed files (`scripts/agent/verify.mjs` via `.agent/testing/test-map.yml`) | inner loop; run freely |
+| Mid | `pnpm verify:mid` | fast + full unit suite (`pnpm test:run`) | before declaring done |
+| Full | `pnpm verify:full` | mid + build + e2e | **CI / nightly / release only — agents must not run locally** |
+
+Dry-run selection before executing: `node scripts/agent/verify.mjs plan --json` → `{risk, changed_files, selected_checks, skipped_checks, estimated_scope, execution_required}`.
+
+Test-fix loop: fail-fast (first failing test only); max 3 fix iterations, then stop and escalate with the failure digest (test + traceback + agent's diff). Never rerun an unchanged failing suite. Never let `pnpm test:run` replace `verify:fast` for trivial edits; never claim a check passed that did not run.
+
+Pointers: `.agent/README.md` (index) · `.agent/testing/test-strategy.md` · `.agent/testing/known-baseline-failures.md` (re-verify before trusting) · `.agent/workflows/*.md` (implement/verify/debug/release).
+Report after work: changed files · risk · checks executed + results · skipped + reason · limitations. Distinguish **task verified** from **release verified** (`pnpm verify:full` or CI only).
+
+Machine-readable tier commands:
+- RUN_FAST_TESTS: pnpm verify:fast
+- RUN_MID_TESTS: pnpm verify:mid
+- RUN_FULL_SUITE: pnpm verify:full

@@ -3,13 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { formatDateTime } from '@/lib/utils'
 import type { Notification } from '@/types'
-import { Bell, CheckCircle, X, Eye, Trash2, Filter, MoreVertical, Clock, Package, FileText, AlertCircle, UserPlus, RefreshCw } from 'lucide-react'
+import { Bell, CheckCircle, X, Trash2, Filter, Clock, Package, FileText, AlertCircle, UserPlus } from 'lucide-react'
 
-const notificationIcons: Record<string, any> = {
+const notificationIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   NEW_ORDER: Package,
   ORDER_STATUS_CHANGED: Clock,
   CUSTOM_REQUEST: FileText,
@@ -57,19 +56,9 @@ export function NotificationList({
 
   const unreadCount = notifications.filter((n) => !n.isRead).length
 
-  const getIcon = (type: string) => {
-    const Icon = notificationIcons[type] || notificationIcons.DEFAULT
-    return <Icon className="w-5 h-5" />
-  }
+  
 
-  const handleNotificationClick = (notification: Notification) => {
-    if (!notification.isRead) {
-      onMarkRead(notification.id)
-    }
-    if (notification.data?.url) {
-      window.location.href = notification.data.url
-    }
-  }
+  
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -125,7 +114,7 @@ export function NotificationList({
             { value: 'oldest', label: 'Oldest First' },
           ]}
           value={sortBy}
-          onChange={(v) => setSortBy(v as any)}
+          onChange={(v) => setSortBy(v as 'newest' | 'oldest')}
         />
       </div>
 
@@ -141,9 +130,8 @@ export function NotificationList({
           </div>
         ) : (
           filteredNotifications.map((notification) => {
-            const Icon = notificationIcons[notification.type] || notificationIcons.DEFAULT
-            const color = notificationColors[notification.type] || notificationColors.DEFAULT
-            const isExpanded = expandedId === notification.id
+            const IconComponent = notificationIcons[notification.type] || notificationIcons.DEFAULT
+                      const isExpanded = expandedId === notification.id
 
             return (
               <div
@@ -160,7 +148,7 @@ export function NotificationList({
                     !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                   )}
                 >
-                  {Icon}
+                  <IconComponent className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0" onClick={() => setExpandedId(isExpanded ? null : notification.id)}>
                   <div className="flex items-start justify-between gap-2 mb-1">
@@ -227,7 +215,6 @@ export function NotificationBellDropdown({
   notifications,
   onMarkRead,
   onMarkAllRead,
-  onDelete,
 }: {
   notifications: Notification[]
   onMarkRead: (id: string) => void
@@ -303,7 +290,7 @@ export function NotificationBellDropdown({
                     key={notification.id}
                     onClick={() => {
                       if (!notification.isRead) onMarkRead(notification.id)
-                      if (notification.data?.url) window.location.href = notification.data.url
+                      if (notification.data && typeof notification.data === 'object' && 'url' in notification.data) window.location.href = String(notification.data.url)
                       setIsOpen(false)
                     }}
                     className={cn(

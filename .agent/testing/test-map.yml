@@ -1,0 +1,48 @@
+# Test ↔ source map (Pass 1.5)
+# Hand-annotated at architectural boundaries; generated where tooling exists.
+# verify.mjs maps changed files → these globs. `shared_footprint: true` widens
+# the scope (L1 suite-wide) when the file is touched.
+modules:
+  pricing:
+    source: [src/lib/pricing.ts, src/lib/pricing/**]
+    unit: [tests/unit/pricing.test.ts]
+    e2e_hint: [e2e/smoke.spec.ts]
+    shared_footprint: true
+  order-status:
+    source: [src/lib/order-status.ts]
+    unit: [tests/unit/order-status.test.ts]
+    e2e_hint: [e2e/smoke.spec.ts]
+  validations:
+    source: [src/lib/validations/**]
+    unit: [tests/unit/validations.test.ts]
+  utils:
+    source: [src/lib/utils.ts]
+    unit: [tests/unit/utils.test.ts, tests/unit/dead-utilities.test.ts]
+    shared_footprint: true
+  motion:
+    source: [src/lib/motion.ts]
+    unit: [tests/unit/motion.test.ts]
+  design-tokens:
+    source: [src/lib/design-tokens.ts, tokens/**]
+    unit: [tests/unit/design-tokens.test.ts]
+    shared_footprint: true
+  globals-tokens:
+    source: [src/app/globals.css]
+    unit: [tests/unit/globals-tokens.test.ts, tests/unit/text-contrast.test.ts, tests/unit/tailwind-opacity.test.ts]
+    shared_footprint: true
+  tailwind-config:
+    source: [tailwind.config.ts]
+    unit: [tests/unit/tailwind-opacity.test.ts, tests/unit/dead-utilities.test.ts, tests/unit/text-contrast.test.ts]
+  providers:
+    source: [src/components/**, src/app/layout.tsx]
+    unit: [tests/unit/components/providers.test.tsx]
+  auth-middleware:
+    source: [src/middleware.ts, src/auth.config.ts, src/lib/auth.ts]
+    unit: []
+    e2e_hint: [e2e/smoke.spec.ts]
+    shared_footprint: true
+  api-utils-prisma:
+    source: [src/lib/api-utils.ts, src/lib/prisma.ts]
+    unit: []
+    e2e_hint: [e2e/smoke.spec.ts]
+    shared_footprint: true

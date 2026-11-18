@@ -155,6 +155,7 @@ export default function CustomRequestsPage() {
       width: '100px',
       cell: (row: CustomRequest) => (
         <div className="relative">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={row.imageUrl}
             alt={row.originalName}
@@ -342,6 +343,7 @@ export default function CustomRequestsPage() {
         closeOnEscape={true}
       >
         <div className="text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageModalSrc}
             alt={imageModalAlt}
