@@ -32,7 +32,7 @@ export function ColorAdjustments({ filter, onChange, className }: ColorAdjustmen
     advancedAdjustments.every((a) => filter[a.key] === a.default)
 
   return (
-    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-6 space-y-6', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-ink-3 p-6 space-y-6', className)}>
       <div className="flex items-center justify-between">
         <h3 className="font-display text-xl text-[var(--brand)]">Color Adjustments</h3>
         <div className="flex items-center gap-2">

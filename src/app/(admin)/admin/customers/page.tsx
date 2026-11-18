@@ -86,7 +86,7 @@ const columns = [
     width: '160px',
   },
   { 
-    key: 'orders', 
+    key: 'orderCount', 
     header: 'Orders', 
     width: '100px',
     accessor: (row: CustomerRow) => (
@@ -95,7 +95,7 @@ const columns = [
     sortable: true 
   },
   { 
-    key: 'spent', 
+    key: 'totalSpent', 
     header: 'Total Spent', 
     width: '160px',
     accessor: (row: CustomerRow) => (
@@ -116,7 +116,7 @@ const columns = [
     accessor: (row: CustomerRow) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[var(--text-subtle)]">—</span>,
   },
   { 
-    key: 'joined', 
+    key: 'createdAt', 
     header: 'Joined', 
     width: '140px',
     accessor: (row: CustomerRow) => (

@@ -70,7 +70,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(
           'inline-flex items-center justify-center gap-2 font-display tracking-wide',
           'rounded-pill border-[3px] border-[var(--ink)]',
-          'shadow-[var(--shadow-ink-2)] hover:shadow-[var(--shadow-ink-3)]',
+          'shadow-ink-2 hover:shadow-ink-3',
           'transition-[transform,box-shadow] duration-fast ease-spring',
           'hover:-translate-y-1 active:translate-x-[4px] active:translate-y-[4px] active:shadow-none',
           'disabled:cursor-not-allowed disabled:opacity-60',

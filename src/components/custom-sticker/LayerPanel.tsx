@@ -38,7 +38,7 @@ export function LayerPanel({
   const [expanded, setExpanded] = useState(true)
 
   return (
-    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] flex flex-col h-full', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-ink-3 flex flex-col h-full', className)}>
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-[color-mix(in_srgb,var(--ink)_15%,transparent)]">
         <h3 className="font-display text-lg text-[var(--brand)]">Layers</h3>
@@ -209,7 +209,7 @@ function LayerActionsMenu({
       {open && (
         <div
           ref={menuRef}
-          className="absolute right-0 top-full mt-1 w-40 bg-[var(--surface-raised)] border-[3px] border-[var(--ink)] rounded-[var(--radius-md)] shadow-[var(--shadow-ink-2)] animate-scale-in z-50"
+          className="absolute right-0 top-full mt-1 w-40 bg-[var(--surface-raised)] border-[3px] border-[var(--ink)] rounded-[var(--radius-md)] shadow-ink-2 animate-scale-in z-50"
           role="menu"
         >
           <button

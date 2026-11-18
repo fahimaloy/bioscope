@@ -65,7 +65,7 @@ const COLUMNS: Column<ProductRow>[] = [
   },
   { key: 'name', header: 'Product', accessor: (row) => row.name, sortable: true },
   { key: 'category', header: 'Category', accessor: (row) => row.category?.name ?? '—' },
-  { key: 'price', header: 'Price', accessor: (row) => formatCurrency(Number(row.basePrice)), sortable: true },
+  { key: 'basePrice', header: 'Price', accessor: (row) => formatCurrency(Number(row.basePrice)), sortable: true },
   { key: 'stock', header: 'Stock', accessor: (row) => row.stock, sortable: true },
   { key: 'status', header: 'Status', cell: (row) => <Badge variant={row.isActive ? 'success' : 'error'} size="sm">{row.isActive ? 'Active' : 'Inactive'}</Badge> },
   { key: 'featured', header: 'Featured', cell: (row) => (row.isFeatured ? 'Yes' : 'No') },

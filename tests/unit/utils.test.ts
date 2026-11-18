@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateTax, getDeliveryCharge, slugify, generateOrderNumber, formatCurrency, truncate } from '@/lib/utils'
+import { calculateTax, getDeliveryCharge, slugify, generateOrderNumber, formatCurrency, truncate, safeCallbackUrl } from '@/lib/utils'
 
 describe('calculateTax', () => {
   it('exclusive tax', () => {
@@ -36,5 +36,23 @@ describe('misc utils', () => {
   it('truncate', () => {
     expect(truncate('hello world', 5)).toBe('hello...')
     expect(truncate('hi', 5)).toBe('hi')
+  })
+})
+
+describe('safeCallbackUrl', () => {
+  it('keeps relative paths', () => {
+    expect(safeCallbackUrl('/checkout')).toBe('/checkout')
+    expect(safeCallbackUrl('/shop/kraft-paper-label-stickers')).toBe('/shop/kraft-paper-label-stickers')
+  })
+  it('defaults to / when absent', () => {
+    expect(safeCallbackUrl(null)).toBe('/')
+    expect(safeCallbackUrl(undefined)).toBe('/')
+    expect(safeCallbackUrl('')).toBe('/')
+  })
+  it('blocks open-redirect shapes', () => {
+    expect(safeCallbackUrl('https://evil.example')).toBe('/')
+    expect(safeCallbackUrl('//evil.example')).toBe('/')
+    expect(safeCallbackUrl('/\\evil.example')).toBe('/')
+    expect(safeCallbackUrl('javascript:alert(1)')).toBe('/')
   })
 })

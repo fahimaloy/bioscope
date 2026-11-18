@@ -77,7 +77,7 @@ export function ErrorBoundaryFallback({ error, onRetry }: ErrorBoundaryFallbackP
           />
         </div>
 
-        <div className="relative space-y-6 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-10 shadow-[var(--shadow-ink-3)]">
+        <div className="relative space-y-6 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-10 shadow-ink-3">
           {/* Sad sticker illustration */}
           <div className="relative mx-auto h-40 w-40">
             <DoodleStar

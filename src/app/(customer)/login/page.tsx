@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, type LoginInput } from '@/lib/validations/auth'
+import { safeCallbackUrl } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
@@ -20,7 +21,9 @@ import { toast } from 'sonner'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  // `redirect` is the alias used by shop/cart links; both are sanitised so a
+  // crafted callback cannot bounce the user off-site after sign-in.
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl') || searchParams.get('redirect'))
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [showError, setShowError] = useState(false)

@@ -338,7 +338,7 @@ export default function CustomStickerPage() {
               </Badge>
 
               {/* Quantity Stepper */}
-              <div className="flex items-center gap-2 bg-[var(--surface-raised)] border-[3px] border-[var(--ink)] rounded-pill px-3 py-1.5 shadow-[var(--shadow-ink-1)]">
+              <div className="flex items-center gap-2 bg-[var(--surface-raised)] border-[3px] border-[var(--ink)] rounded-pill px-3 py-1.5 shadow-ink-1">
                 <span className="text-sm text-[var(--text-subtle)] mr-2">Qty</span>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -359,7 +359,7 @@ export default function CustomStickerPage() {
 
               {/* Live Price */}
               <motion.div
-                className="flex items-center gap-2 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill px-6 py-3 shadow-[var(--shadow-ink-2)]"
+                className="flex items-center gap-2 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill px-6 py-3 shadow-ink-2"
                 variants={variants.pulseSoft}
                 animate={pricePulse ? 'animate' : 'initial'}
               >
@@ -386,7 +386,7 @@ export default function CustomStickerPage() {
               initial={{ x: -300 }}
               animate={{ x: 0 }}
               exit={{ x: -300 }}
-              className="w-96 h-full bg-[var(--paper-deep)] border-r-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-4)] overflow-y-auto p-4"
+              className="w-96 h-full bg-[var(--paper-deep)] border-r-[3px] border-[var(--ink)] shadow-ink-4 overflow-y-auto p-4"
             >
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-display text-xl text-[var(--brand)]">Tools</h2>
@@ -419,7 +419,7 @@ export default function CustomStickerPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar - Tools */}
           <aside className="hidden lg:block lg:col-span-3" data-testid="builder-panel-tools">
-            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-4 space-y-4">
+            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-ink-3 p-4 space-y-4">
               <div className="flex items-center gap-3">
                 <WashiTape color="pink" width={84} height={22} />
                 <h2 className="font-display text-lg text-[var(--ink)]">Tools</h2>
@@ -444,7 +444,7 @@ export default function CustomStickerPage() {
           {/* Canvas Area - Center */}
           <section className="lg:col-span-6 flex flex-col gap-6" data-testid="builder-panel-canvas">
             {/* Canvas Toolbar */}
-            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] p-4 shadow-[var(--shadow-ink-3)]">
+            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] p-4 shadow-ink-3">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <Button
@@ -595,7 +595,7 @@ export default function CustomStickerPage() {
               >
                 <button
                   onClick={() => setShowToolsMobile(true)}
-                  className="w-full mb-4 py-3 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill font-display text-lg shadow-[var(--shadow-ink-2)]"
+                  className="w-full mb-4 py-3 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill font-display text-lg shadow-ink-2"
                 >
                   <ChevronDown className="w-6 h-6 inline mr-2" />
                   Open Tools Panel
@@ -623,7 +623,7 @@ export default function CustomStickerPage() {
             fullWidth
             onClick={handleRequestQuote}
             loading={submitting}
-            className="relative shadow-[var(--shadow-ink-4)]"
+            className="relative shadow-ink-4"
           >
             {submitting ? (
               <>
