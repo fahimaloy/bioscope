@@ -434,6 +434,7 @@ enum CustomRequestStatus {
   APPROVED
   REJECTED
   PRICED
+  REVISION_REQUESTED
   ORDERED
 }
 

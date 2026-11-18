@@ -70,6 +70,8 @@ export default function CustomStickerPage() {
   const [mobileTab, setMobileTab] = useState<'tools' | 'canvas' | 'preview'>('canvas')
   const [showToolsMobile, setShowToolsMobile] = useState(false)
   const [pricePulse, setPricePulse] = useState(false)
+  // A request the admin sent back for another pass, surfaced as a banner.
+  const [revisionRequest, setRevisionRequest] = useState<{ id: string; adminNotes: string | null; quotedPrice: number | null } | null>(null)
 
   const {
     design,
@@ -135,6 +137,23 @@ export default function CustomStickerPage() {
     })
   }, [actions, design.canvas.width, design.canvas.height])
 
+  useEffect(() => {
+    fetch('/api/custom-requests?limit=100')
+      .then((r) => r.json())
+      .then((json) => {
+        const list = json?.success ? (json.data?.data ?? []) : []
+        const awaiting = list.find((request: { status: string }) => request.status === 'REVISION_REQUESTED')
+        if (awaiting) {
+          setRevisionRequest({
+            id: awaiting.id,
+            adminNotes: awaiting.adminNotes ?? null,
+            quotedPrice: awaiting.quotedPrice ?? null,
+          })
+        }
+      })
+      .catch(() => {})
+  }, [])
+
   const handleExport = useCallback(async (format: 'png' | 'jpg' | 'pdf' | 'svg') => {
     if (!fabricCanvas) {
       toast.error('Canvas is not ready yet')
@@ -151,6 +170,49 @@ export default function CustomStickerPage() {
     a.click()
     toast.success(`Exported as ${format.toUpperCase()}`)
   }, [fabricCanvas])
+
+  const handleResubmit = useCallback(
+    async (requestId: string) => {
+      if (submitting) return
+      setSubmitting(true)
+      try {
+        if (!fabricCanvas) throw new Error('Canvas is not ready yet')
+        const dataUrl = fabricCanvas.toDataURL({ format: 'png', multiplier: 2 })
+        const upRes = await fetch('/api/custom-requests/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataUrl, name: 'custom-sticker-revision.png' }),
+        })
+        const upJson = await upRes.json()
+        if (!upRes.ok) throw new Error(upJson.error || 'Image upload failed')
+
+        const res = await fetch(`/api/custom-requests/${requestId}/resubmit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrl: upJson.data.url,
+            originalName: upJson.data.originalName,
+            width: design.canvas.width,
+            height: design.canvas.height,
+            quantity,
+            material,
+            finish,
+            cutType,
+          }),
+        })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Could not submit the revision')
+        toast.success('Revised design submitted — we will price it again shortly.')
+        setRevisionRequest(null)
+        router.push('/profile')
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [submitting, fabricCanvas, design.canvas.width, design.canvas.height, quantity, material, finish, cutType, router]
+  )
 
   const handleRequestQuote = useCallback(async () => {
     if (submitting) return
@@ -199,7 +261,37 @@ export default function CustomStickerPage() {
   }, [submitting, fabricCanvas, design.canvas.width, design.canvas.height, quantity, material, finish, cutType, router])
 
   return (
-  <div className="min-h-screen">
+    <div className="min-h-screen">
+      {revisionRequest && (
+        <div className="bg-[color-mix(in_srgb,var(--warning)_15%,transparent)] border-b-[3px] border-[var(--warning)] px-4 py-3">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+            <div>
+              <p className="font-medium text-[var(--ink)]">Your design needs another pass</p>
+              <p className="text-sm text-[var(--text-subtle)]">
+                {revisionRequest.adminNotes || 'Our team sent this back for a revision.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setRevisionRequest(null)}
+                className="text-sm text-[var(--text-subtle)] underline underline-offset-2"
+              >
+                Later
+              </button>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleResubmit(revisionRequest.id)}
+                className="rounded-pill border-2 border-[var(--ink)] bg-[var(--gold)] px-4 py-2 text-sm font-medium text-[var(--ink)] disabled:opacity-50"
+              >
+                {submitting ? 'Submitting…' : 'Submit revised design'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Tab Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--paper-deep)] border-t-[3px] border-[var(--ink)] shadow-[0_-6px_0_var(--ink)]">
         <div className="grid grid-cols-3">

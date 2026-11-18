@@ -69,3 +69,6 @@ modules:
     source: [src/lib/product-csv.ts, src/lib/actions/product.ts, src/app/api/products/**]
     unit: [tests/unit/product-csv.test.ts, tests/unit/dead-utilities.test.ts]
     shared_footprint: true
+  custom-requests:
+    source: [src/lib/actions/customRequest.ts, src/lib/validations/custom-request.ts, src/app/api/custom-requests/**]
+    unit: [tests/unit/custom-request-workflow.test.ts, tests/unit/webhooks.test.ts]
