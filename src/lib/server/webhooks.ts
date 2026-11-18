@@ -16,6 +16,67 @@ export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number]
 
 const DELIVERY_TIMEOUT_MS = 5000
 const MAX_DELIVERY_ERROR_LENGTH = 500
+/** Delivery log rows older than this are pruned (PII retention bound). */
+export const DELIVERY_RETENTION_DAYS = 30
+const PRUNE_INTERVAL_MS = 60 * 60 * 1000
+let lastPruneAt = 0
+
+// The delivery log is admin-readable and long-lived, so it must not retain
+// customer PII. Subscribers still receive the full payload over HTTPS; only
+// the stored log copy is redacted. These keys (and any *email*/*phone* key)
+// are replaced with a placeholder at any depth.
+const REDACTED_KEYS = new Set([
+  'user',
+  'address',
+  'shippingname',
+  'shippingphone',
+  'shippingaddress',
+  'shippingcity',
+  'shippingdistrict',
+  'shippingzip',
+  'shippingcountry',
+])
+const REDACTED_KEY_PATTERN = /email|phone/i
+const MAX_REDACT_DEPTH = 8
+
+/** Redact PII from a payload copy destined for the delivery log. Pure. */
+export function redactForDeliveryLog(value: unknown, depth = 0): unknown {
+  if (depth > MAX_REDACT_DEPTH) return '[redacted]'
+  if (Array.isArray(value)) return value.map((item) => redactForDeliveryLog(item, depth + 1))
+  if (value && typeof value === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [key, item] of Object.entries(value)) {
+      const lower = key.toLowerCase()
+      out[key] =
+        REDACTED_KEYS.has(lower) || REDACTED_KEY_PATTERN.test(lower)
+          ? '[redacted]'
+          : redactForDeliveryLog(item, depth + 1)
+    }
+    return out
+  }
+  return value
+}
+
+/** Delete delivery log rows past the retention window. Returns rows removed. */
+export async function pruneOldDeliveries(now = Date.now()): Promise<number> {
+  const cutoff = new Date(now - DELIVERY_RETENTION_DAYS * 24 * 60 * 60 * 1000)
+  const { count } = await prisma.webhookDelivery.deleteMany({
+    where: { createdAt: { lt: cutoff } },
+  })
+  return count
+}
+
+/** Opportunistic prune, at most once an hour. Never throws. */
+async function pruneDeliveriesThrottled(): Promise<void> {
+  const now = Date.now()
+  if (now - lastPruneAt < PRUNE_INTERVAL_MS) return
+  lastPruneAt = now
+  try {
+    await pruneOldDeliveries(now)
+  } catch (error) {
+    console.error('[webhooks] delivery prune failed:', error)
+  }
+}
 
 export interface WebhookEndpointView {
   id: string
@@ -185,6 +246,10 @@ async function deliver(endpoint: {
 
 async function recordDelivery(result: DeliveryResult, event: WebhookEvent, payload: unknown) {
   try {
+    // Normalise through JSON so Prisma Dates/Decimals become plain strings
+    // and the column only ever holds valid JSON — then redact PII: the log
+    // copy keeps operational fields, never customer contact details.
+    const normalised = JSON.parse(JSON.stringify(payload ?? null)) as object
     await prisma.webhookDelivery.create({
       data: {
         endpointId: result.endpointId,
@@ -193,9 +258,7 @@ async function recordDelivery(result: DeliveryResult, event: WebhookEvent, paylo
         responseCode: result.status,
         error: result.error,
         durationMs: result.durationMs,
-        // Normalise through JSON so Prisma Dates/Decimals become plain strings
-        // and the column only ever holds valid JSON.
-        payload: JSON.parse(JSON.stringify(payload ?? null)) as object,
+        payload: redactForDeliveryLog(normalised) as object,
       },
     })
   } catch (error) {
@@ -225,6 +288,8 @@ export async function dispatchWebhook(event: WebhookEvent, payload: unknown): Pr
 
   const results = await Promise.all(endpoints.map((endpoint) => deliver(endpoint, event, payload)))
   await Promise.all(results.map((result) => recordDelivery(result, event, payload)))
+  // Retention sweep rides along with dispatch (throttled, never throws).
+  await pruneDeliveriesThrottled()
   return results
 }
 
