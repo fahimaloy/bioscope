@@ -199,6 +199,7 @@ export function OrderConfirmation({ order, onPrint, onDownloadInvoice, onShare, 
                     'border-b border-dashed border-[color-mix(in_srgb,var(--ink)_15%,transparent)]'
                 )}
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.productImage}
                   alt={item.productName}

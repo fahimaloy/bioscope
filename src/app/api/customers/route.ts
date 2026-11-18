@@ -1,4 +1,5 @@
 import { handleRouteError, ok, requireAdmin, parsePagination, buildPagination } from '@/lib/api-utils'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
     const sortBy = ['createdAt', 'name', 'email'].includes(sp.get('sortBy') || '') ? (sp.get('sortBy') as string) : 'createdAt'
     const sortOrder = sp.get('sortOrder') === 'asc' ? 'asc' : 'desc'
 
-    const where: any = { role: 'CUSTOMER' }
+    const where: Prisma.UserWhereInput = { role: 'CUSTOMER' }
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },

@@ -43,11 +43,10 @@ vi.mock('next/link', () => ({
 
 vi.mock('next/image', () => ({
   default: ({
-    fill,
-    sizes,
     ...props
   }: React.ImgHTMLAttributes<HTMLImageElement> & { fill?: boolean; sizes?: string }) => (
-    <img {...props} />
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt="" {...props} />
   ),
 }))
 
@@ -322,7 +321,7 @@ describe('Checkout page', () => {
 
   it('renders the order number on the confirmation step', async () => {
     mockUseAuth.mockReturnValue(authenticatedUser())
-    mockCreateOrder.mockResolvedValue({ success: true, order: makeOrder() })
+    mockCreateOrder.mockResolvedValue({ success: true, order: makeOrder() as unknown as Awaited<ReturnType<typeof createOrder>>['order'] })
     useCartStore
       .getState()
       .setItems([makeCartItem(makeProduct('pskull', 'Skull Sticker', 200))])

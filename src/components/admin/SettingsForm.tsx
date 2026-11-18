@@ -9,16 +9,50 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { Badge } from '@/components/ui/Badge'
 import { TaxConfig } from './TaxConfig'
 import { DeliveryConfig } from './DeliveryConfig'
-import { Settings, Tag, Truck, Mail, Globe, Bell, Shield, Users, Palette, DollarSign, Save, Loader2, Image as ImageIcon, FileText, Wrench } from 'lucide-react'
+import { Settings, Tag, Truck, Mail, Globe, Palette, Save, Loader2, Image as ImageIcon, FileText, Wrench } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
-import { SketchUnderline, StickerPeel, DoodleShape } from '@/components/decorative/DoodleElements'
+import { SketchUnderline, StickerPeel } from '@/components/decorative/DoodleElements'
 import { Checkbox } from '@/components/ui/Checkbox'
 
 interface SettingsFormProps {
-  onSave: (settings: Record<string, any>) => Promise<void>
-  initialSettings?: Record<string, any>
+  onSave: (settings: SettingsData) => Promise<void>
+  initialSettings?: SettingsData
   className?: string
+}
+
+interface SettingsData {
+  site_name?: string
+  site_currency?: string
+  contact_email?: string
+  contact_phone?: string
+  address?: string
+  timezone?: string
+  language?: string
+  maintenance_mode?: boolean
+  custom_request_enabled?: boolean
+  custom_request_min_quantity?: number
+  custom_request_max_dimension_cm?: number
+  global_tax_percent?: number
+  tax_inclusive_pricing?: boolean
+  tax_categories?: Array<{ id: string; name: string; rate: number; description: string }>
+  delivery_zones?: Array<{ id: string; name: string; districts: string[]; charge: number; days: string }>
+  smtp_host?: string
+  smtp_port?: string
+  smtp_user?: string
+  smtp_password?: string
+  from_email?: string
+  from_name?: string
+  order_confirmation_template?: string
+  order_status_template?: string
+  custom_request_template?: string
+  welcome_template?: string
+  primary_color?: string
+  secondary_color?: string
+  accent_color?: string
+  logo?: string
+  favicon?: string
+  custom_css?: string
 }
 
 export function SettingsForm({ onSave, initialSettings = {}, className }: SettingsFormProps) {
@@ -457,6 +491,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                     {assetUpload === 'logo' && <p className="text-sm text-[var(--text-subtle)]">Uploading…</p>}
                     {appearanceSettings.logo && (
                       <span className="mt-2 inline-flex items-start gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={appearanceSettings.logo} alt="Logo preview" className="h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
                         <button type="button" onClick={() => setAppearanceSettings((prev) => ({ ...prev, logo: '' }))} className="text-xs text-error underline underline-offset-2">Remove</button>
                       </span>
@@ -476,6 +511,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                     {assetUpload === 'favicon' && <p className="text-sm text-[var(--text-subtle)]">Uploading…</p>}
                     {appearanceSettings.favicon && (
                       <span className="mt-2 inline-flex items-start gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={appearanceSettings.favicon} alt="Favicon preview" className="w-16 h-16 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]" />
                         <button type="button" onClick={() => setAppearanceSettings((prev) => ({ ...prev, favicon: '' }))} className="text-xs text-error underline underline-offset-2">Remove</button>
                       </span>

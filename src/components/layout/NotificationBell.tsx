@@ -5,9 +5,10 @@ import { cn } from '@/lib/utils'
 import { Bell, X, CheckCircle, Clock, AlertCircle, Package, FileText, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useNotificationStore } from '@/lib/stores/notificationStore'
+import type { Notification } from '@/types'
 import { formatDateTime } from '@/lib/utils'
 
-const notificationIcons: Record<string, any> = {
+const notificationIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   NEW_ORDER: Package,
   ORDER_STATUS_CHANGED: Clock,
   CUSTOM_REQUEST: FileText,
@@ -28,7 +29,6 @@ export function NotificationBell() {
     unreadCount,
     markAsRead,
     markAllAsRead,
-    removeNotification,
   } = useNotificationStore()
 
   useEffect(() => {
@@ -48,13 +48,13 @@ export function NotificationBell() {
     return <Icon className="w-5 h-5 flex-shrink-0" />
   }
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: Notification) => {
     if (!notification.isRead) {
       markAsRead(notification.id)
     }
     // Navigate to relevant page based on notification data
-    if (notification.data?.url) {
-      window.location.href = notification.data.url
+    if (notification.data && typeof notification.data === 'object' && 'url' in notification.data) {
+      window.location.href = String(notification.data.url)
     }
     setIsOpen(false)
   }

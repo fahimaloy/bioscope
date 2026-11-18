@@ -26,7 +26,6 @@ interface ReviewFormData {
 }
 
 export function ReviewForm({
-  productId,
   onSubmit,
   onCancel,
   initialRating = 0,

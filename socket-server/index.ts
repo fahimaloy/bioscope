@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { PrismaClient } from '@prisma/client'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import type { EmitOrder, EmitCustomRequest, EmitProduct } from '../src/lib/socket-types'
 
 // Load .env from the project root (tsx does not do this automatically)
 for (const envPath of [join(process.cwd(), '.env'), join(process.cwd(), 'socket-server', '.env')]) {
@@ -171,7 +172,7 @@ io.on('connection', (socket) => {
 })
 
 // Export functions to emit events from API routes
-export const emitToUser = (userId: string, event: string, data: any) => {
+export const emitToUser = (userId: string, event: string, data: unknown) => {
   const sockets = userSockets.get(userId)
   if (sockets) {
     sockets.forEach((socketId) => {
@@ -182,15 +183,15 @@ export const emitToUser = (userId: string, event: string, data: any) => {
   io.to(`user:${userId}`).emit(event, data)
 }
 
-export const emitToAdmins = (event: string, data: any) => {
+export const emitToAdmins = (event: string, data: unknown) => {
   io.to('admins').emit(event, data)
 }
 
-export const emitToOrder = (orderId: string, event: string, data: any) => {
+export const emitToOrder = (orderId: string, event: string, data: unknown) => {
   io.to(`order:${orderId}`).emit(event, data)
 }
 
-export const emitNewOrder = async (order: any) => {
+export const emitNewOrder = async (order: EmitOrder) => {
   // Notify all admins
   emitToAdmins('order:created', {
     orderId: order.id,
@@ -218,7 +219,7 @@ export const emitNewOrder = async (order: any) => {
   )
 }
 
-export const emitOrderStatusChange = async (order: any, oldStatus: string, newStatus: string) => {
+export const emitOrderStatusChange = async (order: EmitOrder, oldStatus: string, newStatus: string) => {
   const statusLabels: Record<string, string> = {
     PENDING: 'Pending',
     CONFIRMED: 'Confirmed',
@@ -263,7 +264,7 @@ export const emitOrderStatusChange = async (order: any, oldStatus: string, newSt
   })
 }
 
-export const emitCustomRequestSubmitted = async (request: any) => {
+export const emitCustomRequestSubmitted = async (request: EmitCustomRequest) => {
   emitToAdmins('custom_request:submitted', {
     requestId: request.id,
     customerName: request.user?.name || request.user?.email,
@@ -292,7 +293,7 @@ export const emitCustomRequestSubmitted = async (request: any) => {
   )
 }
 
-export const emitCustomRequestPriced = async (request: any) => {
+export const emitCustomRequestPriced = async (request: EmitCustomRequest) => {
   emitToUser(request.userId, 'custom_request:priced', {
     requestId: request.id,
     quotedPrice: request.quotedPrice,
@@ -311,7 +312,7 @@ export const emitCustomRequestPriced = async (request: any) => {
   })
 }
 
-export const emitLowStockAlert = async (product: any) => {
+export const emitLowStockAlert = async (product: EmitProduct) => {
   emitToAdmins('product:low_stock', {
     productId: product.id,
     productName: product.name,

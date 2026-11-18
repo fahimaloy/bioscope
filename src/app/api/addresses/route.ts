@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { handleRouteError, requireUser, ok, created, buildPagination, parsePagination } from '@/lib/api-utils'
 import { addressSchema } from '@/lib/validations/order'

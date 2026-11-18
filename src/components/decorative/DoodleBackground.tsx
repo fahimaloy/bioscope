@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 export function DoodleBackground({
   shapeCount = 8,
   className,
-  interactive = false,
+
 }: {
   shapeCount?: number
   className?: string
@@ -32,7 +32,7 @@ export function DoodleBackground({
     const colors = ['primary', 'secondary', 'accent', 'ink'] as const satisfies ('primary' | 'secondary' | 'accent' | 'ink')[]
     const sizes = ['sm', 'md', 'lg'] as const
 
-    shapesRef.current = Array.from({ length: shapeCount }, (_, i) => ({
+    shapesRef.current = Array.from({ length: shapeCount }, () => ({
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: sizes[Math.floor(Math.random() * sizes.length)],

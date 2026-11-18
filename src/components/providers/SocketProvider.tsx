@@ -6,7 +6,7 @@ import { useNotificationStore } from '@/lib/stores/notificationStore'
 
 export function SocketProvider({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth()
-  const { addNotification, setCounts, syncFromServer } = useNotificationStore()
+  useNotificationStore()
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -21,7 +21,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 // Separate provider for socket event handling
 export function SocketEventProvider({ children }: { children: ReactNode }) {
   const { user, isLoading } = useAuth()
-  const { addNotification, setCounts } = useNotificationStore()
+  useNotificationStore()
 
   useEffect(() => {
     if (isLoading || !user) return

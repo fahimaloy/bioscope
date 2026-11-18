@@ -3,7 +3,6 @@
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Slider } from '@/components/ui/Slider'
-import { ColorPicker } from '@/components/ui/ColorPicker'
 import type { ImageFilter } from '@/types'
 import { Sun, Contrast, Palette, Droplet, Minus, Plus, RefreshCw } from 'lucide-react'
 

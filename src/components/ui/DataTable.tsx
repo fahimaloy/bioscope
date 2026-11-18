@@ -214,7 +214,7 @@ export function DataTable<T>({
                         ? column.cell(row)
                         : column.accessor
                           ? column.accessor(row)
-                          : (row as any)[column.key]}
+                          : (row[column.key as keyof T] as ReactNode)}
                     </td>
                   ))}
                 </motion.tr>

@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { handleRouteError, ok } from '@/lib/api-utils'

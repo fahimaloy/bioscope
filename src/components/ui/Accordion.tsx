@@ -37,7 +37,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
           // `valueProp` is the accordion's own state; the item keeps its own
           // `value`. Cloning `value` here used to overwrite the item's
           // identity, so `isOpen` could never be true.
-          return React.cloneElement(child as React.ReactElement<any>, {
+          return React.cloneElement(child as React.ReactElement<AccordionItemProps>, {
             type,
             collapsible,
             valueProp: internalValue,
@@ -94,7 +94,7 @@ export const AccordionItem = forwardRef<HTMLDivElement, AccordionItemProps>(
       >
         {React.Children.map(children, (child) => {
           if (!React.isValidElement(child)) return child;
-          return React.cloneElement(child as React.ReactElement<any>, {
+          return React.cloneElement(child as React.ReactElement<AccordionTriggerProps | AccordionContentProps>, {
             isOpen,
             onToggle: handleToggle,
             disabled: type === 'single' && !collapsible && isOpen,

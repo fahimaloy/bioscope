@@ -13,7 +13,9 @@ import { designTokens } from '@/lib/design-tokens'
 
 const repoRoot = process.cwd()
 
-function readJson(relativePath: string): Record<string, any> {
+type TokenNode = { $value?: string; [key: string]: TokenNode | string | undefined }
+
+function readJson(relativePath: string): Record<string, TokenNode> {
   return JSON.parse(readFileSync(path.join(repoRoot, relativePath), 'utf8'))
 }
 
@@ -354,10 +356,10 @@ describe('design tokens', () => {
   })
 
   it('defines --shadow-die-cut without colliding with --die-cut', () => {
-    expect(shape['shadow-die-cut'].$value).toBe('0 0 0 3px var(--die-cut), var(--shadow-ink-2)')
+    expect((shape['shadow-die-cut'] as { $value: string }).$value).toBe('0 0 0 3px var(--die-cut), var(--shadow-ink-2)')
     // Both referenced parts must resolve to tokens that exist.
-    expect(shape['shadow-ink-2'].$value).toBe('4px 4px 0 var(--ink)')
-    expect(color['die-cut'].$value).toBe('#FFFFFF')
+    expect((shape['shadow-ink-2'] as { $value: string }).$value).toBe('4px 4px 0 var(--ink)')
+    expect((color['die-cut'] as { $value: string }).$value).toBe('#FFFFFF')
   })
 
   it('defines the type scale from spec §5.3', () => {
@@ -380,7 +382,8 @@ describe('design tokens', () => {
       expect(shape[name]?.$value, `shape.${name}`).toBe(expected)
     }
     for (const [name, expected] of Object.entries(Z_INDEX)) {
-      expect(shape.z?.[name]?.$value, `shape.z.${name}`).toBe(expected)
+      const z = shape.z as Record<string, { $value?: string }>
+      expect(z[name]?.$value, `shape.z.${name}`).toBe(expected)
     }
   })
 

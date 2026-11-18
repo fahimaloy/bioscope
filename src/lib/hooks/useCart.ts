@@ -1,6 +1,6 @@
 'use client'
 
-import { useCartStore, useCartItems, useCartItemCount, useCartSubtotal, useCartIsOpen, useCartActions } from '@/lib/stores/cartStore'
+import { useCartItems, useCartItemCount, useCartSubtotal, useCartIsOpen, useCartActions } from '@/lib/stores/cartStore'
 import type { CartItem, Product } from '@/types'
 import { useCallback } from 'react'
 
@@ -12,7 +12,7 @@ export function useCart() {
   const actions = useCartActions()
 
   const addItem = useCallback(
-    (product: Product, width: number, height: number, quantity: number = 1, customization?: Record<string, any>) => {
+    (product: Product, width: number, height: number, quantity: number = 1, customization?: Record<string, unknown>) => {
       // Validate quantity against product's allowed quantities
       const qtyConfig = product.allowedQuantities.find(
         (q) => quantity >= q.minQty && (q.maxQty === null || quantity <= q.maxQty!)
@@ -29,8 +29,7 @@ export function useCart() {
         throw new Error('Invalid dimensions for this product')
       }
 
-      const finalPrice = qtyConfig.pricePerUnit * dimConfig.priceMultiplier
-
+    
       actions.addItem({
         productId: product.id,
         product,

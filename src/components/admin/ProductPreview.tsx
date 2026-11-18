@@ -5,9 +5,9 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import type { Product } from '@/types'
-import { Tag, DollarSign, Settings, Eye, Edit3, Trash2, CheckCircle, XCircle, Package, Layers, Image as ImageIcon, Globe, Hash, Palette } from 'lucide-react'
-import { DoodleShape, DoodleScribble, StickerPeel, WashiTape } from '@/components/decorative/DoodleElements'
+import type { Product, DimensionConfig, QuantityConfig } from '@/types'
+import { Tag, DollarSign, Settings, Eye, Edit3, Trash2, Package, Layers, Image as ImageIcon, Palette } from 'lucide-react'
+import { DoodleShape, StickerPeel } from '@/components/decorative/DoodleElements'
 
 interface ProductPreviewProps {
   product: Partial<Product>
@@ -15,15 +15,7 @@ interface ProductPreviewProps {
 }
 
 export function ProductPreview({ product, className }: ProductPreviewProps) {
-  const defaultDimension = product.allowedDimensions?.find((d: any) => d.isDefault) || product.allowedDimensions?.[0]
-  const basePrice = (product.basePrice ?? 0) || 0
-  const dimensionMultiplier = defaultDimension?.priceMultiplier || 1
-  const effectivePrice = basePrice * dimensionMultiplier
-
-  const hasDiscount = product.compareAtPrice && product.compareAtPrice > (product.basePrice ?? 0)
-  const discountPercent = hasDiscount
-    ? Math.round(((product.compareAtPrice! - (product.basePrice ?? 0)) / product.compareAtPrice!) * 100)
-    : 0
+  
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -67,7 +59,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
               {product.compareAtPrice && product.compareAtPrice > (product.basePrice ?? 0) && (
                 <Badge variant="error" size="sm">-{Math.round(((product.compareAtPrice! - ((product.basePrice ?? 0) || 0)) / product.compareAtPrice!) * 100)}%</Badge>
               )}
-              {(product as any).isFeatured && <Badge variant="accent" size="sm">Featured</Badge>}
+              {product.isFeatured && <Badge variant="accent" size="sm">Featured</Badge>}
             </div>
             <StickerPeel className="absolute top-0 right-0" />
           </div>
@@ -77,7 +69,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
             <div>
               <span className="text-sm font-medium text-secondary uppercase tracking-wider flex items-center gap-1">
                 <Tag className="w-3 h-3" />
-                {(product as any).category?.name || 'Category'}
+                {product.category?.name || 'Category'}
               </span>
               <h3 className="font-display text-2xl text-[var(--ink)] mt-1">{product.name || 'Product Name'}</h3>
             </div>
@@ -104,7 +96,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
             {(product.taxPercent || 0) > 0 && (
               <p className="text-sm text-[var(--text-subtle)] flex items-center gap-1">
                 <Settings className="w-4 h-4" />
-                {(product as any).isTaxInclusive ? 'Price includes' : 'Plus'} {(product as any).taxPercent}% tax
+                {product.isTaxInclusive ? 'Price includes' : 'Plus'} {product.taxPercent}% tax
               </p>
             )}
 
@@ -116,7 +108,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                   Available Sizes
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {product.allowedDimensions.map((dim: any) => (
+                  {product.allowedDimensions.map((dim: DimensionConfig) => (
                     <Badge
                       key={`${dim.width}x${dim.height}`}
                       variant={dim.isDefault ? 'primary' : 'outline'}
@@ -137,7 +129,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                   Quantity Tiers
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {product.allowedQuantities.map((qty: any) => (
+                  {product.allowedQuantities.map((qty: QuantityConfig) => (
                     <Badge key={`${qty.minQty}-${qty.maxQty}`} variant="outline" size="sm">
                       {qty.label}: {qty.pricePerUnit.toLocaleString()} BDT/unit
                     </Badge>
@@ -230,7 +222,7 @@ export function CompactProductPreview({ product }: { product: Partial<Product> }
       </div>
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-body text-[var(--ink)] truncate">{product.name || 'Unnamed Product'}</h4>
-        <p className="text-sm text-[var(--text-subtle)]">{(product as any).category?.name || 'No category'}</p>
+        <p className="text-sm text-[var(--text-subtle)]">{product.category?.name || 'No category'}</p>
       </div>
       <div className="text-right">
         <p className="font-display text-primary">{((product.basePrice ?? 0) || 0).toLocaleString()} BDT</p>

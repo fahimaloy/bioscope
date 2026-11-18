@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Slider } from '@/components/ui/Slider'
 import { Badge } from '@/components/ui/Badge'
-import { Maximize, Minimize, Lock, Unlock, RotateCcw, RefreshCw } from 'lucide-react'
+import { Maximize, Minimize, Lock, Unlock, RefreshCw } from 'lucide-react'
 
 interface DimensionControlsProps {
   width: number

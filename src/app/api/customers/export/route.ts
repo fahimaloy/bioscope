@@ -1,4 +1,5 @@
 import { handleRouteError, requireAdmin } from '@/lib/api-utils'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
@@ -16,7 +17,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url)
     const search = url.searchParams.get('search') || undefined
 
-    const where: any = { role: 'CUSTOMER' }
+    const where: Prisma.UserWhereInput = { role: 'CUSTOMER' }
     if (search) {
       where.OR = [
         { name: { contains: search, mode: 'insensitive' } },

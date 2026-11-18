@@ -1,19 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Input, Textarea, Select } from '@/components/ui/Input'
 import { ImageUpload } from '@/components/ui/ImageUpload'
-import { Badge } from '@/components/ui/Badge'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { DimensionSelector } from '@/components/product/DimensionSelector'
 import { QuantitySelector } from '@/components/product/QuantitySelector'
-import { ProductPreview } from '@/components/admin/ProductPreview'
 import type { Product, DimensionConfig, QuantityConfig } from '@/types'
-import { Plus, Minus, Trash2, GripVertical, Eye, EyeOff, Copy, Settings, Tag, Package, DollarSign, Layers, Upload, X, Image as ImageIcon } from 'lucide-react'
-import { DoodleShape, DoodleScribble, StickerPeel, WashiTape } from '@/components/decorative/DoodleElements'
+import { Plus, Trash2, Settings, Tag, Package, Layers, Image as ImageIcon } from 'lucide-react'
+import { StickerPeel, WashiTape } from '@/components/decorative/DoodleElements'
 import { Card } from '@/components/ui/Card'
 
 interface ProductFormProps {
@@ -25,7 +23,7 @@ interface ProductFormProps {
   className?: string
 }
 
-interface ProductFormData {
+export interface ProductFormData {
   name: string
   slug: string
   description: string
@@ -77,7 +75,6 @@ const DEFAULT_QUANTITIES: QuantityConfig[] = [
 ]
 
 export function ProductForm({
-  initialData,
   categories,
   onSubmit,
   onCancel,
@@ -167,13 +164,6 @@ export function ProductForm({
     setFormData((prev) => ({ ...prev, allowedDimensions: [...prev.allowedDimensions, newDim] }))
   }
 
-  const removeDimension = (id: string) => {
-    if (formData.allowedDimensions.length <= 1) return
-    setFormData((prev) => ({
-      ...prev,
-      allowedDimensions: prev.allowedDimensions.filter((d) => d.id !== id),
-    }))
-  }
 
   const addQuantity = () => {
     const lastQty = formData.allowedQuantities[formData.allowedQuantities.length - 1]

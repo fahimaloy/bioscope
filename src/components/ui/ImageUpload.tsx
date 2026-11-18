@@ -31,7 +31,7 @@ interface ImageUploadProps {
 }
 
 interface UploadedFile {
-  file: File;
+  file: File | null;
   preview: string;
   progress: number;
   status: 'pending' | 'uploading' | 'complete' | 'error';
@@ -69,7 +69,7 @@ export const ImageUpload = forwardRef<HTMLDivElement, ImageUploadProps>(function
       const urls = Array.isArray(value) ? value : [value];
       setFiles(
         urls.map((url) => ({
-          file: null as any,
+          file: null,
           preview: url,
           progress: 100,
           status: 'complete' as const,
@@ -79,7 +79,7 @@ export const ImageUpload = forwardRef<HTMLDivElement, ImageUploadProps>(function
     }
   }, [value]);
 
-  const validateFile = (file: File): string | null => {
+  const validateFile = useCallback((file: File): string | null => {
     if (!file.type.match(accept.replace('*', '.*'))) {
       return `File type not allowed. Accepted: ${accept}`;
     }
@@ -87,7 +87,7 @@ export const ImageUpload = forwardRef<HTMLDivElement, ImageUploadProps>(function
       return `File size exceeds ${maxSize}MB limit`;
     }
     return null;
-  };
+  }, [accept, maxSize]);
 
   const handleFiles = useCallback(
     async (newFiles: FileList | File[]) => {
@@ -150,7 +150,7 @@ export const ImageUpload = forwardRef<HTMLDivElement, ImageUploadProps>(function
         onChange([...files.map((f) => f.url || f.preview), ...newUploads.map((u) => u.preview)]);
       }
     },
-    [files, maxFiles, multiple, onChange, uploadAction]
+    [files, maxFiles, multiple, onChange, uploadAction, validateFile]
   );
 
   const removeFile = useCallback(
@@ -212,7 +212,7 @@ export const ImageUpload = forwardRef<HTMLDivElement, ImageUploadProps>(function
       ? files
       : value
         ? (Array.isArray(value) ? value : [value]).map((url) => ({
-            file: null as any,
+            file: null,
             preview: url,
             progress: 100,
             status: 'complete' as const,
@@ -272,6 +272,7 @@ export const ImageUpload = forwardRef<HTMLDivElement, ImageUploadProps>(function
                         </div>
                       </div>
                     ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={file.preview}
                         alt={`Upload ${index + 1}`}

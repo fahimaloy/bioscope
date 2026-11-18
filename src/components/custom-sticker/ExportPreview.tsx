@@ -7,8 +7,8 @@ import { Badge } from '@/components/ui/Badge'
 import { StickerPreview } from './StickerCanvas'
 import { Checkbox } from '@/components/ui/Checkbox'
 import { Slider } from '@/components/ui/Slider'
-import type { StickerDesign, MaterialType, FinishType, CutType } from '@/types'
-import { Download, Eye, CheckCircle, XCircle, Settings, FileImage, FileText, Share2, Copy, RotateCcw } from 'lucide-react'
+import type { StickerDesign } from '@/types'
+import { Download, CheckCircle, XCircle, Settings, FileImage, RotateCcw } from 'lucide-react'
 
 interface ExportPreviewProps {
   design: StickerDesign
@@ -47,11 +47,12 @@ export function ExportPreview({
   onClose,
   className,
 }: ExportPreviewProps) {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [exportResults] = useState<Record<string, { url: string; size: string }>>({})
+
   const [options, setOptions] = useState<ExportOptions>(DEFAULT_OPTIONS)
   const [exporting, setExporting] = useState<'png' | 'jpg' | 'pdf' | 'svg' | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [showAdvanced, setShowAdvanced] = useState(false)
-  const [exportResults, setExportResults] = useState<Record<string, { url: string; size: string }>>({})
 
   const fileSize = calculateEstimatedSize()
   const dimensions = `${design.canvas.width} × ${design.canvas.height} cm`
@@ -109,7 +110,7 @@ export function ExportPreview({
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-medium text-body text-[var(--ink)]">Preview</h3>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => generatePreview()}>
+                <Button variant="ghost" size="sm" onClick={() => setPreviewUrl(generatePreviewUrl())}>
                   <RotateCcw className="w-4 h-4 mr-1" />
                   Refresh
                 </Button>
@@ -118,6 +119,7 @@ export function ExportPreview({
 
             <div className="flex-1 relative bg-[var(--light)] rounded-input overflow-hidden flex items-center justify-center min-h-[300px]">
               {previewUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={previewUrl}
                   alt="Export preview"
@@ -154,7 +156,7 @@ export function ExportPreview({
                 {['png', 'jpg', 'pdf', 'svg'].map((format) => (
                   <button
                     key={format}
-                    onClick={() => setOptions((prev) => ({ ...prev, format: format as any }))}
+                    onClick={() => setOptions((prev) => ({ ...prev, format: format as ExportOptions['format'] }))}
                     className={cn(
                       'p-3 rounded-input border-3 text-center transition-all',
                       options.format === format
@@ -220,7 +222,7 @@ export function ExportPreview({
                 {['transparent', 'white', 'checkerboard'].map((bg) => (
                   <button
                     key={bg}
-                    onClick={() => setOptions((prev) => ({ ...prev, background: bg as any }))}
+                    onClick={() => setOptions((prev) => ({ ...prev, background: bg as ExportOptions['background'] }))}
                     className={cn(
                       'p-3 rounded-input border-3 text-center transition-all',
                       options.background === bg
@@ -286,7 +288,7 @@ export function ExportPreview({
                     <label className="block text-sm font-medium text-[var(--ink)] mb-2">Color Profile</label>
                     <select
                       value={options.colorProfile}
-                      onChange={(e) => setOptions((prev) => ({ ...prev, colorProfile: e.target.value as any }))}
+                      onChange={(e) => setOptions((prev) => ({ ...prev, colorProfile: e.target.value as ExportOptions['colorProfile'] }))}
                       className="w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input"
                     >
                       <option value="sRGB">sRGB (Web)</option>
@@ -350,9 +352,9 @@ export function ExportPreview({
   )
 }
 
-function generatePreview() {
-  // This would generate a preview based on current settings
-  // For now, just trigger a re-render
+function generatePreviewUrl(): string | null {
+  const canvas = document.querySelector('canvas') as HTMLCanvasElement | null
+  return canvas ? canvas.toDataURL('image/png') : null
 }
 
 function downloadBlob(url: string, filename: string) {

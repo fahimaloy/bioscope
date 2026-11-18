@@ -131,12 +131,7 @@ export function Wordmark({
     gap: spec.gap,
   }
 
-  const wordmarkStyle: CSSProperties = {
-    fontFamily: 'Shrikhand',
-    fontSize: spec.fontSize,
-    lineHeight: 1,
-    color: color.raw,
-  }
+  
 
   // Build the colored letter spans
   const letters = text.split('')

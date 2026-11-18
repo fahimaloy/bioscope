@@ -199,11 +199,11 @@ export default function CategoriesPage() {
   const formIcon = getCategoryIcon(form.icon)
   const FormIcon = formIcon ?? Package
 
-  const columns: Column<any>[] = [
+  const columns: Column<CategoryRow>[] = [
     {
       key: 'image',
       header: 'Icon',
-      cell: ({ row }: { row: any }) => {
+      cell: (row: CategoryRow) => {
         const Icon = getCategoryIcon(row.icon)
         return (
           <div className="w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] flex items-center justify-center">
@@ -220,21 +220,21 @@ export default function CategoriesPage() {
       },
       width: '64px',
     },
-    { key: 'name', header: 'Name', accessor: (row: any) => row.name, sortable: true },
-    { key: 'slug', header: 'Slug', accessor: (row: any) => row.slug },
-    { key: 'sortOrder', header: 'Sort', accessor: (row: any) => row.sortOrder, sortable: true },
-    { key: 'products', header: 'Products', accessor: (row: any) => row._count?.products ?? 0 },
+    { key: 'name', header: 'Name', accessor: (row: CategoryRow) => row.name, sortable: true },
+    { key: 'slug', header: 'Slug', accessor: (row: CategoryRow) => row.slug },
+    { key: 'sortOrder', header: 'Sort', accessor: (row: CategoryRow) => row.sortOrder, sortable: true },
+    { key: 'products', header: 'Products', accessor: (row: CategoryRow) => row._count?.products ?? 0 },
     {
       key: 'status',
       header: 'Status',
-      cell: ({ row }: { row: any }) => (
+      cell: (row: CategoryRow) => (
         <Badge variant={row.isActive ? 'success' : 'error'} size="sm">{row.isActive ? 'Active' : 'Inactive'}</Badge>
       ),
     },
     {
       key: 'actions',
       header: 'Actions',
-      cell: ({ row }: { row: any }) => (
+      cell: (row: CategoryRow) => (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={() => openEdit(row)} aria-label="Edit" className="hover:-translate-y-1 transition-transform"><Edit className="w-4 h-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => handleToggleActive(row)} aria-label={row.isActive ? 'Deactivate' : 'Activate'} className="hover:-translate-y-1 transition-transform text-xs font-medium">{row.isActive ? 'Off' : 'On'}</Button>

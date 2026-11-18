@@ -67,7 +67,7 @@ export const uploadImage = async (
   options: {
     folder?: string
     publicId?: string
-    transformation?: any[]
+    transformation?: Record<string, unknown>[]
   } = {}
 ): Promise<{ publicId: string; url: string; width: number; height: number } | null> => {
   try {

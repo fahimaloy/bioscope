@@ -62,6 +62,7 @@ export function AddressForm({
     district: '',
     division: 'Dhaka',
     postalCode: '',
+    country: 'Bangladesh',
     isDefault: false,
     deliveryZone: 'INSIDE_DHAKA' as 'INSIDE_DHAKA' | 'OUTSIDE_DHAKA',
   })
@@ -74,7 +75,7 @@ export function AddressForm({
       if (editingAddress) {
         await onUpdateAddress?.(editingAddress.id, formData)
       } else {
-        await onAddAddress?.(formData as any)
+        await onAddAddress?.(formData)
       }
 
       setShowForm(false)
@@ -96,6 +97,7 @@ export function AddressForm({
       district: address.district,
       division: address.division,
       postalCode: address.postalCode || '',
+      country: address.country || 'Bangladesh',
       isDefault: address.isDefault,
       deliveryZone: address.deliveryZone,
     })
@@ -118,8 +120,9 @@ export function AddressForm({
       district: '',
       division: 'Dhaka',
       postalCode: '',
+      country: 'Bangladesh',
       isDefault: false,
-      deliveryZone: 'INSIDE_DHAKA',
+      deliveryZone: 'INSIDE_DHAKA' as 'INSIDE_DHAKA' | 'OUTSIDE_DHAKA',
     })
   }
 
@@ -229,7 +232,7 @@ export function AddressForm({
                 <Select
                   label="Delivery Zone"
                   value={formData.deliveryZone}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, deliveryZone: e.target.value as any }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, deliveryZone: e.target.value as 'INSIDE_DHAKA' | 'OUTSIDE_DHAKA' }))}
                   options={[
                     { value: 'INSIDE_DHAKA', label: 'Inside Dhaka (60 BDT)' },
                     { value: 'OUTSIDE_DHAKA', label: 'Outside Dhaka (120 BDT)' },

@@ -15,6 +15,7 @@ import { Input, Select } from '@/components/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import type { Product } from '@/types'
 
 const sortOptions = [
   { value: 'featured', label: 'Featured', sortBy: 'sortOrder', sortOrder: 'asc' },
@@ -27,14 +28,70 @@ const sortOptions = [
 
 type Category = { id: string; name: string; slug: string; image?: string | null; icon?: string | null }
 
-function normalize(p: any) {
+interface PrismaProduct {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  basePrice: { toNumber(): number } | number
+  compareAtPrice: { toNumber(): number } | number | null
+  images: string[]
+  categoryId: string
+  category: { name: string } | null
+  allowedDimensions: Array<{
+    id: string
+    width: number
+    height: number
+    label: string
+    priceMultiplier: { toNumber(): number } | number
+    isDefault: boolean
+    sortOrder: number
+  }>
+  allowedQuantities: Array<{
+    id: string
+    minQty: number
+    maxQty: number | null
+    pricePerUnit: { toNumber(): number } | number
+    label: string
+    sortOrder: number
+  }>
+  customizationOptions: unknown
+  taxPercent: { toNumber(): number } | number
+  additionalCharge: { toNumber(): number } | number
+  isTaxInclusive: boolean
+  trackInventory: boolean
+  stock: number
+  lowStockThreshold: number
+  isActive: boolean
+  isFeatured: boolean
+  sortOrder: number
+  metaTitle: string | null
+  metaDescription: string | null
+  createdAt: Date
+  updatedAt: Date
+  reviews?: Array<{
+    id: string
+    rating: number
+    title: string | null
+    content: string
+    userId: string
+    user: { name: string | null; email: string }
+    createdAt: Date
+  }>
+  _count?: {
+    reviews: number
+    orderItems: number
+  }
+}
+
+function normalize(p: PrismaProduct): Product {
   return {
     ...p,
     basePrice: Number(p.basePrice),
     compareAtPrice: p.compareAtPrice != null ? Number(p.compareAtPrice) : null,
     taxPercent: Number(p.taxPercent ?? 0),
     additionalCharge: Number(p.additionalCharge ?? 0),
-  }
+  } as Product
 }
 
 const selectOptions = sortOptions.map(opt => ({ value: opt.value, label: opt.label }))
@@ -62,7 +119,7 @@ export default function ShopPage() {
   const [sortBy, setSortBy] = useState<(typeof sortOptions)[number]['value']>('featured')
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
-  const [products, setProducts] = useState<any[]>([])
+  const [products, setProducts] = useState<Product[]>([])
   const [pager, setPager] = useState({ total: 0, totalPages: 1 })
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
@@ -238,7 +295,7 @@ export default function ShopPage() {
                 viewport={{ once: true, margin: '-100px' }}
                 exit="exit"
               >
-                <ProductGrid products={products as any} variant="default" />
+                <ProductGrid products={(products as PrismaProduct[]).map(normalize)} variant="default" />
               </motion.div>
             </AnimatePresence>
           ) : (

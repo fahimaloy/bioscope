@@ -14,9 +14,13 @@ export interface DeliveryZone {
   days: string
 }
 
+interface DeliverySettings {
+  delivery_zones?: DeliveryZone[]
+}
+
 interface DeliveryConfigProps {
-  onChange: (patch: Record<string, any>) => void
-  initialSettings?: Record<string, any>
+  onChange: (patch: Partial<DeliverySettings>) => void
+  initialSettings?: DeliverySettings
 }
 
 const DEFAULT_ZONES: DeliveryZone[] = [
@@ -26,7 +30,7 @@ const DEFAULT_ZONES: DeliveryZone[] = [
 
 export function DeliveryConfig({ onChange, initialSettings = {} }: DeliveryConfigProps) {
   const [deliveryZones, setDeliveryZones] = useState<DeliveryZone[]>(
-    initialSettings.delivery_zones || DEFAULT_ZONES
+    initialSettings.delivery_zones ?? DEFAULT_ZONES
   )
   const [showZones, setShowZones] = useState(true)
   const [editingZone, setEditingZone] = useState<string | null>(null)

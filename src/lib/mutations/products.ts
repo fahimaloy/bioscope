@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { productKeys } from '@/lib/queries/products'
 import type { CreateProductInput, UpdateProductInput } from '@/lib/validations/product'
+import type { bulkUpdateProducts } from '@/lib/actions/product'
 
 export function useCreateProduct() {
   const queryClient = useQueryClient()
@@ -66,7 +67,7 @@ export function useBulkUpdateProducts() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: { ids: string[]; updates: Partial<any> }) => {
+    mutationFn: async (data: { ids: string[]; updates: Parameters<typeof bulkUpdateProducts>[1] }) => {
       const res = await fetch('/api/products/bulk', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },

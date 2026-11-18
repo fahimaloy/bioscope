@@ -7,24 +7,25 @@ import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { DataTable } from '@/components/ui/DataTable'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Users, User, DollarSign, ShoppingBag, TrendingUp, Filter, X, Download } from 'lucide-react'
+import { Users, User, DollarSign, ShoppingBag, Filter, Download } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 import { CustomerDetailModal } from '@/components/admin/CustomerDetailModal'
 import { motion } from 'framer-motion'
-import { SketchUnderline, DoodleShape, DoodleStar, StickerPeel } from '@/components/decorative/DoodleElements'
+import { SketchUnderline, DoodleShape, StickerPeel } from '@/components/decorative/DoodleElements'
 import { CounterAnimation } from '@/components/animations/CounterAnimation'
 import { cn, formatNumber } from '@/lib/utils'
 
-const statusColors: Record<string, 'default' | 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'error' | 'outline' | 'info' | 'doodle'> = {
-  PENDING: 'warning',
-  CONFIRMED: 'info',
-  PROCESSING: 'primary',
-  PRINTING: 'primary',
-  READY_TO_SHIP: 'secondary',
-  SHIPPED: 'secondary',
-  DELIVERED: 'success',
-  CANCELLED: 'error',
-  REFUNDED: 'error',
+/** Shape of a customer row as returned by /api/customers (includes computed fields). */
+interface CustomerRow {
+  id: string
+  name: string | null
+  email: string
+  phone: string | null
+  orderCount: number
+  totalSpent: number | string
+  spendTier: string | null
+  latestOrderStatus: string | null
+  createdAt: string
 }
 
 const spendTiers = [
@@ -47,7 +48,6 @@ function SpendBadge({ totalSpent, overrideTier }: { totalSpent: number; override
 }
 
 function OrderStatusBadge({ status }: { status: string }) {
-  const config = statusColors[status] || 'default'
   return <StatusBadge status={status} size="sm" />
 }
 
@@ -56,7 +56,7 @@ const columns = [
     key: 'customer', 
     header: 'Customer', 
     width: '280px',
-    cell: (row: any) => (
+    cell: (row: CustomerRow) => (
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white flex items-center justify-center font-display text-sm">
           {row.name?.charAt(0)?.toUpperCase() || row.email?.charAt(0)?.toUpperCase() || '?'}
@@ -72,7 +72,7 @@ const columns = [
   { 
     key: 'phone', 
     header: 'Phone', 
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="text-sm text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{row.phone ?? '—'}</span>
     ),
     sortable: true,
@@ -82,7 +82,7 @@ const columns = [
     key: 'orders', 
     header: 'Orders', 
     width: '100px',
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="font-medium text-[var(--ink)]">{row.orderCount}</span>
     ), 
     sortable: true 
@@ -91,7 +91,7 @@ const columns = [
     key: 'spent', 
     header: 'Total Spent', 
     width: '160px',
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="font-display text-primary">{formatCurrency(row.totalSpent)}</span>
     ), 
     sortable: true 
@@ -100,19 +100,19 @@ const columns = [
     key: 'tier', 
     header: 'Tier', 
     width: '120px',
-    accessor: (row: any) => <SpendBadge totalSpent={Number(row.totalSpent)} overrideTier={row.spendTier} />,
+    accessor: (row: CustomerRow) => <SpendBadge totalSpent={Number(row.totalSpent)} overrideTier={row.spendTier} />,
   },
   { 
     key: 'status', 
     header: 'Latest Order', 
     width: '140px',
-    accessor: (row: any) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[var(--text-subtle)]">—</span>,
+    accessor: (row: CustomerRow) => row.latestOrderStatus ? <OrderStatusBadge status={row.latestOrderStatus} /> : <span className="text-[var(--text-subtle)]">—</span>,
   },
   { 
     key: 'joined', 
     header: 'Joined', 
     width: '140px',
-    accessor: (row: any) => (
+    accessor: (row: CustomerRow) => (
       <span className="text-sm text-[var(--text-subtle)]">{formatDate(row.createdAt)}</span>
     ), 
     sortable: true 
@@ -121,7 +121,7 @@ const columns = [
 
 export default function CustomersPage() {
   const router = useRouter()
-  const [customers, setCustomers] = useState<any[]>([])
+  const [customers, setCustomers] = useState<Array<{ id: string; name: string | null; email: string; phone: string | null; orderCount: number; totalSpent: number; spendTier: string | null; latestOrderStatus: string | null; createdAt: string }>>([])
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [pager, setPager] = useState({ total: 0, pageSize: 20 })
@@ -135,7 +135,7 @@ export default function CustomersPage() {
       {
         key: 'view',
         header: '',
-        cell: (row: any) => (
+        cell: (row: CustomerRow) => (
           <Button size="sm" variant="outline" onClick={() => setSelectedCustomerId(row.id)}>
             View
           </Button>
@@ -348,7 +348,7 @@ interface StatCardProps {
   index: number
 }
 
-function StatCard({ label, value, icon, color, iconBg, index }: StatCardProps) {
+function StatCard({ label, value, icon, color: _color, iconBg, index }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

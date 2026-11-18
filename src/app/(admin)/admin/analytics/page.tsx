@@ -4,13 +4,38 @@ import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { StatsCards, RevenueChartCard, OrderStatusDistribution, DashboardSummary } from '@/components/admin/StatsCards'
-import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell } from 'recharts'
-import { TrendingUp, ShoppingBag, DollarSign, Users, Package, Target, ArrowUpRight, ArrowDownRight, Activity } from 'lucide-react'
-import { formatCurrency, formatNumber } from '@/lib/utils'
-import { cn } from '@/lib/utils'
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell } from 'recharts'
+import { TrendingUp, ShoppingBag, DollarSign, Users } from 'lucide-react'
+import { formatCurrency, formatNumber, cn } from '@/lib/utils'
+import { SketchUnderline, DoodleShape } from '@/components/decorative/DoodleElements'
+
+interface AdminStats {
+  totalOrders: number
+  pendingOrders: number
+  totalRevenue: number
+  totalProducts: number
+  totalCustomers: number
+  lowStockProducts: number
+  pendingCustomRequests: number
+  conversionRate: number
+  averageOrderValue: number
+  todayOrders: number
+  todayRevenue: number
+}
+
+interface TopCustomerItem {
+  id: string
+  name: string
+  email: string
+  totalSpent: number
+  orderCount: number
+}
+
+interface ProductItem {
+  stock: number
+}
+
 import { motion } from 'framer-motion'
-import { SketchUnderline, DoodleShape, DoodleStar } from '@/components/decorative/DoodleElements'
-import { CounterAnimation } from '@/components/animations/CounterAnimation'
 
 interface MonthlyData {
   date: string
@@ -45,14 +70,14 @@ interface GeoDistrict {
 }
 
 export default function AnalyticsPage() {
-  const [stats, setStats] = useState<any>(null)
+  const [stats, setStats] = useState<AdminStats | null>(null)
   const [monthly, setMonthly] = useState<MonthlyData[]>([])
   const [topProducts, setTopProducts] = useState<TopProduct[]>([])
   const [topCustomers, setTopCustomers] = useState<TopCustomer[]>([])
   const [distribution, setDistribution] = useState<Record<string, number>>({})
   const [topCategories, setTopCategories] = useState<TopCategory[]>([])
   const [topDistricts, setTopDistricts] = useState<GeoDistrict[]>([])
-  const [loading, setLoading] = useState(true)
+  const [, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
@@ -71,7 +96,7 @@ export default function AnalyticsPage() {
         ])
         setMonthly(revRes?.data?.monthly ?? [])
         setTopProducts(topProductRes?.data?.items ?? [])
-        setTopCustomers((topCustomerRes?.data?.items ?? []).map((c: any) => ({ id: c.id, name: c.name, email: c.email, totalSpent: c.totalSpent, orderCount: c.orderCount })))
+        setTopCustomers((topCustomerRes?.data?.items ?? []).map((c: TopCustomerItem) => ({ id: c.id, name: c.name, email: c.email, totalSpent: c.totalSpent, orderCount: c.orderCount })))
         setTopCategories(categoriesRes?.data?.items ?? [])
         setTopDistricts(geoRes?.data?.items ?? [])
         setDistribution(ordRes?.data?.distribution ?? {})
@@ -81,7 +106,7 @@ export default function AnalyticsPage() {
           totalRevenue: revRes?.data?.totalRevenue ?? 0,
           totalProducts: productsRes?.data?.pagination?.total ?? (productsRes?.data?.data ?? []).length,
           totalCustomers: customersRes?.data?.pagination?.total ?? 0,
-          lowStockProducts: (productsRes?.data?.data ?? []).filter((p: any) => Number(p.stock) <= 10).length,
+          lowStockProducts: (productsRes?.data?.data ?? []).filter((p: ProductItem) => Number(p.stock) <= 10).length,
           pendingCustomRequests: 0,
           conversionRate: 0,
           averageOrderValue: revRes?.data?.averageOrderValue ?? 0,
@@ -569,7 +594,7 @@ interface MetricCardProps {
   iconBg: string
 }
 
-function MetricCard({ label, value, icon, color, trend, trendUp, iconBg }: MetricCardProps) {
+function MetricCard({ label, value, icon, color: _color, trend, trendUp, iconBg }: MetricCardProps) {
   return (
     <Card variant="doodle" hover={true} padding="md" className="relative overflow-visible group">
       <div className="flex items-center justify-between mb-2">

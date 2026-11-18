@@ -217,16 +217,16 @@ function ExpandedRowContent({
               <div key={item.id} className="flex gap-4 p-4 bg-white border-2 border-[var(--light)] rounded-card">
                 <div className="w-20 h-20 flex-shrink-0 relative">
                   {item.productImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      // eslint-disable-next-line @next/next/no-img-element
                       src={item.productImage}
                       alt={item.productName}
                       className="w-full h-full object-cover rounded-input"
                     />
                   ) : (
                     <div className="w-full h-full bg-[var(--light)] rounded-input flex items-center justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        // eslint-disable-next-line @next/next/no-img-element
                         src="/images/stickers/skull_sticker.png"
                         alt="Placeholder"
                         className="w-12 h-12 opacity-50"

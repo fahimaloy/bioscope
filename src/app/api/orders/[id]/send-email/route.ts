@@ -19,7 +19,7 @@ export async function POST(_request: Request, { params }: { params: { id: string
     const statusLabel = ORDER_STATUS_LABELS[order.status as keyof typeof ORDER_STATUS_LABELS] ?? order.status
     const rows = order.items
       .map(
-        (item: any) => `<tr>
+        (item: { productName: string; width: number; height: number; quantity: number; totalPrice: { toString(): string } }) => `<tr>
           <td style="padding:8px;border-bottom:1px solid #eee">${escapeHtml(item.productName)}<br><small>${item.width}×${item.height} cm · Qty ${item.quantity}</small></td>
           <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">৳${Number(item.totalPrice).toFixed(2)}</td>
         </tr>`

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { z } from 'zod'
+import { Prisma, type DimensionConfig, type QuantityConfig } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { AppError, handleRouteError, requireUser, ok, created } from '@/lib/api-utils'
 import { cartItemSchema } from '@/lib/validations/order'
@@ -20,7 +20,7 @@ async function getOrCreateCart(userId: string) {
 
 async function pricingSettings() {
   const rows = await prisma.setting.findMany({ where: { isPublic: true } })
-  const kv: Record<string, any> = {}
+  const kv: Record<string, unknown> = {}
   for (const s of rows) {
     if (s.type === 'NUMBER') kv[s.key] = parseFloat(s.value)
     else if (s.type === 'BOOLEAN') kv[s.key] = s.value === 'true'
@@ -36,15 +36,15 @@ async function pricingSettings() {
   }
 }
 
-function toPriceable(product: any) {
+function toPriceable(product: Prisma.ProductGetPayload<{ include: { allowedDimensions: true; allowedQuantities: true } }>) {
   return {
     basePrice: Number(product.basePrice),
     taxPercent: Number(product.taxPercent),
     additionalCharge: Number(product.additionalCharge),
-    allowedDimensions: product.allowedDimensions.map((d: any) => ({
+    allowedDimensions: product.allowedDimensions.map((d: DimensionConfig) => ({
       width: d.width, height: d.height, priceMultiplier: Number(d.priceMultiplier),
     })),
-    allowedQuantities: product.allowedQuantities.map((q: any) => ({
+    allowedQuantities: product.allowedQuantities.map((q: QuantityConfig) => ({
       minQty: q.minQty, maxQty: q.maxQty, pricePerUnit: Number(q.pricePerUnit),
     })),
   }
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
 
     const product = await prisma.product.findUnique({
       where: { id: validated.productId },
-      include: { allowedDimensions: true },
+      include: { allowedDimensions: true, allowedQuantities: true },
     })
     if (!product) throw new AppError(404, 'Product not found', 'PRODUCT_NOT_FOUND')
     if (!product.isActive) throw new AppError(400, 'This product is no longer available', 'PRODUCT_INACTIVE')

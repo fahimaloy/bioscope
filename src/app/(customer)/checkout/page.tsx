@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { checkoutSchema, type CheckoutInput } from '@/lib/validations/order'
+import type { Order } from '@/types'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useCartStore, useCartItems, useCartSubtotal } from '@/lib/stores/cartStore'
 import { Button } from '@/components/ui/Button'
@@ -16,6 +17,7 @@ import { OrderConfirmation } from '@/components/checkout/OrderConfirmation'
 import { CheckoutProgressStepper } from '@/components/checkout/CheckoutProgressStepper'
 import { Loader2, Truck, CheckCircle } from 'lucide-react'
 import { createOrder } from '@/lib/actions/order'
+import type { Prisma } from '@prisma/client'
 import { getSettings } from '@/lib/actions/settings'
 import { toast } from 'sonner'
 import { DoodleScatter } from '@/components/decorative'
@@ -35,8 +37,8 @@ export default function CheckoutPage() {
   const variants = useMotionVariants()
   const [step, setStep] = useState<Step>('address')
   const [isLoading, setIsLoading] = useState(false)
-  const [settings, setSettings] = useState<any>(null)
-  const [order, setOrder] = useState<any>(null)
+  const [settings, setSettings] = useState<Record<string, string | number | boolean> | null>(null)
+  const [order, setOrder] = useState<Order | null>(null)
 
   const {
     handleSubmit,
@@ -85,16 +87,16 @@ export default function CheckoutPage() {
           width: i.width,
           height: i.height,
           quantity: i.quantity,
-          customization: i.customization ?? undefined,
+          customization: (i.customization as Prisma.InputJsonValue | null) ?? undefined,
         })),
       })
       if (result.success) {
         clearCart()
-        setOrder(result.order)
+        setOrder(result.order as unknown as Order)
         setStep('confirmation')
         toast.success('Order placed successfully')
       } else {
-        toast.error((result as any)?.error || 'Could not place order')
+        toast.error((result as { error?: string })?.error || 'Could not place order')
       }
     } catch (error) {
       console.error('Checkout failed:', error)

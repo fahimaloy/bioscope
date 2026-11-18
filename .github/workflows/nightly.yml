@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/bioscope
-      NEXTAUTH_SECRET: nightly-secret
-      NEXTAUTH_URL: http://localhost:3000
+      AUTH_SECRET: nightly-secret
+      AUTH_URL: http://localhost:3000
     services:
       postgres:
         image: postgres:16

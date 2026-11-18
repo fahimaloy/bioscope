@@ -2,10 +2,12 @@
 // src/middleware.ts (edge runtime). Must NOT import prisma or any node-only module.
 import type { NextAuthConfig } from 'next-auth'
 
+import { authSecret } from '@/lib/auth-secret'
+
 export const authConfig: NextAuthConfig = {
   // @auth/core (next-auth v5 beta) reads only AUTH_SECRET*; fall back to the
   // legacy NEXTAUTH_SECRET so local .env keeps working. AUTH_SECRET wins when set.
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  secret: authSecret() || undefined,
   providers: [], // node runtime adds the Credentials provider in src/lib/auth.ts
   session: {
     strategy: 'jwt',
@@ -19,8 +21,8 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
-        token.role = (user as any).role
-        token.phone = (user as any).phone ?? null
+        token.role = (user as { role?: string }).role
+        token.phone = (user as { phone?: string | null }).phone ?? null
       }
       if (trigger === 'update' && session) {
         token.name = session.name
@@ -34,7 +36,7 @@ export const authConfig: NextAuthConfig = {
           ...session.user,
           id: token.id as string,
           role: token.role as string,
-          phone: (token as any).phone ?? null,
+          phone: (token as { phone?: string | null }).phone ?? null,
         }
       }
       return session

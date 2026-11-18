@@ -4,26 +4,53 @@ import { getProductBySlug, getRelatedProducts } from '@/lib/actions/product'
 import { ProductDetail } from '@/components/product/ProductDetail'
 import { ProductGrid } from '@/components/product/ProductCard'
 import { ReviewList } from '@/components/product/ReviewList'
+import { Prisma } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
 
-function serializeProduct(p: any) {
+type ProductWithRelations = Prisma.ProductGetPayload<{
+  include: {
+    category: true
+    allowedDimensions: true
+    allowedQuantities: true
+    reviews: {
+      include: { user: { select: { name: true; avatar: true } } }
+      orderBy: { createdAt: 'desc' }
+      take: 10
+    }
+    _count: { select: { reviews: true } }
+  }
+}>
+
+function serializeProduct(p: ProductWithRelations) {
+  const customizationOptions = p.customizationOptions
+    ? (typeof p.customizationOptions === 'string'
+        ? JSON.parse(p.customizationOptions)
+        : p.customizationOptions)
+    : null;
+
   return {
     ...p,
     basePrice: Number(p.basePrice),
     compareAtPrice: p.compareAtPrice != null ? Number(p.compareAtPrice) : null,
     taxPercent: Number(p.taxPercent ?? 0),
     additionalCharge: Number(p.additionalCharge ?? 0),
+    customizationOptions,
     // `priceMultiplier` is a Prisma Decimal on each dimension. Left uncoerced it
     // reaches ProductDetail as a string (or a Decimal object), so `!== 1` was
     // always true — the default size rendered a spurious "0%" — and
     // `(m - 1) * 100` printed `+19.999999999999996%` for a 1.2x size.
-    allowedDimensions: p.allowedDimensions?.map((d: any) => ({
+    allowedDimensions: p.allowedDimensions?.map((d) => ({
       ...d,
       priceMultiplier: Number(d.priceMultiplier),
     })),
-    reviews: undefined,
-    _count: undefined,
+    allowedQuantities: p.allowedQuantities?.map((q) => ({
+      ...q,
+      pricePerUnit: Number(q.pricePerUnit),
+    })),
+    category: p.category ?? { id: '', name: '', slug: '', description: null, isActive: true, sortOrder: 0, createdAt: new Date(), updatedAt: new Date(), image: null, icon: null },
+    reviews: p.reviews ?? [],
+    _count: { reviews: p._count?.reviews ?? 0, orderItems: 0 },
   }
 }
 
@@ -33,13 +60,24 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   const related = await getRelatedProducts(product.id, product.categoryId, 8)
 
-  const reviews = (product.reviews ?? []).map((r: any) => ({
-    ...r,
-    createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+  const reviews = (product.reviews ?? []).map((r) => ({
+    id: r.id,
+    userId: r.userId,
+    user: r.user ? { id: r.userId, email: '', name: r.user.name ?? '', role: 'CUSTOMER' as const, phone: null, avatar: r.user.avatar ?? null, emailVerified: null, createdAt: new Date(), updatedAt: new Date() } : undefined,
+    productId: product.id,
+    rating: r.rating,
+    title: r.title,
+    comment: r.comment,
+    images: r.images ?? [],
+    isVerifiedPurchase: r.isVerifiedPurchase ?? false,
+    isApproved: r.isApproved ?? true,
+    helpfulCount: (r as { helpfulCount?: number }).helpfulCount ?? 0,
+    createdAt: r.createdAt instanceof Date ? r.createdAt : new Date(r.createdAt),
+    updatedAt: r.updatedAt instanceof Date ? r.updatedAt : new Date(r.updatedAt),
   }))
-  const totalReviews = (product as any)._count?.reviews ?? reviews.length
+  const totalReviews = product._count?.reviews ?? reviews.length
   const averageRating = reviews.length
-    ? Math.round((reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length) * 10) / 10
+    ? Math.round((reviews.reduce((s: number, r) => s + r.rating, 0) / reviews.length) * 10) / 10
     : 0
   const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
   for (const r of reviews) ratingDistribution[r.rating] = (ratingDistribution[r.rating] ?? 0) + 1
@@ -59,12 +97,12 @@ export default async function ProductPage({ params }: { params: { slug: string }
           <span className="text-[var(--text)]">{product.name}</span>
         </nav>
 
-        <ProductDetail product={serializeProduct(product) as any} />
+        <ProductDetail product={serializeProduct(product)} />
 
         <section className="mt-16">
           <h2 className="font-display text-2xl text-[var(--brand)] mb-6">Reviews ({totalReviews})</h2>
           <ReviewList
-            reviews={reviews as any}
+            reviews={reviews}
             productId={product.id}
             averageRating={averageRating}
             totalReviews={totalReviews}
@@ -87,7 +125,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
             </div>
             {/* Task 2.2's grid owns the column map; `featured` is 1/2/3 columns
                 (the plan's "4-column grid" would need a ProductGrid change). */}
-            <ProductGrid products={related.map((p) => serializeProduct(p) as any)} variant="featured" />
+            <ProductGrid products={related.map((p) => serializeProduct(p as unknown as ProductWithRelations))} variant="featured" />
           </section>
         )}
       </div>
