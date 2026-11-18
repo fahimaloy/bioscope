@@ -400,3 +400,20 @@ Not run locally: `pnpm verify:full` (build + e2e) — policy keeps that to CI.
 - `createOrderFromCustomRequest` is type-checked and shares the checkout pricing
   primitives but has not been exercised end-to-end (needs admin credentials).
 
+### Follow-up 2026-11-18 (admin bootstrap)
+The owner item "dev DB admin password does not match `.env ADMIN_PASSWORD`" was
+a real bug, not owner data to work around: `instrumentation.ts` never ran (no
+`experimental.instrumentationHook`, and Next 14.2 loads it from `src/`), and it
+only created the account when missing. Fixed in `5d2997f` — bootstrap moved to
+`src/instrumentation.ts`, flag enabled, and `src/lib/admin-bootstrap.ts` now
+plans create/reconcile/none so a drifted password is repaired on server start.
+
+Verified with that credential against the running dev server:
+- `createOrderFromCustomRequest` end to end — 17/17 checks: pricing, order
+  creation, server-side totals (subtotal 1020 / tax 51 / delivery 60 / total 1131),
+  request→order link, stock decrement, duplicate refused 409.
+- Revision loop end to end — admin `REVISION_REQUESTED`, customer resubmit
+  returns the request to `PENDING` with the quote cleared, resubmit refused 409
+  when no revision is pending.
+
+
