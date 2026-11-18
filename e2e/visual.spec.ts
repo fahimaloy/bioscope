@@ -57,6 +57,28 @@ async function collectConsoleErrors(page: Page): Promise<string[]> {
   return errors
 }
 
+/**
+ * Scroll through the page before the full-page capture.
+ *
+ * Playwright's `fullPage` screenshot does not scroll the document, so sections
+ * revealed by framer-motion's `whileInView` never intersect the viewport and are
+ * captured in their hidden (opacity 0) state — the baseline then records blank
+ * bands instead of the real layout.
+ */
+async function revealInViewContent(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    const step = window.innerHeight
+    for (let y = 0; y < document.body.scrollHeight; y += step) {
+      window.scrollTo(0, y)
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+    window.scrollTo(0, document.body.scrollHeight)
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    window.scrollTo(0, 0)
+  })
+  await page.waitForTimeout(500)
+}
+
 for (const [viewportName, viewport] of Object.entries(VIEWPORTS) as Array<
   [ViewportName, (typeof VIEWPORTS)[ViewportName]]
 >) {
@@ -77,6 +99,7 @@ for (const [viewportName, viewport] of Object.entries(VIEWPORTS) as Array<
           { timeout: 15_000 },
         ).catch(() => {})
         await page.evaluate(() => document.fonts?.ready.catch(() => undefined)).catch(() => {})
+        await revealInViewContent(page)
         await page.waitForTimeout(1_000)
         await expect(page).toHaveScreenshot(`${name}-${viewportName}.png`, {
           fullPage: true,
