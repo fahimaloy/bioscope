@@ -62,6 +62,9 @@ modules:
   content-pages:
     source: [src/components/content/**, src/lib/content/**, src/app/(customer)/faq/**, src/app/(customer)/shipping/**, src/app/(customer)/returns/**, src/app/(customer)/privacy/**, src/app/(customer)/terms/**, src/app/(customer)/accessibility/**, src/app/(customer)/blog/**, src/app/(customer)/careers/**, src/app/(customer)/press/**, src/app/(customer)/affiliates/**]
     unit: [tests/unit/pages/content-pages.test.tsx]
+  wishlist:
+    source: [src/lib/stores/wishlistStore.ts, src/app/(customer)/wishlist/**, src/components/product/ProductCard.tsx, src/components/product/ProductDetail.tsx, src/components/layout/Navbar.tsx]
+    unit: [tests/unit/wishlist.test.tsx, tests/unit/components/product-card.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []

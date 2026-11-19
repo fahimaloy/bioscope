@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/Button'
 import { StickerPeel } from '@/components/decorative/StickerPeel'
 import { motion, AnimatePresence } from 'framer-motion'
 import { motionVariants } from '@/lib/motion'
-import { Menu, X, ShoppingCart, User, LogOut, LayoutDashboard } from 'lucide-react'
+import { Menu, X, ShoppingCart, User, LogOut, LayoutDashboard, Heart } from 'lucide-react'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useUIStore } from '@/lib/stores/uiStore'
 import { useCartStore } from '@/lib/stores/cartStore'
+import { useWishlistCount } from '@/lib/stores/wishlistStore'
 import { signOut } from 'next-auth/react'
 import { FOCUS_VISIBLE } from '@/components/ui/shared'
 
@@ -41,6 +42,7 @@ export function Navbar() {
   const { user, isAuthenticated, logout, isAdmin } = useAuth()
   const { mobileMenuOpen, setMobileMenuOpen, toggleMobileMenu } = useUIStore()
   const { itemCount, toggleCart } = useCartStore()
+  const wishlistCount = useWishlistCount()
   const [scrolled, setScrolled] = useState(false)
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
 
@@ -114,6 +116,17 @@ export function Navbar() {
             </motion.ul>
 
             <div className="flex items-center gap-2">
+              {/* Wishlist — visible to guests too (local store, survives login) */}
+              <Link href="/wishlist" className="relative hidden sm:block">
+                <Button variant="ghost" size="sm" aria-label={`Wishlist${wishlistCount > 0 ? ` with ${wishlistCount} items` : ''}`}>
+                  <Heart className="h-5 w-5" aria-hidden="true" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--pink-strong)] text-xs font-semibold text-[var(--on-pink-strong)]">
+                      {wishlistCount > 99 ? '99+' : wishlistCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
               {isAuthenticated ? (
                 <>
                   <Button

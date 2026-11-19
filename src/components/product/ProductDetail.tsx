@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal'
 import { HoverLift } from '@/components/animations/HoverLift'
 import { FOCUS_VISIBLE_INK } from '@/components/ui/shared'
 import { useCartStore, useIsInCart } from '@/lib/stores/cartStore'
+import { useIsWished, useWishlistActions } from '@/lib/stores/wishlistStore'
 import { useAuth } from '@/lib/hooks/useAuth'
 import type { Product, DimensionConfig } from '@/types'
 import {
@@ -49,6 +50,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
   const variants = useMotionVariants()
   const { addItem, updateQuantity } = useCartStore()
   const { isAuthenticated } = useAuth()
+  const wished = useIsWished(product.id)
+  const { toggle: toggleWishlist } = useWishlistActions()
 
   // Copy before sorting: `Array.prototype.sort` mutates in place, and
   // `allowedQuantities` is a React prop (tracked defect).
@@ -165,8 +168,15 @@ export function ProductDetail({ product }: ProductDetailProps) {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" aria-label="Add to wishlist">
-            <Heart className="w-5 h-5" />
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
+            aria-pressed={wished}
+            onClick={() => toggleWishlist(product)}
+            className={wished ? 'text-[var(--error)]' : undefined}
+          >
+            <Heart className="w-5 h-5" fill={wished ? 'currentColor' : 'none'} />
           </Button>
           <Button variant="ghost" size="sm" aria-label="Share product">
             <Share2 className="w-5 h-5" />
@@ -462,9 +472,15 @@ export function ProductDetail({ product }: ProductDetailProps) {
               )}
               {addToCartState !== 'success' && (inCart ? 'Update Cart' : 'Add to Cart')}
             </Button>
-            <Button variant="secondary" size="xl" className="w-full sm:w-auto">
-              <Heart className="w-5 h-5 mr-2" />
-              Wishlist
+            <Button
+              variant="secondary"
+              size="xl"
+              className="w-full sm:w-auto"
+              aria-pressed={wished}
+              onClick={() => toggleWishlist(product)}
+            >
+              <Heart className="w-5 h-5 mr-2" fill={wished ? 'currentColor' : 'none'} />
+              {wished ? 'Wishlisted' : 'Wishlist'}
             </Button>
           </div>
 

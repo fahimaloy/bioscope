@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { motionVariants } from '@/lib/motion'
 import { useCartStore, useGetItemQuantity, useIsInCart } from '@/lib/stores/cartStore'
+import { useIsWished, useWishlistActions } from '@/lib/stores/wishlistStore'
 import { useAuth } from '@/lib/hooks/useAuth'
 import type { Product } from '@/types'
 
@@ -44,6 +45,8 @@ export function ProductCard({
 }: ProductCardProps) {
   const { addItem } = useCartStore()
   const { isAuthenticated } = useAuth()
+  const wished = useIsWished(product.id)
+  const { toggle: toggleWishlist } = useWishlistActions()
 
   const defaultDimension =
     product.allowedDimensions.find((d) => d.isDefault) || product.allowedDimensions[0]
@@ -169,13 +172,22 @@ export function ProductCard({
             )}
         </div>
 
-        {/* Wishlist */}
+        {/* Wishlist — guest-friendly (local store, survives login) */}
         <button
           type="button"
-          className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--surface-raised)] text-[var(--text-muted)] transition-colors hover:text-[var(--error)]"
-          aria-label={`Add ${product.name} to wishlist`}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            toggleWishlist(product)
+          }}
+          className={cn(
+            'absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full border-2 border-[var(--ink)] bg-[var(--surface-raised)] transition-colors',
+            wished ? 'text-[var(--error)]' : 'text-[var(--text-muted)] hover:text-[var(--error)]'
+          )}
+          aria-label={wished ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+          aria-pressed={wished}
         >
-          <Heart className="h-5 w-5" />
+          <Heart className="h-5 w-5" fill={wished ? 'currentColor' : 'none'} />
         </button>
       </div>
 
@@ -337,6 +349,8 @@ export function ProductGrid({
 
 // Featured product showcase
 export function FeaturedProduct({ product }: { product: Product }) {
+  const wished = useIsWished(product.id)
+  const { toggle: toggleWishlist } = useWishlistActions()
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8 md:flex-row">
       <div className="relative aspect-square md:min-h-[500px] md:w-1/2">
@@ -377,9 +391,18 @@ export function FeaturedProduct({ product }: { product: Product }) {
             <ShoppingCart className="mr-2 h-5 w-5" />
             Add to Cart
           </Button>
-          <Button variant="secondary" size="lg">
-            <Heart className="mr-2 h-5 w-5" />
-            Wishlist
+          <Button
+            variant="secondary"
+            size="lg"
+            aria-pressed={wished}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              toggleWishlist(product)
+            }}
+          >
+            <Heart className="mr-2 h-5 w-5" fill={wished ? 'currentColor' : 'none'} />
+            {wished ? 'Wishlisted' : 'Wishlist'}
           </Button>
         </div>
       </div>
