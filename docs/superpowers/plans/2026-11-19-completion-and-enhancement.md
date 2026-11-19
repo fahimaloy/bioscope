@@ -147,7 +147,14 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** `/sitemap.xml` + `/robots.txt` serve 200 with correct entries; product
   page carries valid JSON-LD; no private route in the sitemap.
 
-### E7 — Guest cart continuity `[ ]`
+### E7 — Guest cart continuity `[x]`
+> **DONE 2026-11-20, commit `bf81d7b`, controller-executed.** Guest items already survive login
+> (localStorage), but the server cart was never populated (hydrate/setItems had zero callers). Added
+> pure mergeCartItems (dedupe product+variant, sum, stock cap, no mutation) + useCartSync (guest→auth
+> transition: GET server cart, merge local items, POST mode 'set' → no dup rows, hydrate client;
+> failure keeps guest items 'local'). CartSync mounted in customer layout. 13 tests; verify:mid 68
+> files; live server dedupe (two adds → 1 row qty 5, set 4 → 4). Risk medium (layout mount; rest
+> additive). Report: `task-e7-report.md`.
 - **Evidence:** cart is client localStorage; server cart is source of truth at checkout
   (AGENTS.md). Verify what happens to guest items at sign-in; if they are dropped,
   merge them into the server cart on login (dedupe by product+variant, sum quantities
