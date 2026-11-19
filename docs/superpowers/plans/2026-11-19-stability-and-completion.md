@@ -329,7 +329,18 @@ a mocked fetch; no endpoint configured in the dev DB).
   placeholder legal text is a liability, ship with "coming soon" + working
   contact link rather than invented policy.
 
-### C4 — Track order (task 2.13 — the one new backend piece) `[ ]`
+### C4 — Track order (task 2.13 — the one new backend piece) `[x]`
+> **DONE 2026-11-19, commits `a32677d` (feature) + `8bbd92a` (footer overflow fix found
+> during verification), controller-executed.** Read-only `trackOrder` action + POST
+> `/api/orders/track` + public `/track-order` page (in (customer) group). orderNumber +
+> (email OR phone) match; generic 404 on any miss (no enumeration); narrow PII-free
+> shape, Decimals coerced; rate-limited 5/min/IP (new bucket). 13 action/route + 5 page
+> tests; verify:mid 520/520; live email/phone match + enumeration guard + 429 verified;
+> browser 320px form/result/error all render, scrollWidth 312≤320. **Real-browser defect
+> fixed:** AnimatePresence mode="wait" spring-exit stalled the result mount (jsdom passed
+> 5/5, couldn't catch it) → entrance-only motion. **Global defect fixed:** footer lg
+> Wordmark overflowed 320px on every page (336→312) via responsive md/lg pair. Report:
+> `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-c4-report.md`.
 - Read-only `trackOrder` action + `/api/track-order` route (orderNumber +
   email/phone match, rate-limited, no enumeration: generic error on miss) +
   public page. Explicit exception to the frozen logic layer (already granted
