@@ -106,8 +106,10 @@ describe('Footer', () => {
 
     // The lockup: the mark image plus the accessible brand name on its link.
     // The old assertion passed on the sr-only text node alone; the link's
-    // accessible name pins the lockup link itself.
-    expect(screen.getByRole('img', { name: 'BIOSCOPE' })).toBeInTheDocument()
+    // accessible name pins the lockup link itself. The responsive lockup
+    // renders a md/lg pair (one display:none at each breakpoint) so the lg
+    // mark never overflows a 320px viewport — two mark images, one home link.
+    expect(screen.getAllByRole('img', { name: 'BIOSCOPE' }).length).toBe(2)
     expect(screen.getByRole('link', { name: 'BIOSCOPE — home' })).toBeInTheDocument()
 
     for (const { href, label } of DESTINATIONS) {
@@ -258,8 +260,10 @@ describe('Footer', () => {
 
     // The wordmark's letters carry per-letter colors (letter-1 through letter-8) as display type,
     // contract §2 permits. Nothing else may use an accent as text on ink.
-    const wordmarkRoot = container.querySelector('span.sr-only')?.parentElement
-    expect(wordmarkRoot, 'the wordmark renders its sr-only label').not.toBeNull()
+    // The responsive lockup is a md/lg pair inside ONE home link; scope the
+    // confinement check to that link so both wordmarks' letters are covered.
+    const wordmarkRoot = container.querySelector('a[aria-label="BIOSCOPE — home"]')
+    expect(wordmarkRoot, 'the wordmark lockup link renders').not.toBeNull()
 
     const ACCENT_TEXT =
       /text-\[var\(--(letter-[1-8]|pink|pink-strong|violet|orange|lime|teal|blue|gold|red|green|green-strong)\)\]/

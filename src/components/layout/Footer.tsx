@@ -119,7 +119,12 @@ export function Footer() {
               aria-label="BIOSCOPE — home"
               className={`inline-flex items-center rounded-pill ${FOCUS_VISIBLE}`}
             >
-              <Wordmark size="lg" variant="light" />
+              {/* Responsive lockup: the lg mark (≈320px) overflows a 320px
+                  viewport once the footer's px-4 is added (contract §6). Show
+                  md below sm, lg from sm up — display:none on the hidden one
+                  removes it from layout, so no horizontal scroll at 320px. */}
+              <Wordmark size="md" variant="light" className="sm:hidden" />
+              <Wordmark size="lg" variant="light" className="hidden sm:inline-flex" />
             </Link>
 
             {/* TODO: owner copy */}
