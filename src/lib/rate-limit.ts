@@ -14,6 +14,7 @@ import { NextResponse } from 'next/server'
 
 export type RateLimitBucket =
   | 'register'
+  | 'login'
   | 'forgot-password'
   | 'reset-password'
   | 'change-password'
@@ -22,6 +23,7 @@ export type RateLimitBucket =
 /** Requests allowed per window, per bucket, per client IP. */
 export const rateLimits: Record<RateLimitBucket, { limit: number; windowMs: number }> = {
   register: { limit: 10, windowMs: 60_000 },
+  login: { limit: 10, windowMs: 60_000 },
   'forgot-password': { limit: 5, windowMs: 60_000 },
   'reset-password': { limit: 5, windowMs: 60_000 },
   'change-password': { limit: 10, windowMs: 60_000 },

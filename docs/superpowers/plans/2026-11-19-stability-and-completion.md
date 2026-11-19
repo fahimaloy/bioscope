@@ -251,10 +251,12 @@ a mocked fetch; no endpoint configured in the dev DB).
   horizontal scroll (authenticated browser check — needs owner session).
 - **Verify:** focused test + `verify:fast`; live check with dev credential.
 
-### B2 — Analytics: replace the three zero placeholders `[~]`
-> **PARTIAL 2026-11-19, commit `4703009`:** `pendingCustomRequests` wired to
-> `/api/custom-requests/stats`. Remaining: `todayOrders` (needs a today aggregate)
-> and `conversionRate` (no session source — remove or replace with a real metric).
+### B2 — Analytics: replace the three zero placeholders `[x]`
+> **DONE 2026-11-19, controller-executed.** `pendingCustomRequests` wired (`4703009`);
+> `todayOrders`/`todayRevenue` now a real server aggregate in `/api/analytics/orders`
+> (`today` block, local midnight, paid-definition revenue); `conversionRate` removed
+> (no session source — ruling: no fake metrics), card replaced by Pending Requests.
+> Fake StatsCards trend badges removed too. verify:mid 461/461; live smoke matches DB.
 - `todayOrders` ← `/api/orders/stats` (or a `?range=today` aggregate),
   `pendingCustomRequests` ← `/api/custom-requests/stats`,
   `conversionRate` ← delivered orders ÷ checkout sessions **only if** a session
