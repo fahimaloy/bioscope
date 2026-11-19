@@ -121,7 +121,14 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
   inline error; admin can create a code and use it at checkout in the same session;
   pricing math stays server-side (frozen layer untouched).
 
-### E5 — Customer notifications, live `[ ]`
+### E5 — Customer notifications, live `[x]`
+> **DONE 2026-11-20, commit `1cce395`, controller-executed.** useNotifications hook: fetch feed on
+> mount (syncFromServer), subscribe notification:new socket (live), persist mark-read via
+> POST [id]/read + /read-all. NotificationBell rebuilt on tokens (width-capped dropdown, no 320
+> overflow), mounted in authenticated customer Navbar. 7 jsdom tests; verify:mid 66 files; live:
+> status PATCH CONFIRMED → notification appears (unread 1) → mark-read persists (gone from
+> unreadOnly). Socket server up + emitNotificationNew confirmed. Risk medium (additive Navbar mount).
+> Report: `task-e5-report.md`.
 - **Evidence:** `NotificationBell` reads `notificationStore` but **nothing fetches**
   `/api/notifications` into it, and the bell is **not mounted** in the customer Navbar
   (admin layout only). `SocketProvider` is a stub; `useSocket` has no customer consumer.
