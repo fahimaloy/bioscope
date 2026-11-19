@@ -6,7 +6,6 @@ import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight } from 'lucide-react'
 import { DoodleScatter, MarqueeRibbon, SketchUnderline } from '@/components/decorative'
-import { PageWrapper } from '@/components/layout/PageWrapper'
 import { ProductCard } from '@/components/product/ProductCard'
 import { SkeletonProductCard } from '@/components/ui/Skeleton'
 import { cn } from '@/lib/utils'
@@ -122,7 +121,7 @@ export default function HomePage() {
   const products = featured.length > 0 ? featured : FALLBACK_FEATURED
 
   return (
-    <PageWrapper>
+    <>
       {/* ── Editorial hero ───────────────────────────────────────────────
           Oversized Shrikhand headline, the word "Fun" in `--pink` (display
           type on the vivid accent, contract §2), a hand-written line, two real
@@ -285,6 +284,6 @@ export default function HomePage() {
           </div>
         </motion.div>
       </section>
-    </PageWrapper>
+    </>
   )
 }

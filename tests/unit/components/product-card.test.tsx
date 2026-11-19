@@ -29,7 +29,7 @@ import { readFileSync } from 'node:fs'
 import { SessionProvider } from 'next-auth/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ProductCard } from '@/components/product/ProductCard'
-import HomePage from '@/app/page'
+import HomePage from '@/app/(customer)/page'
 import { featuredProductsOptions } from '@/lib/queries/products'
 import { formatCurrency } from '@/lib/utils'
 import type { Product } from '@/types'
@@ -181,7 +181,7 @@ const LEGACY_TEXT_OPACITY = [
 /** Emoji are not icons (Ruling 4, spec §5.6). */
 const EMOJI_PATTERN = /\p{Extended_Pictographic}/u
 
-const OWNED_FILES = ['src/app/page.tsx', 'src/components/product/ProductCard.tsx']
+const OWNED_FILES = ['src/app/(customer)/page.tsx', 'src/components/product/ProductCard.tsx']
 
 describe('ProductCard', () => {
   it('renders the product name', () => {

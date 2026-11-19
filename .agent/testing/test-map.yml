@@ -53,6 +53,9 @@ modules:
   login-register:
     source: [src/app/(customer)/login/**, src/app/(customer)/register/**, src/lib/validations/auth.ts]
     unit: [tests/unit/pages/auth-pages.test.tsx, tests/unit/validations.test.ts]
+  landing-shell:
+    source: [src/app/(customer)/page.tsx, src/app/(customer)/layout.tsx]
+    unit: [tests/unit/landing-shell.test.ts, tests/unit/components/product-card.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
