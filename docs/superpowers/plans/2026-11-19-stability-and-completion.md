@@ -338,7 +338,16 @@ a mocked fetch; no endpoint configured in the dev DB).
   bans unapproved marketing claims. Contact form already posts `/api/contact`;
   keep the contract, add rate limit (B3) server-side.
 
-### C3 — Content pages: policies + company (tasks 2.11/2.12) `[ ]`
+### C3 — Content pages: policies + company (tasks 2.11/2.12) `[x]`
+> **DONE 2026-11-19, commit `55f7c45`, controller-executed.** 10 dead Footer routes render
+> via a shared ContentPage shell: faq (Accordion), shipping (LIVE public-settings rates),
+> returns/privacy/terms/accessibility (honest "being finalized" placeholders, TODO owner copy,
+> no invented legal text — ruling 3), blog/careers/press/affiliates (coming-soon). Shared faqs
+> module (contact refactored DRY). 12 jsdom tests; verify:mid 555/555; all 10 routes 200;
+> browser faq/shipping/blog 320 scrollWidth 312≤320, shipping live rates, FAQ live false→true.
+> Gate PARTIAL (contact module-scope edit outside function symbol span — tool limitation, not
+> a defect; contact test-verified). Report:
+> `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-c3-report.md`.
 - `/faq`, `/shipping`, `/returns`, `/privacy`, `/terms` (+ blog/careers/press/
   affiliates/accessibility only if owner wants them now). Shared
   `ContentPage` component; **owner must supply or approve legal copy** —
