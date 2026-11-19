@@ -175,7 +175,7 @@ export default function ShopPage() {
   ]
 
   return (
-    <div className="bg-[var(--paper)] pt-24">
+    <div className="pt-24">
       {/* Hero — one decor accent: a single DoodleScatter (contract §3). */}
       <section className="relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
         <DoodleScatter count={6} seed="shop-hero" />

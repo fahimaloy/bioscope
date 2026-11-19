@@ -70,6 +70,8 @@ export default function CustomStickerPage() {
   const [mobileTab, setMobileTab] = useState<'tools' | 'canvas' | 'preview'>('canvas')
   const [showToolsMobile, setShowToolsMobile] = useState(false)
   const [pricePulse, setPricePulse] = useState(false)
+  // A request the admin sent back for another pass, surfaced as a banner.
+  const [revisionRequest, setRevisionRequest] = useState<{ id: string; adminNotes: string | null; quotedPrice: number | null } | null>(null)
 
   const {
     design,
@@ -135,6 +137,23 @@ export default function CustomStickerPage() {
     })
   }, [actions, design.canvas.width, design.canvas.height])
 
+  useEffect(() => {
+    fetch('/api/custom-requests?limit=100')
+      .then((r) => r.json())
+      .then((json) => {
+        const list = json?.success ? (json.data?.data ?? []) : []
+        const awaiting = list.find((request: { status: string }) => request.status === 'REVISION_REQUESTED')
+        if (awaiting) {
+          setRevisionRequest({
+            id: awaiting.id,
+            adminNotes: awaiting.adminNotes ?? null,
+            quotedPrice: awaiting.quotedPrice ?? null,
+          })
+        }
+      })
+      .catch(() => {})
+  }, [])
+
   const handleExport = useCallback(async (format: 'png' | 'jpg' | 'pdf' | 'svg') => {
     if (!fabricCanvas) {
       toast.error('Canvas is not ready yet')
@@ -151,6 +170,49 @@ export default function CustomStickerPage() {
     a.click()
     toast.success(`Exported as ${format.toUpperCase()}`)
   }, [fabricCanvas])
+
+  const handleResubmit = useCallback(
+    async (requestId: string) => {
+      if (submitting) return
+      setSubmitting(true)
+      try {
+        if (!fabricCanvas) throw new Error('Canvas is not ready yet')
+        const dataUrl = fabricCanvas.toDataURL({ format: 'png', multiplier: 2 })
+        const upRes = await fetch('/api/custom-requests/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataUrl, name: 'custom-sticker-revision.png' }),
+        })
+        const upJson = await upRes.json()
+        if (!upRes.ok) throw new Error(upJson.error || 'Image upload failed')
+
+        const res = await fetch(`/api/custom-requests/${requestId}/resubmit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrl: upJson.data.url,
+            originalName: upJson.data.originalName,
+            width: design.canvas.width,
+            height: design.canvas.height,
+            quantity,
+            material,
+            finish,
+            cutType,
+          }),
+        })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error || 'Could not submit the revision')
+        toast.success('Revised design submitted — we will price it again shortly.')
+        setRevisionRequest(null)
+        router.push('/profile')
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : 'Something went wrong')
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [submitting, fabricCanvas, design.canvas.width, design.canvas.height, quantity, material, finish, cutType, router]
+  )
 
   const handleRequestQuote = useCallback(async () => {
     if (submitting) return
@@ -199,7 +261,37 @@ export default function CustomStickerPage() {
   }, [submitting, fabricCanvas, design.canvas.width, design.canvas.height, quantity, material, finish, cutType, router])
 
   return (
-    <div className="min-h-screen bg-[var(--paper)]">
+    <div className="min-h-screen">
+      {revisionRequest && (
+        <div className="bg-[color-mix(in_srgb,var(--warning)_15%,transparent)] border-b-[3px] border-[var(--warning)] px-4 py-3">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center gap-3 sm:justify-between">
+            <div>
+              <p className="font-medium text-[var(--ink)]">Your design needs another pass</p>
+              <p className="text-sm text-[var(--text-subtle)]">
+                {revisionRequest.adminNotes || 'Our team sent this back for a revision.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setRevisionRequest(null)}
+                className="text-sm text-[var(--text-subtle)] underline underline-offset-2"
+              >
+                Later
+              </button>
+              <button
+                type="button"
+                disabled={submitting}
+                onClick={() => handleResubmit(revisionRequest.id)}
+                className="rounded-pill border-2 border-[var(--ink)] bg-[var(--gold)] px-4 py-2 text-sm font-medium text-[var(--ink)] disabled:opacity-50"
+              >
+                {submitting ? 'Submitting…' : 'Submit revised design'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Tab Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--paper-deep)] border-t-[3px] border-[var(--ink)] shadow-[0_-6px_0_var(--ink)]">
         <div className="grid grid-cols-3">
@@ -246,7 +338,7 @@ export default function CustomStickerPage() {
               </Badge>
 
               {/* Quantity Stepper */}
-              <div className="flex items-center gap-2 bg-[var(--surface-raised)] border-[3px] border-[var(--ink)] rounded-pill px-3 py-1.5 shadow-[var(--shadow-ink-1)]">
+              <div className="flex items-center gap-2 bg-[var(--surface-raised)] border-[3px] border-[var(--ink)] rounded-pill px-3 py-1.5 shadow-ink-1">
                 <span className="text-sm text-[var(--text-subtle)] mr-2">Qty</span>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -267,7 +359,7 @@ export default function CustomStickerPage() {
 
               {/* Live Price */}
               <motion.div
-                className="flex items-center gap-2 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill px-6 py-3 shadow-[var(--shadow-ink-2)]"
+                className="flex items-center gap-2 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill px-6 py-3 shadow-ink-2"
                 variants={variants.pulseSoft}
                 animate={pricePulse ? 'animate' : 'initial'}
               >
@@ -294,7 +386,7 @@ export default function CustomStickerPage() {
               initial={{ x: -300 }}
               animate={{ x: 0 }}
               exit={{ x: -300 }}
-              className="w-96 h-full bg-[var(--paper-deep)] border-r-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-4)] overflow-y-auto p-4"
+              className="w-96 h-full bg-[var(--paper-deep)] border-r-[3px] border-[var(--ink)] shadow-ink-4 overflow-y-auto p-4"
             >
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-display text-xl text-[var(--brand)]">Tools</h2>
@@ -327,7 +419,7 @@ export default function CustomStickerPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar - Tools */}
           <aside className="hidden lg:block lg:col-span-3" data-testid="builder-panel-tools">
-            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-4 space-y-4">
+            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-ink-3 p-4 space-y-4">
               <div className="flex items-center gap-3">
                 <WashiTape color="pink" width={84} height={22} />
                 <h2 className="font-display text-lg text-[var(--ink)]">Tools</h2>
@@ -352,7 +444,7 @@ export default function CustomStickerPage() {
           {/* Canvas Area - Center */}
           <section className="lg:col-span-6 flex flex-col gap-6" data-testid="builder-panel-canvas">
             {/* Canvas Toolbar */}
-            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] p-4 shadow-[var(--shadow-ink-3)]">
+            <div className="bg-[var(--paper-deep)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] p-4 shadow-ink-3">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-2">
                   <Button
@@ -503,7 +595,7 @@ export default function CustomStickerPage() {
               >
                 <button
                   onClick={() => setShowToolsMobile(true)}
-                  className="w-full mb-4 py-3 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill font-display text-lg shadow-[var(--shadow-ink-2)]"
+                  className="w-full mb-4 py-3 bg-[var(--brand)] text-[var(--ink)] border-[3px] border-[var(--ink)] rounded-pill font-display text-lg shadow-ink-2"
                 >
                   <ChevronDown className="w-6 h-6 inline mr-2" />
                   Open Tools Panel
@@ -531,7 +623,7 @@ export default function CustomStickerPage() {
             fullWidth
             onClick={handleRequestQuote}
             loading={submitting}
-            className="relative shadow-[var(--shadow-ink-4)]"
+            className="relative shadow-ink-4"
           >
             {submitting ? (
               <>

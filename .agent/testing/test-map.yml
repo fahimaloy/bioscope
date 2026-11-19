@@ -49,3 +49,38 @@ modules:
     unit: []
     e2e_hint: [e2e/smoke.spec.ts]
     shared_footprint: true
+  spend-tiers:
+    source: [src/lib/spend-tiers.ts]
+    unit: [tests/unit/spend-tiers.test.ts]
+  customers:
+    source: [src/lib/customers.ts, src/app/api/customers/**, src/app/(admin)/admin/customers/page.tsx]
+    unit: [tests/unit/customers-api.test.ts]
+  secrets:
+    source: [src/lib/crypto.ts, src/lib/secret-settings.ts, src/lib/actions/settings.ts, src/lib/server/settings-backup.ts, src/lib/server/email-config.ts]
+    unit: [tests/unit/crypto.test.ts, tests/unit/secret-settings.test.ts, tests/unit/secret-roundtrip.test.ts, tests/unit/settings-backup.test.ts]
+    shared_footprint: true
+  webhooks:
+    source: [src/lib/server/webhooks.ts, src/lib/validations/webhook.ts, src/app/api/webhooks/**]
+    unit: [tests/unit/webhooks.test.ts]
+  api-keys:
+    source: [src/lib/server/api-keys.ts, src/lib/validations/api-key.ts, src/app/api/api-keys/**, src/app/api/headless/**]
+    unit: [tests/unit/api-keys.test.ts, tests/unit/api-key-scopes.test.ts]
+  settings-backup:
+    source: [src/lib/server/settings-backup.ts, src/app/api/settings/backup/**]
+    unit: [tests/unit/settings-backup.test.ts]
+  products:
+    source: [src/lib/product-csv.ts, src/lib/actions/product.ts, src/app/api/products/**]
+    unit: [tests/unit/product-csv.test.ts, tests/unit/dead-utilities.test.ts]
+    shared_footprint: true
+  custom-requests:
+    source: [src/lib/actions/customRequest.ts, src/lib/validations/custom-request.ts, src/app/api/custom-requests/**]
+    unit: [tests/unit/custom-request-workflow.test.ts, tests/unit/webhooks.test.ts]
+  realtime:
+    source: [src/lib/hooks/useAdminRealtime.ts, src/lib/socket.ts]
+    unit: [tests/unit/spend-tiers.test.ts]
+  admin-bootstrap:
+    source: [instrumentation.ts, next.config.js, src/lib/admin-bootstrap.ts]
+    unit: [tests/unit/admin-bootstrap.test.ts]
+  csv:
+    source: [src/lib/csv.ts, src/lib/product-csv.ts, src/app/api/products/export/route.ts, src/app/api/orders/export/route.ts, src/app/api/custom-requests/export/route.ts]
+    unit: [tests/unit/csv.test.ts, tests/unit/product-csv.test.ts]

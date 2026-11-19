@@ -1,5 +1,5 @@
 export { StaggeredText, StaggeredTextSimple } from './StaggeredText'
-export { FloatingShapes, FloatingEmojis } from './FloatingShapes'
+export { FloatingShapes } from './FloatingShapes'
 export { CounterAnimation, StatCounter } from './CounterAnimation'
 export { PageTransition, LayoutTransition, StaggerContainer, StaggerItem, PageTransitionWrapper } from './PageTransition'
 export { HoverLift, HoverCard, HoverButton, ScaleOnHover, RotateOnHover } from './HoverLift'

@@ -106,7 +106,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] relative pt-24 pb-12 px-4 overflow-hidden">
+  <div className="min-h-screen relative pt-24 pb-12 px-4 overflow-hidden">
       {/* Global Doodle Background */}
       <DoodleBackground shapeCount={10} />
       

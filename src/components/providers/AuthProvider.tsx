@@ -24,14 +24,10 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-color)]">
+   <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="staggered-title text-4xl mb-4" style={{ fontSize: '4rem' }}>
             <span>Loading...</span>
-          </div>
-          <div className="floating-emojis">
-            <span className="emoji e1">🎨</span>
-            <span className="emoji e2">✨</span>
           </div>
         </div>
       </div>

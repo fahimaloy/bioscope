@@ -51,8 +51,8 @@ const variantStyles: Record<NonNullable<CardProps['variant']>, string> = {
 
 const elevationStyles: Record<NonNullable<CardProps['elevation']>, string> = {
   flat: 'shadow-none',
-  raised: 'shadow-[var(--shadow-ink-3)]',
-  sticker: 'shadow-[var(--shadow-die-cut)]',
+  raised: 'shadow-ink-3',
+  sticker: 'shadow-die-cut',
 };
 
 /** The `variant` → `elevation` mapping documented on the prop. */
@@ -87,7 +87,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           elevationStyles[resolvedElevation],
           hover &&
             resolvedElevation === 'raised' &&
-            'hover:-translate-y-1 hover:shadow-[var(--shadow-ink-4)]',
+            'hover:-translate-y-1 hover:shadow-ink-4',
           hover && resolvedElevation === 'sticker' && 'hover:-translate-y-1',
           paddingStyles[padding],
           className

@@ -82,6 +82,23 @@ const DEFAULT_LETTER_COLORS: readonly string[] = [
 ]
 
 /**
+ * Static lookup of complete class strings for the `--letter-*` tokens, so
+ * Tailwind's scanner sees them verbatim. A runtime-constructed
+ * `text-[var(--${tokenName})]` never makes it into the stylesheet — the
+ * letters silently inherit ink. Covers the default palette; a caller passing a
+ * custom `letterColors` array is still handled via inline `style`.
+ */
+const LETTER_CLASSES: Record<string, string> = {
+  'letter-1': 'text-[var(--letter-1)]',
+  'letter-2': 'text-[var(--letter-2)]',
+  'letter-3': 'text-[var(--letter-3)]',
+  'letter-4': 'text-[var(--letter-4)]',
+  'letter-5': 'text-[var(--letter-5)]',
+  'letter-6': 'text-[var(--letter-6)]',
+  'letter-7': 'text-[var(--letter-7)]',
+  'letter-8': 'text-[var(--letter-8)]',
+}
+/**
  * Die-cut halo for the mark (spec §5.1: the primary mark is used "inside a
  * white die-cut treatment"). The source PNG is 500×500 RGBA with transparent
  * corners and an irregular silhouette — camera body, protruding lens, crank
@@ -155,10 +172,15 @@ export function Wordmark({
       )
     }
 
+    // Known tokens go through a static lookup so Tailwind emits the utility;
+    // an unknown custom token gets an inline style instead of a class the
+    // compiler will never generate (which silently inherited ink).
+    const staticClass = LETTER_CLASSES[tokenName]
     return (
       <span
         key={index}
-        className={cn('font-display leading-none tracking-tight', spec.textClass, `text-[var(--${tokenName})]`)}
+        className={cn('font-display leading-none tracking-tight', spec.textClass, staticClass)}
+        style={staticClass ? undefined : { color: tokenValue }}
       >
         {letter}
       </span>

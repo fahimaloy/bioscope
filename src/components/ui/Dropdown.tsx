@@ -5,7 +5,6 @@ import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from './Button';
 import { Card } from './Card';
-import { Checkbox } from './Checkbox';
 import { FOCUS_VISIBLE, setRefs } from './shared';
 
 interface DropdownItem {
@@ -280,14 +279,19 @@ export const MultiSelectDropdown = forwardRef<HTMLDivElement, MultiSelectDropdow
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <Checkbox
-                      checked={isSelected}
-                      disabled={Boolean(item.disabled || isLimitReached)}
-                      className="h-4 w-4"
+                    {/* Decorative, not a button: the option row is already the
+                        single pressable, so a nested checkbox would be invalid
+                        HTML and double-announce to assistive tech. */}
+                    <span
                       aria-hidden="true"
-                      tabIndex={-1}
-                      onCheckedChange={() => {}}
-                    />
+                      className={cn(
+                        'flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-[var(--radius-sm)] border-2 border-[var(--ink)] bg-[var(--surface-raised)] transition-colors duration-fast',
+                        isSelected && 'bg-[var(--ink)] text-[var(--paper-raised)]',
+                        (item.disabled || isLimitReached) && 'opacity-50'
+                      )}
+                    >
+                      {isSelected && <Check className="h-3 w-3" strokeWidth={3} />}
+                    </span>
                     {item.icon && <span className="flex-shrink-0">{item.icon}</span>}
                     <span className="truncate">{item.label}</span>
                   </div>

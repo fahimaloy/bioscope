@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -13,7 +13,7 @@ import { ProductPreview } from '@/components/admin/ProductPreview'
 import { Select } from '@/components/ui'
 import { Modal } from '@/components/ui/Modal'
 import { formatCurrency, formatDate } from '@/lib/utils'
-import { Plus, Tag, Edit, Trash2, Eye } from 'lucide-react'
+import { Plus, Tag, Edit, Trash2, Eye, Copy, Download, Upload } from 'lucide-react'
 import { SearchInput } from '@/components/ui/SearchInput'
 import Image from 'next/image'
 import type { Product } from '@/types'
@@ -65,7 +65,7 @@ const COLUMNS: Column<ProductRow>[] = [
   },
   { key: 'name', header: 'Product', accessor: (row) => row.name, sortable: true },
   { key: 'category', header: 'Category', accessor: (row) => row.category?.name ?? '—' },
-  { key: 'price', header: 'Price', accessor: (row) => formatCurrency(Number(row.basePrice)), sortable: true },
+  { key: 'basePrice', header: 'Price', accessor: (row) => formatCurrency(Number(row.basePrice)), sortable: true },
   { key: 'stock', header: 'Stock', accessor: (row) => row.stock, sortable: true },
   { key: 'status', header: 'Status', cell: (row) => <Badge variant={row.isActive ? 'success' : 'error'} size="sm">{row.isActive ? 'Active' : 'Inactive'}</Badge> },
   { key: 'featured', header: 'Featured', cell: (row) => (row.isFeatured ? 'Yes' : 'No') },
@@ -82,6 +82,11 @@ export default function ProductsPage() {
   const [page, setPage] = useState(1)
   const [pager, setPager] = useState({ total: 0, pageSize: 10 })
   const [loading, setLoading] = useState(true)
+  const [cloningId, setCloningId] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState<{ created: number; updated: number; errors: Array<{ row: number; reason: string }> } | null>(null)
+  const csvInput = useRef<HTMLInputElement>(null)
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<ProductRow | null>(null)
   const [previewProduct, setPreviewProduct] = useState<ProductRow | null>(null)
@@ -149,6 +154,68 @@ export default function ProductsPage() {
     }
   }
 
+  const handleClone = async (id: string) => {
+    setCloningId(id)
+    try {
+      const res = await fetch(`/api/products/${id}/clone`, { method: 'POST' })
+      const json = await res.json().catch(() => null)
+      if (!res.ok) throw new Error(json?.error || 'Clone failed')
+      toast.success('Product cloned as an inactive draft')
+      load()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Clone failed')
+    } finally {
+      setCloningId(null)
+    }
+  }
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const res = await fetch('/api/products/export')
+      if (!res.ok) {
+        const json = await res.json().catch(() => null)
+        throw new Error(json?.error || 'Export failed')
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = 'products.csv'
+      anchor.click()
+      URL.revokeObjectURL(url)
+      toast.success('Products exported')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Export failed')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  const handleImportFile = async (file: File) => {
+    setImporting(true)
+    setImportResult(null)
+    try {
+      const csv = await file.text()
+      const res = await fetch('/api/products/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ csv }),
+      })
+      const json = await res.json().catch(() => null)
+      if (!res.ok) throw new Error(json?.error || 'Import failed')
+      const result = json.data
+      setImportResult(result)
+      toast.success(`Import finished: ${result.created} created, ${result.updated} updated`)
+      if (result.errors?.length) toast.warning(`${result.errors.length} row(s) skipped`)
+      load()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Import failed')
+    } finally {
+      setImporting(false)
+    }
+  }
+
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this product?')) return
     const res = await fetch(`/api/products/${id}`, { method: 'DELETE' })
@@ -170,6 +237,7 @@ export default function ProductsPage() {
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" onClick={() => setPreviewProduct(row)} aria-label="Preview" className="hover:-translate-y-1 transition-transform"><Eye className="w-4 h-4" /></Button>
           <Button variant="ghost" size="sm" onClick={() => { setEditingProduct(row); setShowForm(true) }} aria-label="Edit" className="hover:-translate-y-1 transition-transform"><Edit className="w-4 h-4" /></Button>
+          <Button variant="ghost" size="sm" onClick={() => handleClone(row.id)} aria-label="Clone" loading={cloningId === row.id} className="hover:-translate-y-1 transition-transform"><Copy className="w-4 h-4" /></Button>
           <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 hover:-translate-y-1 transition-transform" onClick={() => handleDelete(row.id)} aria-label="Delete"><Trash2 className="w-4 h-4" /></Button>
         </div>
       ),
@@ -177,7 +245,7 @@ export default function ProductsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
+  <div className="min-h-screen pt-24 pb-12 px-4">
       <div className="max-w-full mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -191,12 +259,61 @@ export default function ProductsPage() {
                 Manage Categories
               </Button>
             </Link>
+            <Button variant="outline" onClick={handleExport} loading={exporting}>
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
+            <Button variant="outline" onClick={() => csvInput.current?.click()} loading={importing}>
+              <Upload className="w-4 h-4 mr-2" />
+              Import CSV
+            </Button>
+            <input
+              ref={csvInput}
+              type="file"
+              accept=".csv,text/csv"
+              className="hidden"
+              aria-label="Product CSV file"
+              onChange={(e) => {
+                const file = e.target.files?.[0]
+                if (file) handleImportFile(file)
+                e.target.value = ''
+              }}
+            />
             <Button onClick={() => { setEditingProduct(null); setShowForm(true) }}>
               <Plus className="w-4 h-4 mr-2" />
               Add Product
             </Button>
           </div>
         </div>
+
+        {importResult && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+            <span className="text-[var(--ink)]">
+              Last import: {importResult.created} created, {importResult.updated} updated
+            </span>
+            {importResult.errors.length > 0 && (
+              <details className="text-[var(--warning)]">
+                <summary className="cursor-pointer">
+                  {importResult.errors.length} row(s) skipped
+                </summary>
+                <ul className="mt-1 space-y-0.5 text-xs text-[var(--text-subtle)]">
+                  {importResult.errors.map((entry) => (
+                    <li key={`${entry.row}-${entry.reason}`}>
+                      Row {entry.row}: {entry.reason}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            )}
+            <button
+              type="button"
+              onClick={() => setImportResult(null)}
+              className="text-[var(--text-subtle)] underline underline-offset-2 hover:text-[var(--ink)]"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         <Card className="p-4 mb-6">
           <div className="flex flex-wrap gap-4">

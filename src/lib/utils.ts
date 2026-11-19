@@ -182,3 +182,17 @@ export function pick<T extends Record<string, unknown>, K extends keyof T>(
   })
   return result
 }
+
+/**
+ * Sanitise a post-login destination taken from a query parameter.
+ *
+ * Accepts `callbackUrl` (the next-auth convention) or `redirect` (used by the
+ * shop/cart links). Only single-slash relative paths are allowed: `//evil.com`
+ * is protocol-relative and absolute URLs would turn sign-in into an open
+ * redirect. Anything else falls back to `/`.
+ */
+export function safeCallbackUrl(raw: string | null | undefined): string {
+  if (!raw) return '/'
+  if (!raw.startsWith('/') || raw.startsWith('//') || raw.includes('\\')) return '/'
+  return raw
+}

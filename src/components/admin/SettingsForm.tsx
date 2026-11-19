@@ -9,15 +9,20 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { Badge } from '@/components/ui/Badge'
 import { TaxConfig } from './TaxConfig'
 import { DeliveryConfig } from './DeliveryConfig'
-import { Settings, Tag, Truck, Mail, Globe, Palette, Save, Loader2, Image as ImageIcon, FileText, Wrench } from 'lucide-react'
+import { WebhookSettings } from './WebhookSettings'
+import { ApiKeySettings } from './ApiKeySettings'
+import { BackupSettings } from './BackupSettings'
+import { Settings, Tag, Truck, Mail, Globe, Palette, Save, Loader2, Image as ImageIcon, FileText, Wrench, CreditCard, ShieldCheck, Webhook, KeyRound, DatabaseBackup } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { SketchUnderline, StickerPeel } from '@/components/decorative/DoodleElements'
 import { Checkbox } from '@/components/ui/Checkbox'
+import type { SettingsTab } from '@/lib/admin-settings'
 
 interface SettingsFormProps {
   onSave: (settings: SettingsData) => Promise<void>
   initialSettings?: SettingsData
+  initialTab?: SettingsTab
   className?: string
 }
 
@@ -41,8 +46,20 @@ interface SettingsData {
   smtp_port?: string
   smtp_user?: string
   smtp_password?: string
+  smtp_secure?: boolean
   from_email?: string
   from_name?: string
+  payment_stripe_publishable_key?: string
+  payment_stripe_secret_key?: string
+  payment_stripe_webhook_secret?: string
+  payment_sslcommerz_store_id?: string
+  payment_sslcommerz_store_password?: string
+  payment_bkash_app_key?: string
+  payment_bkash_app_secret?: string
+  payment_bkash_username?: string
+  payment_bkash_password?: string
+  payment_nagad_merchant_id?: string
+  payment_nagad_private_key?: string
   order_confirmation_template?: string
   order_status_template?: string
   custom_request_template?: string
@@ -55,8 +72,8 @@ interface SettingsData {
   custom_css?: string
 }
 
-export function SettingsForm({ onSave, initialSettings = {}, className }: SettingsFormProps) {
-  const [activeTab, setActiveTab] = useState<'general' | 'tax' | 'delivery' | 'email' | 'appearance'>('general')
+export function SettingsForm({ onSave, initialSettings = {}, className, initialTab }: SettingsFormProps) {
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab ?? 'general')
   const [submitting, setSubmitting] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -87,6 +104,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
   const [emailSettings, setEmailSettings] = useState({
     smtpHost: initialSettings.smtp_host || '',
     smtpPort: initialSettings.smtp_port || '587',
+    smtpSecure: initialSettings.smtp_secure ?? false,
     smtpUser: initialSettings.smtp_user || '',
     smtpPassword: initialSettings.smtp_password || '',
     fromEmail: initialSettings.from_email || '',
@@ -95,6 +113,22 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
     orderStatusUpdate: initialSettings.order_status_template || '',
     customRequestUpdate: initialSettings.custom_request_template || '',
     welcomeEmail: initialSettings.welcome_template || '',
+  })
+
+  // Payment-gateway credentials are secrets: the server returns them masked and
+  // stores them encrypted. Leaving a field as the mask keeps the stored value.
+  const [paymentSettings, setPaymentSettings] = useState({
+    stripePublishableKey: initialSettings.payment_stripe_publishable_key || '',
+    stripeSecretKey: initialSettings.payment_stripe_secret_key || '',
+    stripeWebhookSecret: initialSettings.payment_stripe_webhook_secret || '',
+    sslcommerzStoreId: initialSettings.payment_sslcommerz_store_id || '',
+    sslcommerzStorePassword: initialSettings.payment_sslcommerz_store_password || '',
+    bkashAppKey: initialSettings.payment_bkash_app_key || '',
+    bkashAppSecret: initialSettings.payment_bkash_app_secret || '',
+    bkashUsername: initialSettings.payment_bkash_username || '',
+    bkashPassword: initialSettings.payment_bkash_password || '',
+    nagadMerchantId: initialSettings.payment_nagad_merchant_id || '',
+    nagadPrivateKey: initialSettings.payment_nagad_private_key || '',
   })
 
   const [assetUpload, setAssetUpload] = useState<'logo' | 'favicon' | null>(null)
@@ -151,6 +185,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
       ...generalSettings,
       ...taxSettings,
       ...deliverySettings,
+      ...paymentSettings,
       ...emailSettings,
       ...appearanceSettings,
     }
@@ -205,8 +240,12 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
           <TabsTrigger value="general"><Settings className="w-4 h-4 mr-1" /> General</TabsTrigger>
           <TabsTrigger value="tax"><Tag className="w-4 h-4 mr-1" /> Tax</TabsTrigger>
           <TabsTrigger value="delivery"><Truck className="w-4 h-4 mr-1" /> Delivery</TabsTrigger>
+          <TabsTrigger value="payments"><CreditCard className="w-4 h-4 mr-1" /> Payments</TabsTrigger>
           <TabsTrigger value="email"><Mail className="w-4 h-4 mr-1" /> Email</TabsTrigger>
           <TabsTrigger value="appearance"><Palette className="w-4 h-4 mr-1" /> Appearance</TabsTrigger>
+          <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-1" /> Webhooks</TabsTrigger>
+          <TabsTrigger value="api-keys"><KeyRound className="w-4 h-4 mr-1" /> API Keys</TabsTrigger>
+          <TabsTrigger value="backup"><DatabaseBackup className="w-4 h-4 mr-1" /> Backup</TabsTrigger>
         </TabsList>
 
         {/* General Settings */}
@@ -352,6 +391,74 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
           <DeliveryConfig onChange={(patch) => setDeliverySettings((prev) => ({ ...prev, ...patch }))} initialSettings={deliverySettings} />
         </TabsContent>
 
+        {/* Payment Gateway Settings */}
+        <TabsContent value="payments" className="space-y-6 animate-fade-in">
+          {[
+            {
+              title: 'Stripe',
+              fields: [
+                { label: 'Publishable Key', key: 'stripePublishableKey', placeholder: 'pk_live_…' },
+                { label: 'Secret Key', key: 'stripeSecretKey', placeholder: 'sk_live_…', secret: true },
+                { label: 'Webhook Signing Secret', key: 'stripeWebhookSecret', placeholder: 'whsec_…', secret: true },
+              ],
+            },
+            {
+              title: 'SSLCommerz',
+              fields: [
+                { label: 'Store ID', key: 'sslcommerzStoreId', placeholder: 'your-store-id' },
+                { label: 'Store Password', key: 'sslcommerzStorePassword', placeholder: '••••••••', secret: true },
+              ],
+            },
+            {
+              title: 'bKash',
+              fields: [
+                { label: 'App Key', key: 'bkashAppKey', placeholder: 'app-key' },
+                { label: 'App Secret', key: 'bkashAppSecret', placeholder: '••••••••', secret: true },
+                { label: 'Username', key: 'bkashUsername', placeholder: 'merchant-username' },
+                { label: 'Password', key: 'bkashPassword', placeholder: '••••••••', secret: true },
+              ],
+            },
+            {
+              title: 'Nagad',
+              fields: [
+                { label: 'Merchant ID', key: 'nagadMerchantId', placeholder: 'merchant-id' },
+                { label: 'Private Key', key: 'nagadPrivateKey', placeholder: '-----BEGIN PRIVATE KEY-----', secret: true },
+              ],
+            },
+          ].map((provider, index) => (
+            <motion.div
+              key={provider.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * index, type: 'spring', stiffness: 100, damping: 15 }}
+            >
+              <SectionCard title={provider.title} icon={<CreditCard className="w-5 h-5" />} iconColor="var(--secondary)">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {provider.fields.map((field) => (
+                    <Input
+                      key={field.key}
+                      label={field.label}
+                      type={field.secret ? 'password' : 'text'}
+                      value={paymentSettings[field.key as keyof typeof paymentSettings]}
+                      onChange={(e) =>
+                        setPaymentSettings((prev) => ({ ...prev, [field.key]: e.target.value }))
+                      }
+                      placeholder={field.placeholder}
+                    />
+                  ))}
+                </div>
+              </SectionCard>
+            </motion.div>
+          ))}
+          <p className="flex items-start gap-2 text-sm text-[var(--text-subtle)]">
+            <ShieldCheck className="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span>
+              Credentials are encrypted at rest and returned masked. Leave a masked field unchanged to keep the stored
+              value; clear it to remove the credential. Keys are only read by the server when a payment is processed.
+            </span>
+          </p>
+        </TabsContent>
+
         {/* Email Settings */}
         <TabsContent value="email" className="space-y-6 animate-fade-in">
           <motion.div
@@ -365,6 +472,21 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
                 <Input label="SMTP Port" value={emailSettings.smtpPort} onChange={(e) => setEmailSettings((prev) => ({ ...prev, smtpPort: e.target.value }))} placeholder="587" />
                 <Input label="SMTP Username" value={emailSettings.smtpUser} onChange={(e) => setEmailSettings((prev) => ({ ...prev, smtpUser: e.target.value }))} placeholder="your-email@gmail.com" />
                 <Input label="SMTP Password" type="password" value={emailSettings.smtpPassword} onChange={(e) => setEmailSettings((prev) => ({ ...prev, smtpPassword: e.target.value }))} placeholder="••••••••" />
+              </div>
+              <div className="mt-4">
+                <label className="flex items-start gap-3 rounded-input border-2 border-[var(--light)] p-4 cursor-pointer hover:border-[var(--primary)] transition-colors">
+                  <Checkbox
+                    checked={emailSettings.smtpSecure}
+                    onCheckedChange={(checked) => setEmailSettings((prev) => ({ ...prev, smtpSecure: checked === true }))}
+                    aria-label="Use a secure (TLS) connection"
+                  />
+                  <span>
+                    <span className="block text-sm font-medium text-[var(--ink)]">Always use TLS</span>
+                    <span className="block text-sm text-[var(--text-subtle)] mt-0.5">
+                      Require an encrypted connection for every send. Port 465 implies TLS regardless of this setting.
+                    </span>
+                  </span>
+                </label>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                 <Input label="From Email" value={emailSettings.fromEmail} onChange={(e) => setEmailSettings((prev) => ({ ...prev, fromEmail: e.target.value }))} placeholder="noreply@bioscope.com" />
@@ -405,6 +527,21 @@ export function SettingsForm({ onSave, initialSettings = {}, className }: Settin
               </Tabs>
             </SectionCard>
           </motion.div>
+        </TabsContent>
+
+        {/* Webhook Endpoints */}
+        <TabsContent value="webhooks" className="animate-fade-in">
+          <WebhookSettings />
+        </TabsContent>
+
+        {/* Headless API Keys */}
+        <TabsContent value="api-keys" className="animate-fade-in">
+          <ApiKeySettings />
+        </TabsContent>
+
+        {/* Settings backup + restore */}
+        <TabsContent value="backup" className="animate-fade-in">
+          <BackupSettings />
         </TabsContent>
 
         {/* Appearance Settings */}

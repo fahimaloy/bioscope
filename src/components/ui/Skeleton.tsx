@@ -125,7 +125,7 @@ export function SkeletonProductCard({ className, ...props }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'space-y-4 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-6 shadow-[var(--shadow-ink-3)]',
+        'space-y-4 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-6 shadow-ink-3',
         className
       )}
     >
@@ -147,7 +147,7 @@ export function SkeletonOrderCard({ className, ...props }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'space-y-4 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-6 shadow-[var(--shadow-ink-3)]',
+        'space-y-4 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-6 shadow-ink-3',
         className
       )}
     >

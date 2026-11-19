@@ -68,7 +68,7 @@ export function EditingTools({
   const isShape = selectedLayer.type === 'shape'
 
   return (
-    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-4 space-y-4', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-ink-3 p-4 space-y-4', className)}>
       {/* Layer Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -329,7 +329,7 @@ export function EditingTools({
                 value={selectedLayer.text || ''}
                 onChange={(e) => onUpdateLayer(selectedLayer.id, { text: e.target.value })}
                 rows={3}
-                className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-[var(--radius-md)] focus:border-[var(--brand)] focus:shadow-[var(--shadow-ink-1)] text-[var(--text)] text-[var(--ink)] resize-y min-h-[80px]"
+                className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-[var(--radius-md)] focus:border-[var(--brand)] focus:shadow-ink-1 text-[var(--text)] text-[var(--ink)] resize-y min-h-[80px]"
                 disabled={selectedLayer.locked}
               />
             </div>

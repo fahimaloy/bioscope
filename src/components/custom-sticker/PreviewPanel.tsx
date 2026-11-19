@@ -116,13 +116,13 @@ export function PreviewPanel({
             </Button>
           </div>
           <div className="flex items-center gap-1 bg-[var(--paper-deep)] rounded-[var(--radius-md)] px-3 py-1">
-            <Button variant="ghost" size="sm" onClick={() => setViewMode('canvas')} className={viewMode === 'canvas' ? 'bg-[var(--surface-raised)] shadow-[var(--shadow-ink-1)]' : ''} aria-label="Canvas view">
+            <Button variant="ghost" size="sm" onClick={() => setViewMode('canvas')} className={viewMode === 'canvas' ? 'bg-[var(--surface-raised)] shadow-ink-1' : ''} aria-label="Canvas view">
               <Eye className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setViewMode('3d')} className={viewMode === '3d' ? 'bg-[var(--surface-raised)] shadow-[var(--shadow-ink-1)]' : ''} aria-label="3D view">
+            <Button variant="ghost" size="sm" onClick={() => setViewMode('3d')} className={viewMode === '3d' ? 'bg-[var(--surface-raised)] shadow-ink-1' : ''} aria-label="3D view">
               <Maximize className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setViewMode('mockup')} className={viewMode === 'mockup' ? 'bg-[var(--surface-raised)] shadow-[var(--shadow-ink-1)]' : ''} aria-label="Mockup view">
+            <Button variant="ghost" size="sm" onClick={() => setViewMode('mockup')} className={viewMode === 'mockup' ? 'bg-[var(--surface-raised)] shadow-ink-1' : ''} aria-label="Mockup view">
               <Share2 className="w-4 h-4" />
             </Button>
           </div>
@@ -364,7 +364,7 @@ function CutLinePreview({ cutType }: { cutType: CutType }) {
         {/* Sticker shape */}
         <div className="relative w-32 h-32">
           {/* Background sticker */}
-          <div className="absolute inset-0 bg-[var(--surface-raised)] border-2 border-[var(--ink)] rounded-full shadow-[var(--shadow-ink-1)]" />
+          <div className="absolute inset-0 bg-[var(--surface-raised)] border-2 border-[var(--ink)] rounded-full shadow-ink-1" />
 
           {/* Cut line */}
           {cutType === 'kiss_cut' && (
@@ -414,7 +414,7 @@ function Sticker3DPreview({ design, material, finish, cutType }: { design: Stick
         {/* 3D sticker with CSS transforms */}
         <div className="w-full h-full relative transform rotate-x-10 rotate-y-5 transition-all duration-500">
           {/* Base material layer */}
-          <div className={cn('absolute inset-0 rounded-full shadow-[var(--shadow-ink-3)]', MATERIAL_SURFACE[material])} />
+          <div className={cn('absolute inset-0 rounded-full shadow-ink-3', MATERIAL_SURFACE[material])} />
 
           {/* Sticker preview on top */}
           <div className="relative z-10 p-2">

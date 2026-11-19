@@ -536,7 +536,7 @@ export function StickerCanvas({
       </div>
 
       {/* Zoom Controls */}
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-[color-mix(in_srgb,var(--die-cut)_90%,transparent)] backdrop-blur-sm rounded-[var(--radius-md)] p-2 shadow-[var(--shadow-ink-2)] z-10">
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-[color-mix(in_srgb,var(--die-cut)_90%,transparent)] backdrop-blur-sm rounded-[var(--radius-md)] p-2 shadow-ink-2 z-10">
         <button onClick={zoomOut} className="p-2 text-[var(--ink)] hover:text-[var(--brand)] transition-colors" aria-label="Zoom out">−</button>
         <span className="px-3 text-sm font-medium text-[var(--ink)]">{Math.round(zoom * 100)}%</span>
         <button onClick={zoomIn} className="p-2 text-[var(--ink)] hover:text-[var(--brand)] transition-colors" aria-label="Zoom in">+</button>

@@ -82,7 +82,7 @@ export function DimensionControls({
   const megapixels = (pixelsWidth * pixelsHeight / 1000000).toFixed(1)
 
   return (
-    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-[var(--shadow-ink-3)] p-6 space-y-6', className)}>
+    <div className={cn('bg-[var(--surface-raised)] rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] shadow-ink-3 p-6 space-y-6', className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="font-display text-xl text-[var(--brand)]">Canvas Dimensions</h3>

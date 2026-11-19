@@ -25,6 +25,32 @@ const densityStyles: Record<'comfortable' | 'compact', { cell: string; header: s
   compact: { cell: 'px-3 py-1.5', header: 'px-3 py-2' },
 };
 
+/**
+ * Compare two cell values for sorting.
+ *
+ * Prisma Decimals serialise to JSON strings, so money columns arrive as
+ * "1200.00" — a raw `<`/`>` compare sorts those lexicographically
+ * ("110.00" < "80.00"). Numeric strings therefore compare as numbers;
+ * null/undefined sort first ascending; everything else uses localeCompare.
+ * Exported for tests.
+ */
+export function compareCellValues(a: unknown, b: unknown): number {
+  if (a === b) return 0;
+  if (a === null || a === undefined) return -1;
+  if (b === null || b === undefined) return 1;
+  if (typeof a === 'number' && typeof b === 'number') {
+    return a === b ? 0 : a < b ? -1 : 1;
+  }
+  if (a !== '' && b !== '') {
+    const an = Number(a);
+    const bn = Number(b);
+    if (Number.isFinite(an) && Number.isFinite(bn)) {
+      return an === bn ? 0 : an < bn ? -1 : 1;
+    }
+  }
+  return String(a).localeCompare(String(b));
+}
+
 interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
@@ -89,9 +115,8 @@ export function DataTable<T>({
     return [...data].sort((a, b) => {
       const aVal = a[sortConfig.key as keyof T];
       const bVal = b[sortConfig.key as keyof T];
-      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
+      const cmp = compareCellValues(aVal, bVal);
+      return sortConfig.direction === 'asc' ? cmp : -cmp;
     });
   }, [data, sortConfig]);
 

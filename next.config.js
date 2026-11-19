@@ -24,6 +24,8 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   experimental: {
+    // Loads instrumentation.ts (admin bootstrap) on server start.
+    instrumentationHook: true,
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
   },
   webpack: (config, { isServer }) => {

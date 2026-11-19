@@ -238,15 +238,15 @@ describe('Card', () => {
 
   it('applies the die-cut shadow for elevation="sticker"', () => {
     const { container, unmount } = render(<Card elevation="sticker">Body</Card>);
-    expect(rootClasses(container)).toContain('shadow-[var(--shadow-die-cut)]');
+    expect(rootClasses(container)).toContain('shadow-die-cut');
     unmount();
   });
 
   it('applies a hard offset ink shadow for elevation="raised"', () => {
     const { container, unmount } = render(<Card elevation="raised">Body</Card>);
     const classes = rootClasses(container);
-    expect(classes).toContain('shadow-[var(--shadow-ink-3)]');
-    expect(classes).not.toContain('shadow-[var(--shadow-die-cut)]');
+    expect(classes).toContain('shadow-ink-3');
+    expect(classes).not.toContain('shadow-die-cut');
     unmount();
   });
 
@@ -254,7 +254,7 @@ describe('Card', () => {
     const { container, unmount } = render(<Card elevation="flat">Body</Card>);
     const classes = rootClasses(container);
     expect(classes).toContain('shadow-none');
-    expect(classes).not.toContain('shadow-[var(--shadow-ink-3)]');
+    expect(classes).not.toContain('shadow-ink-3');
     unmount();
   });
 
@@ -264,7 +264,7 @@ describe('Card', () => {
         Body
       </Card>
     );
-    expect(rootClasses(container)).toContain('shadow-[var(--shadow-die-cut)]');
+    expect(rootClasses(container)).toContain('shadow-die-cut');
     unmount();
   });
 
@@ -272,10 +272,10 @@ describe('Card', () => {
     // The mapping the JSDoc documents: outlined is flat, doodle-elevated is
     // the sticker treatment, everything else is raised.
     const derived: Array<{ variant: CardProps['variant']; shadow: string }> = [
-      { variant: 'default', shadow: 'shadow-[var(--shadow-ink-3)]' },
-      { variant: 'elevated', shadow: 'shadow-[var(--shadow-ink-3)]' },
-      { variant: 'doodle', shadow: 'shadow-[var(--shadow-ink-3)]' },
-      { variant: 'doodle-elevated', shadow: 'shadow-[var(--shadow-die-cut)]' },
+      { variant: 'default', shadow: 'shadow-ink-3' },
+      { variant: 'elevated', shadow: 'shadow-ink-3' },
+      { variant: 'doodle', shadow: 'shadow-ink-3' },
+      { variant: 'doodle-elevated', shadow: 'shadow-die-cut' },
       { variant: 'outlined', shadow: 'shadow-none' },
     ];
 

@@ -232,7 +232,7 @@
 ### 5.1 Additive Regression Gates
 - [x] 5.1.1 `tests/unit/dead-utilities.test.ts` already exists — ensure it passes
 - [x] 5.1.2 Add `tests/unit/admin-classes.test.ts`: scan `src/components/admin/**/*.tsx` for any class referencing non-existent Tailwind config keys (color/radius/fontSize) — fail if found
-- [~] 5.1.3 (deferred: needs route-handler test harness with vi.mock(next-auth); no API-route test infra exists in tests/unit) Add `tests/unit/category-api.test.ts`: test `requireAdmin` on POST, `HAS_PRODUCTS` guard on DELETE, icon/image fields
+- [x] 5.1.3 `tests/unit/category-api.test.ts` — route-handler harness (vi.hoisted mocks for `@/lib/auth` + `@/lib/prisma`, node env, Request/NextResponse): 401/403/400/201 matrix on POST incl. icon/image persistence; 401/404/409 HAS_PRODUCTS/200 matrix on DELETE. 8 tests, suite green (28 files, 270 tests)
 
 ### 5.2 Full Verification Pass
 - [x] 5.2.1 `pnpm type-check` → 0 errors
@@ -262,9 +262,59 @@
 | Admin bootstrap | instrumentation.ts at repo root | ☑ Resolved | Idempotent `instrumentation.ts` bootstrap shipped eda3d17 (ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_NAME) |
 | Admin panel scope (P1/P2 items) | Approve wiring dead filters, export, payment gateway, SMTP | ☐ Pending | Blocks Pass 4.2 export/gateway/SMTP lanes only |
 | Nightly CI minutes | GitHub Actions minutes for nightly full suite | ☐ Pending | Needed before merging 1.5.12 nightly.yml to main |
-| Dead admin filter UI (customers page, SettingsForm logo/favicon uploads) | Wire or remove | ☐ Pending | Pass 4.2/4.3 — owner scope decision |
-| Nested button in Dropdown component | Merge into single pressable | ☐ Pending | Pass 5.1 — additive fix, zero visual change intended |
+| Dead admin filter UI (customers page, SettingsForm logo/favicon uploads) | Wire or remove | ☑ Resolved | Wired 2026-11-18: SettingsForm logo/favicon already posted to `/api/settings/logo`; customers list + CSV export now accept spend tier / min orders / join date (owner chose "wire") |
+| Nested button in Dropdown component | Merge into single pressable | ☑ Resolved | Merged 2026-11-18: the option row is the single pressable; the check is a decorative indicator (zero visual change) |
 | modlens vision broken | Fix vs drop vision features | ☐ Pending | Tooling, outside app code |
+
+---
+
+## Pass 5 addendum (2026-11-18)
+
+Continued from the `wt/20261118-175207` session. The owner picked the remaining
+scope — `eng-backlog`, `visual-qa`, `e2e-rebaseline`, `dropdown-fix`,
+`dead-filters` (mode: **wire**) — engineering items first.
+
+**Shipped**
+- **5.1.3** — route-handler harness + `tests/unit/category-api.test.ts` (8 tests).
+- **Dead admin filters wired** — `GET /api/customers` and `/api/customers/export`
+  accept `spendTier`, `minOrders`, `dateFrom`; the customers page controls are
+  bound to state, reset the page, and feed the CSV export. Tier bands and the
+  override-vs-spend resolution are single-sourced in `src/lib/spend-tiers.ts`;
+  `src/lib/customers.ts` builds the where-clause for both routes. New tests:
+  `tests/unit/customers-api.test.ts` (10), `tests/unit/spend-tiers.test.ts` (4).
+- **Nested button merged** — `MultiSelectDropdown` option rows are the single
+  pressable; the check is a decorative span (zero visual change).
+- **Auth fixes**
+  - `/admin/login` was unreachable while logged out: the `/admin/:path*` guard ran
+    before the auth-path branch, so admins were bounced to the customer `/login`,
+    which then bounced them back. `authorized()` now lets the admin sign-in page
+    through when logged out. Found by the P5-06 smoke.
+  - Register auto sign-in uses `next-auth/react` `signIn('credentials')` instead of
+    a raw `POST /api/auth/signin`, which cannot establish a session and followed a
+    MissingCSRF redirect to an HTML page while reporting success.
+- **e2e visual baselines re-baselined** — all 48 viewports. `e2e/visual.spec.ts` now
+  scrolls through the page before the full-page capture: Playwright's `fullPage`
+  screenshot does not scroll, so `whileInView` sections were captured hidden. The
+  pre-overhaul baselines recorded blank bands where the featured grid and CTA band
+  now render (verified: 4 cards, last row centred).
+
+**Verification**
+- `pnpm verify:fast` → type-check ✓ · lint ✓ (no warnings or errors) · unit:all ✓
+  (30 files, 284 tests). Risk class HIGH (`src/auth.config.ts`), so `fast` already
+  selected the full unit suite — `pnpm verify:mid` adds no further scope.
+- `pnpm build` ✓ (clean `.next`, exit 0); `pnpm e2e:visual:update` → 48/48 passed.
+- P5-06 curl smoke — public pages 200 · protected pages 307→/login · `/admin/login`
+  200 logged out · `/api/customers[/export]` 401 · register→session→add-to-cart→
+  cart→checkout→orders verified with a throwaway account (deleted afterwards).
+  Order creation not exercised — P5-07.
+- Observation: the production server logs `[auth][error] UntrustedHost` for
+  `/api/auth/session`; the plan already tracks `AUTH_URL` / `AUTH_SECRET` as an
+  owner environment item.
+
+**Not done (owner)**
+- 5.3 visual QA pass on the running app.
+- P5-07 full order E2E + notification/socket record check.
+- Product imagery is still the shared placeholder asset (content, not code).
 
 ---
 
@@ -276,10 +326,162 @@
 | 1.5 | Agentic Development Setup | 15 | 15 | 0 | verify:fast/mid/full + .agent/ + agent-harness.test.ts |
 | 2 | Shop Rework | 12 | 12 | 0 | shipped |
 | 3 | Admin Categories | 9 | 9 | 0 | shipped |
-| 4 | Admin Completeness | 25 | 10 | 15 | 4.1/4.2 shipped; 4.3/4.4 deferred (scope) |
-| 5 | Polish + Gates | 8 | 6 | 2 | 5.1.3 deferred; 5.2.5 partial; 5.3 = owner QA |
-| **Total** | | **87** | **70** | **17** | |
+| 4 | Admin Completeness | 25 | 25 | 0 | 4.3/4.4 shipped in the 2026-11-18 addendum |
+| 5 | Polish + Gates | 8 | 7 | 1 | 5.1.3 shipped; 5.3 = owner QA |
+| **Total** | | **87** | **86** | **1** | |
 
 ---
 
 **Next Action:** Commit Pass 4 + Pass 5.1/5.2 work (single commit or split by theme: `feat(admin): pass 4 — audit log, inventory, customers, email, invoice`). Then: (1) rerun `pnpm verify` after the gitnexus bootstrap (`bunx gitnexus@latest analyze`; if the worktree still blocks `detect-changes`, run it in the main repo pre-merge — AGENTS.md §"No .gitnexus/run.cjs?" documents the bootstrap). (2) Owner actions: confirm/reset the dev-DB admin password to match `.env ADMIN_PASSWORD` (currently mismatched → all credentials logins 302→`/login?error=Configuration` despite the `AUTH_SECRET ?? NEXTAUTH_SECRET` code fallback landed in this pass); set `AUTH_SECRET` in Vercel/local envs; visual QA pass (5.3) on /shop, /admin/*; decide scope for Pass 4.3 (payments/SMTP/webhooks/API keys/backup) and 4.4 (realtime/revision loop/CSV import). Gates at report time: type-check ✓ lint ✓ test:run 262/262 ✓ build ✓ verify 4/5 (detect-changes blocked). Never claim a check that did not run.
+
+---
+
+## Addendum — Admin Panel Completeness (2026-11-18)
+
+Supersedes the 4.3/4.4 scope decision above: both were implemented on
+`feat/admin-panel-completeness` (branched from `main`) and merged `--no-ff`.
+Phase numbering below is the one used for that branch; it is not the Pass 1–5
+numbering above.
+
+### P0 — Secrets at rest, settings tabs (`893fc2c`)
+- `src/lib/crypto.ts` — AES-256-GCM, key derived with `scryptSync` from
+  `SETTINGS_ENCRYPTION_KEY`, payload `v1:iv:tag:data`. Losing that env var makes
+  stored secrets unrecoverable; there is no backdoor.
+- `src/lib/secret-settings.ts` — `SECRET_SETTING_KEYS` whitelist (SMTP password,
+  every payment provider credential). Reads return masked values, a submitted
+  mask means "unchanged" so ciphertext survives a round-trip, an empty field
+  clears.
+- `src/lib/admin-settings.ts` + `admin/settings/[tab]` — general/tax/delivery/
+  payments/email/appearance tabs with deep links and a URL-driven initial tab.
+- SMTP TLS toggle with DB-backed config (`server/email-config.ts`).
+
+### P1 — Webhooks, API keys, backup (`8c615a6`, `c389200` predecessors)
+- `WebhookEndpoint` / `WebhookDelivery` models, `/api/webhooks*` CRUD, HMAC-SHA256
+  signing, per-endpoint delivery log, test-event path. Dispatch never throws, so
+  a broken subscriber cannot fail the triggering mutation.
+- `ApiKey` model, `bsk_live_` prefix, SHA-256 hash stored (plaintext shown once),
+  scopes, expiry/revocation, `POST /api/headless/orders` as a headless consumer.
+- `/api/settings/backup` export/import with masked secrets and validated import.
+
+### P2 — Product + order tooling (`c389200`)
+- Product clone (starts inactive, zero stock, never inherits sold units).
+- Product CSV import/export (RFC4180, `;`-separated images, JSON nested records,
+  match-by-slug import). Round-trip smoke: 4 products exported → 4 parsed, 0 errors.
+- Order and custom-request CSV export honouring the current filters.
+
+### P4 — Custom-request workflow (`ecc5da3`)
+- `REVISION_REQUESTED` status end to end: admin sends a pending/approved/priced
+  request back (guarded by `REVISION_ALLOWED_FROM`), the customer sees a banner
+  with the admin's notes on the builder and re-submits the current canvas, which
+  clears the old quote and returns the request to `PENDING`.
+- `createOrderFromCustomRequest`: the admin picks the product, the customer's
+  address, size and quantity. Totals are recomputed server-side with
+  `priceLine`/`computeOrderTotals` — the request's quoted price is advisory and
+  the form's numbers are never trusted. Stock is decremented conditionally, the
+  request is marked `ORDERED` and linked, and order/custom-request events fire.
+
+### P3 — Realtime (`e527ecd`)
+- `useAdminRealtime` hook over the existing module-level socket
+  (`SocketEvents` maps names to handler signatures, so payloads are derived with
+  `Parameters<...>[0]`; the handler is read through a ref so a new callback
+  identity does not rebuild the subscription).
+- Dashboard: Live activity card + connection indicator, full refresh on any event.
+- Orders: `order:status_changed` repaints the row in place; `order.created` toasts
+  and reloads.
+- Custom requests: a new submission toasts and reloads; a price update reloads.
+
+### Gates
+type-check ✓ · lint ✓ · unit 37 files / 345 tests ✓ (per commit).
+Not run locally: `pnpm verify:full` (build + e2e) — policy keeps that to CI.
+
+### Still open (owner)
+- Product imagery is still the shared placeholder asset (content, not code).
+- P5-07 full order E2E + notification/socket record check.
+- `createOrderFromCustomRequest` is type-checked and shares the checkout pricing
+  primitives but has not been exercised end-to-end (needs admin credentials).
+
+### Follow-up 2026-11-18 (admin bootstrap)
+The owner item "dev DB admin password does not match `.env ADMIN_PASSWORD`" was
+a real bug, not owner data to work around: `instrumentation.ts` never ran (no
+`experimental.instrumentationHook`, and Next 14.2 loads it from `src/`), and it
+only created the account when missing. Fixed in `5d2997f` — bootstrap moved to
+`src/instrumentation.ts`, flag enabled, and `src/lib/admin-bootstrap.ts` now
+plans create/reconcile/none so a drifted password is repaired on server start.
+
+Verified with that credential against the running dev server:
+- `createOrderFromCustomRequest` end to end — 17/17 checks: pricing, order
+  creation, server-side totals (subtotal 1020 / tax 51 / delivery 60 / total 1131),
+  request→order link, stock decrement, duplicate refused 409.
+- Revision loop end to end — admin `REVISION_REQUESTED`, customer resubmit
+  returns the request to `PENDING` with the quote cleared, resubmit refused 409
+  when no revision is pending.
+
+### Follow-up 2026-11-19 (code review of 18–19 Nov commits)
+
+Reviewed `dc7a526^..54cbe72` (239 files) against the `code-reviewer` rule packs
+and AGENTS.md. Three of seven review sub-agents died on provider 429s, so those
+groups were covered by a direct pass instead.
+
+Root cause behind three credential bugs: `maskSecretSettings` keys on the
+*setting key*, and three call sites passed a throwaway key (`'v'`, `'value'`),
+so masking silently no-opped — leaking plaintext in the backup export and in
+`getSetting`, and defeating the "unchanged" detection that protects credentials
+on save.
+
+Fixed in `6dbd3ba` (secrets) and `dc3b396` (security hardening):
+- `maskSecretsForDisplay` decrypts-then-masks under the real key; read paths use
+  it; `updateSetting` shares the mask/unchanged/clear semantics and refuses
+  `isPublic` on credentials; `getPublicSettings` excludes credential keys.
+- Backup export masks with `maskSecret`; import encrypts via
+  `protectSecretSettings` and recognises a mask even on a fresh DB.
+- SMTP port 465 implies TLS unless explicitly disabled.
+- Bootstrap: no PII in logs, guarded body, P2002-tolerant create, lowercased
+  email; registration reserves `ADMIN_EMAIL` so it cannot be claimed and then
+  promoted.
+- Webhook signing and the endpoint query are guarded so dispatch cannot 500 the
+  triggering mutation.
+- `requireApiKey` demands every requested scope (`hasAllScopes`).
+- Shared `escapeCsvCell` neutralises spreadsheet formula injection in all three
+  exporters; product import returns 400 on empty and caps at 1 MB.
+
+Verified live (7/7): credential stored encrypted, bulk read masked, echoed-mask
+save preserves the ciphertext byte-for-byte, `getSetting` masked, registration
+of `ADMIN_EMAIL` refused 409 `EMAIL_RESERVED`.
+Gate: `verify:mid` green — type-check, lint, 41 files / 367 tests.
+GitNexus `detect-changes` reports risk **critical**, expected: the diff touches
+auth and credential paths by design.
+
+Still open from the review (not fixed): tier filter loads all customers+orders
+into memory; product import slug upsert is racy and its dimension replacement is
+not transactional; `WebhookDelivery` retains full order payloads (PII) with no
+pruning; backup import has no Zod schema; several export filters are unvalidated.
+
+
+
+### Follow-up 2026-11-19 (stability pass — the five open review items are closed)
+
+The "Still open from the review" list above was implemented as Track A of
+`docs/superpowers/plans/2026-11-19-stability-and-completion.md` (commits
+`be53905`, `f5430aa`, `78d0d82`, `41fcaee`, `c6c5987`):
+
+- Tier filter + customer export aggregate spend in Postgres (groupBy), no
+  order rows in memory; customers export also gained the shared formula-
+  injection escape its local copy had missed.
+- Product import: per-row error isolation, P2002 create-race converges to an
+  update, duplicate in-file slugs rejected, 500-row cap; nested config
+  replacement is one atomic Prisma write.
+- WebhookDelivery log copies are PII-redacted (wire payload unchanged) and
+  rows older than 30 days are pruned (throttled, never-throws).
+- Backup import has a Zod envelope + version gate + size/count bounds; the
+  live smoke also caught and fixed a double response envelope that crashed
+  the restore panel (`c6c5987`).
+- Orders/custom-requests export filters and getOrders are Zod-validated
+  (400 at the edge, not Prisma 500s).
+
+Also closed from the rebuild ledger's tracked defects: DataTable money sort
++ no-op sort keys, the shadow-[var(--shadow-*)] no-box-shadow family (29
+sites), and the ?redirect= post-login gap (with an open-redirect guard).
+
+Gate: verify:mid green, 47 files / 416 tests; live smoke 14/14. Remaining
+work (profile mock data P0, rebuild tasks 2.9–5.1, hardening proposals) is
+tracked in the new plan.

@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loginSchema, type LoginInput } from '@/lib/validations/auth'
+import { safeCallbackUrl } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
@@ -20,7 +21,9 @@ import { toast } from 'sonner'
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  // `redirect` is the alias used by shop/cart links; both are sanitised so a
+  // crafted callback cannot bounce the user off-site after sign-in.
+  const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl') || searchParams.get('redirect'))
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [showError, setShowError] = useState(false)
@@ -82,17 +85,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] flex items-center justify-center px-4 py-12 relative overflow-hidden">
+  <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Doodle background scatter */}
       <DoodleBackground shapeCount={4} className="pointer-events-none" />
-      
-      {/* Floating emoji decorations */}
-      <div className="floating-emojis pointer-events-none" aria-hidden="true">
-        <span className="emoji e1">🎨</span>
-        <span className="emoji e2">✨</span>
-        <span className="emoji e3">🌈</span>
-        <span className="emoji e4">🎭</span>
-      </div>
 
       <Card variant="doodle-elevated" padding="xl" className="w-full max-w-md relative">
         {/* Washi tape accent on card */}

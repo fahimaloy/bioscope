@@ -141,7 +141,7 @@ export const ColorPicker = forwardRef<HTMLDivElement, ColorPickerProps>(function
 
       {isOpen && (
         <div
-          className="absolute z-popover mt-1 w-64 animate-scale-in rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-4 shadow-[var(--shadow-ink-3)]"
+          className="absolute z-popover mt-1 w-64 animate-scale-in rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-4 shadow-ink-3"
           role="dialog"
           aria-label="Color picker"
         >

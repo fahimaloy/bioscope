@@ -7,6 +7,7 @@ import { createProductSchema, updateProductSchema } from '@/lib/validations/prod
 import type { CreateProductInput, UpdateProductInput } from '@/lib/validations/product'
 import { AppError, requireAdmin, buildPagination } from '@/lib/api-utils'
 import { emitLowStockAlert } from '@/lib/server/socket-emit'
+import { parseProductsCsv } from '@/lib/product-csv'
 
 const PRODUCT_SORT_FIELDS = ['createdAt', 'name', 'basePrice', 'stock', 'sortOrder', 'isActive'] as const
 
@@ -65,6 +66,233 @@ export async function createProduct(data: CreateProductInput) {
   }
 
   return { success: true, product }
+}
+
+export async function cloneProduct(id: string) {
+  await requireAdmin()
+
+  const source = await prisma.product.findUnique({
+    where: { id },
+    include: { allowedDimensions: true, allowedQuantities: true },
+  })
+  if (!source) throw new AppError(404, 'Product not found', 'PRODUCT_NOT_FOUND')
+
+  // A clone starts as an inactive draft with no stock: it must be reviewed
+  // before it goes live, and it must not inherit the original's sold units.
+  return createProduct({
+    name: `${source.name} (Copy)`.slice(0, 100),
+    slug: `${source.slug}-copy-${Date.now().toString(36)}`.slice(0, 100),
+    description: source.description ?? undefined,
+    basePrice: Number(source.basePrice),
+    compareAtPrice: source.compareAtPrice ? Number(source.compareAtPrice) : undefined,
+    categoryId: source.categoryId,
+    images: source.images,
+    allowedDimensions: source.allowedDimensions.map((d) => ({
+      width: d.width,
+      height: d.height,
+      label: d.label,
+      priceMultiplier: Number(d.priceMultiplier),
+      isDefault: d.isDefault,
+      sortOrder: d.sortOrder,
+    })),
+    allowedQuantities: source.allowedQuantities.map((q) => ({
+      minQty: q.minQty,
+      maxQty: q.maxQty ?? undefined,
+      pricePerUnit: Number(q.pricePerUnit),
+      label: q.label,
+      sortOrder: q.sortOrder,
+    })),
+    customizationOptions: source.customizationOptions as CreateProductInput['customizationOptions'],
+    taxPercent: Number(source.taxPercent),
+    additionalCharge: Number(source.additionalCharge),
+    isTaxInclusive: source.isTaxInclusive,
+    trackInventory: source.trackInventory,
+    stock: 0,
+    lowStockThreshold: source.lowStockThreshold,
+    isActive: false,
+    isFeatured: false,
+    sortOrder: source.sortOrder,
+    metaTitle: source.metaTitle ?? undefined,
+    metaDescription: source.metaDescription ?? undefined,
+  })
+}
+
+export interface ProductImportResult {
+  created: number
+  updated: number
+  errors: Array<{ row: number; reason: string }>
+}
+
+function productDataPayload(data: CreateProductInput) {
+  return {
+    name: data.name,
+    slug: data.slug,
+    description: data.description,
+    basePrice: data.basePrice,
+    compareAtPrice: data.compareAtPrice,
+    categoryId: data.categoryId,
+    images: data.images,
+    customizationOptions: data.customizationOptions,
+    taxPercent: data.taxPercent,
+    additionalCharge: data.additionalCharge,
+    isTaxInclusive: data.isTaxInclusive,
+    trackInventory: data.trackInventory,
+    stock: data.stock,
+    lowStockThreshold: data.lowStockThreshold,
+    isActive: data.isActive,
+    isFeatured: data.isFeatured,
+    sortOrder: data.sortOrder,
+    metaTitle: data.metaTitle,
+    metaDescription: data.metaDescription,
+  }
+}
+
+function nestedConfigPayload(data: CreateProductInput) {
+  return {
+    allowedDimensions: {
+      create: data.allowedDimensions.map((d) => ({
+        width: d.width,
+        height: d.height,
+        label: d.label,
+        priceMultiplier: d.priceMultiplier,
+        isDefault: d.isDefault,
+        sortOrder: d.sortOrder,
+      })),
+    },
+    allowedQuantities: {
+      create: data.allowedQuantities.map((q) => ({
+        minQty: q.minQty,
+        maxQty: q.maxQty ?? null,
+        pricePerUnit: q.pricePerUnit,
+        label: q.label,
+        sortOrder: q.sortOrder,
+      })),
+    },
+  }
+}
+
+/** Bound the work one import can do: each row is several queries. */
+const MAX_IMPORT_ROWS = 500
+
+/** Replace a product's scalar fields and nested configs in one atomic write. */
+async function updateImportedProduct(id: string, data: CreateProductInput) {
+  const nested = nestedConfigPayload(data)
+  await prisma.product.update({
+    where: { id },
+    data: {
+      ...productDataPayload(data),
+      // deleteMany + create inside a single nested write is one Prisma
+      // transaction — the product never exists without its configs.
+      allowedDimensions: { deleteMany: {}, ...nested.allowedDimensions },
+      allowedQuantities: { deleteMany: {}, ...nested.allowedQuantities },
+    },
+  })
+}
+
+/** Import a product CSV, matching rows to existing products by slug. */
+export async function importProductsFromCsv(csv: string): Promise<ProductImportResult> {
+  await requireAdmin()
+
+  const { rows, errors } = parseProductsCsv(csv)
+  const result: ProductImportResult = { created: 0, updated: 0, errors }
+  if (rows.length === 0) return result
+  if (rows.length > MAX_IMPORT_ROWS) {
+    result.errors.push({ row: 0, reason: `too many rows (max ${MAX_IMPORT_ROWS})` })
+    return result
+  }
+
+  const categories = await prisma.category.findMany({ select: { id: true, slug: true } })
+  const categoryIdBySlug = new Map(categories.map((category) => [category.slug, category.id]))
+  const seenSlugs = new Set<string>()
+
+  for (const row of rows) {
+    const categoryId = categoryIdBySlug.get(row.categorySlug)
+    if (!categoryId) {
+      result.errors.push({ row: row.row, reason: `unknown category "${row.categorySlug}"` })
+      continue
+    }
+
+    const candidate: CreateProductInput = {
+      name: row.name,
+      slug: row.slug,
+      description: row.description,
+      basePrice: row.basePrice,
+      compareAtPrice: row.compareAtPrice,
+      categoryId,
+      images: row.images,
+      allowedDimensions: row.dimensions,
+      allowedQuantities: row.quantities,
+      taxPercent: row.taxPercent,
+      additionalCharge: row.additionalCharge,
+      isTaxInclusive: row.isTaxInclusive,
+      trackInventory: row.trackInventory,
+      stock: row.stock,
+      lowStockThreshold: row.lowStockThreshold,
+      isActive: row.isActive,
+      isFeatured: row.isFeatured,
+      sortOrder: row.sortOrder,
+      metaTitle: row.metaTitle,
+      metaDescription: row.metaDescription,
+    }
+
+    // Validate with the same schema the admin form uses, so an import can never
+    // write a product the UI would refuse to save.
+    const validated = createProductSchema.safeParse(candidate)
+    if (!validated.success) {
+      const detail = Object.entries(validated.error.flatten().fieldErrors)
+        .map(([field, messages]) => `${field}: ${(messages ?? []).join(', ')}`)
+        .join('; ')
+      result.errors.push({ row: row.row, reason: detail || 'invalid row' })
+      continue
+    }
+
+    const data = validated.data
+
+    // Two rows with the same slug in one file would silently overwrite each
+    // other; report the duplicate instead.
+    if (seenSlugs.has(data.slug)) {
+      result.errors.push({ row: row.row, reason: `duplicate slug "${data.slug}" in this file` })
+      continue
+    }
+    seenSlugs.add(data.slug)
+
+    // One bad row must not abort the rest of the file: every write is guarded
+    // and reported per row.
+    try {
+      const existing = await prisma.product.findUnique({ where: { slug: data.slug }, select: { id: true } })
+      if (existing) {
+        await updateImportedProduct(existing.id, data)
+        result.updated += 1
+      } else {
+        try {
+          await createProduct(data)
+          result.created += 1
+        } catch (err) {
+          if ((err as { code?: string })?.code === 'P2002') {
+            // Lost the create race: a concurrent import created the same slug
+            // between our check and write. Converge by updating the winner.
+            const winner = await prisma.product.findUnique({ where: { slug: data.slug }, select: { id: true } })
+            if (!winner) throw err
+            await updateImportedProduct(winner.id, data)
+            result.updated += 1
+          } else {
+            throw err
+          }
+        }
+      }
+    } catch (err) {
+      const code = (err as { code?: string })?.code
+      console.error('[product-import] row failed', { row: row.row, code })
+      result.errors.push({
+        row: row.row,
+        reason: code === 'P2025' ? 'product changed during import' : 'database error while saving row',
+      })
+    }
+  }
+
+  revalidatePath('/admin/products')
+  revalidatePath('/shop')
+  return result
 }
 
 export async function updateProduct(id: string, data: UpdateProductInput) {
