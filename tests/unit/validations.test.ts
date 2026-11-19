@@ -3,6 +3,7 @@ import { checkoutSchema, addressSchema, cartItemSchema, orderStatusUpdateSchema 
 import { createReviewSchema } from '@/lib/validations/review'
 import { createCategorySchema } from '@/lib/validations/category'
 import { changePasswordSchema } from '@/lib/validations/profile'
+import { registerSchema, updateProfileSchema } from '@/lib/validations/auth'
 
 describe('checkoutSchema', () => {
   it('accepts a valid checkout', () => {
@@ -62,5 +63,23 @@ describe('changePasswordSchema', () => {
     expect(changePasswordSchema.safeParse({ currentPassword: 'x', newPassword: 'Password1' }).success).toBe(true)
     expect(changePasswordSchema.safeParse({ currentPassword: 'x', newPassword: 'short' }).success).toBe(false)
     expect(changePasswordSchema.safeParse({ currentPassword: 'x', newPassword: 'onlyletters' }).success).toBe(false)
+  })
+})
+
+describe('optional phone (C1 fix — blank field must not block submission)', () => {
+  const base = { name: 'Test User', email: 't@example.com', password: 'Password1', confirmPassword: 'Password1' }
+  it('registerSchema accepts an empty/blank phone as absent', () => {
+    expect(registerSchema.safeParse({ ...base, phone: '' }).success).toBe(true)
+    expect(registerSchema.safeParse({ ...base, phone: '   ' }).success).toBe(true)
+    expect(registerSchema.safeParse(base).success).toBe(true)
+  })
+  it('registerSchema still validates a non-empty phone', () => {
+    expect(registerSchema.safeParse({ ...base, phone: '01700000000' }).success).toBe(true)
+    expect(registerSchema.safeParse({ ...base, phone: 'abc' }).success).toBe(false)
+  })
+  it('updateProfileSchema accepts an empty phone (clearing the field)', () => {
+    expect(updateProfileSchema.safeParse({ phone: '' }).success).toBe(true)
+    expect(updateProfileSchema.safeParse({ phone: '01700000000' }).success).toBe(true)
+    expect(updateProfileSchema.safeParse({ phone: 'nope' }).success).toBe(false)
   })
 })

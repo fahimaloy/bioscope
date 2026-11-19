@@ -50,6 +50,9 @@ modules:
   global-states:
     source: [src/app/not-found.tsx, src/app/global-error.tsx, src/app/loading.tsx]
     unit: [tests/unit/pages/global-states.test.tsx]
+  login-register:
+    source: [src/app/(customer)/login/**, src/app/(customer)/register/**, src/lib/validations/auth.ts]
+    unit: [tests/unit/pages/auth-pages.test.tsx, tests/unit/validations.test.ts]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []

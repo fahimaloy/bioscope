@@ -10,8 +10,7 @@ import { registerSchema, type RegisterInput } from '@/lib/validations/auth'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
-import { WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
+import { WashiTape, SketchUnderline } from '@/components/decorative'
 import { motion } from 'framer-motion'
 import { Check, X, Eye, EyeOff } from 'lucide-react'
 
@@ -111,9 +110,6 @@ function RegisterForm() {
 
   return (
   <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Doodle background scatter */}
-      <DoodleBackground shapeCount={4} className="pointer-events-none" />
-
       <Card variant="doodle-elevated" padding="xl" className="w-full max-w-md relative">
         {/* Washi tape accent on card */}
         <WashiTape rotation={-3} width={160} height={32} className="absolute -top-4 left-1/2 -translate-x-1/2 z-10" />
@@ -121,8 +117,8 @@ function RegisterForm() {
         {/* Sticker peel from Card component (already included via variant) */}
 
         <div className="text-center mb-8 relative z-10">
-          <h1 className="font-display text-3xl md:text-4xl text-primary">Create Account</h1>
-          <p className="text-[var(--text-subtle)] mt-2 text-body">Join us and start creating custom stickers</p>
+          <h1 className="font-display text-3xl md:text-4xl text-[var(--text)]">Create Account</h1>
+          <p className="text-[var(--text-subtle)] mt-2">Join us and start creating custom stickers</p>
         </div>
 
         {/* Error alert with doodle styling - shake on appear, slide out on dismiss */}
@@ -131,7 +127,7 @@ function RegisterForm() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
-            className="mb-6 p-4 bg-[color-mix(in_srgb,var(--error)_10%,transparent)] border-2 border-[var(--error)] rounded-input text-[var(--text)] text-sm flex items-start justify-between gap-4 animate-shake"
+            className="mb-6 p-4 bg-[color-mix(in_srgb,var(--error)_10%,transparent)] border-2 border-[var(--error)] rounded-md text-[var(--text)] text-sm flex items-start justify-between gap-4 animate-shake"
             role="alert"
             transition={{ duration: 0.3 }}
           >
@@ -244,7 +240,7 @@ function RegisterForm() {
               <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-2">
                   {passwordsMatch ? (
-                    <span className="flex items-center gap-1.5 text-success text-sm">
+                    <span className="flex items-center gap-1.5 text-[var(--green-strong)] text-sm">
                       <Check className="w-4 h-4" />
                       Passwords match
                     </span>
@@ -261,7 +257,7 @@ function RegisterForm() {
 
           <Button
             type="submit"
-            variant="doodle"
+            variant="primary"
             size="xl"
             fullWidth
             loading={isLoading}
@@ -273,7 +269,7 @@ function RegisterForm() {
         <div className="mt-6 text-center">
           <p className="text-[var(--text-subtle)]">
             Already have an account?{' '}
-            <Link href="/login" className="text-primary font-medium">
+            <Link href="/login" className="text-[var(--text)] font-medium">
               <SketchUnderline>Sign in</SketchUnderline>
             </Link>
           </p>

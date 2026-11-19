@@ -1,5 +1,16 @@
 import { z } from 'zod'
 
+// An optional phone must accept an EMPTY form field as "absent". A bare
+// `.optional()` only allows `undefined`, but an untouched/blank text input
+// submits `''`, which fails the regex and silently blocks registration /
+// profile save. Preprocess blank → undefined so the optional field is truly
+// optional (found by C1's register-flow test; the register API route ignores
+// phone entirely, so this is a client-side validation fix).
+const optionalPhone = z.preprocess(
+  (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+  z.string().regex(/^\+?[0-9]{10,15}$/, { message: 'Please enter a valid phone number' }).optional()
+)
+
 export const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address' }),
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
@@ -17,7 +28,7 @@ export const registerSchema = z
       .regex(/[a-z]/, { message: 'Password must contain at least one lowercase letter' })
       .regex(/[0-9]/, { message: 'Password must contain at least one number' }),
     confirmPassword: z.string(),
-    phone: z.string().regex(/^\+?[0-9]{10,15}$/, { message: 'Please enter a valid phone number' }).optional(),
+    phone: optionalPhone,
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -62,7 +73,7 @@ export const changePasswordSchema = z
 
 export const updateProfileSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }).max(50).optional(),
-  phone: z.string().regex(/^\+?[0-9]{10,15}$/, { message: 'Please enter a valid phone number' }).optional(),
+  phone: optionalPhone,
 })
 
 export type LoginInput = z.infer<typeof loginSchema>
