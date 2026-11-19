@@ -1,6 +1,5 @@
 export { ProductCard, ProductGrid, FeaturedProduct } from './ProductCard'
 export { ProductDetail } from './ProductDetail'
-export { ProductConfigurator } from './ProductConfigurator'
 export { QuantitySelector, CompactQuantitySelector } from './QuantitySelector'
 export { DimensionSelector, DimensionDisplay, DimensionComparisonTable } from './DimensionSelector'
 export { ReviewList, ReviewSummary } from './ReviewList'
