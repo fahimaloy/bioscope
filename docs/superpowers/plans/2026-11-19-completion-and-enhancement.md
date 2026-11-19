@@ -83,7 +83,15 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** toggle persists across reload; card + detail + page agree on state;
   320px clean; unit tests (store + page).
 
-### E3 — Review submission `[ ]`
+### E3 — Review submission `[x]`
+> **DONE 2026-11-19, commit `08793c0`, controller-executed.** ReviewForm revived (was dead code)
+> as a token client component under ReviewList on /shop/[slug]: star rating (required) + optional
+> title/comment → POST /api/reviews → toast + router.refresh(); guests get sign-in CTA with
+> callbackUrl. Eligibility stated honestly (route flags isVerifiedPurchase, does NOT gate on
+> purchase). Dead StarRating/ReviewHelpfulButton barrel exports removed. 4 jsdom tests; verify:mid
+> 63 files; live POST 201 + visible in GET; browser guest CTA renders. Gate PARTIAL (barrel re-export,
+> no symbols — tool limitation). **Tracked for C7:** pre-existing ProductDetail 320px overflow (Tabs
+> 350px + share row 378). Report: `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-e3-report.md`.
 - **Evidence:** `ReviewForm.tsx` has zero consumers; product detail renders `ReviewList`
   only; `POST /api/reviews` exists and is unused by the UI.
 - **Work:** revive ReviewForm onto the token system, mount under ReviewList on product
