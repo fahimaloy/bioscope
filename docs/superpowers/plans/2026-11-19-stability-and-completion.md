@@ -55,12 +55,21 @@ to `0`.
 - `conversionRate` — **needs a decision**: no checkout-session source exists. Drop the card or
   define a real source. No fake metrics.
 
-### B3 — Rate limiting on public write endpoints — **TODO, self-contained**
-No throttling anywhere (registration, login, contact, password reset/change, webhook test,
-headless order creation). Design: in-memory sliding-window limiter in `src/lib/rate-limit.ts`
-(no new deps), applied in route handlers (node-side, not edge). Limits: auth 10/min/IP,
-contact 5/min/IP, headless 60/min/key. 429 + `Retry-After` via `handleRouteError`. Accept:
-window-expiry and per-key-isolation unit tests. Multi-instance caveat to be documented.
+### B3 — Rate limiting on public write endpoints — **DONE, commit `899f740`**
+No throttling existed anywhere. `src/lib/rate-limit.ts` (132 lines, no new deps) is a sliding-window
+log keyed `bucket:clientIP`, fail-open on store errors, nothing about the caller logged;
+`enforceRateLimit(request, bucket)` returns a ready 429 `NextResponse` carrying `Retry-After`, which
+kept `src/lib/api-utils.ts` untouched. Wired into register, forgot-password, reset-password,
+change-password and contact. Limits 10/5/5/10/5 per minute.
+**Verified:** `tests/unit/rate-limit.test.ts` imports the **real route handlers** and loops all five,
+firing `limit` requests from one IP then asserting request N+1 is 429 with `Retry-After` and a
+generic `RATE_LIMITED` body; plus window expiry on fake timers, per-IP isolation, missing-IP
+fallback, fail-open and unchanged valid traffic. Full suite **301/301** across 29 files;
+`verify:fast` type-check 0 / lint 0.
+**Caveats recorded in the file:** per-process memory (N instances ⇒ N× effective limit; Redis
+upgrade path named, API unchanged), node-side only, and `x-forwarded-for` spoofable without a
+trusted proxy — a speed bump, not an access control. No headless/webhook route exists yet, so
+those were not invented.
 
 ### B4 — Admin password-reset / session hygiene — **TODO**
 `AUTH_SECRET`/`AUTH_URL` boot validation (fail fast instead of per-request `UntrustedHost`),
@@ -100,7 +109,8 @@ D14 full order E2E · D15 soft-delete/archive products.
 ## Execution order
 
 1. ~~Track A~~ — shipped.
-2. ~~B1~~ — done. **Next: B2 (partially blocked) or B3 (self-contained).**
+2. ~~B1~~ done, ~~B3~~ done. **Remaining Track B: B2 (two metrics blocked on owner decisions) and
+   B4 (session hygiene, self-contained).**
 3. C1/C2/C6 → C4 → C3 (owner copy) → C5 → C9 → C7 → C8.
 4. Track D by owner priority; D2/D6/D11 cheap and recommended first.
 
