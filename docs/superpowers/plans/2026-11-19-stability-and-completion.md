@@ -391,7 +391,14 @@ a mocked fetch; no endpoint configured in the dev DB).
   rebuilt — profile/about/contact still import it). Re-grep consumers at
   dispatch time; delete only at zero.
 
-### C10 — Landing page shell gap (owner decision) `[ ]`
+### C10 — Landing page shell gap (owner decision) `[x]`
+> **DONE 2026-11-19, commit `0d4ab64`, controller-executed (ruling: move into group).**
+> Moved `src/app/page.tsx` → `src/app/(customer)/page.tsx` (URL stays /); removed the
+> landing's self-PageWrapper (the group layout supplies PageWrapper + MobileNav) to avoid
+> double wrap (nested main, double pt-16, double grain). Fixed product-card.test.tsx import +
+> OWNED_FILES path. landing-shell structural guard added. Browser 390×844: MobileNav present,
+> mainCount 2 (not 3), hero y=64 (single offset), scrollWidth 390==viewport. verify:mid 537/537.
+> Report: `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-c10-report.md`.
 - `/` sits outside `(customer)/layout.tsx` → no MobileNav, no CartDrawer on
   the landing page; cart entry points render only when authenticated. Either
   move `/` into the group or mount the shell explicitly — **owner picks**
