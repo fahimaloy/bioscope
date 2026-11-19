@@ -84,7 +84,7 @@ export default function AnalyticsPage() {
       setLoading(true)
       try {
         const range = '12mo'
-        const [revRes, ordRes, topProductRes, topCustomerRes, categoriesRes, geoRes, productsRes, customersRes] = await Promise.all([
+        const [revRes, ordRes, topProductRes, topCustomerRes, categoriesRes, geoRes, productsRes, customersRes, customRequestStatsRes] = await Promise.all([
           fetch(`/api/analytics/revenue?range=${range}`).then((r) => r.json()),
           fetch(`/api/analytics/orders?range=${range}`).then((r) => r.json()),
           fetch(`/api/analytics/top-products?limit=8&range=${range}`).then((r) => r.json()),
@@ -93,6 +93,8 @@ export default function AnalyticsPage() {
           fetch(`/api/analytics/geo?limit=10&range=${range}`).then((r) => r.json()),
           fetch('/api/products?limit=100').then((r) => r.json()),
           fetch('/api/customers?limit=1').then((r) => r.json()),
+          // `getCustomRequestStats` already returns { total, pending, priced, completed }.
+          fetch('/api/custom-requests/stats').then((r) => r.json()),
         ])
         setMonthly(revRes?.data?.monthly ?? [])
         setTopProducts(topProductRes?.data?.items ?? [])
@@ -107,7 +109,7 @@ export default function AnalyticsPage() {
           totalProducts: productsRes?.data?.pagination?.total ?? (productsRes?.data?.data ?? []).length,
           totalCustomers: customersRes?.data?.pagination?.total ?? 0,
           lowStockProducts: (productsRes?.data?.data ?? []).filter((p: ProductItem) => Number(p.stock) <= 10).length,
-          pendingCustomRequests: 0,
+          pendingCustomRequests: customRequestStatsRes?.data?.pending ?? 0,
           conversionRate: 0,
           averageOrderValue: revRes?.data?.averageOrderValue ?? 0,
           todayOrders: 0,
