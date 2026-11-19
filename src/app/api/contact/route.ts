@@ -1,11 +1,15 @@
 import { prisma } from '@/lib/prisma'
 import { handleRouteError, ok } from '@/lib/api-utils'
 import { contactSchema } from '@/lib/validations/contact'
+import { enforceRateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = enforceRateLimit(request, 'contact')
+    if (rateLimited) return rateLimited
+
     const body = await request.json()
     const validated = contactSchema.parse(body)
 

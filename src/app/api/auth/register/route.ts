@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { handleRouteError, created } from '@/lib/api-utils'
+import { enforceRateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +20,9 @@ const registerSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = enforceRateLimit(request, 'register')
+    if (rateLimited) return rateLimited
+
     const body = await request.json()
     const validated = registerSchema.parse(body)
 

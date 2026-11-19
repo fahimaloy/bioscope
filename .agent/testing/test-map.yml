@@ -41,6 +41,9 @@ modules:
     unit: []
     e2e_hint: [e2e/smoke.spec.ts]
     shared_footprint: true
+  rate-limit:
+    source: [src/lib/rate-limit.ts, src/app/api/auth/register/route.ts, src/app/api/auth/forgot-password/route.ts, src/app/api/auth/reset-password/route.ts, src/app/api/auth/change-password/route.ts, src/app/api/contact/route.ts]
+    unit: [tests/unit/rate-limit.test.ts]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []

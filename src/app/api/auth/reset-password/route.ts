@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import { prisma } from '@/lib/prisma'
 import { handleRouteError, ok } from '@/lib/api-utils'
 import { resetPasswordSchema } from '@/lib/validations/profile'
+import { enforceRateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +12,9 @@ const hashToken = (token: string) => crypto.createHash('sha256').update(token).d
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = enforceRateLimit(request, 'reset-password')
+    if (rateLimited) return rateLimited
+
     const body = await request.json()
     const validated = resetPasswordSchema.parse(body)
 
