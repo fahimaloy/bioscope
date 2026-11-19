@@ -84,3 +84,6 @@ modules:
   csv:
     source: [src/lib/csv.ts, src/lib/product-csv.ts, src/app/api/products/export/route.ts, src/app/api/orders/export/route.ts, src/app/api/custom-requests/export/route.ts]
     unit: [tests/unit/csv.test.ts, tests/unit/product-csv.test.ts]
+  analytics:
+    source: [src/lib/analytics.ts, src/app/api/analytics/**, src/components/admin/StatsCards.tsx, src/app/(admin)/admin/analytics/page.tsx, src/app/(admin)/admin/dashboard/page.tsx]
+    unit: [tests/unit/analytics-orders.test.ts]

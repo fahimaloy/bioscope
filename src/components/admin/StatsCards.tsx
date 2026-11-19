@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import { CounterAnimation } from '@/components/animations/CounterAnimation'
 import { formatCurrency, formatNumber } from '@/lib/utils'
-import { Package, ShoppingBag, DollarSign, Users, TrendingUp } from 'lucide-react'
+import { Package, ShoppingBag, DollarSign, Users, TrendingUp, Palette } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { SketchUnderline } from '@/components/decorative/DoodleElements'
@@ -19,7 +19,6 @@ interface StatsCardsProps {
     totalCustomers: number
     lowStockProducts: number
     pendingCustomRequests: number
-    conversionRate: number
     averageOrderValue: number
     todayOrders: number
     todayRevenue: number
@@ -28,6 +27,8 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ stats, className }: StatsCardsProps) {
+  // No trend badges: there is no period-over-period data source, and hardcoded
+  // "+12%"-style trends are fake metrics (B2 ruling — no invented numbers).
   const cards = [
     {
       key: 'totalOrders',
@@ -35,8 +36,6 @@ export function StatsCards({ stats, className }: StatsCardsProps) {
       value: stats.totalOrders,
       icon: ShoppingBag,
       color: 'var(--primary)',
-      trend: '+12%',
-      trendUp: true,
     },
     {
       key: 'totalRevenue',
@@ -45,8 +44,6 @@ export function StatsCards({ stats, className }: StatsCardsProps) {
       icon: DollarSign,
       color: 'var(--success)',
       format: 'currency',
-      trend: '+8%',
-      trendUp: true,
     },
     {
       key: 'totalProducts',
@@ -54,8 +51,6 @@ export function StatsCards({ stats, className }: StatsCardsProps) {
       value: stats.totalProducts,
       icon: Package,
       color: 'var(--secondary)',
-      trend: '+5 new',
-      trendUp: true,
     },
     {
       key: 'totalCustomers',
@@ -63,8 +58,6 @@ export function StatsCards({ stats, className }: StatsCardsProps) {
       value: stats.totalCustomers,
       icon: Users,
       color: 'var(--purple)',
-      trend: '+3%',
-      trendUp: true,
     },
   ]
 
@@ -77,8 +70,6 @@ export function StatsCards({ stats, className }: StatsCardsProps) {
           label={card.label}
           icon={card.icon}
           color={card.color}
-          trend={card.trend}
-          trendUp={card.trendUp}
           format={card.format}
           index={index}
         />
@@ -92,13 +83,11 @@ interface StatCardProps {
   label: string
   icon: React.ComponentType<{ className?: string }>
   color: string
-  trend?: string
-  trendUp?: boolean
   format?: string
   index: number
 }
 
-function StatCard({ value, label, icon: Icon, color, trend, trendUp, format, index }: StatCardProps) {
+function StatCard({ value, label, icon: Icon, color, format, index }: StatCardProps) {
 
   return (
     <motion.div
@@ -117,9 +106,6 @@ function StatCard({ value, label, icon: Icon, color, trend, trendUp, format, ind
               <Icon className="w-6 h-6" />
             </div>
           </div>
-          <Badge variant={trendUp ? 'success' : 'error'} size="sm" className="whitespace-nowrap">
-            {trendUp ? '↑' : '↓'} {trend}
-          </Badge>
         </div>
         <CounterAnimation
           target={value}
@@ -195,11 +181,10 @@ export function DashboardSummary({ stats }: { stats: StatsCardsProps['stats'] })
           format="currency"
         />
         <SummaryCard
-          label="Conversion Rate"
-          value={stats.conversionRate}
-          icon={TrendingUp}
-          color="var(--warning)"
-          format="percent"
+          label="Pending Requests"
+          value={stats.pendingCustomRequests}
+          icon={Palette}
+          color="var(--secondary)"
         />
       </div>
     </motion.div>

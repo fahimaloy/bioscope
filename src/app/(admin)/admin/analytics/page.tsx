@@ -17,7 +17,6 @@ interface AdminStats {
   totalCustomers: number
   lowStockProducts: number
   pendingCustomRequests: number
-  conversionRate: number
   averageOrderValue: number
   todayOrders: number
   todayRevenue: number
@@ -110,10 +109,9 @@ export default function AnalyticsPage() {
           totalCustomers: customersRes?.data?.pagination?.total ?? 0,
           lowStockProducts: (productsRes?.data?.data ?? []).filter((p: ProductItem) => Number(p.stock) <= 10).length,
           pendingCustomRequests: customRequestStatsRes?.data?.pending ?? 0,
-          conversionRate: 0,
           averageOrderValue: revRes?.data?.averageOrderValue ?? 0,
-          todayOrders: 0,
-          todayRevenue: 0,
+          todayOrders: ordRes?.data?.today?.orders ?? 0,
+          todayRevenue: ordRes?.data?.today?.revenue ?? 0,
         })
       } catch (error) {
         console.error('Error loading analytics:', error)

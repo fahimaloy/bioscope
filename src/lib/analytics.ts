@@ -23,3 +23,8 @@ export function parseLimit(url: string, fallback = 10): number {
 }
 
 export const EXCLUDE_PAID: { status: { notIn: OrderStatus[] } } = { status: { notIn: PAID_NOT_IN } }
+
+/** Local midnight today — the "today" aggregate boundary (server timezone). */
+export function startOfToday(now = new Date()): Date {
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+}

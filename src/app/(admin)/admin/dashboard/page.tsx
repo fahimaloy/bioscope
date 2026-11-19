@@ -29,7 +29,6 @@ export default function AdminDashboardPage() {
     totalCustomers: number
     lowStockProducts: number
     pendingCustomRequests: number
-    conversionRate: number
     averageOrderValue: number
     todayOrders: number
     todayRevenue: number
@@ -128,7 +127,6 @@ const products = (productsRes?.data?.data ?? []) as ProductSummary[]
           totalCustomers: customersRes?.data?.pagination?.total ?? 0,
           lowStockProducts: products.filter((p) => Number(p.stock) <= LOW_STOCK).length,
           pendingCustomRequests: crRes?.data?.pending ?? 0,
-          conversionRate: 0,
           averageOrderValue: paid.length ? Math.round(revenueTotal / paid.length) : 0,
           todayOrders: days[days.length - 1]?.orders ?? 0,
           todayRevenue: days[days.length - 1]?.revenue ?? 0,
