@@ -19,6 +19,7 @@ export type RateLimitBucket =
   | 'reset-password'
   | 'change-password'
   | 'contact'
+  | 'track-order'
 
 /** Requests allowed per window, per bucket, per client IP. */
 export const rateLimits: Record<RateLimitBucket, { limit: number; windowMs: number }> = {
@@ -28,6 +29,8 @@ export const rateLimits: Record<RateLimitBucket, { limit: number; windowMs: numb
   'reset-password': { limit: 5, windowMs: 60_000 },
   'change-password': { limit: 10, windowMs: 60_000 },
   contact: { limit: 5, windowMs: 60_000 },
+  // C4 — public order lookup; low limit blunts order-number enumeration.
+  'track-order': { limit: 5, windowMs: 60_000 },
 }
 
 const MAX_WINDOW_MS = Math.max(...Object.values(rateLimits).map((r) => r.windowMs))
