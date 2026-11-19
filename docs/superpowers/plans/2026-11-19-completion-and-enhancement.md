@@ -193,7 +193,13 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** every animation transform/opacity-only (contract §4); global
   reduced-motion rule covers all; no new JS loop outside `motion.ts`/globals keyframes.
 
-### E10 — Shop search UX `[ ]`
+### E10 — Shop search UX `[x]`
+> **DONE 2026-11-20, commit `06b86d9`, controller-executed.** ProductSearchBox: debounced (250ms)
+> suggestions (top 5 /api/products?search=), keyboard nav (Arrow/Enter/Escape), recent searches
+> (localStorage ≤5), clear button, honest empty state, combobox/listbox ARIA. AbortController cancels
+> stale fetches (no fetch per keystroke). Typing still drives grid filter. 6 tests; shop.test.tsx got
+> a next/navigation mock; verify:mid 72 files; browser typing 'sticker' → 4 real suggestions + clear.
+> Risk medium. Report: `task-e10-report.md`.
 - Debounced suggestions (top 5 from the existing search API, keyboard navigable,
   Escape closes), recent searches (localStorage, ≤5), clear button, honest empty state.
 - **Accept:** suggestions track the query with ≤300ms debounce; arrow keys + Enter

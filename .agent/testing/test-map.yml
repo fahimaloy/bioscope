@@ -86,6 +86,9 @@ modules:
   shop-search:
     source: [src/components/product/ProductSearchBox.tsx, src/app/(customer)/shop/page.tsx]
     unit: [tests/unit/product-search-box.test.tsx]
+  error-states:
+    source: [src/components/ui/FetchErrorState.tsx, src/app/(customer)/orders/page.tsx]
+    unit: [tests/unit/fetch-error-state.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []

@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card'
 import { StatusBadge } from '@/components/ui/Badge'
 import { Pagination } from '@/components/ui/Pagination'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { FetchErrorState } from '@/components/ui/FetchErrorState'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { ORDER_STATUS_LABELS, CUSTOMER_CANCELLABLE } from '@/lib/order-status'
 import type { OrderStatus } from '@/lib/order-status'
@@ -41,10 +42,12 @@ export default function OrdersPage() {
   const [page, setPage] = useState(1)
   const [pager, setPager] = useState({ total: 0, totalPages: 1, hasNext: false, hasPrev: false })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
+    setError(false)
     try {
       const params = new URLSearchParams({ page: String(page), limit: '10' })
       if (status !== 'all') params.set('status', status)
@@ -58,8 +61,11 @@ export default function OrdersPage() {
         setOrders(json.data.data)
         setPager(json.data.pagination)
       } else {
+        setError(true)
         toast.error(json.error || 'Failed to load orders')
       }
+    } catch {
+      setError(true)
     } finally {
       setLoading(false)
     }
@@ -112,6 +118,8 @@ export default function OrdersPage() {
               <Skeleton key={i} className="h-28 w-full rounded-[var(--radius-lg)]" />
             ))}
           </div>
+        ) : error ? (
+          <FetchErrorState message="We couldn't load your orders. Please try again." onRetry={load} />
         ) : orders.length === 0 ? (
           <Card className="p-10 text-center">
             <Package className="w-10 h-10 mx-auto text-[var(--text-subtle)] mb-3" />
