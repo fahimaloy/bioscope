@@ -371,7 +371,14 @@ a mocked fetch; no endpoint configured in the dev DB).
   public page. Explicit exception to the frozen logic layer (already granted
   in the rebuild plan).
 
-### C5 — Admin visual rebuild (tasks 3.1–3.6) `[ ]`
+### C5 — Admin visual rebuild (tasks 3.1–3.6) `[x]`
+> **DONE 2026-11-20, commit `b60d91f`, controller-executed.** Token migration across 15 admin files
+> (bg-white→surface-raised, bg-red-500→error, text-white→on-brand/paper, primary→brand); fixed one
+> opacity-var (NotificationList badge→color-mix); ProductPreview Decimal coerce fix (tracked defect).
+> **Finding: border-3 valid + light-mode-only → legacy classes were functional; cosmetic consistency
+> migration, not bug fix.** Invoice EXCLUDED (print doc). Features frozen. type-check 0; verify:mid 75;
+> admin routes 307 no 500. **Risk CRITICAL (15 files/32 shared symbols) SURFACED not waived** —
+> presentational, tests green; admin visual sweep deferred to C7 (auth-gated). Report: `task-c5-report.md`.
 - 17 files still carry `text-primary` / `--surface-card` / `shadow-card`
   legacy classes (scan list in the ledger). One task per surface: dashboard,
   products (+ProductForm/Preview), orders, custom-requests, customers,
@@ -400,7 +407,13 @@ a mocked fetch; no endpoint configured in the dev DB).
 - CI/nightly only: `verify:full` + 48-viewport visual baselines re-recorded
   after C1–C6. Owner: nightly minutes decision still pending.
 
-### C9 — Dead-code purge `[ ]`
+### C9 — Dead-code purge `[x]`
+> **DONE 2026-11-20, commit `35a92bb`, controller-executed (partial — true zero-consumer modules).**
+> Re-grepped at dispatch: deleted ExportPreview.tsx (~395 lines, ExportPreview+ExportSettingsSummary
+> never imported) + ProductConfigurator.tsx (348 lines, barrel-only); removed barrel re-exports.
+> Retained (still consumed): OrderConfirmationCard, SimplePaymentMethod, DoodleBackground (admin/login).
+> ReviewForm excluded (revived E3). type-check 0; verify:mid 75. Gate PARTIAL (deleted files unmappable —
+> consumers verified by grep+type-check+suite). Report: ledger entry.
 - Zero-consumer modules confirmed by the ledger: `ExportPreview.tsx` (395
   lines), `ProductConfigurator.tsx`, `ReviewForm.tsx`, `OrderConfirmationCard`,
   `SimplePaymentMethod`, `DoodleBackground` shim (after its last consumer is
@@ -420,7 +433,11 @@ a mocked fetch; no endpoint configured in the dev DB).
   move `/` into the group or mount the shell explicitly — **owner picks**
   (product decision recorded in the ledger, Task 1.5).
 
-### C11 — globals.css utility-rule token gaps `[ ]`
+### C11 — globals.css utility-rule token gaps `[x]`
+> **DONE 2026-11-20, verified via gate (no code change needed).** globals-tokens test 3/3 green;
+> shadow utilities (card/btn/input/stat) resolve via tailwind.config boxShadow; admin legacy classes
+> resolved by C5 migration. Task 1.6 had closed most gaps; re-scan confirms no remaining undefined-var
+> utility rules. Gate: tests/unit/globals-tokens.test.ts.
 - Re-scan at dispatch: Task 1.6 closed most; verify `--shadow-btn/card/input/
   stat/glass` utility rules and the admin legacy classes resolve; the
   `globals-tokens` test is the gate.
