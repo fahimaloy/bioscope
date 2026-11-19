@@ -23,6 +23,30 @@ export const authConfig: NextAuthConfig = {
         token.id = user.id
         token.role = (user as { role?: string }).role
         token.phone = (user as { phone?: string | null }).phone ?? null
+        // B4 — session lifetime follows rememberMe: 30 days when remembered
+        // (the default), 1 day otherwise. `authTime` is the ABSOLUTE sign-in
+        // instant: @auth/core's encoder re-stamps `iat` and `exp` on every
+        // session fetch (jwt.encode always calls setIssuedAt/setExpirationTime
+        // with the cookie maxAge), so neither rolling claim can express an
+        // absolute lifetime — verified against @auth/core 0.41.3 jwt.js.
+        const remembered = (user as { rememberMe?: boolean }).rememberMe !== false
+        token.rememberMe = remembered
+        token.authTime = Math.floor(Date.now() / 1000)
+      }
+      // B4 — a non-remembered session expires 24h after sign-in, absolutely.
+      // Returning null invalidates the token: the session action clears the
+      // cookie and every consumer (middleware `authorized`, server `auth()`,
+      // the client session fetch) sees no session — fail closed, not a
+      // half-dead session whose cookie keeps being refreshed. Tokens minted
+      // before B4 carry no authTime/rememberMe and stay on the 30-day default.
+      const remembered = (token as { rememberMe?: boolean }).rememberMe !== false
+      const authTime = (token as { authTime?: number }).authTime
+      if (
+        !remembered &&
+        typeof authTime === 'number' &&
+        authTime + 24 * 60 * 60 < Math.floor(Date.now() / 1000)
+      ) {
+        return null
       }
       if (trigger === 'update' && session) {
         token.name = session.name

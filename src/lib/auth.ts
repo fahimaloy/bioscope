@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 import { authConfig } from '@/auth.config'
+import { parseRememberMe } from '@/lib/auth-secret'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // No adapter: JWT session strategy + credentials-only provider.
@@ -31,6 +32,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const { email, password } = parsedCredentials.data
 
+        // B4 — rememberMe was a no-op control: the form sent it, authorize
+        // dropped it. parseRememberMe owns the convention (absent = remembered).
+        const rememberMe = parseRememberMe(
+          (credentials as Record<string, unknown> | undefined)?.rememberMe
+        )
+
         const user = await prisma.user.findUnique({
           where: { email: email.toLowerCase() },
         })
@@ -52,6 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           role: user.role,
           phone: user.phone,
           image: user.avatar,
+          rememberMe,
         }
       },
     }),
@@ -73,5 +81,6 @@ declare module 'next-auth' {
   interface User {
     role: string
     phone?: string | null
+    rememberMe?: boolean
   }
 }

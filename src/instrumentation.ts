@@ -13,6 +13,18 @@ import { planAdminBootstrap, type AdminBootstrapAccount } from '@/lib/admin-boot
  */
 export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return
+
+  // B4 — fail fast on a broken auth environment instead of serving per-request
+  // UntrustedHost/Configuration errors. Runs before the bootstrap and outside
+  // its guard: a missing secret is an operator error that must stop the boot.
+  const { validateAuthEnv } = await import('@/lib/auth-secret')
+  const report = validateAuthEnv(process.env, process.env.NODE_ENV ?? 'development')
+  for (const warning of report.warnings) console.warn(`[auth-env] ${warning}`)
+  if (report.fatal) {
+    console.error(`[auth-env] FATAL: ${report.fatal}`)
+    process.exit(1)
+  }
+
   if (process.env.ADMIN_BOOTSTRAP === '0') return
 
   try {
