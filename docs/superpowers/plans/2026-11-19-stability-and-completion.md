@@ -311,7 +311,16 @@ a mocked fetch; no endpoint configured in the dev DB).
 > classes renamed in the same pass; no dynamic class interpolation; three text
 > roles only; one decor accent per section; motion on every page.
 
-### C1 — Login & register rebuild (task 2.9) `[ ]`
+### C1 — Login & register rebuild (task 2.9) `[x]`
+> **DONE 2026-11-19, commit `8bbb1e8`, controller-executed.** Visual rebuild onto tokens
+> (text roles, --green-strong for match text, rounded-md, Button primary, deprecated decor
+> out → one WashiTape accent). Auth logic frozen + test-pinned: signIn+rememberMe, admin
+> rejection (signOut+toast), A8 ?redirect=, register fetch→auto-signIn. **Functional fix:**
+> optional phone rejected an empty field ('' fails regex; .optional() only allows undefined)
+> → optionalPhone preprocess (blank→undefined) on registerSchema AND updateProfileSchema.
+> 6 page + 3 schema tests; verify:mid 534/534; browser /login+/register 320 scrollWidth 312≤320;
+> live empty-phone register → / with no error. Report:
+> `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-c1-report.md`.
 - Includes A8's convention permanently; register keeps the `signIn('credentials')`
   flow (do not regress to raw POST); admin-rejection toast preserved.
 - Files: `(customer)/login/page.tsx`, `(customer)/register/page.tsx`.
