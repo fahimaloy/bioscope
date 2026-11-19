@@ -213,7 +213,12 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** measured numbers recorded in the ledger; no chunk > 300KB gzipped
   without a recorded justification; LCP < 2.5s on the dev-prod build (isolated).
 
-### E12 — Empty/error state polish `[ ]`
+### E12 — Empty/error state polish `[x]`
+> **DONE 2026-11-20, commit `ae4fedb`, controller-executed.** Reusable FetchErrorState (doodle Card +
+> AlertCircle + retry, role=alert). Orders page tracks error state (non-ok + network catch) → shows
+> recoverable error with retry instead of misleading 'No orders yet'. Sweep: wishlist already doodle
+> empty (E2), notifications empty (E5), profile form field-errors+toast. 3 tests; verify:mid 73 files.
+> Risk medium. Report: `task-e12-report.md`.
 - Orders/wishlist/notifications empty states on the doodle language; every fetch
   surface gets a retry affordance (profile/orders pattern already exists — sweep the
   rest); offline banner optional, skip if it adds risk.
