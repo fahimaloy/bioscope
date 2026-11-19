@@ -77,6 +77,9 @@ modules:
   cart-sync:
     source: [src/lib/cart-merge.ts, src/lib/hooks/useCartSync.ts, src/components/cart/CartSync.tsx, src/lib/stores/cartStore.ts, src/app/api/cart/**]
     unit: [tests/unit/cart-merge.test.ts, tests/unit/use-cart-sync.test.tsx]
+  seo:
+    source: [src/lib/seo.ts, src/lib/site-url.ts, src/app/sitemap.ts, src/app/robots.ts, src/app/manifest.ts, 'src/app/(customer)/shop/[slug]/**']
+    unit: [tests/unit/seo.test.ts]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []

@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getProductBySlug, getRelatedProducts } from '@/lib/actions/product'
+import { buildProductMetadata, buildProductJsonLd, type SeoProduct } from '@/lib/seo'
 import { ProductDetail } from '@/components/product/ProductDetail'
 import { ProductGrid } from '@/components/product/ProductCard'
 import { ReviewList } from '@/components/product/ReviewList'
@@ -55,6 +57,22 @@ function serializeProduct(p: ProductWithRelations) {
   }
 }
 
+/** E6 — per-product SEO metadata (uses the product's metaTitle/metaDescription
+ *  when set, else name/description), canonical URL, and OG/Twitter cards. */
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const product = await getProductBySlug(params.slug)
+  if (!product || !product.isActive) return {}
+  return buildProductMetadata(toSeoProduct(product))
+}
+
+function toSeoProduct(p: { id: string; name: string; slug: string; description: string | null; images: string[]; basePrice: unknown; stock: number; trackInventory: boolean; metaTitle: string | null; metaDescription: string | null }): SeoProduct {
+  return {
+    id: p.id, name: p.name, slug: p.slug, description: p.description, images: p.images,
+    basePrice: Number(p.basePrice), stock: p.stock, trackInventory: p.trackInventory,
+    metaTitle: p.metaTitle, metaDescription: p.metaDescription,
+  }
+}
+
 export default async function ProductPage({ params }: { params: { slug: string } }) {
   const product = await getProductBySlug(params.slug)
   if (!product || !product.isActive) notFound()
@@ -83,8 +101,12 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const ratingDistribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
   for (const r of reviews) ratingDistribution[r.rating] = (ratingDistribution[r.rating] ?? 0) + 1
 
+  // E6 — JSON-LD Product structured data from real product/price/stock/review data.
+  const jsonLd = buildProductJsonLd(toSeoProduct(product), { averageRating, totalReviews })
+
   return (
   <div className="min-h-screen pt-24 pb-12 px-4">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="max-w-7xl mx-auto">
         <nav className="flex items-center gap-2 text-sm text-[var(--text-subtle)] mb-6">
           <Link href="/" className="text-[var(--brand)] hover:underline">
