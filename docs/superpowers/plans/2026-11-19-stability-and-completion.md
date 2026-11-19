@@ -284,7 +284,17 @@ a mocked fetch; no endpoint configured in the dev DB).
 - **Accept:** unit tests (window expiry, per-key isolation); 429 shape via
   `handleRouteError` (`AppError(429,…)`); no PII in logs.
 
-### B4 — Admin password-reset / session hygiene `[ ]`
+### B4 — Admin password-reset / session hygiene `[x]`
+> **DONE 2026-11-19, commit `a5dffd5` (controller-completed after the implementer was
+> interrupted).** The draft's `token.exp`/`iat` mechanism was broken against the installed
+> @auth/core 0.41.3 (encoder re-stamps both on every session fetch) — replaced with an
+> absolute `authTime` claim + jwt-callback null invalidation (cookie cleared, fail closed
+> everywhere). Boot-time `validateAuthEnv` (fatal → exit(1)) incl. the nested-quote
+> `.env` UntrustedHost trap. Runbook: `docs/AUTH_RUNBOOK.md` (admin reset = bootstrap
+> reconcile, documented not reinvented). 20 new tests, RED-verified; verify:mid 502/502;
+> live: all three rememberMe variants sign in + pass middleware. Report:
+> `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-b4-report.md`.
+> Not live-verified: the 24h expiry itself (fake-timer unit tests only).
 - Owner-facing runbook + code: `AUTH_SECRET`/`AUTH_URL` env validation at boot
   (fail fast with a clear log, not per-request `UntrustedHost`), session
   maxAge review, and a documented admin-password reset path (bootstrap
