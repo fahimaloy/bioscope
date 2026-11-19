@@ -66,6 +66,9 @@ firing `limit` requests from one IP then asserting request N+1 is 429 with `Retr
 generic `RATE_LIMITED` body; plus window expiry on fake timers, per-IP isolation, missing-IP
 fallback, fail-open and unchanged valid traffic. Full suite **301/301** across 29 files;
 `verify:fast` type-check 0 / lint 0.
+**Live-verified** against the dev server: `POST /api/contact` from one IP returns 429 with
+`Retry-After: 60` and `{"success":false,"code":"RATE_LIMITED"}`, and `/`, `/login`, `/register`,
+`/api/auth/session` all still behave (session `null`; `/profile` and `/admin/dashboard` still 307).
 **Caveats recorded in the file:** per-process memory (N instances ⇒ N× effective limit; Redis
 upgrade path named, API unchanged), node-side only, and `x-forwarded-for` spoofable without a
 trusted proxy — a speed bump, not an access control. No headless/webhook route exists yet, so
