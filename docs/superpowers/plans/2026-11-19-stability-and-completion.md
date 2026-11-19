@@ -354,7 +354,14 @@ a mocked fetch; no endpoint configured in the dev DB).
   Decimal compare fixed in the products task (tracked defect). DataTable
   already fixed by A6 — do not re-fix.
 
-### C6 — Global states (task 4.1) `[ ]`
+### C6 — Global states (task 4.1) `[x]`
+> **DONE 2026-11-19, commit `70ecda3`, controller-executed.** not-found rebuilt onto
+> tokens (border-[3px], surface-raised, --text/--text-muted roles, one aria-hidden doodle
+> scatter replacing five deprecated DoodleShape accents, entrance motion, Go Home + Browse
+> destinations). **global-error functional fix:** it replaces the root layout so it must
+> render its own `<html>/<body>` (was a bare `<div>`) + import globals.css; logs digest only.
+> loading already token-based (unchanged). 5 jsdom tests; browser 404@320 scrollWidth 317≤320;
+> verify:mid 525/525. Report: `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-c6-report.md`.
 - `loading.tsx`, `not-found.tsx`, `global-error.tsx` onto tokens; not-found
   still references undefined `--surface-card`/`text-primary`.
 
