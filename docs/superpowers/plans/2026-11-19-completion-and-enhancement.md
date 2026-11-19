@@ -66,7 +66,14 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
   with new password); expired/used token → clear error; unit tests for the route's
   email path (mocked transport) + page tests.
 
-### E2 — Working wishlist `[ ]`
+### E2 — Working wishlist `[x]`
+> **DONE 2026-11-19, commit `4cbd05e`, controller-executed.** wishlistStore (zustand+localStorage,
+> cart pattern, guest-friendly survives login); ProductCard/ProductDetail/FeaturedProduct hearts
+> wired (filled + aria-pressed + toggle label); /wishlist page (grid + remove + clear + empty state);
+> Navbar icon + badge visible to guests. 6 jsdom tests; verify:mid 561/561; browser live heart
+> false→true, badge 1, page shows item, persists across reload. detect-changes HIGH (ProductCard/
+> Navbar) surfaced not waived. FeaturedProduct Add-to-Cart also dead → tracked for E8. Report:
+> `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-e2-report.md`.
 - **Evidence:** `ProductCard.tsx:172-179` heart button has **no onClick** — decorative;
   `ProductDetail` same. No wishlist store exists.
 - **Work:** `wishlistStore` (zustand + localStorage, cart-store pattern), heart toggles
