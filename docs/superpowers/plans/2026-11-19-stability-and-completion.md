@@ -325,7 +325,14 @@ a mocked fetch; no endpoint configured in the dev DB).
   flow (do not regress to raw POST); admin-rejection toast preserved.
 - Files: `(customer)/login/page.tsx`, `(customer)/register/page.tsx`.
 
-### C2 — About & contact rebuild (task 2.10) `[ ]`
+### C2 — About & contact rebuild (task 2.10) `[x]`
+> **DONE 2026-11-19, commit `5e9626b`, controller-executed.** About: fabricated stats/team
+> removed (ruling 2), owner-copy TODOs, token rebuild (ink-band values, capped DoodleScatter).
+> Contact: **FAQ was a dead onClick={() => {}}** → working accordion (aria-expanded); fake
+> newsletter removed (no backend, matches T1.3); emoji removed (§5.6); token alerts/confetti;
+> onSubmit posts real /api/contact (frozen). 6 jsdom tests; verify:mid 543/543; browser
+> /about+/contact 320 scrollWidth 312≤320; FAQ live false→true. Report:
+> `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/task-c2-report.md`.
 - **Owner decision first:** fabricated stats ("500 Happy Customers", "150
   Projects Done") must be removed or replaced with approved copy — the plan
   bans unapproved marketing claims. Contact form already posts `/api/contact`;
