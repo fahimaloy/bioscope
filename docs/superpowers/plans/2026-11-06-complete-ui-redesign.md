@@ -1,5 +1,12 @@
 # Complete UI Redesign Implementation Plan
 
+> **SUPERSEDED (marked 2026-11-19):** this MAFTS-era plan (Bangers/Outfit, `--primary #FF6B6B`)
+> was replaced the same day by `2026-11-06-bioscope-frontend-rebuild.md` +
+> `docs/superpowers/specs/2026-11-06-bioscope-frontend-design.md`, executed under the SDD
+> ledger `.superpowers/sdd/2026-11-06-bioscope-frontend-rebuild/progress.md`. Kept for
+> history only — do not dispatch from it. Live continuation:
+> `2026-11-19-stability-and-completion.md` + `2026-11-19-completion-and-enhancement.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Complete redesign of all pages, components, and layout to achieve a cohesive, fun, doodle-styled cartoonish yet modern interactive UI with proper tokenized design system, consistent color combinations, visible text, correct sizing, and delightful animations — all reflecting the "bioscope" sticker shop brand identity.
