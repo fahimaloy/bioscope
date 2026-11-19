@@ -9,6 +9,7 @@ import { Input, Textarea } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { Mail, Phone, MapPin, Clock, Send, Loader2, CheckCircle, AlertCircle, ChevronDown } from 'lucide-react'
 import { DoodleScatter, WashiTape, SketchUnderline } from '@/components/decorative'
+import { faqs } from '@/lib/content/faqs'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionVariants } from '@/lib/motion'
 import { toast } from 'sonner'
@@ -29,15 +30,6 @@ const contactInfo = [
   { icon: Phone, title: 'Call Us', value: '+880 1700 000000', href: 'tel:+880****0000', desc: 'Sat-Thu 9AM-6PM (GMT+6)' },
   { icon: MapPin, title: 'Visit Us', value: 'Dhaka, Bangladesh', href: '#', desc: 'By appointment only' },
   { icon: Clock, title: 'Business Hours', value: 'Sat-Thu 9AM-6PM', href: '#', desc: 'Friday closed' },
-]
-
-const faqs = [
-  { q: 'How long does delivery take?', a: 'Inside Dhaka: 2-3 business days. Outside Dhaka: 3-5 business days. Custom orders may take additional time for production.' },
-  { q: 'What file formats do you accept for custom designs?', a: 'We accept PNG, JPG, PDF, AI, and EPS files. For best results, use vector files (AI, EPS, PDF) or high-resolution PNG (300 DPI minimum).' },
-  { q: 'Can I order a sample before placing a large order?', a: 'Yes! We offer sample packs for most products. Contact us for details on sample pricing and availability.' },
-  { q: 'What is your return policy?', a: 'Custom printed items cannot be returned unless there is a manufacturing defect. Standard products can be returned within 30 days if unused.' },
-  { q: 'Do you offer bulk discounts?', a: 'Yes! We offer volume pricing tiers. The more you order, the lower the per-unit cost. Check individual product pages for quantity pricing.' },
-  { q: 'What payment methods do you accept?', a: 'We accept Cash on Delivery (COD) and Bank Transfer. Payment is collected upon delivery for COD orders.' },
 ]
 
 // Brand-token confetti palette (no legacy --primary/--purple, no emoji).

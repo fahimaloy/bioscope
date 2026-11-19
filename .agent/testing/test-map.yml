@@ -59,6 +59,9 @@ modules:
   about-contact:
     source: [src/app/(customer)/about/**, src/app/(customer)/contact/**]
     unit: [tests/unit/pages/about-contact.test.tsx]
+  content-pages:
+    source: [src/components/content/**, src/lib/content/**, src/app/(customer)/faq/**, src/app/(customer)/shipping/**, src/app/(customer)/returns/**, src/app/(customer)/privacy/**, src/app/(customer)/terms/**, src/app/(customer)/accessibility/**, src/app/(customer)/blog/**, src/app/(customer)/careers/**, src/app/(customer)/press/**, src/app/(customer)/affiliates/**]
+    unit: [tests/unit/pages/content-pages.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
