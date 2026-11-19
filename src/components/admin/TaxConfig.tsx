@@ -68,14 +68,14 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
   return (
     <div className="space-y-6">
       {/* Global Tax Settings */}
-      <div className="bg-white rounded-card border-3 border-[var(--ink)] p-6 shadow-card">
+      <div className="bg-[var(--surface-raised)] rounded-card border-3 border-[var(--ink)] p-6 shadow-card">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-input bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center">
-              <Percent className="w-5 h-5 text-primary" />
+              <Percent className="w-5 h-5 text-[var(--brand)]" />
             </div>
             <div>
-              <h3 className="font-display text-xl text-primary">Global Tax Settings</h3>
+              <h3 className="font-display text-xl text-[var(--brand)]">Global Tax Settings</h3>
               <p className="text-[var(--text-subtle)]">Configure default tax behavior for all products</p>
             </div>
           </div>
@@ -137,15 +137,15 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
           <h4 className="font-medium text-body text-[var(--ink)] mb-3">Tax Calculation Preview</h4>
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
-              <div className="text-2xl font-display text-primary">100.00</div>
+              <div className="text-2xl font-display text-[var(--brand)]">100.00</div>
               <div className="text-xs text-[var(--text-subtle)]">Base Price</div>
             </div>
             <div>
-              <div className="text-2xl font-display text-primary">+{globalTax.toFixed(2)}%</div>
+              <div className="text-2xl font-display text-[var(--brand)]">+{globalTax.toFixed(2)}%</div>
               <div className="text-xs text-[var(--text-subtle)]">Tax Amount</div>
             </div>
             <div>
-              <div className="text-2xl font-display text-primary">
+              <div className="text-2xl font-display text-[var(--brand)]">
                 {taxInclusive ? '100.00' : (100 + globalTax).toFixed(2)}
               </div>
               <div className="text-xs text-[var(--text-subtle)]">Final Price</div>
@@ -157,7 +157,7 @@ export function TaxConfig({ onChange, initialSettings = {} }: TaxConfigProps) {
       {/* Tax Categories */}
       <div className="border-t border-[var(--light)] pt-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-display text-lg text-primary flex items-center gap-2">
+          <h3 className="font-display text-lg text-[var(--brand)] flex items-center gap-2">
             <Settings className="w-5 h-5" />
             Tax Categories
           </h3>

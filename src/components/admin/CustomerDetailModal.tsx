@@ -142,7 +142,7 @@ export function CustomerDetailModal({
               { label: 'Avg. order', value: formatCurrency(detail.stats.averageOrderValue) },
             ].map((s) => (
               <Card key={s.label} variant="doodle" padding="md" className="text-center">
-                <p className="text-2xl font-display text-primary">{s.value}</p>
+                <p className="text-2xl font-display text-[var(--brand)]">{s.value}</p>
                 <p className="text-xs uppercase tracking-wide text-[var(--text-subtle)]">{s.label}</p>
               </Card>
             ))}
@@ -157,7 +157,7 @@ export function CustomerDetailModal({
             <TabsContent value="profile">
               <div className="space-y-4 pt-2">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white flex items-center justify-center font-display text-xl">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-[var(--on-brand)] flex items-center justify-center font-display text-xl">
                     {profile.name?.charAt(0)?.toUpperCase() ?? profile.email.charAt(0).toUpperCase()}
                   </div>
                   <div>
@@ -198,7 +198,7 @@ export function CustomerDetailModal({
                 {detail.addresses.map((a) => (
                   <Card key={a.id} variant="default" padding="md">
                     <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 mt-0.5 text-primary" />
+                      <MapPin className="w-5 h-5 mt-0.5 text-[var(--brand)]" />
                       <div className="text-sm">
                         <p className="font-medium text-[var(--ink)] flex items-center gap-2">
                           {a.name} · {a.phone}
@@ -219,7 +219,7 @@ export function CustomerDetailModal({
                 {detail.orders.map((o) => (
                   <div key={o.id} className="flex items-center justify-between gap-3 border-2 border-[var(--light)] rounded-card px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Package className="w-5 h-5 text-primary" />
+                      <Package className="w-5 h-5 text-[var(--brand)]" />
                       <div>
                         <p className="font-medium text-[var(--ink)]">{o.orderNumber}</p>
                         <p className="text-xs text-[var(--text-subtle)]">{formatDate(o.createdAt)} · {o.items.length} item{o.items.length === 1 ? '' : 's'}</p>
@@ -227,7 +227,7 @@ export function CustomerDetailModal({
                     </div>
                     <div className="flex items-center gap-3">
                       <StatusBadge status={o.status} size="sm" />
-                      <span className="font-display text-primary">{formatCurrency(Number(o.total))}</span>
+                      <span className="font-display text-[var(--brand)]">{formatCurrency(Number(o.total))}</span>
                     </div>
                   </div>
                 ))}

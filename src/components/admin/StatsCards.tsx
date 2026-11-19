@@ -137,7 +137,7 @@ export function LiveStatCard({
 }) {
   return (
     <div className={cn(
-      'bg-white rounded-card border-3 border-[var(--ink)] p-4 shadow-card transition-all',
+      'bg-[var(--surface-raised)] rounded-card border-3 border-[var(--ink)] p-4 shadow-card transition-all',
       className
     )}>
       <div className="flex items-center justify-between mb-3">
@@ -237,7 +237,7 @@ export function RevenueChartCard({ data }: { data: Array<{ date: string; revenue
     >
       <Card variant="doodle" padding="lg" className="relative overflow-visible">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-lg text-primary">Revenue Overview</h3>
+          <h3 className="font-display text-lg text-[var(--brand)]">Revenue Overview</h3>
           <Badge variant="doodle" size="sm">Live</Badge>
         </div>
         <div className="h-72">
@@ -382,7 +382,7 @@ export function OrderStatusDistribution({ distribution }: { distribution: Record
       transition={{ delay: 0.4, type: 'spring', stiffness: 100, damping: 15 }}
     >
       <Card variant="doodle" padding="lg" className="relative overflow-visible">
-        <h3 className="font-display text-lg text-primary mb-4">Order Status Distribution</h3>
+        <h3 className="font-display text-lg text-[var(--brand)] mb-4">Order Status Distribution</h3>
         <div className="space-y-3">
           {statuses.map((status) => {
             const count = distribution[status.key] || 0
@@ -452,7 +452,7 @@ export function ActivityFeed({ activities, limit = 6 }: { activities: ActivityIt
     >
       <Card variant="doodle" padding="lg" className="relative overflow-visible">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-lg text-primary">Recent Activity</h3>
+          <h3 className="font-display text-lg text-[var(--brand)]">Recent Activity</h3>
           <Badge variant="outline" size="sm">{displayActivities.length} items</Badge>
         </div>
         <div className="relative">
@@ -512,7 +512,7 @@ export function ActivityFeed({ activities, limit = 6 }: { activities: ActivityIt
                 </div>
                 
                 {/* Activity content */}
-                <div className="bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[var(--light)] rounded-card p-4 hover:border-primary hover:shadow-md transition-all duration-300">
+                <div className="bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[var(--light)] rounded-card p-4 hover:border-[var(--brand)] hover:shadow-md transition-all duration-300">
                   {activity.href ? (
                     <a href={activity.href} className="block">
                       <ActivityContent activity={activity} typeColor={getTypeColor()} timeAgo={timeAgo} />

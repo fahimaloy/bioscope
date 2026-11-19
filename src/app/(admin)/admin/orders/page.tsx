@@ -210,12 +210,12 @@ function ExpandedRowContent({
         {/* Order Items */}
         <div>
           <h4 className="font-display text-lg text-[var(--ink)] mb-4 flex items-center gap-2">
-            <Package className="w-5 h-5 text-primary" />
+            <Package className="w-5 h-5 text-[var(--brand)]" />
             Order Items ({order.items.length})
           </h4>
           <div className="space-y-3">
             {order.items.map((item) => (
-              <div key={item.id} className="flex gap-4 p-4 bg-white border-2 border-[var(--light)] rounded-card">
+              <div key={item.id} className="flex gap-4 p-4 bg-[var(--surface-raised)] border-2 border-[var(--light)] rounded-card">
                 <div className="w-20 h-20 flex-shrink-0 relative">
                   {item.productImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -245,7 +245,7 @@ function ExpandedRowContent({
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="font-display text-primary">{formatCurrency(Number(item.unitPrice))}</p>
+                  <p className="font-display text-[var(--brand)]">{formatCurrency(Number(item.unitPrice))}</p>
                   <p className="text-sm text-[var(--text-subtle)]">{formatCurrency(Number(item.totalPrice))} total</p>
                 </div>
               </div>
@@ -256,7 +256,7 @@ function ExpandedRowContent({
         {/* Status Timeline */}
         <div>
           <h4 className="font-display text-lg text-[var(--ink)] mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-primary" />
+            <Clock className="w-5 h-5 text-[var(--brand)]" />
             Status Timeline
             {historyLoading && <span className="text-xs font-normal text-[var(--text-subtle)]">Loading latest…</span>}
           </h4>
@@ -269,7 +269,7 @@ function ExpandedRowContent({
                   <div className="relative flex-shrink-0">
                     <div className={`
                       w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium
-                      ${isCurrent ? 'bg-primary text-white' : 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary border-2 border-primary'}
+                      ${isCurrent ? 'bg-[var(--brand)] text-[var(--on-brand)]' : 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-[var(--brand)] border-2 border-[var(--brand)]'}
                     `}>
                       {isCurrent ? (
                         <Clock className="w-5 h-5 animate-pulse" />
@@ -311,9 +311,9 @@ function ExpandedRowContent({
 
           {/* Tracking Info */}
           {(order.trackingNumber || order.shippedAt || order.deliveredAt) && (
-            <div className="mt-6 p-4 bg-white border-2 border-[var(--light)] rounded-card">
+            <div className="mt-6 p-4 bg-[var(--surface-raised)] border-2 border-[var(--light)] rounded-card">
               <h5 className="font-medium text-[var(--ink)] mb-3 flex items-center gap-2">
-                <Truck className="w-4 h-4 text-primary" />
+                <Truck className="w-4 h-4 text-[var(--brand)]" />
                 Shipping Details
               </h5>
               <div className="space-y-2 text-sm">
@@ -556,7 +556,7 @@ export default function AdminOrdersPage() {
       key: 'orderNumber',
       header: 'Order #',
       accessor: (row: Order) => (
-        <span className="font-mono font-medium text-[var(--ink)] cursor-pointer hover:text-primary" onClick={() => handleRowClick(row.id)}>
+        <span className="font-mono font-medium text-[var(--ink)] cursor-pointer hover:text-[var(--brand)]" onClick={() => handleRowClick(row.id)}>
           {row.orderNumber}
         </span>
       ),
@@ -591,7 +591,7 @@ export default function AdminOrdersPage() {
       key: 'total',
       header: 'Total',
       accessor: (row: Order) => (
-        <span className="font-display text-primary">{formatCurrency(Number(row.total))}</span>
+        <span className="font-display text-[var(--brand)]">{formatCurrency(Number(row.total))}</span>
       ),
       sortable: true,
       align: 'right' as const,
@@ -638,7 +638,7 @@ export default function AdminOrdersPage() {
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); handleRowClick(row.id) }}
-              className="p-2 rounded-input text-[var(--text-subtle)] hover:text-primary hover:bg-[var(--light)] transition-colors"
+              className="p-2 rounded-input text-[var(--text-subtle)] hover:text-[var(--brand)] hover:bg-[var(--light)] transition-colors"
               aria-label="Expand row"
             >
               {expandedRow === row.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -655,7 +655,7 @@ export default function AdminOrdersPage() {
       <div className="max-w-full mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-display text-3xl text-primary">Orders</h1>
+            <h1 className="font-display text-3xl text-[var(--brand)]">Orders</h1>
             <p className="text-[var(--text-subtle)]">Manage and track all orders</p>
           </div>
           <Button

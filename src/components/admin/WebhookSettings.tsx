@@ -263,7 +263,7 @@ export function WebhookSettings() {
                   value={testEvent[endpoint.id] ?? endpoint.events[0] ?? WEBHOOK_EVENTS[0]}
                   onChange={(e) => setTestEvent((prev) => ({ ...prev, [endpoint.id]: e.target.value }))}
                   aria-label="Test event"
-                  className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:outline-none"
+                  className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] text-body focus:border-[var(--brand)] focus:outline-none"
                 >
                   {WEBHOOK_EVENTS.map((event) => (
                     <option key={event} value={event}>

@@ -65,7 +65,7 @@ const columns = [
     width: '280px',
     cell: (row: CustomerRow) => (
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white flex items-center justify-center font-display text-sm">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-[var(--on-brand)] flex items-center justify-center font-display text-sm">
           {row.name?.charAt(0)?.toUpperCase() || row.email?.charAt(0)?.toUpperCase() || '?'}
         </div>
         <div>
@@ -99,7 +99,7 @@ const columns = [
     header: 'Total Spent', 
     width: '160px',
     accessor: (row: CustomerRow) => (
-      <span className="font-display text-primary">{formatCurrency(row.totalSpent)}</span>
+      <span className="font-display text-[var(--brand)]">{formatCurrency(row.totalSpent)}</span>
     ), 
     sortable: true 
   },
@@ -205,7 +205,7 @@ export default function CustomersPage() {
           className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
           <div>
-            <h1 className="font-display text-3xl text-primary">Customers</h1>
+            <h1 className="font-display text-3xl text-[var(--brand)]">Customers</h1>
             <p className="text-[var(--text-subtle)]">Manage and analyze your customer base</p>
           </div>
           <div className="flex items-center gap-3">
@@ -306,7 +306,7 @@ export default function CustomersPage() {
                       value={spendTier}
                       onChange={(e) => { setSpendTier(e.target.value); setPage(1) }}
                       aria-label="Spend tier"
-                      className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none"
+                      className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] text-body focus:border-[var(--brand)] focus:shadow-input focus:outline-none"
                     >
                       <option value="">All Tiers</option>
                       {spendTiers.map(t => (
@@ -322,7 +322,7 @@ export default function CustomersPage() {
                       value={minOrders}
                       onChange={(e) => { setMinOrders(e.target.value); setPage(1) }}
                       aria-label="Minimum orders"
-                      className="w-24 px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none"
+                      className="w-24 px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] text-body focus:border-[var(--brand)] focus:shadow-input focus:outline-none"
                     />
                   </div>
                   <div className="flex items-center gap-2">
@@ -332,7 +332,7 @@ export default function CustomersPage() {
                       value={dateFrom}
                       onChange={(e) => { setDateFrom(e.target.value); setPage(1) }}
                       aria-label="Joined from"
-                      className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:shadow-input focus:outline-none"
+                      className="px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] text-body focus:border-[var(--brand)] focus:shadow-input focus:outline-none"
                     />
                   </div>
                   {(spendTier || minOrders || dateFrom) && (

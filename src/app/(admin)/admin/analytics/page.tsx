@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
           className="flex flex-col md:flex-row md:items-center justify-between gap-4"
         >
           <div>
-            <h1 className="font-display text-3xl text-primary">Analytics</h1>
+            <h1 className="font-display text-3xl text-[var(--brand)]">Analytics</h1>
             <p className="text-[var(--text-subtle)]">Track your store performance with detailed insights</p>
           </div>
           <div className="flex items-center gap-3">
@@ -186,7 +186,7 @@ export default function AnalyticsPage() {
           {/* Orders Trend */}
           <Card variant="doodle" padding="lg" className="relative overflow-visible">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-display text-lg text-primary">Orders Trend</h3>
+              <h3 className="font-display text-lg text-[var(--brand)]">Orders Trend</h3>
               <Badge variant="doodle" size="sm">12 Months</Badge>
             </div>
             <div className="h-72">
@@ -298,7 +298,7 @@ export default function AnalyticsPage() {
           {/* Top Products */}
           <Card variant="doodle" padding="lg" className="relative overflow-visible">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-display text-lg text-primary">Top Selling Products</h3>
+              <h3 className="font-display text-lg text-[var(--brand)]">Top Selling Products</h3>
               <Badge variant="outline" size="sm">By Revenue</Badge>
             </div>
             <div className="space-y-3 max-h-[380px] overflow-y-auto pr-2">
@@ -314,12 +314,12 @@ export default function AnalyticsPage() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05, type: 'spring', stiffness: 100, damping: 15 }}
-                    className="flex items-center gap-4 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[var(--light)] rounded-card hover:border-primary hover:shadow-md transition-all duration-300 group"
+                    className="flex items-center gap-4 p-3 bg-[color-mix(in_srgb,var(--surface-sunken)_50%,transparent)] border-2 border-[var(--light)] rounded-card hover:border-[var(--brand)] hover:shadow-md transition-all duration-300 group"
                   >
                     <div className="relative w-12 h-12 flex-shrink-0">
                       <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] rounded-input opacity-20" />
-                      <div className="relative w-full h-full rounded-input flex items-center justify-center bg-white border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]">
-                        <span className="font-display text-primary text-lg">{index + 1}</span>
+                      <div className="relative w-full h-full rounded-input flex items-center justify-center bg-[var(--surface-raised)] border-2 border-[color-mix(in_srgb,var(--ink)_10%,transparent)]">
+                        <span className="font-display text-[var(--brand)] text-lg">{index + 1}</span>
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -327,7 +327,7 @@ export default function AnalyticsPage() {
                       <p className="text-sm text-[var(--text-subtle)]">{formatNumber(product.sales)} units sold</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-display text-primary">{formatCurrency(product.revenue)}</p>
+                      <p className="font-display text-[var(--brand)]">{formatCurrency(product.revenue)}</p>
                       <p className="text-xs text-[var(--text-subtle)]">Revenue</p>
                     </div>
                   </motion.div>
@@ -347,7 +347,7 @@ export default function AnalyticsPage() {
           {/* Revenue by Product Category */}
           <Card variant="doodle" padding="lg" className="relative overflow-visible">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-display text-lg text-primary">Revenue by Category</h3>
+              <h3 className="font-display text-lg text-[var(--brand)]">Revenue by Category</h3>
               <Badge variant="doodle" size="sm">Top 6</Badge>
             </div>
             <div className="h-72 flex items-center justify-center">
@@ -408,7 +408,7 @@ export default function AnalyticsPage() {
         >
           <Card variant="doodle" padding="lg" className="relative overflow-visible">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg text-primary">Revenue by Category</h3>
+              <h3 className="font-display text-lg text-[var(--brand)]">Revenue by Category</h3>
               <Badge variant="outline" size="sm">Last 12 months</Badge>
             </div>
             {topCategories.length === 0 ? (
@@ -435,7 +435,7 @@ export default function AnalyticsPage() {
 
           <Card variant="doodle" padding="lg" className="relative overflow-visible">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display text-lg text-primary">Top Districts</h3>
+              <h3 className="font-display text-lg text-[var(--brand)]">Top Districts</h3>
               <Badge variant="outline" size="sm">Paid orders</Badge>
             </div>
             {topDistricts.length === 0 ? (
@@ -473,7 +473,7 @@ export default function AnalyticsPage() {
         >
           <Card variant="doodle" padding="lg" className="relative overflow-visible">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="font-display text-lg text-primary">Top Customers</h3>
+              <h3 className="font-display text-lg text-[var(--brand)]">Top Customers</h3>
               <Badge variant="outline" size="sm">By Lifetime Value</Badge>
             </div>
             <div className="overflow-x-auto">
@@ -507,7 +507,7 @@ export default function AnalyticsPage() {
                         className="transition-colors hover:bg-[var(--surface-raised)]"
                       >
                         <td className="px-4 py-3">
-                          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-white font-display text-sm">
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] text-[var(--on-brand)] font-display text-sm">
                             {index + 1}
                           </div>
                         </td>
@@ -521,7 +521,7 @@ export default function AnalyticsPage() {
                           <span className="font-medium text-[var(--ink)]">{customer.orderCount}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="font-display text-primary">{formatCurrency(customer.totalSpent)}</span>
+                          <span className="font-display text-[var(--brand)]">{formatCurrency(customer.totalSpent)}</span>
                         </td>
                         <td className="px-4 py-3">
                           <span className="text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{formatCurrency(customer.orderCount > 0 ? customer.totalSpent / customer.orderCount : 0)}</span>

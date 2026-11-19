@@ -65,10 +65,10 @@ export function NotificationList({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-input bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center">
-            <Bell className="w-5 h-5 text-primary" />
+            <Bell className="w-5 h-5 text-[var(--brand)]" />
           </div>
           <div>
-            <h3 className="font-display text-xl text-primary">Notifications</h3>
+            <h3 className="font-display text-xl text-[var(--brand)]">Notifications</h3>
             <p className="text-sm text-[var(--text-subtle)]">
               {notifications.length} total • {unreadCount} unread
             </p>
@@ -93,13 +93,13 @@ export function NotificationList({
               className={cn(
                 'px-3 py-1.5 rounded-input text-sm font-medium transition-all',
                 filter === f
-                  ? 'bg-primary text-white shadow-btn'
+                  ? 'bg-[var(--brand)] text-[var(--on-brand)] shadow-btn'
                   : 'bg-[var(--light)] text-[color-mix(in_srgb,var(--ink)_70%,transparent)] hover:bg-dark/10 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]'
               )}
             >
               {f.charAt(0).toUpperCase() + f.slice(1)}
               {f !== 'all' && (
-                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-white/20">
+                <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-[color-mix(in_srgb,var(--paper)_20%,transparent)]">
                   {notifications.filter((n) => f === 'unread' ? !n.isRead : n.isRead).length}
                 </span>
               )}
@@ -138,14 +138,14 @@ export function NotificationList({
                 key={notification.id}
                 className={cn(
                   'flex items-start gap-3 p-4 rounded-input border-2 transition-all',
-                  !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)] border-[color-mix(in_srgb,var(--primary)_20%,transparent)]' : 'bg-white border-[var(--light)]',
+                  !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_5%,transparent)] border-[color-mix(in_srgb,var(--primary)_20%,transparent)]' : 'bg-[var(--surface-raised)] border-[var(--light)]',
                   isExpanded && 'ring-2 ring-[color-mix(in_srgb,var(--primary)_20%,transparent)]'
                 )}
               >
                 <div
                   className={cn(
                     'w-10 h-10 rounded-input flex items-center justify-center flex-shrink-0',
-                    !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-primary' : 'bg-[var(--light)] text-[var(--text-subtle)]'
+                    !notification.isRead ? 'bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] text-[var(--brand)]' : 'bg-[var(--light)] text-[var(--text-subtle)]'
                   )}
                 >
                   <IconComponent className="w-5 h-5" />
@@ -252,16 +252,16 @@ export function NotificationBellDropdown({
       >
         <Bell className="w-5 h-5 text-[var(--ink)]" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs font-medium flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[var(--error)] text-[var(--paper)] text-xs font-medium flex items-center justify-center">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </Button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-96 bg-white border-3 border-[var(--ink)] rounded-card shadow-[0_10px_40px_rgba(0,0,0,0.15)] animate-scale-in z-50">
+        <div className="absolute right-0 top-full mt-2 w-96 bg-[var(--surface-raised)] border-3 border-[var(--ink)] rounded-card shadow-[0_10px_40px_rgba(0,0,0,0.15)] animate-scale-in z-50">
           <div className="flex items-center justify-between p-4 border-b border-[var(--light)]">
-            <h3 className="font-display text-primary">Notifications</h3>
+            <h3 className="font-display text-[var(--brand)]">Notifications</h3>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
                 <Button variant="ghost" size="sm" onClick={onMarkAllRead} className="text-xs">
@@ -318,7 +318,7 @@ export function NotificationBellDropdown({
                       </p>
                     </div>
                     {!notification.isRead && (
-                      <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-1" />
+                      <div className="w-2 h-2 rounded-full bg-[var(--brand)] flex-shrink-0 mt-1" />
                     )}
                   </button>
                   )

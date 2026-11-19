@@ -22,7 +22,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="font-display text-xl text-primary">Live Preview</h3>
+          <h3 className="font-display text-xl text-[var(--brand)]">Live Preview</h3>
           <p className="text-[var(--text-subtle)]">See how your product will appear to customers</p>
         </div>
         <div className="flex items-center gap-2">
@@ -38,7 +38,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
         <div className="flex flex-col md:flex-row gap-6">
           {/* Image */}
           <div className="relative w-full md:w-64 flex-shrink-0">
-            <div className="aspect-square rounded-input overflow-hidden bg-white border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] relative">
+            <div className="aspect-square rounded-input overflow-hidden bg-[var(--surface-raised)] border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] relative">
               <DoodleShape size="sm" color="primary" animation="float" className="absolute top-4 left-4 opacity-20 pointer-events-none" />
               <DoodleShape size="sm" color="secondary" animation="wobble" className="absolute bottom-4 right-4 opacity-20 pointer-events-none" style={{ animationDelay: '1s' }} />
               {product.images?.[0] ? (
@@ -80,7 +80,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
 
             {/* Price */}
             <div className="flex items-baseline gap-4 flex-wrap">
-              <span className="text-3xl font-display text-primary flex items-center gap-1">
+              <span className="text-3xl font-display text-[var(--brand)] flex items-center gap-1">
                 <DollarSign className="w-6 h-6" />
                 {((product.basePrice ?? 0) || 0).toLocaleString()} BDT
               </span>
@@ -114,7 +114,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
                       variant={dim.isDefault ? 'primary' : 'outline'}
                       size="sm"
                     >
-                      {dim.label} {dim.priceMultiplier !== 1 && `(${dim.priceMultiplier}x)`}
+                      {dim.label} {Number(dim.priceMultiplier) !== 1 && `(${Number(dim.priceMultiplier)}x)`}
                     </Badge>
                   ))}
                 </div>
@@ -212,7 +212,7 @@ export function ProductPreview({ product, className }: ProductPreviewProps) {
 // Compact preview for lists
 export function CompactProductPreview({ product }: { product: Partial<Product> }) {
   return (
-    <div className="flex items-center gap-4 p-3 bg-white rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
+    <div className="flex items-center gap-4 p-3 bg-[var(--surface-raised)] rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] hover:border-[color-mix(in_srgb,var(--primary)_50%,transparent)] transition-colors">
       <div className="relative w-16 h-16 flex-shrink-0 rounded-input overflow-hidden border-2 border-[color-mix(in_srgb,var(--ink)_20%,transparent)] bg-[var(--light)]">
         {product.images?.[0] ? (
           <Image src={product.images[0]} alt={product.name as string} fill className="object-cover" sizes="64px" />
@@ -225,7 +225,7 @@ export function CompactProductPreview({ product }: { product: Partial<Product> }
         <p className="text-sm text-[var(--text-subtle)]">{product.category?.name || 'No category'}</p>
       </div>
       <div className="text-right">
-        <p className="font-display text-primary">{((product.basePrice ?? 0) || 0).toLocaleString()} BDT</p>
+        <p className="font-display text-[var(--brand)]">{((product.basePrice ?? 0) || 0).toLocaleString()} BDT</p>
         <Badge variant={product.isActive ? 'success' : 'error'} size="sm">
           {product.isActive ? 'Active' : 'Inactive'}
         </Badge>

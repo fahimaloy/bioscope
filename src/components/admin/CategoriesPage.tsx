@@ -249,7 +249,7 @@ export default function CategoriesPage() {
       <div className="max-w-full mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-display text-3xl text-primary">Categories</h1>
+            <h1 className="font-display text-3xl text-[var(--brand)]">Categories</h1>
             <p className="text-[var(--text-subtle)]">Organise your product catalogue</p>
           </div>
           <Button onClick={openCreate}>

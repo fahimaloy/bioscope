@@ -600,7 +600,7 @@ function CustomizationField({
             className={cn(
               'px-3 py-1.5 rounded-input text-sm font-medium transition-all',
               value.includes(option)
-                ? 'bg-primary text-white shadow-btn'
+                ? 'bg-[var(--brand)] text-[var(--on-brand)] shadow-btn'
                 : 'bg-[var(--light)] text-[var(--ink)] hover:bg-dark/10 border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]'
             )}
           >

@@ -211,7 +211,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
         className="flex items-center justify-between"
       >
         <div>
-          <h2 className="font-display text-2xl text-primary">Settings</h2>
+          <h2 className="font-display text-2xl text-[var(--brand)]">Settings</h2>
           <p className="text-[var(--text-subtle)]">Configure your store settings</p>
         </div>
         <div className="flex gap-3">
@@ -566,7 +566,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
                       type="color"
                       value={appearanceSettings.primaryColor}
                       onChange={(e) => setAppearanceSettings((prev) => ({ ...prev, primaryColor: e.target.value }))}
-                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-primary"
+                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-[var(--brand)]"
                     />
                     <Input
                       value={appearanceSettings.primaryColor}
@@ -583,7 +583,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
                       type="color"
                       value={appearanceSettings.secondaryColor}
                       onChange={(e) => setAppearanceSettings((prev) => ({ ...prev, secondaryColor: e.target.value }))}
-                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-primary"
+                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-[var(--brand)]"
                     />
                     <Input
                       value={appearanceSettings.secondaryColor}
@@ -600,7 +600,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
                       type="color"
                       value={appearanceSettings.accentColor}
                       onChange={(e) => setAppearanceSettings((prev) => ({ ...prev, accentColor: e.target.value }))}
-                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-primary"
+                      className="w-full h-12 rounded-input border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] cursor-pointer transition-all hover:border-[var(--brand)]"
                     />
                     <Input
                       value={appearanceSettings.accentColor}
@@ -629,7 +629,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
                       accept="image/*"
                       disabled={assetUpload !== null}
                       onChange={handleAssetUpload('logo')}
-                      className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
+                      className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-[var(--brand)] focus:shadow-input text-body"
                     />
                     {assetUpload === 'logo' && <p className="text-sm text-[var(--text-subtle)]">Uploading…</p>}
                     {appearanceSettings.logo && (
@@ -649,7 +649,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
                       accept="image/*"
                       disabled={assetUpload !== null}
                       onChange={handleAssetUpload('favicon')}
-                      className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-primary focus:shadow-input text-body"
+                      className="w-full px-4 py-3 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input focus:border-[var(--brand)] focus:shadow-input text-body"
                     />
                     {assetUpload === 'favicon' && <p className="text-sm text-[var(--text-subtle)]">Uploading…</p>}
                     {appearanceSettings.favicon && (

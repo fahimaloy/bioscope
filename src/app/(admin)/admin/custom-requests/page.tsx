@@ -291,7 +291,7 @@ export default function CustomRequestsPage() {
             <span>{String(row.cutType).replace('_', ' ')}</span>
           </div>
           {row.quotedPrice && (
-            <span className="font-display text-primary block">{formatCurrency(Number(row.quotedPrice))}</span>
+            <span className="font-display text-[var(--brand)] block">{formatCurrency(Number(row.quotedPrice))}</span>
           )}
         </div>
       ),
@@ -320,7 +320,7 @@ export default function CustomRequestsPage() {
             size="sm"
             onClick={() => handleImageClick(row.imageUrl, row.originalName)}
             aria-label="View design"
-            className="text-[var(--text-subtle)] hover:text-primary"
+            className="text-[var(--text-subtle)] hover:text-[var(--brand)]"
           >
             <Eye className="w-4 h-4" />
           </Button>
@@ -342,7 +342,7 @@ export default function CustomRequestsPage() {
                 size="sm"
                 onClick={() => setStatus(row.id, 'REJECTED')}
                 aria-label="Reject request"
-                className="text-xs text-[var(--error)] border-[var(--error)] hover:bg-[var(--error)] hover:text-white"
+                className="text-xs text-[var(--error)] border-[var(--error)] hover:bg-[var(--error)] hover:text-[var(--on-brand)]"
               >
                 <XCircle className="w-4 h-4 mr-1" />
                 Reject
@@ -372,7 +372,7 @@ export default function CustomRequestsPage() {
                 setStatus(row.id, 'REVISION_REQUESTED')
               }}
               aria-label="Request revision"
-              className="text-xs text-[var(--text-subtle)] hover:text-primary"
+              className="text-xs text-[var(--text-subtle)] hover:text-[var(--brand)]"
             >
               Request Revision
             </Button>
@@ -385,7 +385,7 @@ export default function CustomRequestsPage() {
                 size="sm"
                 onClick={() => handlePriceClick(row)}
                 aria-label="Edit price"
-                className="text-xs text-[var(--text-subtle)] hover:text-primary"
+                className="text-xs text-[var(--text-subtle)] hover:text-[var(--brand)]"
               >
                 <Edit2 className="w-4 h-4" />
               </Button>
@@ -410,7 +410,7 @@ export default function CustomRequestsPage() {
       <div className="max-w-full mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-display text-3xl text-primary">Custom Requests</h1>
+            <h1 className="font-display text-3xl text-[var(--brand)]">Custom Requests</h1>
             <p className="text-[var(--text-subtle)]">Review and manage custom sticker requests</p>
           </div>
           <Button
@@ -441,7 +441,7 @@ export default function CustomRequestsPage() {
             <select
               value={statusFilter}
               onChange={(e) => { setStatusFilter(e.target.value); setPage(1) }}
-              className="w-48 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white py-2 px-4 text-body focus:border-primary focus:shadow-input focus:outline-none"
+              className="w-48 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] py-2 px-4 text-body focus:border-[var(--brand)] focus:shadow-input focus:outline-none"
             >
               <option value="">All Status</option>
               <option value="PENDING">PENDING</option>
@@ -548,7 +548,7 @@ export default function CustomRequestsPage() {
             <select
               value={orderForm.productId}
               onChange={(e) => setOrderForm((prev) => ({ ...prev, productId: e.target.value }))}
-              className="mt-1 w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:outline-none"
+              className="mt-1 w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] text-body focus:border-[var(--brand)] focus:outline-none"
             >
               <option value="">Select a product…</option>
               {orderProducts.map((product) => (
@@ -564,7 +564,7 @@ export default function CustomRequestsPage() {
             <select
               value={orderForm.addressId}
               onChange={(e) => setOrderForm((prev) => ({ ...prev, addressId: e.target.value }))}
-              className="mt-1 w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:outline-none"
+              className="mt-1 w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] text-body focus:border-[var(--brand)] focus:outline-none"
             >
               <option value="">Select an address…</option>
               {orderAddresses.map((address) => (
@@ -616,7 +616,7 @@ export default function CustomRequestsPage() {
             <select
               value={orderForm.paymentMethod}
               onChange={(e) => setOrderForm((prev) => ({ ...prev, paymentMethod: e.target.value }))}
-              className="mt-1 w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-white text-body focus:border-primary focus:outline-none"
+              className="mt-1 w-full px-3 py-2 border-2 border-[color-mix(in_srgb,var(--ink)_30%,transparent)] rounded-input bg-[var(--surface-raised)] text-body focus:border-[var(--brand)] focus:outline-none"
             >
               <option value="COD">Cash on delivery</option>
               <option value="BANK_TRANSFER">Bank transfer</option>
