@@ -264,3 +264,41 @@ folds into C7's authenticated sweep.
 detect-changes before commit · never build while dev server shares `.next` ·
 tests mock the real API envelope · no fake metrics/copy · frozen logic layer
 untouched except the granted trackOrder exception and stability-track fixes.
+
+---
+
+## Newly identified follow-ups (discovered during the 2026-11-20 implementation pass)
+
+Proposals surfaced while implementing E2–E12/C5/C9 — not yet scheduled. Owner
+prioritises; cheap ones flagged.
+
+- **E13 — ProductDetail customization buttons are decorative.** The material /
+  finish / cut-type option buttons in `ProductDetail.tsx` have no `onClick` (they
+  highlight nothing and feed nothing into `addItem`). The real customization path
+  is the `/custom-sticker` builder. Either wire these into the cart item's
+  `customization` payload or replace them with a "Customize this sticker" link to
+  the builder. (Defect; medium.)
+- **E14 — Admin login visual rebuild.** `admin/login/page.tsx` still uses the
+  `DoodleBackground` shim (the last consumer keeping it alive — C9 retained it).
+  Rebuild onto tokens + capped doodle scatter, then delete the shim. (Cheap.)
+- **E15 — Dark mode.** The token system already defines semantic roles, but there
+  is no `darkMode` config and no `prefers-color-scheme` block — the app is
+  light-mode-only. Add a dark palette + `darkMode:'class'` toggle once the owner
+  wants it; C5's token migration makes this far cheaper now. (Enhancement; owner.)
+- **E16 — `generateMetadata` double-fetch.** The product page calls
+  `getProductBySlug` in both `generateMetadata` and the page body (Prisma is not
+  auto-deduped like `fetch`). Wrap it in React `cache()` to halve the query.
+  (Cheap perf.)
+- **E17 — Order-status email + welcome email (Track D4)** and **webhook retry
+  with backoff (D1)**, **retention cron (D2)**, **admin audit trail (D8)**,
+  **streaming exports (D9)**, **pg_trgm search indexes (D10)**, **product
+  soft-delete/archive (D15)**, **headless idempotency key (D7)**, **secrets
+  runbook docs (D11)** remain as proposed in Track D. D3 (payment provider) and
+  D13 (imagery) stay owner-blocked.
+
+### Status after the 2026-11-20 pass
+Done & verified (verify:mid 75 files): B4, C1, C2, C3, C4, C5, C6, C9, C10, C11,
+E2, E3, E4, E5, E6, E7, E8, E9, E10, E12, D5, D6 (+ Footer 320 fix).
+Remaining: C7 (authenticated a11y/motion/responsive sweep — needs owner session),
+C8 (verify:full + baselines — CI/nightly only), E11 (perf numbers — isolated
+build), E13–E17 above, and the Track D larger features.
