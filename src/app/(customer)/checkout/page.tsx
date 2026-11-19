@@ -9,13 +9,14 @@ import type { Order } from '@/types'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useCartStore, useCartItems, useCartSubtotal } from '@/lib/stores/cartStore'
 import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { AddressForm } from '@/components/checkout/AddressForm'
 import { CheckoutOrderSummary } from '@/components/checkout/OrderSummary'
 import { PaymentMethod } from '@/components/checkout/PaymentMethod'
 import { OrderConfirmation } from '@/components/checkout/OrderConfirmation'
 import { CheckoutProgressStepper } from '@/components/checkout/CheckoutProgressStepper'
-import { Loader2, Truck, CheckCircle } from 'lucide-react'
+import { Loader2, Truck, CheckCircle, Ticket, X } from 'lucide-react'
 import { createOrder } from '@/lib/actions/order'
 import type { Prisma } from '@prisma/client'
 import { getSettings } from '@/lib/actions/settings'
@@ -39,6 +40,12 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [settings, setSettings] = useState<Record<string, string | number | boolean> | null>(null)
   const [order, setOrder] = useState<Order | null>(null)
+  // E4 — promo code: the discount is computed SERVER-side (/api/promo/validate)
+  // and re-computed authoritatively by createOrder; never client math.
+  const [promoInput, setPromoInput] = useState('')
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number } | null>(null)
+  const [promoError, setPromoError] = useState('')
+  const [promoLoading, setPromoLoading] = useState(false)
 
   const {
     handleSubmit,
@@ -82,6 +89,7 @@ export default function CheckoutPage() {
     try {
       const result = await createOrder({
         ...data,
+        promoCode: appliedPromo?.code,
         items: items.map((i) => ({
           productId: i.productId,
           width: i.width,
@@ -190,7 +198,40 @@ export default function CheckoutPage() {
     settings?.delivery_enabled === true && subtotal < freeDeliveryThreshold
       ? insideDhakaCharge
       : 0
-  const total = subtotal + taxAmount + deliveryCharge
+  const discountAmount = appliedPromo?.discount ?? 0
+  const total = Math.max(0, subtotal + taxAmount + deliveryCharge - discountAmount)
+
+  const applyPromo = async () => {
+    const code = promoInput.trim()
+    if (!code) return
+    setPromoLoading(true)
+    setPromoError('')
+    try {
+      const res = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal }),
+      })
+      const json = await res.json()
+      if (!res.ok) {
+        setPromoError(json?.error || 'Invalid promo code')
+        setAppliedPromo(null)
+        return
+      }
+      setAppliedPromo({ code: json.data.code, discount: json.data.discount })
+      setPromoInput('')
+      toast.success(`Promo ${json.data.code} applied`)
+    } catch {
+      setPromoError('Could not validate the code. Please try again.')
+    } finally {
+      setPromoLoading(false)
+    }
+  }
+
+  const removePromo = () => {
+    setAppliedPromo(null)
+    setPromoError('')
+  }
 
   const renderStep = () => {
     switch (step) {
@@ -252,12 +293,44 @@ export default function CheckoutPage() {
                 readOnly
               />
             </div>
+            {/* E4 — promo code (server-validated discount) */}
+            <div>
+              <h3 className="font-display text-lg text-[var(--brand)] mb-4">Promo Code</h3>
+              {appliedPromo ? (
+                <div className="flex items-center justify-between gap-3 rounded-md border-2 border-[var(--green-strong)] bg-[color-mix(in_srgb,var(--green-strong)_12%,transparent)] p-3">
+                  <span className="flex items-center gap-2 font-medium text-[var(--text)]">
+                    <Ticket className="h-4 w-4" aria-hidden="true" />
+                    {appliedPromo.code} applied
+                  </span>
+                  <Button type="button" variant="ghost" size="sm" onClick={removePromo} aria-label="Remove promo code">
+                    <X className="h-4 w-4" aria-hidden="true" />
+                    Remove
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex-1">
+                    <Input
+                      label="Have a promo code?"
+                      placeholder="Enter code"
+                      value={promoInput}
+                      onChange={(e) => setPromoInput(e.target.value)}
+                      disabled={promoLoading}
+                      error={promoError}
+                    />
+                  </div>
+                  <Button type="button" variant="secondary" size="lg" onClick={applyPromo} loading={promoLoading} className="sm:mt-7">
+                    Apply
+                  </Button>
+                </div>
+              )}
+            </div>
             <CheckoutOrderSummary
               items={items}
               subtotal={subtotal}
               taxAmount={taxAmount}
               deliveryCharge={deliveryCharge}
-              discountAmount={0}
+              discountAmount={discountAmount}
               total={total}
             />
           </motion.div>

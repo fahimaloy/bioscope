@@ -12,7 +12,8 @@ import { DeliveryConfig } from './DeliveryConfig'
 import { WebhookSettings } from './WebhookSettings'
 import { ApiKeySettings } from './ApiKeySettings'
 import { BackupSettings } from './BackupSettings'
-import { Settings, Tag, Truck, Mail, Globe, Palette, Save, Loader2, Image as ImageIcon, FileText, Wrench, CreditCard, ShieldCheck, Webhook, KeyRound, DatabaseBackup } from 'lucide-react'
+import { PromoSettings } from './PromoSettings'
+import { Settings, Tag, Truck, Mail, Globe, Palette, Save, Loader2, Image as ImageIcon, FileText, Wrench, CreditCard, ShieldCheck, Webhook, KeyRound, DatabaseBackup, Ticket } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { motion } from 'framer-motion'
 import { SketchUnderline, StickerPeel } from '@/components/decorative/DoodleElements'
@@ -246,6 +247,7 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
           <TabsTrigger value="webhooks"><Webhook className="w-4 h-4 mr-1" /> Webhooks</TabsTrigger>
           <TabsTrigger value="api-keys"><KeyRound className="w-4 h-4 mr-1" /> API Keys</TabsTrigger>
           <TabsTrigger value="backup"><DatabaseBackup className="w-4 h-4 mr-1" /> Backup</TabsTrigger>
+          <TabsTrigger value="promotions"><Ticket className="w-4 h-4 mr-1" /> Promotions</TabsTrigger>
         </TabsList>
 
         {/* General Settings */}
@@ -542,6 +544,10 @@ export function SettingsForm({ onSave, initialSettings = {}, className, initialT
         {/* Settings backup + restore */}
         <TabsContent value="backup" className="animate-fade-in">
           <BackupSettings />
+        </TabsContent>
+
+        <TabsContent value="promotions" className="animate-fade-in">
+          <PromoSettings />
         </TabsContent>
 
         {/* Appearance Settings */}

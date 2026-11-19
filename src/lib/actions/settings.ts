@@ -134,6 +134,15 @@ export async function updateSetting(data: { key: string; value: string; type: st
   return { success: true, setting }
 }
 
+export async function deleteSetting(key: string) {
+  await requireAdmin()
+  const existing = await prisma.setting.findUnique({ where: { key } })
+  if (!existing) throw new AppError(404, 'Setting not found', 'NOT_FOUND')
+  await prisma.setting.delete({ where: { key } })
+  revalidatePath('/admin/settings')
+  return { success: true }
+}
+
 export async function updateSettings(settings: Record<string, string | number | boolean>) {
   await requireAdmin()
 
