@@ -4,6 +4,7 @@ import { getProductBySlug, getRelatedProducts } from '@/lib/actions/product'
 import { ProductDetail } from '@/components/product/ProductDetail'
 import { ProductGrid } from '@/components/product/ProductCard'
 import { ReviewList } from '@/components/product/ReviewList'
+import { ReviewForm } from '@/components/product/ReviewForm'
 import { Prisma } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
@@ -109,6 +110,10 @@ export default async function ProductPage({ params }: { params: { slug: string }
             ratingDistribution={ratingDistribution}
             canReview={false}
           />
+          {/* E3 — review submission (client component; guests get a sign-in CTA). */}
+          <div className="mt-8">
+            <ReviewForm productId={product.id} />
+          </div>
         </section>
 
         {related.length > 0 && (

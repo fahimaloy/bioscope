@@ -65,6 +65,9 @@ modules:
   wishlist:
     source: [src/lib/stores/wishlistStore.ts, src/app/(customer)/wishlist/**, src/components/product/ProductCard.tsx, src/components/product/ProductDetail.tsx, src/components/layout/Navbar.tsx]
     unit: [tests/unit/wishlist.test.tsx, tests/unit/components/product-card.test.tsx]
+  reviews:
+    source: [src/components/product/ReviewForm.tsx, src/components/product/index.ts, 'src/app/(customer)/shop/[slug]/**']
+    unit: [tests/unit/review-form.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
