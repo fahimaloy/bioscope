@@ -47,6 +47,9 @@ modules:
   track-order:
     source: [src/lib/actions/trackOrder.ts, src/lib/validations/track-order.ts, src/app/api/orders/track/route.ts, src/app/(customer)/track-order/**]
     unit: [tests/unit/track-order.test.ts]
+  global-states:
+    source: [src/app/not-found.tsx, src/app/global-error.tsx, src/app/loading.tsx]
+    unit: [tests/unit/pages/global-states.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []

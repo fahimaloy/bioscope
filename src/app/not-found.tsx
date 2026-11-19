@@ -2,71 +2,77 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
-import { DoodleShape, WashiTape } from '@/components/decorative/DoodleElements'
-import { Home } from 'lucide-react'
+import { DoodleHeart, DoodleSparkle, DoodleStar, WashiTape } from '@/components/decorative'
+import { useMotionVariants } from '@/lib/motion'
+import { Home, Search } from 'lucide-react'
 
 export default function NotFound() {
+  const variants = useMotionVariants()
   return (
-    <div className="min-h-[70vh] flex items-center justify-center p-8">
-      <div className="relative w-full max-w-md text-center">
-        {/* Background doodle shapes */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <DoodleShape size="xl" color="primary" animation="float" style={{ top: '-20%', left: '-10%', opacity: 0.15 }} />
-          <DoodleShape size="lg" color="secondary" animation="float" style={{ bottom: '-10%', right: '-15%', opacity: 0.15, animationDelay: '-5s' }} />
-          <DoodleShape size="md" color="accent" animation="pulse" style={{ top: '30%', right: '10%', opacity: 0.1, animationDelay: '-10s' }} />
-          <DoodleShape size="sm" color="ink" animation="rotate" style={{ bottom: '20%', left: '15%', opacity: 0.08, animationDelay: '-3s' }} />
+    <div className="flex min-h-[70vh] items-center justify-center p-8">
+      <motion.div
+        variants={variants.fadeInUp}
+        initial="initial"
+        animate="animate"
+        className="relative w-full max-w-md text-center"
+      >
+        {/* One decor accent: a scatter of brand doodles, all aria-hidden
+            (contract §3). Replaces the five deprecated DoodleShape accents. */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <DoodleStar size={96} color="gold" animation="float" className="absolute -left-8 -top-8 opacity-20" />
+          <DoodleHeart size={72} color="pink" animation="float" className="absolute -bottom-6 -right-8 opacity-20" />
+          <DoodleSparkle size={48} color="violet" animation="pulse" className="absolute right-6 top-8 opacity-20" />
         </div>
 
-        <div className="relative bg-[var(--surface-raised)] border-3 border-[var(--ink)] rounded-card p-10 shadow-card space-y-6">
-          {/* Lost sticker character - skull sticker */}
-          <div className="relative mx-auto w-48 h-48">
-            <DoodleShape size="xl" color="primary" animation="float" className="opacity-20" />
+        <div className="relative space-y-6 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-10 shadow-ink-3">
+          {/* Lost sticker character */}
+          <div className="relative mx-auto h-48 w-48">
             <div className="absolute inset-0 flex items-center justify-center">
               <Image
                 src="/images/stickers/skull_sticker.png"
                 alt="Lost sticker character"
                 width={180}
                 height={180}
-                className="w-full h-full object-contain drop-shadow-[4px_4px_0_var(--ink)]"
+                className="h-full w-full object-contain drop-shadow-[4px_4px_0_var(--ink)]"
                 priority
               />
             </div>
             {/* Speech bubble */}
-            <div className="absolute -top-6 -right-4 w-48 bg-white border-3 border-[var(--ink)] rounded-card p-3 shadow-card animate-fade-in-up">
-              <p className="font-display text-sm text-primary text-center">I'm lost!</p>
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-0 h-0 border-4 border-transparent border-t-[var(--ink)]" />
+            <div className="absolute -top-6 -right-4 w-40 rounded-[var(--radius-lg)] border-[3px] border-[var(--ink)] bg-[var(--surface-raised)] p-3 shadow-ink-2 sm:w-48">
+              <p className="text-center font-display text-sm text-[var(--text)]">I&apos;m lost!</p>
+              <div className="absolute bottom-0 left-1/2 h-0 w-0 -translate-x-1/2 translate-y-1/2 border-4 border-transparent border-t-[var(--ink)]" />
             </div>
           </div>
 
-          {/* Washi tape on top */}
-          <WashiTape rotation={-3} width={160} height={32} className="absolute -top-4 left-1/2 -translate-x-1/2 pointer-events-none" />
+          <WashiTape rotation={-3} width={160} height={32} className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2" />
 
-          {/* Heading */}
-          <h1 className="font-display text-3xl md:text-4xl text-primary tracking-wider">
+          <h1 className="font-display text-3xl tracking-wider text-[var(--text)] md:text-4xl">
             Page wandered off
           </h1>
 
-          {/* Message */}
-          <p className="text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)] leading-relaxed">
-            This page must have peeled off and gotten stuck somewhere. Let's get you back on track.
+          <p className="leading-relaxed text-[var(--text-muted)]">
+            This page must have peeled off and gotten stuck somewhere. Let&apos;s get you back on track.
           </p>
 
-          {/* Go Home button */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
             <Link href="/" className="w-full sm:w-auto">
-              <Button 
-                variant="doodle" 
-                size="xl"
-                className="w-full sm:w-auto min-w-[200px]"
-              >
-                <Home className="w-6 h-6 mr-3" />
+              <Button variant="primary" size="xl" className="w-full min-w-[200px] sm:w-auto">
+                <Home className="mr-3 h-6 w-6" aria-hidden="true" />
                 Go Home
               </Button>
             </Link>
+            <Link
+              href="/shop"
+              className="inline-flex min-h-[44px] items-center gap-2 font-medium text-[var(--text)]"
+            >
+              <Search className="h-4 w-4" aria-hidden="true" />
+              Browse stickers
+            </Link>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
