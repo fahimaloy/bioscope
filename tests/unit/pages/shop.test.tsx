@@ -43,6 +43,13 @@ vi.mock('next/image', () => ({
   ),
 }))
 
+// E10 — ProductSearchBox uses useRouter; mount outside the App Router.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+  usePathname: () => '/shop',
+  useSearchParams: () => new URLSearchParams(),
+}))
+
 beforeEach(() => {
   // jsdom has no IntersectionObserver, and framer-motion's `whileInView`
   // creates one on mount. The stub never fires, so in-view sections stay at

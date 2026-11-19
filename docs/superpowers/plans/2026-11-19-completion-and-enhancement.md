@@ -169,7 +169,15 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** guest adds items → signs in → items still in cart; no duplicate rows;
   unit test for the merge function.
 
-### E8 — Product detail UX `[ ]`
+### E8 — Product detail UX `[x]`
+> **DONE 2026-11-20, commit `ceaae4a`, controller-executed.** Fixed two dead buttons: FeaturedProduct
+> Add to Cart (no onClick → adds default dim + drawer + toast, guest redirect) and ProductDetail Share
+> (no onClick → navigator.share + clipboard fallback). Fixed pre-existing 320 overflow (header
+> flex-wrap/min-w-0, TabsList max-w-full overflow-x-auto, removed stale Reviews-coming-soon tab).
+> Sticky mobile add-to-cart bar (bottom-[72px] clears MobileNav) + spacer. Recently-viewed rail
+> (localStorage last-8 dedupe, excludes current, mount-gated). Zoom + quantity stepper already
+> existed. 6 tests; verify:mid 71 files; browser 320 scrollW 314<=320 (was 378), sticky bar bottom
+> 772=844-72. Risk medium. Report: `task-e8-report.md`.
 - Image zoom (hover magnify desktop / pinch or tap-expand mobile, reduced-motion safe),
   sticky add-to-cart bar on mobile, quantity stepper on the shared primitive,
   recently-viewed rail (localStorage, last 8, excludes current).

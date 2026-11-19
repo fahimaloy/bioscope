@@ -9,9 +9,10 @@ import { Pagination } from '@/components/ui/Pagination'
 import { SkeletonProductCard } from '@/components/ui/Skeleton'
 import { DoodleScatter, DoodleSparkle } from '@/components/decorative'
 import { FOCUS_VISIBLE_INK } from '@/components/ui/shared'
-import { Search, Truck, Shield, Sparkles, Package, LayoutGrid } from 'lucide-react'
+import { Truck, Shield, Sparkles, Package, LayoutGrid } from 'lucide-react'
 import { getCategoryIcon } from '@/lib/category-icons'
-import { Input, Select } from '@/components/ui'
+import { Select } from '@/components/ui'
+import { ProductSearchBox } from '@/components/product/ProductSearchBox'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMotionVariants } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -197,13 +198,10 @@ export default function ShopPage() {
         <div className="max-w-7xl mx-auto">
           {/* Row 1 — search + sort */}
           <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-            <Input
-              aria-label="Search stickers"
-              placeholder="Search stickers…"
-              icon={<Search size={18} />}
+            <ProductSearchBox
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="flex-1 min-w-0 min-h-[44px]"
+              onChange={setSearchInput}
+              className="flex-1 min-w-0"
             />
             <div className="flex items-center gap-2">
               <label htmlFor="shop-sort" className="text-sm font-medium text-[var(--text-subtle)] whitespace-nowrap">

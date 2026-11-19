@@ -83,6 +83,9 @@ modules:
   product-ux:
     source: [src/components/product/ProductDetail.tsx, src/components/product/ProductCard.tsx, src/components/product/RecentlyViewed.tsx, src/lib/stores/recentlyViewedStore.ts]
     unit: [tests/unit/recently-viewed.test.tsx, tests/unit/featured-add-to-cart.test.tsx, tests/unit/components/product-card.test.tsx]
+  shop-search:
+    source: [src/components/product/ProductSearchBox.tsx, src/app/(customer)/shop/page.tsx]
+    unit: [tests/unit/product-search-box.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
