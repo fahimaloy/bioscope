@@ -89,6 +89,9 @@ modules:
   error-states:
     source: [src/components/ui/FetchErrorState.tsx, src/app/(customer)/orders/page.tsx]
     unit: [tests/unit/fetch-error-state.test.tsx]
+  animation:
+    source: [src/app/(customer)/template.tsx, src/lib/motion.ts]
+    unit: [tests/unit/customer-template.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
