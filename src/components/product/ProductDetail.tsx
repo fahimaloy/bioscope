@@ -31,6 +31,7 @@ import {
 import { motion } from 'framer-motion'
 import { useMotionVariants } from '@/lib/motion'
 import { SketchUnderline } from '@/components/decorative'
+import { toast } from 'sonner'
 
 interface ProductDetailProps {
   product: Product
@@ -157,9 +158,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
         variants={variants.fadeInUp}
         initial="initial"
         animate="animate"
-        className="flex items-start justify-between gap-4 mb-6"
+        className="flex flex-wrap items-start justify-between gap-4 mb-6"
       >
-        <div>
+        <div className="min-w-0">
           <Badge variant="doodle" size="sm" className="mb-2">
             {product.category?.name || 'Product'}
           </Badge>
@@ -167,7 +168,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <SketchUnderline>{product.name}</SketchUnderline>
           </h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-shrink-0 items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -178,7 +179,25 @@ export function ProductDetail({ product }: ProductDetailProps) {
           >
             <Heart className="w-5 h-5" fill={wished ? 'currentColor' : 'none'} />
           </Button>
-          <Button variant="ghost" size="sm" aria-label="Share product">
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label="Share product"
+            onClick={async () => {
+              // E8 — was a dead button. Native share, clipboard fallback.
+              const url = `${window.location.origin}/shop/${product.slug}`
+              try {
+                if (navigator.share) {
+                  await navigator.share({ title: product.name, url })
+                } else {
+                  await navigator.clipboard.writeText(url)
+                  toast.success('Product link copied to clipboard')
+                }
+              } catch {
+                /* user cancelled the share sheet — no-op */
+              }
+            }}
+          >
             <Share2 className="w-5 h-5" />
           </Button>
         </div>
@@ -513,10 +532,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {/* Tabs Section */}
       <Tabs defaultValue="description">
-        <TabsList className="bg-[var(--paper-deep)] rounded-pill p-1 w-fit mx-auto mb-8">
+        <TabsList className="bg-[var(--paper-deep)] rounded-pill p-1 w-fit max-w-full overflow-x-auto mx-auto mb-8">
           <TabsTrigger value="description">Description</TabsTrigger>
           <TabsTrigger value="specifications">Specifications</TabsTrigger>
-          <TabsTrigger value="reviews">Reviews</TabsTrigger>
         </TabsList>
 
         <TabsContent value="description" className="text-[var(--text)]">
@@ -552,12 +570,6 @@ export function ProductDetail({ product }: ProductDetailProps) {
               <dd className="font-display text-xl text-[var(--brand)]">{product.isActive ? 'Active' : 'Inactive'}</dd>
             </div>
           </dl>
-        </TabsContent>
-
-        <TabsContent value="reviews">
-          <div className="text-center py-12">
-            <p className="text-[var(--text-subtle)]">Reviews coming soon...</p>
-          </div>
         </TabsContent>
       </Tabs>
 
@@ -643,6 +655,30 @@ export function ProductDetail({ product }: ProductDetailProps) {
           )}
         </div>
       </Modal>
+
+      {/* E8 — spacer so the fixed mobile bar never covers the last content. */}
+      <div className="h-24 md:hidden" aria-hidden="true" />
+
+      {/* E8 — sticky add-to-cart bar on mobile, sitting above the 72px MobileNav. */}
+      <div className="fixed bottom-[72px] left-0 right-0 z-[var(--z-fixed)] border-t-2 border-[var(--ink)] bg-[var(--surface-raised)] px-4 py-3 shadow-ink-3 md:hidden">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs text-[var(--text-subtle)]">{selectedQuantity} × {unitPrice.toLocaleString()} BDT</p>
+            <p className="font-display text-lg text-[var(--brand)]">{totalPrice.toLocaleString()} BDT</p>
+          </div>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={handleAddToCart}
+            disabled={!isAuthenticated || !selectedDimension || addToCartState === 'loading'}
+            loading={addToCartState === 'loading'}
+            className="flex-shrink-0"
+          >
+            <ShoppingCart className="mr-2 h-5 w-5" aria-hidden="true" />
+            {inCart ? 'Update Cart' : 'Add to Cart'}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

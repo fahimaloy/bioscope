@@ -7,6 +7,7 @@ import { ProductDetail } from '@/components/product/ProductDetail'
 import { ProductGrid } from '@/components/product/ProductCard'
 import { ReviewList } from '@/components/product/ReviewList'
 import { ReviewForm } from '@/components/product/ReviewForm'
+import { RecentlyViewed } from '@/components/product/RecentlyViewed'
 import { Prisma } from '@prisma/client'
 
 export const dynamic = 'force-dynamic'
@@ -155,6 +156,17 @@ export default async function ProductPage({ params }: { params: { slug: string }
             <ProductGrid products={related.map((p) => serializeProduct(p as unknown as ProductWithRelations))} variant="featured" />
           </section>
         )}
+
+        {/* E8 — recently-viewed rail (localStorage, last 8, excludes current). */}
+        <RecentlyViewed
+          current={{
+            id: product.id,
+            slug: product.slug,
+            name: product.name,
+            image: product.images?.[0] ?? null,
+            basePrice: Number(product.basePrice),
+          }}
+        />
       </div>
     </div>
   )

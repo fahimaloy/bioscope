@@ -12,6 +12,7 @@ import { useCartStore, useGetItemQuantity, useIsInCart } from '@/lib/stores/cart
 import { useIsWished, useWishlistActions } from '@/lib/stores/wishlistStore'
 import { useAuth } from '@/lib/hooks/useAuth'
 import type { Product } from '@/types'
+import { toast } from 'sonner'
 
 /**
  * The one default product image (spec §13: "one default image per product").
@@ -351,6 +352,30 @@ export function ProductGrid({
 export function FeaturedProduct({ product }: { product: Product }) {
   const wished = useIsWished(product.id)
   const { toggle: toggleWishlist } = useWishlistActions()
+  const { addItem, openCart } = useCartStore()
+  const { isAuthenticated } = useAuth()
+  const defaultDimension =
+    product.allowedDimensions.find((d) => d.isDefault) || product.allowedDimensions[0]
+
+  // E8 — was a dead button (no onClick). Mirrors ProductCard.addToCart.
+  const addToCart = () => {
+    if (!isAuthenticated) {
+      window.location.href = `/login?redirect=/shop/${product.slug}`
+      return
+    }
+    if (!defaultDimension) return
+    addItem({
+      productId: product.id,
+      product,
+      width: defaultDimension.width,
+      height: defaultDimension.height,
+      quantity: 1,
+      customization: null,
+    })
+    toast.success(`${product.name} added to cart`)
+    openCart()
+  }
+
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-8 md:flex-row">
       <div className="relative aspect-square md:min-h-[500px] md:w-1/2">
@@ -387,7 +412,7 @@ export function FeaturedProduct({ product }: { product: Product }) {
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <Button variant="primary" size="lg" className="min-w-[200px] flex-1">
+          <Button variant="primary" size="lg" className="min-w-[200px] flex-1" onClick={addToCart}>
             <ShoppingCart className="mr-2 h-5 w-5" />
             Add to Cart
           </Button>

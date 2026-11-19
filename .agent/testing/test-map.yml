@@ -80,6 +80,9 @@ modules:
   seo:
     source: [src/lib/seo.ts, src/lib/site-url.ts, src/app/sitemap.ts, src/app/robots.ts, src/app/manifest.ts, 'src/app/(customer)/shop/[slug]/**']
     unit: [tests/unit/seo.test.ts]
+  product-ux:
+    source: [src/components/product/ProductDetail.tsx, src/components/product/ProductCard.tsx, src/components/product/RecentlyViewed.tsx, src/lib/stores/recentlyViewedStore.ts]
+    unit: [tests/unit/recently-viewed.test.tsx, tests/unit/featured-add-to-cart.test.tsx, tests/unit/components/product-card.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []

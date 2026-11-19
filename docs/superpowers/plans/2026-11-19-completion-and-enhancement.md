@@ -138,7 +138,14 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** a status change on the customer's order appears in the bell without
   reload (socket) and after reload (fetch); mark-read persists; tests for fetch + store.
 
-### E6 — SEO & sharing must-haves `[ ]`
+### E6 — SEO & sharing must-haves `[x]`
+> **DONE 2026-11-20, commit `5a3c366`, controller-executed.** sitemap.ts (static public + DB
+> products/categories, DB-fail fallback, no private routes), robots.ts (disallow private + sitemap),
+> manifest.ts (brand colors/icons), getSiteUrl helper (strips .env quotes), src/lib/seo.ts builders.
+> Product page generateMetadata (metaTitle/metaDescription, canonical, OG/Twitter) + JSON-LD Product
+> (real price/availability/aggregateRating). 11 tests; verify:mid 69 files; live /sitemap.xml +
+> /robots.txt + /manifest.webmanifest 200, product HTML has JSON-LD + canonical + title template,
+> sitemap 0 private routes. Risk medium (product page; rest additive). Report: `task-e6-report.md`.
 - **Evidence:** no `sitemap.ts`, `robots.ts`, `manifest.ts` in `src/app`.
 - **Work:** dynamic sitemap (static routes + products + categories from DB), robots
   (disallow admin/checkout/api), web manifest (brand colors/icons), per-page metadata
