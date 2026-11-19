@@ -74,6 +74,9 @@ modules:
   notifications:
     source: [src/lib/hooks/useNotifications.ts, src/components/layout/NotificationBell.tsx, src/lib/stores/notificationStore.ts, src/app/api/notifications/**]
     unit: [tests/unit/use-notifications.test.tsx]
+  cart-sync:
+    source: [src/lib/cart-merge.ts, src/lib/hooks/useCartSync.ts, src/components/cart/CartSync.tsx, src/lib/stores/cartStore.ts, src/app/api/cart/**]
+    unit: [tests/unit/cart-merge.test.ts, tests/unit/use-cart-sync.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
