@@ -56,6 +56,9 @@ modules:
   landing-shell:
     source: [src/app/(customer)/page.tsx, src/app/(customer)/layout.tsx]
     unit: [tests/unit/landing-shell.test.ts, tests/unit/components/product-card.test.tsx]
+  about-contact:
+    source: [src/app/(customer)/about/**, src/app/(customer)/contact/**]
+    unit: [tests/unit/pages/about-contact.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
