@@ -1,351 +1,336 @@
 'use client'
 
-import { useState } from 'react'
+// Profile — real account data (2026-11-19, rebuild task 2.8 / plan B1).
+//
+// The previous version rendered a hardcoded placeholder user to every customer:
+// profile save was a console.log, address CRUD was local state only, and the
+// orders tab was hardcoded. Everything here now talks to the real APIs:
+//   GET/PATCH /api/user/me            → { user }
+//   POST      /api/addresses          → { address }
+//   PATCH     /api/addresses/[id]     → { address }   (isDefault clears others)
+//   DELETE    /api/addresses/[id]     → 409 IN_USE when orders reference it
+//   POST      /api/auth/change-password
+//
+// Deliberate removals (recorded in the ledger): the Notifications tab had no
+// persistence backend (toggles reset on reload), the Orders tab was dead mock
+// data (the real /orders page exists — the account tab links to it with real
+// counts), and avatar upload is hidden until a customer upload route exists.
+
+import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { updateProfileSchema, changePasswordSchema, type UpdateProfileInput, type ChangePasswordInput } from '@/lib/validations/auth'
+import { z } from 'zod'
+import { toast } from 'sonner'
+import { motion } from 'framer-motion'
+import { User, MapPin, Lock, Save, Eye, EyeOff, Plus, Trash2, Edit, Check, X, ShoppingBag, Palette, Star } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
-import { Tabs, TabsList, TabsContent } from '@/components/ui/Tabs'
+import { Checkbox } from '@/components/ui/Checkbox'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { Badge } from '@/components/ui/Badge'
-import { formatDate, cn } from '@/lib/utils'
-import { User, Lock, Camera, Save, Eye, EyeOff, MapPin, Plus, Trash2, Edit, Check, Settings } from 'lucide-react'
-import { DoodleBackground } from '@/components/decorative/DoodleBackground'
-import { motion } from 'framer-motion'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { WashiTape } from '@/components/decorative'
+import { formatDate } from '@/lib/utils'
 import { motionVariants } from '@/lib/motion'
-
-const mockUser = {
-  id: '1',
-  name: 'John Doe',
-  email: 'john@example.com',
-  phone: '+8801700000000',
-  avatar: null,
-  role: 'CUSTOMER',
-  emailVerified: new Date('2024-01-01'),
-  createdAt: new Date('2024-01-01'),
-  addresses: [
-    {
-      id: '1',
-      name: 'John Doe',
-      phone: '+8801700000000',
-      addressLine1: 'House 123, Road 45',
-      addressLine2: 'Block A',
-      city: 'Dhaka',
-      district: 'Dhaka',
-      division: 'Dhaka',
-      postalCode: '1207',
-      country: 'Bangladesh',
-      isDefault: true,
-      deliveryZone: 'INSIDE_DHAKA' as const,
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      phone: '+8801800000000',
-      addressLine1: 'Apartment 4B, Green Tower',
-      addressLine2: 'Mirpur Road',
-      city: 'Dhaka',
-      district: 'Dhaka',
-      division: 'Dhaka',
-      postalCode: '1216',
-      country: 'Bangladesh',
-      isDefault: false,
-      deliveryZone: 'INSIDE_DHAKA' as const,
-    },
-  ],
-}
+import { addressSchema } from '@/lib/validations/order'
+import { updateProfileSchema, changePasswordSchema, type UpdateProfileInput } from '@/lib/validations/profile'
 
 interface Address {
   id: string
   name: string
   phone: string
   addressLine1: string
-  addressLine2?: string
+  addressLine2?: string | null
   city: string
   district: string
   division: string
-  postalCode: string
+  postalCode?: string | null
   country: string
   isDefault: boolean
   deliveryZone: 'INSIDE_DHAKA' | 'OUTSIDE_DHAKA'
 }
 
-const tabsConfig = [
-  { value: 'account', label: 'Account', icon: User },
-  { value: 'addresses', label: 'Addresses', icon: MapPin },
-  { value: 'notifications', label: 'Notifications', icon: Settings },
-  { value: 'security', label: 'Security', icon: Lock },
-] as const
+interface ProfileUser {
+  id: string
+  email: string
+  name: string | null
+  role: string
+  phone: string | null
+  avatar: string | null
+  emailVerified: string | null
+  createdAt: string
+  addresses: Address[]
+  _count: { orders: number; customRequests: number; reviews: number }
+}
 
+type ApiError = Error & { code?: string; status?: number }
 
-function AddressCard({ 
-  address, 
-  onEdit, 
-  onDelete, 
-  onSetDefault,
-  isEditing = false,
-  editFormData,
-  onEditFormChange,
-  onCancelEdit,
-  onSaveEdit,
-}: { 
-  address: Address
-  onEdit: () => void
-  onDelete: () => void
-  onSetDefault: () => void
-  isEditing?: boolean
-  editFormData?: Partial<Address>
-  onEditFormChange?: (field: string, value: string) => void
-  onCancelEdit?: () => void
-  onSaveEdit?: () => void
-}) {
-  if (isEditing && editFormData && onEditFormChange && onCancelEdit && onSaveEdit) {
-    return (
-      <Card key={address.id} variant="doodle" className="p-4" padding="none">
-        <div className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-display text-xl text-primary">Edit Address</h3>
-            <button
-              type="button"
-              onClick={onCancelEdit}
-              className="text-[var(--text-subtle)] hover:text-primary transition-colors"
-              aria-label="Cancel editing"
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Full Name"
-              value={editFormData.name || ''}
-              onChange={(e) => onEditFormChange('name', e.target.value)}
-              error={!editFormData.name ? 'Name is required' : undefined}
-            />
-            <Input
-              label="Phone"
-              type="tel"
-              value={editFormData.phone || ''}
-              onChange={(e) => onEditFormChange('phone', e.target.value)}
-              error={!editFormData.phone ? 'Phone is required' : undefined}
-            />
-          </div>
-          
-          <Input
-            label="Address Line 1"
-            value={editFormData.addressLine1 || ''}
-            onChange={(e) => onEditFormChange('addressLine1', e.target.value)}
-            error={!editFormData.addressLine1 ? 'Address is required' : undefined}
-          />
-          <Input
-            label="Address Line 2 (Optional)"
-            value={editFormData.addressLine2 || ''}
-            onChange={(e) => onEditFormChange('addressLine2', e.target.value)}
-          />
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Input
-              label="City"
-              value={editFormData.city || ''}
-              onChange={(e) => onEditFormChange('city', e.target.value)}
-              error={!editFormData.city ? 'City is required' : undefined}
-            />
-            <Input
-              label="District"
-              value={editFormData.district || ''}
-              onChange={(e) => onEditFormChange('district', e.target.value)}
-              error={!editFormData.district ? 'District is required' : undefined}
-            />
-            <Input
-              label="Postal Code"
-              value={editFormData.postalCode || ''}
-              onChange={(e) => onEditFormChange('postalCode', e.target.value)}
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Division"
-              value={editFormData.division || ''}
-              onChange={(e) => onEditFormChange('division', e.target.value)}
-              error={!editFormData.division ? 'Division is required' : undefined}
-            />
-            <Input
-              label="Country"
-              value={editFormData.country || ''}
-              onChange={(e) => onEditFormChange('country', e.target.value)}
-              error={!editFormData.country ? 'Country is required' : undefined}
-            />
-          </div>
-          
-          <div className="flex justify-end gap-2 pt-4 border-t border-[var(--light)]">
-            <Button variant="ghost" onClick={onCancelEdit}>Cancel</Button>
-            <Button variant="doodle" onClick={onSaveEdit}>
-              <Save className="w-4 h-4 mr-2" />
-              Save Changes
-            </Button>
-          </div>
-        </div>
-      </Card>
-    )
+/** Fetch a route envelope; throws with the server's message/code on failure. */
+async function api<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, init)
+  const json = await res.json().catch(() => null)
+  if (!res.ok || !json?.success) {
+    const err = new Error(json?.error || 'Something went wrong') as ApiError
+    err.code = json?.code
+    err.status = res.status
+    throw err
+  }
+  return json.data as T
+}
+
+const jsonInit = (method: string, body: unknown): RequestInit => ({
+  method,
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body),
+})
+
+const DIVISIONS = ['Dhaka', 'Chattogram', 'Rajshahi', 'Khulna', 'Barishal', 'Sylhet', 'Rangpur', 'Mymensingh']
+
+const selectClass =
+  'w-full min-h-[44px] rounded-[var(--radius-md)] border-2 border-[var(--ink)] bg-[var(--surface-raised)] px-3 py-2 text-[var(--ink)] focus:border-[var(--brand)] focus:outline-none'
+
+function getInitials(name: string | null | undefined): string {
+  if (!name) return 'U'
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+}
+
+/* ------------------------------------------------------------------ */
+/* Account                                                             */
+/* ------------------------------------------------------------------ */
+
+function AccountTab({ user, onUpdated }: { user: ProfileUser; onUpdated: (patch: Partial<ProfileUser>) => void }) {
+  const [saving, setSaving] = useState(false)
+  const form = useForm<UpdateProfileInput>({
+    resolver: zodResolver(updateProfileSchema),
+    defaultValues: { name: user.name ?? '', phone: user.phone ?? '' },
+  })
+
+  const handleSave = async (data: UpdateProfileInput) => {
+    setSaving(true)
+    try {
+      const result = await api<{ user: Partial<ProfileUser> }>('/api/user/me', jsonInit('PATCH', data))
+      onUpdated(result.user)
+      toast.success('Profile updated')
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update profile')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
-    <Card key={address.id} variant="doodle" className="p-4" padding="none">
-      <div className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2 flex-wrap">
-              <span className="font-medium text-body text-[var(--ink)]">{address.name}</span>
-              {address.isDefault && (
-                <Badge variant="doodle" size="sm">Default</Badge>
-              )}
-              <Badge variant={address.deliveryZone === 'INSIDE_DHAKA' ? 'success' : 'secondary'} size="sm">
-                {address.deliveryZone === 'INSIDE_DHAKA' ? 'Inside Dhaka' : 'Outside Dhaka'}
+    <motion.div variants={motionVariants.staggerContainer} initial="initial" animate="animate" className="space-y-6">
+      <Card variant="doodle" padding="lg">
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+            {user.avatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.avatar} alt="" className="h-20 w-20 rounded-full border-[3px] border-[var(--ink)] object-cover" />
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-full border-[3px] border-[var(--ink)] bg-[var(--paper-deep)]">
+                <span className="font-display text-2xl text-[var(--ink)]">{getInitials(user.name)}</span>
+              </div>
+            )}
+            <div className="min-w-0">
+              <h2 className="font-display text-2xl text-[var(--ink)]">{user.name || 'Customer'}</h2>
+              <p className="truncate text-[var(--text-subtle)]">{user.email}</p>
+              <Badge variant="outline" size="sm" className="mt-2 inline-block">
+                {user.role === 'ADMIN' ? 'Admin' : 'Customer'}
               </Badge>
             </div>
-            <p className="text-body text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">{address.phone}</p>
-            <p className="text-[var(--text-subtle)] mt-1">
-              {address.addressLine1}
-              {address.addressLine2 && `, ${address.addressLine2}`}
-              <br />
-              {address.city}, {address.district}, {address.division}
-              {address.postalCode && ` - ${address.postalCode}`}
-              <br />
-              {address.country}
-            </p>
           </div>
-          <div className="flex items-center gap-2 ml-4 flex-wrap">
-            <Button variant="ghost" size="sm" onClick={onEdit}>
-              <Edit className="w-4 h-4 mr-1" />
-              Edit
-            </Button>
-            <Button variant="ghost" size="sm" className="text-red-500 hover:bg-red-50" onClick={onDelete}>
-              <Trash2 className="w-4 h-4 mr-1" />
-              Delete
-            </Button>
-            {!address.isDefault && (
-              <Button variant="ghost" size="sm" onClick={onSetDefault}>
-                <Check className="w-4 h-4 mr-1" />
-                Set Default
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
-    </Card>
-  )
-}
 
-function AddAddressForm({ onCancel, onSubmit }: { onCancel: () => void; onSubmit: (data: Address) => void }) {
-  const form = useForm<Address>({
-    resolver: zodResolver(
-      updateProfileSchema.extend({
-        addressLine1: updateProfileSchema.shape.phone,
-        addressLine2: updateProfileSchema.shape.phone.optional(),
-        city: updateProfileSchema.shape.phone,
-        district: updateProfileSchema.shape.phone,
-        division: updateProfileSchema.shape.phone,
-        postalCode: updateProfileSchema.shape.phone.optional(),
-        country: updateProfileSchema.shape.phone,
-      })
-    ),
-    defaultValues: {
-      name: '',
-      phone: '',
-      addressLine1: '',
-      addressLine2: '',
-      city: '',
-      district: '',
-      division: '',
-      postalCode: '',
-      country: 'Bangladesh',
-      isDefault: false,
-      deliveryZone: 'INSIDE_DHAKA',
-    },
-  })
-
-  const handleSubmit = form.handleSubmit((data) => {
-    onSubmit(data as Address)
-    form.reset()
-  })
-
-  return (
-    <Card variant="doodle" className="p-4" padding="none">
-      <div className="p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-display text-xl text-primary">Add New Address</h3>
-          <button
-            type="button"
-            onClick={onCancel}
-            className="text-[var(--text-subtle)] hover:text-primary transition-colors"
-            aria-label="Cancel adding address"
-          >
-            ✕
-          </button>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
             <Input
               label="Full Name"
               {...form.register('name')}
               error={form.formState.errors.name?.message}
+              disabled={saving}
             />
             <Input
-              label="Phone"
+              label="Phone Number"
               type="tel"
               {...form.register('phone')}
               error={form.formState.errors.phone?.message}
+              disabled={saving}
             />
+            <Input label="Email" type="email" value={user.email} disabled />
+            <p className="text-sm text-[var(--text-subtle)]">Email cannot be changed. Contact support if needed.</p>
+            <div className="flex justify-end border-t-2 border-[var(--paper-deep)] pt-4">
+              <Button type="submit" variant="doodle" loading={saving}>
+                <Save className="mr-2 h-4 w-4" />
+                Save Changes
+              </Button>
+            </div>
+          </form>
+
+          <div className="rounded-[var(--radius-md)] border-2 border-[var(--paper-deep)] bg-[var(--paper)] p-4">
+            <h3 className="mb-3 font-medium text-[var(--ink)]">Account Info</h3>
+            <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
+              <div>
+                <p className="text-[var(--text-subtle)]">Member Since</p>
+                <p className="font-medium text-[var(--ink)]">{formatDate(user.createdAt)}</p>
+              </div>
+              <div>
+                <p className="text-[var(--text-subtle)]">Email Verified</p>
+                <p className="font-medium text-[var(--ink)]">{user.emailVerified ? 'Yes' : 'No'}</p>
+              </div>
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-2 border-t-2 border-[var(--paper-deep)] pt-4 text-center">
+              <Link href="/orders" className="rounded-[var(--radius-md)] p-2 transition-colors hover:bg-[var(--paper-deep)]">
+                <ShoppingBag className="mx-auto mb-1 h-5 w-5 text-[var(--text-muted)]" aria-hidden="true" />
+                <p className="font-display text-lg text-[var(--ink)]">{user._count.orders}</p>
+                <p className="text-xs text-[var(--text-subtle)]">Orders</p>
+              </Link>
+              <Link href="/custom-sticker" className="rounded-[var(--radius-md)] p-2 transition-colors hover:bg-[var(--paper-deep)]">
+                <Palette className="mx-auto mb-1 h-5 w-5 text-[var(--text-muted)]" aria-hidden="true" />
+                <p className="font-display text-lg text-[var(--ink)]">{user._count.customRequests}</p>
+                <p className="text-xs text-[var(--text-subtle)]">Custom Requests</p>
+              </Link>
+              <div className="p-2">
+                <Star className="mx-auto mb-1 h-5 w-5 text-[var(--text-muted)]" aria-hidden="true" />
+                <p className="font-display text-lg text-[var(--ink)]">{user._count.reviews}</p>
+                <p className="text-xs text-[var(--text-subtle)]">Reviews</p>
+              </div>
+            </div>
           </div>
-          
+        </div>
+      </Card>
+    </motion.div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Addresses                                                           */
+/* ------------------------------------------------------------------ */
+
+type AddressFormValues = z.input<typeof addressSchema>
+
+function AddressForm({
+  initial,
+  busy,
+  onSubmit,
+  onCancel,
+}: {
+  initial?: Address
+  busy: boolean
+  onSubmit: (values: AddressFormValues) => void
+  onCancel: () => void
+}) {
+  const form = useForm<AddressFormValues>({
+    resolver: zodResolver(addressSchema),
+    defaultValues: initial
+      ? {
+          name: initial.name,
+          phone: initial.phone,
+          addressLine1: initial.addressLine1,
+          addressLine2: initial.addressLine2 ?? '',
+          city: initial.city,
+          district: initial.district,
+          division: initial.division,
+          postalCode: initial.postalCode ?? '',
+          country: initial.country,
+          isDefault: initial.isDefault,
+          deliveryZone: initial.deliveryZone,
+        }
+      : {
+          name: '',
+          phone: '',
+          addressLine1: '',
+          addressLine2: '',
+          city: '',
+          district: '',
+          division: 'Dhaka',
+          postalCode: '',
+          country: 'Bangladesh',
+          isDefault: false,
+          deliveryZone: 'INSIDE_DHAKA',
+        },
+  })
+
+  return (
+    <Card variant="doodle" padding="lg">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-display text-xl text-[var(--ink)]">{initial ? 'Edit Address' : 'Add New Address'}</h3>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-[var(--radius-sm)] p-1 text-[var(--text-subtle)] transition-colors hover:text-[var(--ink)]"
+            aria-label="Cancel address form"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <form onSubmit={form.handleSubmit((values) => onSubmit(values))} className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Input label="Full Name" {...form.register('name')} error={form.formState.errors.name?.message} disabled={busy} />
+            <Input label="Phone" type="tel" {...form.register('phone')} error={form.formState.errors.phone?.message} disabled={busy} />
+          </div>
           <Input
             label="Address Line 1"
             {...form.register('addressLine1')}
             error={form.formState.errors.addressLine1?.message}
+            disabled={busy}
           />
-          <Input
-            label="Address Line 2 (Optional)"
-            {...form.register('addressLine2')}
-          />
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Input
-              label="City"
-              {...form.register('city')}
-              error={form.formState.errors.city?.message}
-            />
-            <Input
-              label="District"
-              {...form.register('district')}
-              error={form.formState.errors.district?.message}
-            />
+          <Input label="Address Line 2 (Optional)" {...form.register('addressLine2')} disabled={busy} />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <Input label="City" {...form.register('city')} error={form.formState.errors.city?.message} disabled={busy} />
+            <Input label="District" {...form.register('district')} error={form.formState.errors.district?.message} disabled={busy} />
             <Input
               label="Postal Code"
-              {...form.register('postalCode')}
+              {...form.register('postalCode', { setValueAs: (v) => (v === '' ? undefined : v) })}
+              error={form.formState.errors.postalCode?.message}
+              disabled={busy}
             />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Division"
-              {...form.register('division')}
-              error={form.formState.errors.division?.message}
-            />
-            <Input
-              label="Country"
-              {...form.register('country')}
-              error={form.formState.errors.country?.message}
-            />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label htmlFor="address-division" className="mb-1.5 block text-sm font-medium text-[var(--ink)]">
+                Division
+              </label>
+              <select id="address-division" className={selectClass} {...form.register('division')} disabled={busy}>
+                {DIVISIONS.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="address-zone" className="mb-1.5 block text-sm font-medium text-[var(--ink)]">
+                Delivery Zone
+              </label>
+              <select id="address-zone" className={selectClass} {...form.register('deliveryZone')} disabled={busy}>
+                <option value="INSIDE_DHAKA">Inside Dhaka</option>
+                <option value="OUTSIDE_DHAKA">Outside Dhaka</option>
+              </select>
+            </div>
           </div>
-          
-          <div className="flex justify-end gap-2 pt-4 border-t border-[var(--light)]">
-            <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-            <Button type="submit" variant="doodle">
-              <Save className="w-4 h-4 mr-2" />
-              Add Address
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--ink)]">
+            <Checkbox
+              checked={form.watch('isDefault') === true}
+              onCheckedChange={(checked) => form.setValue('isDefault', checked === true)}
+              aria-label="Set as default address"
+            />
+            Set as default address
+          </label>
+          <div className="flex flex-wrap justify-end gap-2 border-t-2 border-[var(--paper-deep)] pt-4">
+            <Button type="button" variant="ghost" onClick={onCancel} disabled={busy}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="doodle" loading={busy}>
+              <Save className="mr-2 h-4 w-4" />
+              {initial ? 'Save Changes' : 'Add Address'}
             </Button>
           </div>
         </form>
@@ -354,487 +339,316 @@ function AddAddressForm({ onCancel, onSubmit }: { onCancel: () => void; onSubmit
   )
 }
 
-interface Order {
-  id: string
-  orderNumber: string
-  status: string
-  total: number
-  date: string
-  items: number
-}
-
-function OrderHistoryCard({ order }: { order: Order }) {
+function AddressCard({
+  address,
+  busy,
+  confirmingDelete,
+  onEdit,
+  onDelete,
+  onConfirmDelete,
+  onCancelDelete,
+  onSetDefault,
+}: {
+  address: Address
+  busy: boolean
+  confirmingDelete: boolean
+  onEdit: () => void
+  onDelete: () => void
+  onConfirmDelete: () => void
+  onCancelDelete: () => void
+  onSetDefault: () => void
+}) {
   return (
-    <Card key={order.id} variant="doodle" className="p-4" padding="none">
-      <div className="p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-input overflow-hidden bg-[var(--light)] border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-              <div className="w-full h-full flex items-center justify-center text-[var(--text-subtle)]">📦</div>
-            </div>
-            <div>
-              <p className="font-medium text-body text-[var(--ink)]">{order.orderNumber}</p>
-              <p className="text-sm text-[var(--text-subtle)]">{order.items} items • {order.total.toLocaleString()} BDT</p>
-            </div>
+    <Card variant="doodle" padding="lg">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="font-medium text-[var(--ink)]">{address.name}</span>
+            {address.isDefault && <Badge variant="doodle" size="sm">Default</Badge>}
+            <Badge variant={address.deliveryZone === 'INSIDE_DHAKA' ? 'success' : 'secondary'} size="sm">
+              {address.deliveryZone === 'INSIDE_DHAKA' ? 'Inside Dhaka' : 'Outside Dhaka'}
+            </Badge>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-[var(--text-subtle)]">{order.date}</span>
-            <Badge variant={order.status === 'DELIVERED' ? 'success' : 'secondary'} size="sm">{order.status}</Badge>
-            <a href={`/orders/${order.id}`}>
-              <Button variant="ghost" size="sm">View</Button>
-            </a>
-          </div>
+          <p className="text-[var(--text-muted)]">{address.phone}</p>
+          <p className="mt-1 text-[var(--text-subtle)]">
+            {address.addressLine1}
+            {address.addressLine2 ? `, ${address.addressLine2}` : ''}
+            <br />
+            {address.city}, {address.district}, {address.division}
+            {address.postalCode ? ` - ${address.postalCode}` : ''}
+            <br />
+            {address.country}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {confirmingDelete ? (
+            <>
+              <span className="text-sm text-[var(--error)]">Delete this address?</span>
+              <Button type="button" variant="doodle" size="sm" onClick={onConfirmDelete} loading={busy}>
+                Confirm
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={onCancelDelete} disabled={busy}>
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button type="button" variant="ghost" size="sm" onClick={onEdit} disabled={busy}>
+                <Edit className="mr-1 h-4 w-4" />
+                Edit
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-[var(--error)] hover:bg-[color-mix(in_srgb,var(--error)_10%,transparent)]"
+                onClick={onDelete}
+                disabled={busy}
+              >
+                <Trash2 className="mr-1 h-4 w-4" />
+                Delete
+              </Button>
+              {!address.isDefault && (
+                <Button type="button" variant="ghost" size="sm" onClick={onSetDefault} disabled={busy}>
+                  <Check className="mr-1 h-4 w-4" />
+                  Set Default
+                </Button>
+              )}
+            </>
+          )}
         </div>
       </div>
     </Card>
   )
 }
 
-function SecurityTips() {
-  return (
-    <Card variant="doodle" className="p-6">
-      <h3 className="font-display text-lg text-primary mb-4">Security Tips</h3>
-      <ul className="space-y-3 text-[color-mix(in_srgb,var(--ink)_70%,transparent)]">
-        <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">1</span>
-          Use a unique, strong password
-        </li>
-        <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">2</span>
-          Enable 2FA when available
-        </li>
-        <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">3</span>
-          Never share your password
-        </li>
-        <li className="flex items-center gap-2">
-          <span className="w-5 h-5 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center text-primary text-sm">4</span>
-          Log out from shared devices
-        </li>
-      </ul>
-    </Card>
-  )
-}
+function AddressesTab({ user, onRefresh }: { user: ProfileUser; onRefresh: () => Promise<void> }) {
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
 
-function NotificationSettings() {
-  const [notifications, setNotifications] = useState({
-    emailOrders: true,
-    emailPromotions: true,
-    emailNewsletter: false,
-    pushOrders: true,
-    pushPromotions: false,
-    smsOrders: false,
-    smsDelivery: true,
-  })
+  const addresses = user.addresses
 
-  const toggleNotification = (key: keyof typeof notifications) => {
-    setNotifications((prev) => ({ ...prev, [key]: !prev[key] }))
+  const handleAdd = async (values: AddressFormValues) => {
+    setBusy(true)
+    try {
+      await api<{ address: Address }>('/api/addresses', jsonInit('POST', values))
+      toast.success('Address added')
+      setShowAddForm(false)
+      await onRefresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to add address')
+    } finally {
+      setBusy(false)
+    }
   }
 
-  const notificationOptions = [
-    { key: 'emailOrders', label: 'Order Confirmations', description: 'Receive email when you place an order', category: 'Email' },
-    { key: 'emailPromotions', label: 'Promotional Offers', description: 'Get notified about sales and discounts', category: 'Email' },
-    { key: 'emailNewsletter', label: 'Newsletter', description: 'Weekly updates and new arrivals', category: 'Email' },
-    { key: 'pushOrders', label: 'Order Updates', description: 'Push notifications for order status changes', category: 'Push' },
-    { key: 'pushPromotions', label: 'Flash Sales', description: 'Real-time alerts for limited-time offers', category: 'Push' },
-    { key: 'smsOrders', label: 'Order SMS', description: 'SMS confirmation for orders', category: 'SMS' },
-    { key: 'smsDelivery', label: 'Delivery Updates', description: 'SMS when your order is out for delivery', category: 'SMS' },
-  ]
+  const handleEdit = async (id: string, values: AddressFormValues) => {
+    setBusy(true)
+    try {
+      await api<{ address: Address }>(`/api/addresses/${id}`, jsonInit('PATCH', values))
+      toast.success('Address updated')
+      setEditingId(null)
+      await onRefresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update address')
+    } finally {
+      setBusy(false)
+    }
+  }
 
-  const categories = ['Email', 'Push', 'SMS']
+  const handleDelete = async (id: string) => {
+    setBusy(true)
+    try {
+      await api<{ message: string }>(`/api/addresses/${id}`, { method: 'DELETE' })
+      toast.success('Address deleted')
+      setConfirmingDeleteId(null)
+      await onRefresh()
+    } catch (error) {
+      const err = error as ApiError
+      toast.error(err.code === 'IN_USE' ? 'This address is used by existing orders and cannot be deleted' : err.message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const handleSetDefault = async (id: string) => {
+    setBusy(true)
+    try {
+      await api<{ address: Address }>(`/api/addresses/${id}`, jsonInit('PATCH', { isDefault: true }))
+      toast.success('Default address updated')
+      await onRefresh()
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to set default address')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const editing = addresses.find((a) => a.id === editingId)
 
   return (
-    <div className="space-y-6">
-      {categories.map((category) => (
-        <Card key={category} variant="doodle" className="p-4" padding="none">
-          <div className="p-4">
-            <h3 className="font-display text-lg text-primary mb-4">{category} Notifications</h3>
-            <div className="space-y-3">
-              {notificationOptions
-                .filter((opt) => opt.category === category)
-                .map((opt) => (
-                  <label key={opt.key} className="flex items-center justify-between cursor-pointer p-3 rounded-input hover:bg-[var(--light)] transition-colors">
-                    <div className="flex-1">
-                      <p className="font-medium text-body text-[var(--ink)]">{opt.label}</p>
-                      <p className="text-sm text-[var(--text-subtle)]">{opt.description}</p>
-                    </div>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={notifications[opt.key as keyof typeof notifications]}
-                      onClick={() => toggleNotification(opt.key as keyof typeof notifications)}
-                      className={cn(
-                        'relative w-11 h-6 rounded-pill border-3 transition-all duration-200',
-                        notifications[opt.key as keyof typeof notifications]
-                          ? 'bg-primary border-primary'
-                          : 'bg-[color-mix(in_srgb,var(--ink)_20%,transparent)] border-[color-mix(in_srgb,var(--ink)_30%,transparent)]'
-                      )}
-                      aria-label={opt.label}
-                    >
-                      <span
-                        className={cn(
-                          'absolute top-[2px] w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200',
-                          notifications[opt.key as keyof typeof notifications]
-                            ? 'translate-x-5'
-                            : 'translate-x-[2px]'
-                        )}
-                      />
-                    </button>
-                  </label>
-                ))}
-            </div>
+    <motion.div variants={motionVariants.staggerContainer} initial="initial" animate="animate" className="space-y-6">
+      {!showAddForm && !editing && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-xl text-[var(--ink)]">Saved Addresses</h2>
+          <Button type="button" variant="doodle" size="sm" onClick={() => setShowAddForm(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add New Address
+          </Button>
+        </div>
+      )}
+
+      {showAddForm && <AddressForm busy={busy} onSubmit={handleAdd} onCancel={() => setShowAddForm(false)} />}
+      {editing && (
+        <AddressForm
+          key={editing.id}
+          initial={editing}
+          busy={busy}
+          onSubmit={(values) => handleEdit(editing.id, values)}
+          onCancel={() => setEditingId(null)}
+        />
+      )}
+
+      {addresses.length === 0 && !showAddForm ? (
+        <Card variant="doodle" padding="lg">
+          <div className="py-8 text-center">
+            <MapPin className="mx-auto mb-3 h-10 w-10 text-[var(--text-subtle)]" aria-hidden="true" />
+            <p className="font-medium text-[var(--ink)]">No saved addresses yet</p>
+            <p className="mt-1 text-sm text-[var(--text-subtle)]">Add one to speed up checkout.</p>
           </div>
         </Card>
-      ))}
-    </div>
-  )
-}
-
-function NotificationsTab() {
-  return (
-    <div className="space-y-6">
-      <motion.div
-        variants={motionVariants.staggerContainer}
-        initial="initial"
-        animate="animate"
-      >
-        <NotificationSettings />
-      </motion.div>
-    </div>
-  )
-}
-
-function AddressesTab({ user }: { user: typeof mockUser }) {
-  const [addresses, setAddresses] = useState<Address[]>(user.addresses)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editFormData, setEditFormData] = useState<Partial<Address>>({})
-  const [showAddForm, setShowAddForm] = useState(false)
-
-  const handleEdit = (address: Address) => {
-    setEditingId(address.id)
-    setEditFormData({ ...address })
-  }
-
-  const handleCancelEdit = () => {
-    setEditingId(null)
-    setEditFormData({})
-  }
-
-  const handleEditFormChange = (field: string, value: string) => {
-    setEditFormData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleSaveEdit = () => {
-    if (editingId && editFormData.name && editFormData.phone && editFormData.addressLine1) {
-      setAddresses((prev) =>
-        prev.map((addr) =>
-          addr.id === editingId ? { ...addr, ...editFormData } as Address : addr
-        )
-      )
-      setEditingId(null)
-      setEditFormData({})
-    }
-  }
-
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this address?')) {
-      setAddresses((prev) => prev.filter((addr) => addr.id !== id))
-    }
-  }
-
-  const handleSetDefault = (id: string) => {
-    setAddresses((prev) =>
-      prev.map((addr) => ({ ...addr, isDefault: addr.id === id }))
-    )
-  }
-
-  const handleAddAddress = (data: Address) => {
-    const newAddress: Address = {
-      ...data,
-      id: Date.now().toString(),
-      isDefault: addresses.length === 0,
-    }
-    setAddresses((prev) => [...prev, newAddress])
-    setShowAddForm(false)
-  }
-
-  return (
-    <div className="space-y-6">
-      <motion.div
-        variants={motionVariants.staggerContainer}
-        initial="initial"
-        animate="animate"
-      >
-        {!showAddForm ? (
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-xl text-primary">Saved Addresses</h2>
-            <Button variant="doodle" size="sm" onClick={() => setShowAddForm(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Address
-            </Button>
-          </div>
-        ) : (
-          <AddAddressForm onCancel={() => setShowAddForm(false)} onSubmit={handleAddAddress} />
-        )}
-
+      ) : (
         <div className="space-y-4">
           {addresses.map((address) => (
             <motion.div key={address.id} variants={motionVariants.staggerItem}>
-              <AddressCard
-                address={address}
-                onEdit={() => handleEdit(address)}
-                onDelete={() => handleDelete(address.id)}
-                onSetDefault={() => handleSetDefault(address.id)}
-                isEditing={editingId === address.id}
-                editFormData={editFormData}
-                onEditFormChange={handleEditFormChange}
-                onCancelEdit={handleCancelEdit}
-                onSaveEdit={handleSaveEdit}
-              />
+              {editingId !== address.id && (
+                <AddressCard
+                  address={address}
+                  busy={busy}
+                  confirmingDelete={confirmingDeleteId === address.id}
+                  onEdit={() => {
+                    setEditingId(address.id)
+                    setShowAddForm(false)
+                  }}
+                  onDelete={() => setConfirmingDeleteId(address.id)}
+                  onConfirmDelete={() => handleDelete(address.id)}
+                  onCancelDelete={() => setConfirmingDeleteId(null)}
+                  onSetDefault={() => handleSetDefault(address.id)}
+                />
+              )}
             </motion.div>
           ))}
         </div>
-      </motion.div>
-    </div>
-  )
-}
-
-function AccountTab({ user }: { user: typeof mockUser }) {
-  const [avatar, setAvatar] = useState<string | null>(user?.avatar || null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  const profileForm = useForm<UpdateProfileInput>({
-    resolver: zodResolver(updateProfileSchema),
-    defaultValues: {
-      name: user?.name || '',
-      phone: user?.phone || '',
-    },
-  })
-
-  const handleProfileSubmit = async (data: UpdateProfileInput) => {
-    setIsLoading(true)
-    try {
-      // await updateProfile(data)
-      console.log('Profile updated:', data)
-    } catch (error) {
-      console.error('Failed to update profile:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleAvatarUpload = (files: File[]) => {
-    if (files.length > 0) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setAvatar(e.target?.result as string)
-      }
-      reader.readAsDataURL(files[0])
-    }
-  }
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((part) => part[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }
-
-  return (
-    <motion.div
-      variants={motionVariants.staggerContainer}
-      initial="initial"
-      animate="animate"
-      className="space-y-6"
-    >
-      <Card variant="doodle" className="p-6" padding="none">
-        <div className="p-6 space-y-6">
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              {avatar ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatar} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-3 border-[var(--ink)]" />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-[color-mix(in_srgb,var(--primary)_10%,transparent)] flex items-center justify-center border-3 border-[var(--ink)]">
-                  <span className="text-3xl font-display text-primary">{getInitials(user?.name || 'User')}</span>
-                </div>
-              )}
-              <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-[color-mix(in_srgb,var(--primary)_90%,transparent)] transition-colors border-3 border-[var(--surface-raised)] shadow-btn">
-                <Camera className="w-4 h-4" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => e.target.files && handleAvatarUpload(Array.from(e.target.files))}
-                  className="absolute inset-0 opacity-0 cursor-pointer rounded-full"
-                />
-              </label>
-            </div>
-            <div>
-              <h2 className="font-display text-2xl text-[var(--ink)]">{user?.name || 'User'}</h2>
-              <p className="text-[var(--text-subtle)]">{user?.email}</p>
-              <Badge variant="outline" size="sm" className="mt-2 inline-block">
-                {user?.role === 'ADMIN' ? 'Admin' : 'Customer'}
-              </Badge>
-            </div>
-          </div>
-
-          <form onSubmit={profileForm.handleSubmit(handleProfileSubmit)} className="space-y-4">
-            <Input
-              label="Full Name"
-              {...profileForm.register('name')}
-              error={profileForm.formState.errors.name?.message}
-              disabled={isLoading}
-            />
-            <Input
-              label="Phone Number"
-              type="tel"
-              {...profileForm.register('phone')}
-              error={profileForm.formState.errors.phone?.message}
-              disabled={isLoading}
-            />
-            <Input
-              label="Email"
-              type="email"
-              value={user?.email || ''}
-              disabled
-              className="bg-[var(--light)]"
-            />
-            <p className="text-sm text-[var(--text-subtle)]">Email cannot be changed. Contact support if needed.</p>
-
-            <div className="flex justify-end pt-4 border-t border-[var(--light)]">
-              <Button type="submit" size="lg" variant="doodle" loading={isLoading}>
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
-              </Button>
-            </div>
-          </form>
-
-          <div className="p-4 bg-[var(--light)] rounded-input border border-[color-mix(in_srgb,var(--ink)_20%,transparent)]">
-            <h3 className="font-medium text-body text-[var(--ink)] mb-2">Account Info</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-[var(--text-subtle)]">Member Since</p>
-                <p className="font-medium">{formatDate(user?.createdAt || new Date())}</p>
-              </div>
-              <div>
-                <p className="text-[var(--text-subtle)]">Email Verified</p>
-                <p className="font-medium">{user?.emailVerified ? 'Yes' : 'No'}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Card>
+      )}
     </motion.div>
   )
 }
 
-function SecurityTab() {
-  const [isLoading, setIsLoading] = useState(false)
+/* ------------------------------------------------------------------ */
+/* Security                                                            */
+/* ------------------------------------------------------------------ */
 
-  const passwordForm = useForm<ChangePasswordInput>({
-    resolver: zodResolver(changePasswordSchema),
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
+const passwordFormSchema = changePasswordSchema
+  .extend({ confirmPassword: z.string().min(1, { message: 'Please confirm your new password' }) })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match',
   })
 
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+type PasswordFormValues = z.input<typeof passwordFormSchema>
 
-  const handlePasswordSubmit = async (data: ChangePasswordInput) => {
-    setIsLoading(true)
+function SecurityTab() {
+  const [saving, setSaving] = useState(false)
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+
+  const form = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordFormSchema),
+    defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
+  })
+
+  const handleSubmit = async (values: PasswordFormValues) => {
+    setSaving(true)
     try {
-      const response = await fetch('/api/auth/change-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to change password')
-      }
-
-      console.log('Password changed successfully!')
-      passwordForm.reset()
+      await api<{ message: string }>(
+        '/api/auth/change-password',
+        jsonInit('POST', { currentPassword: values.currentPassword, newPassword: values.newPassword })
+      )
+      toast.success('Password updated')
+      form.reset()
     } catch (error) {
-      console.error('Failed to change password:', error)
+      toast.error(error instanceof Error ? error.message : 'Failed to change password')
     } finally {
-      setIsLoading(false)
+      setSaving(false)
     }
   }
 
+  const toggleClass =
+    'absolute right-3 top-[38px] rounded-[var(--radius-sm)] p-1 text-[var(--text-subtle)] transition-colors hover:text-[var(--ink)]'
+
   return (
-    <motion.div
-      variants={motionVariants.staggerContainer}
-      initial="initial"
-      animate="animate"
-      className="space-y-6"
-    >
-      <Card variant="doodle" className="p-6" padding="none">
-        <div className="p-6 space-y-4">
-          <h2 className="font-display text-xl text-primary">Change Password</h2>
-          <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)} className="space-y-4 max-w-md">
+    <motion.div variants={motionVariants.staggerContainer} initial="initial" animate="animate" className="space-y-6">
+      <Card variant="doodle" padding="lg">
+        <div className="space-y-4">
+          <h2 className="font-display text-xl text-[var(--ink)]">Change Password</h2>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="max-w-md space-y-4">
             <div className="relative">
               <Input
                 label="Current Password"
-                type={showCurrentPassword ? 'text' : 'password'}
-                {...passwordForm.register('currentPassword')}
-                error={passwordForm.formState.errors.currentPassword?.message}
-                disabled={isLoading}
+                type={showCurrent ? 'text' : 'password'}
+                {...form.register('currentPassword')}
+                error={form.formState.errors.currentPassword?.message}
+                disabled={saving}
               />
               <button
                 type="button"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-[38px] text-[var(--text-subtle)] hover:text-primary transition-colors"
+                onClick={() => setShowCurrent(!showCurrent)}
+                className={toggleClass}
+                aria-label={showCurrent ? 'Hide current password' : 'Show current password'}
               >
-                {showCurrentPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showCurrent ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
-
             <div className="relative">
               <Input
                 label="New Password"
-                type={showNewPassword ? 'text' : 'password'}
-                {...passwordForm.register('newPassword')}
-                error={passwordForm.formState.errors.newPassword?.message}
-                disabled={isLoading}
+                type={showNew ? 'text' : 'password'}
+                {...form.register('newPassword')}
+                error={form.formState.errors.newPassword?.message}
+                disabled={saving}
               />
               <button
                 type="button"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-[38px] text-[var(--text-subtle)] hover:text-primary transition-colors"
+                onClick={() => setShowNew(!showNew)}
+                className={toggleClass}
+                aria-label={showNew ? 'Hide new password' : 'Show new password'}
               >
-                {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showNew ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
-
             <div className="relative">
               <Input
                 label="Confirm New Password"
-                type={showConfirmPassword ? 'text' : 'password'}
-                {...passwordForm.register('confirmPassword')}
-                error={passwordForm.formState.errors.confirmPassword?.message}
-                disabled={isLoading}
+                type={showConfirm ? 'text' : 'password'}
+                {...form.register('confirmPassword')}
+                error={form.formState.errors.confirmPassword?.message}
+                disabled={saving}
               />
               <button
                 type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-[38px] text-[var(--text-subtle)] hover:text-primary transition-colors"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className={toggleClass}
+                aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
               >
-                {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showConfirm ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
-
-            <div className="flex justify-end pt-4 border-t border-[var(--light)]">
-              <Button type="submit" size="lg" variant="doodle" loading={isLoading}>
-                <Save className="w-4 h-4 mr-2" />
+            <div className="flex justify-end border-t-2 border-[var(--paper-deep)] pt-4">
+              <Button type="submit" variant="doodle" loading={saving}>
+                <Save className="mr-2 h-4 w-4" />
                 Update Password
               </Button>
             </div>
@@ -842,103 +656,105 @@ function SecurityTab() {
         </div>
       </Card>
 
-      <SecurityTips />
+      <Card variant="doodle" padding="lg">
+        <h3 className="mb-4 font-display text-lg text-[var(--ink)]">Security Tips</h3>
+        <ul className="space-y-3 text-[var(--text-muted)]">
+          {['Use a unique, strong password', 'Never share your password', 'Log out from shared devices'].map((tip, i) => (
+            <li key={tip} className="flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--paper-deep)] text-sm text-[var(--ink)]">
+                {i + 1}
+              </span>
+              {tip}
+            </li>
+          ))}
+        </ul>
+      </Card>
     </motion.div>
   )
 }
 
-function OrdersTab() {
-  return (
-    <motion.div
-      variants={motionVariants.staggerContainer}
-      initial="initial"
-      animate="animate"
-      className="space-y-6"
-    >
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-display text-xl text-primary">Order History</h2>
-        <a href="/orders">
-          <Button variant="outline" size="sm">View All Orders</Button>
-        </a>
-      </div>
-
-      <div className="space-y-4">
-        {[
-          { id: '1', orderNumber: 'ORD-2024-001', status: 'DELIVERED', total: 1250, date: '2024-01-15', items: 2 },
-          { id: '2', orderNumber: 'ORD-2024-002', status: 'SHIPPED', total: 850, date: '2024-01-20', items: 1 },
-        ].map((order) => (
-          <motion.div key={order.id} variants={motionVariants.staggerItem}>
-            <OrderHistoryCard order={order} />
-          </motion.div>
-        ))}
-      </div>
-    </motion.div>
-  )
-}
+/* ------------------------------------------------------------------ */
+/* Page                                                                */
+/* ------------------------------------------------------------------ */
 
 export default function ProfilePage() {
-  const [activeTab, setActiveTab] = useState<string>('account')
+  const [user, setUser] = useState<ProfileUser | null>(null)
+  const [loadState, setLoadState] = useState<'loading' | 'error' | 'ready'>('loading')
+
+  const load = useCallback(async () => {
+    setLoadState('loading')
+    try {
+      const data = await api<{ user: ProfileUser }>('/api/user/me')
+      setUser(data.user)
+      setLoadState('ready')
+    } catch {
+      setLoadState('error')
+    }
+  }, [])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  const handleUpdated = useCallback((patch: Partial<ProfileUser>) => {
+    setUser((prev) => (prev ? { ...prev, ...patch } : prev))
+  }, [])
 
   return (
-    <div className="min-h-screen bg-[var(--bg-color)] pt-24 pb-12 px-4">
-      <DoodleBackground shapeCount={3} />
-      <div className="max-w-4xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] }}
-          className="mb-8"
-        >
-          <h1 className="font-display text-3xl text-primary mb-2">My Profile</h1>
-          <p className="text-[var(--text-subtle)]">Manage your account settings</p>
+    <div className="min-h-screen px-4 pb-16 pt-24">
+      <div className="mx-auto max-w-4xl">
+        <motion.div variants={motionVariants.pageEnter} initial="initial" animate="animate" className="relative mb-8">
+          <WashiTape rotation={-2} width={120} height={24} className="absolute -top-5 left-2" />
+          <h1 className="font-display text-3xl text-[var(--ink)]">My Profile</h1>
+          <p className="mt-1 text-[var(--text-subtle)]">Manage your account settings</p>
         </motion.div>
 
-        <Tabs defaultValue={activeTab} onChange={setActiveTab} variant="pills">
-          <TabsList className="grid w-full grid-cols-4 bg-[var(--light)] rounded-card p-1 mb-6" role="tablist">
-            {tabsConfig.map((tab, index) => (
-              <motion.button
-                key={tab.value}
-                variants={motionVariants.staggerItem}
-                custom={index}
-                role="tab"
-                aria-selected={activeTab === tab.value}
-                aria-controls={`tabs-content-${tab.value}`}
-                id={`tabs-trigger-${tab.value}`}
-                onClick={() => setActiveTab(tab.value)}
-                className={cn(
-                  'relative px-4 py-3 rounded-[30px] text-body font-medium transition-all duration-300',
-                  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-raised)]',
-                  activeTab === tab.value
-                    ? 'bg-white text-primary shadow-btn'
-                    : 'text-[color-mix(in_srgb,var(--ink)_70%,transparent)] hover:text-[var(--ink)] hover:bg-white/50'
-                )}
-              >
-                <tab.icon className="w-4 h-4 mr-1" />
-                {tab.label}
-              </motion.button>
-            ))}
-          </TabsList>
+        {loadState === 'loading' && (
+          <div className="space-y-4" data-testid="profile-loading">
+            <Skeleton className="h-12 w-full rounded-[var(--radius-lg)]" />
+            <Skeleton className="h-64 w-full rounded-[var(--radius-lg)]" />
+          </div>
+        )}
 
-          <TabsContent value="account" className="animate-fade-in">
-            <AccountTab user={mockUser} />
-          </TabsContent>
+        {loadState === 'error' && (
+          <Card variant="doodle" padding="lg">
+            <div className="py-8 text-center">
+              <p className="font-medium text-[var(--ink)]">Could not load your profile</p>
+              <p className="mt-1 text-sm text-[var(--text-subtle)]">Check your connection and try again.</p>
+              <Button type="button" variant="doodle" className="mt-4" onClick={() => void load()}>
+                Retry
+              </Button>
+            </div>
+          </Card>
+        )}
 
-          <TabsContent value="addresses" className="animate-fade-in">
-            <AddressesTab user={mockUser} />
-          </TabsContent>
-
-          <TabsContent value="notifications" className="animate-fade-in">
-            <NotificationsTab />
-          </TabsContent>
-
-          <TabsContent value="security" className="animate-fade-in">
-            <SecurityTab />
-          </TabsContent>
-
-          <TabsContent value="orders" className="animate-fade-in">
-            <OrdersTab />
-          </TabsContent>
-        </Tabs>
+        {loadState === 'ready' && user && (
+          <Tabs defaultValue="account" variant="pills">
+            <TabsList className="mb-6 flex-wrap">
+              <TabsTrigger value="account">
+                <User className="mr-1 h-4 w-4" aria-hidden="true" />
+                Account
+              </TabsTrigger>
+              <TabsTrigger value="addresses">
+                <MapPin className="mr-1 h-4 w-4" aria-hidden="true" />
+                Addresses
+              </TabsTrigger>
+              <TabsTrigger value="security">
+                <Lock className="mr-1 h-4 w-4" aria-hidden="true" />
+                Security
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="account">
+              <AccountTab user={user} onUpdated={handleUpdated} />
+            </TabsContent>
+            <TabsContent value="addresses">
+              <AddressesTab user={user} onRefresh={load} />
+            </TabsContent>
+            <TabsContent value="security">
+              <SecurityTab />
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </div>
   )
