@@ -184,7 +184,13 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** zoom measurable in browser; sticky bar clears MobileNav (72px); rail
   renders only with history; 320px clean.
 
-### E9 — Animation & micro-interaction pass `[ ]`
+### E9 — Animation & micro-interaction pass `[x]`
+> **DONE 2026-11-20, commit `a2c60c5`, controller-executed.** Added (customer)/template.tsx route-level
+> fade/rise (opacity+y8, 0.18s ≤200ms, transform/opacity-only, reduced-motion instant opacity-only via
+> useReducedMotion + root MotionConfig). Audit: accordion height reveal reduced-motion-aware, cart badge
+> bounceIn (no layout shift), springs centralized in motion.ts, global reduced-motion rules, add-to-cart
+> feedback (E8). 3 tests; verify:mid 74 files; browser home+shop render through template, shop grid 8
+> products scrollW 1272<=1280. Pure addition. Report: `task-e9-report.md`.
 - Route-level page transition (`template.tsx` fade/rise, ≤200ms, reduced-motion off),
   staggered `whileInView` reveals audited for consistency (landing/shop/about),
   skeleton→content crossfade, add-to-cart feedback (badge pulse + toast, no layout

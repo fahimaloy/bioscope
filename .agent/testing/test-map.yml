@@ -92,6 +92,9 @@ modules:
   animation:
     source: [src/app/(customer)/template.tsx, src/lib/motion.ts]
     unit: [tests/unit/customer-template.test.tsx]
+  health:
+    source: [src/app/api/health/**]
+    unit: [tests/unit/health.test.ts]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
