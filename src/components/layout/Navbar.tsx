@@ -14,6 +14,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
 import { useUIStore } from '@/lib/stores/uiStore'
 import { useCartStore } from '@/lib/stores/cartStore'
 import { useWishlistCount } from '@/lib/stores/wishlistStore'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 import { signOut } from 'next-auth/react'
 import { FOCUS_VISIBLE } from '@/components/ui/shared'
 
@@ -153,6 +154,9 @@ export function Navbar() {
                       )}
                     </AnimatePresence>
                   </Button>
+
+                  {/* E5 — live notification bell (fetch + socket + persisted mark-read) */}
+                  <NotificationBell />
 
                   {isAdmin && (
                     <Link href="/admin/dashboard" className="hidden sm:block">

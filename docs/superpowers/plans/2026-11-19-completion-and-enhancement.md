@@ -102,7 +102,15 @@ Grounded in the 2026-11-19 review; every item cites the evidence found in code.
 - **Accept:** a signed-in customer can submit and see their review; duplicate/eligibility
   errors render as field messages; tests mock the real envelope.
 
-### E4 — Promo codes at checkout + admin management `[ ]`
+### E4 — Promo codes at checkout + admin management `[x]`
+> **DONE 2026-11-20, commit `93f9d73`, controller-executed.** Admin Promotions tab (PromoSettings:
+> list/create/delete promo_<CODE> via settings API; deleteSetting action + DELETE [key] route).
+> Checkout promo input → POST /api/promo/validate (server discount preview, never client math) →
+> discount line + remove → createOrder re-prices. New validate route: requireUser + promo bucket
+> 10/min, reads promo_<CODE> directly, computeDiscount (frozen pricing read-only). 12 tests;
+> verify:mid 65 files; **live E2E same-session: create 200 → validate {E4QA,50} → order 201
+> subtotal 420 discount 42 total 459 → delete 200 → validate 400.** Risk HIGH (checkout money path +
+> SettingsForm) surfaced not waived; additive, pricing.ts only read. Report: `task-e4-report.md`.
 - **Evidence:** `createOrder` accepts `promoCode` (settings key `promo_<CODE>`,
   percent/fixed — `actions/order.ts:132-142`); checkout has **no input**; no admin UI
   creates promo settings.

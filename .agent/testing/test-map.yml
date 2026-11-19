@@ -71,6 +71,9 @@ modules:
   promotions:
     source: [src/app/api/promo/**, src/components/admin/PromoSettings.tsx, src/components/admin/SettingsForm.tsx, src/lib/admin-settings.ts, src/app/api/settings/**, src/lib/actions/settings.ts, src/app/(customer)/checkout/**]
     unit: [tests/unit/promo-validate.test.ts, tests/unit/promo-settings.test.tsx]
+  notifications:
+    source: [src/lib/hooks/useNotifications.ts, src/components/layout/NotificationBell.tsx, src/lib/stores/notificationStore.ts, src/app/api/notifications/**]
+    unit: [tests/unit/use-notifications.test.tsx]
   api-utils-prisma:
     source: [src/lib/api-utils.ts, src/lib/prisma.ts]
     unit: []
