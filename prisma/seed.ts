@@ -36,16 +36,19 @@ async function main() {
 
   console.log('🧹 Cleared existing data')
 
-  // Create admin user — password from SEED_ADMIN_PASSWORD or generated (printed once, never hardcoded).
-  const adminPasswordPlain = process.env.SEED_ADMIN_PASSWORD || crypto.randomBytes(12).toString('hex')
+  // Create admin user — credentials come from .env ADMIN_EMAIL/ADMIN_PASSWORD
+  // (single source of truth, reconciled by instrumentation.ts on every start),
+  // with SEED_ADMIN_PASSWORD as an override. Never hardcode a password.
+  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@bioscope.com').trim().toLowerCase()
+  const adminPasswordPlain = process.env.SEED_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || crypto.randomBytes(12).toString('hex')
   const adminPassword = await bcrypt.hash(adminPasswordPlain, 12)
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@stickershop.com',
+      email: adminEmail,
       passwordHash: adminPassword,
-      name: 'Admin User',
+      name: process.env.ADMIN_NAME || 'Admin User',
       role: UserRole.ADMIN,
-      phone: '+8801700000000',
+      phone: '+880****0000',
       emailVerified: new Date(),
     },
   })
@@ -453,7 +456,7 @@ async function main() {
     prisma.setting.create({
       data: {
         key: 'site_name',
-        value: 'Sticker Shop',
+        value: 'bioscope',
         type: 'STRING',
         category: 'GENERAL',
         description: 'Site name displayed in header and emails',

@@ -10,9 +10,10 @@ import { NotificationBell } from '@/components/layout/NotificationBell'
 import { SketchUnderline } from '@/components/decorative'
 import { motionVariants } from '@/lib/motion'
 import { FOCUS_VISIBLE } from '@/components/ui/shared'
-import { ChevronRight, LogOut, User, Settings, Menu } from 'lucide-react'
+import { ChevronRight, LogOut, User, Settings, Menu, X, Mail } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { useAuth } from '@/lib/hooks/useAuth'
+import { Card } from '@/components/ui/Card'
 
 /**
  * Task 1.4 — the admin chrome (spec §13, plan Task 1.4).
@@ -53,8 +54,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!isAdmin) {
     return (
-   <div className="flex min-h-screen items-center justify-center">
-        Access Denied
+      <div className="flex min-h-screen items-center justify-center">
+        <Card variant="doodle" padding="lg" className="text-center w-full max-w-md">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[color-mix(in_srgb,var(--error)_10%,transparent)] border-2 border-[var(--error)] mb-4 mx-auto">
+            <X className="w-8 h-8 text-[var(--error)]" />
+          </div>
+          <h2 className="font-display text-2xl text-[var(--ink)] mb-2">Access Denied</h2>
+          <p className="text-[var(--text-subtle)] mb-6">
+            You don't have permission to access the admin panel. Sign in with an
+            admin account to continue.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/admin/login"
+              className={cn(
+                'flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-4 text-sm font-medium text-[var(--ink)] transition-colors duration-fast hover:bg-[var(--surface-sunken)]',
+                FOCUS_VISIBLE
+              )}
+            >
+              <Mail className="w-4 h-4" aria-hidden="true" /> Sign in as admin
+            </Link>
+            <Link
+              href="/"
+              className={cn(
+                'flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-[var(--border)] bg-[var(--surface-raised)] px-4 text-sm font-medium text-[var(--text-muted)] transition-colors duration-fast hover:bg-[var(--surface-sunken)]',
+                FOCUS_VISIBLE
+              )}
+            >
+              Go to shop
+            </Link>
+          </div>
+        </Card>
       </div>
     )
   }

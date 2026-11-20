@@ -15,7 +15,6 @@ import { Mail, Lock, X, Eye, EyeOff, Shield } from 'lucide-react'
 import { DoodleBackground } from '@/components/decorative/DoodleBackground'
 import { WashiTape, SketchUnderline } from '@/components/decorative/DoodleElements'
 import { motion } from 'framer-motion'
-import { toast } from 'sonner'
 
 function AdminLoginForm() {
   const router = useRouter()
@@ -61,13 +60,15 @@ function AdminLoginForm() {
       if (result?.error) {
         setError(result.error)
       } else if (result?.ok) {
-        // After successful signIn, fetch session to check user role
+        // After successful signIn, fetch session to check user role.
+        // A non-admin who reaches /admin/login must be signed out and sent
+        // to the customer login — never left with a half-valid session.
         const sessionRes = await fetch('/api/auth/session')
         const session = await sessionRes.json()
-        
+
         if (session?.user?.role !== 'ADMIN') {
-          await signOut({ callbackUrl: '/login' })
-          toast.error('Admin access only')
+          await signOut({ callbackUrl: '/login?error=admin_access_only' })
+          setError('Admin access only — use customer login.')
           return
         }
         router.push(callbackUrl)
