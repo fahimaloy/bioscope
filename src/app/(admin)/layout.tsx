@@ -52,7 +52,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
-  if (!isAdmin) {
+  // The admin login page must render for unauthenticated users — it is where
+  // they authenticate. Every other admin route requires admin access.
+  const isAdminLoginPage = pathname === '/admin/login'
+
+  if (!isAdmin && !isAdminLoginPage) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Card variant="doodle" padding="lg" className="text-center w-full max-w-md">
