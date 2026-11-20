@@ -90,8 +90,13 @@ export const authConfig: NextAuthConfig = {
       }
 
       if (isAdminPath) {
+        // Unauthenticated users trying to reach any admin page go to the
+        // admin login page, not the customer login page.
+        if (!isLoggedIn) {
+          return Response.redirect(new URL('/admin/login', nextUrl))
+        }
         // Returning false redirects page requests to the sign-in page.
-        return isLoggedIn && auth?.user?.role === 'ADMIN'
+        return auth?.user?.role === 'ADMIN'
       }
       if (isAuthPath && isLoggedIn) {
         return Response.redirect(
